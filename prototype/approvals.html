@@ -186,6 +186,10 @@
       white-space: nowrap;
     }
 
+    @media (max-width: 639px) {
+      #bulkBar, .bulk-actions { bottom: calc(56px + var(--space-4) + env(safe-area-inset-bottom, 0)) !important; }
+    }
+
     /* Empty state */
     .populated-content,
     .empty-content { display: none; }

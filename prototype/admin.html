@@ -313,7 +313,7 @@
       <div class="page-header">
         <div class="page-header-left">
           <h1 class="page-title">Administration</h1>
-          <p class="page-subtitle">Manage company settings, users, and system configuration</p>
+          <p class="page-subtitle">Manage company settings, users, and system settings</p>
         </div>
       </div>
 
@@ -345,24 +345,35 @@
                     <input type="text" class="form-input" value="GammaHR Demo Corp">
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Industry</label>
-                    <select class="form-select">
-                      <option>Technology</option>
-                      <option selected>Professional Services</option>
-                      <option>Finance</option>
-                      <option>Healthcare</option>
-                      <option>Manufacturing</option>
-                    </select>
+                    <label class="form-label">Company Logo</label>
+                    <div class="upload-zone" style="padding: var(--space-4); min-height: 80px;">
+                      <svg data-lucide="image" width="24" height="24"></svg>
+                      <span style="font-size: var(--text-body-sm);">Click to upload logo (PNG, SVG, max 2MB)</span>
+                    </div>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Company Size</label>
-                    <select class="form-select">
-                      <option>1-10</option>
-                      <option>11-50</option>
-                      <option selected>50-200</option>
-                      <option>200-500</option>
-                      <option>500+</option>
-                    </select>
+                    <label class="form-label">Tax / Fiscal Number</label>
+                    <input type="text" class="form-input" value="FR12345678901">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">VAT Number</label>
+                    <input type="text" class="form-input" value="FR89123456789">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Standard Work Hours per Day</label>
+                    <input type="number" class="form-input" value="8" min="1" max="24">
+                  </div>
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Standard Work Days per Week</label>
+                    <div style="display:flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-1);">
+                      <label class="form-check"><input type="checkbox" checked> Mon</label>
+                      <label class="form-check"><input type="checkbox" checked> Tue</label>
+                      <label class="form-check"><input type="checkbox" checked> Wed</label>
+                      <label class="form-check"><input type="checkbox" checked> Thu</label>
+                      <label class="form-check"><input type="checkbox" checked> Fri</label>
+                      <label class="form-check"><input type="checkbox"> Sat</label>
+                      <label class="form-check"><input type="checkbox"> Sun</label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -443,36 +454,18 @@
                 </div>
               </div>
 
-              <!-- Approval Chain -->
-              <div class="settings-section" style="margin-bottom: 0;">
-                <h3 class="settings-section-title">Approval Chain</h3>
-                <div class="settings-grid">
-                  <div class="form-group">
-                    <label class="form-label">Leave Approver</label>
-                    <select class="form-select">
-                      <option selected>Direct Manager</option>
-                      <option>Department Manager</option>
-                      <option>HR Manager</option>
-                      <option>Skip-level Manager</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Expense Approver</label>
-                    <select class="form-select">
-                      <option>Direct Manager</option>
-                      <option selected>Department Manager</option>
-                      <option>Finance Manager</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Timesheet Approver</label>
-                    <select class="form-select">
-                      <option>Direct Manager</option>
-                      <option>Department Manager</option>
-                      <option selected>Project Manager</option>
-                    </select>
-                  </div>
-                </div>
+              <!-- Approval Chain Configuration -->
+              <h4 style="margin-top: var(--space-6); margin-bottom: var(--space-3); font-weight: var(--weight-semibold); color: var(--color-text-1);">Approval Chain Configuration</h4>
+              <div class="data-table-wrapper mb-4">
+                <table class="data-table mobile-cards">
+                  <thead><tr><th>Request Type</th><th>Level 1 Approver</th><th>Level 2 Approver</th><th>Threshold</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td data-label="Type">Timesheets</td><td data-label="Level 1">Project Manager</td><td data-label="Level 2">&mdash;</td><td data-label="Threshold">All submissions</td><td data-label="Actions"><button class="btn btn-ghost btn-xs"><svg data-lucide="pencil" width="12" height="12"></svg></button></td></tr>
+                    <tr><td data-label="Type">Expenses</td><td data-label="Level 1">Direct Manager</td><td data-label="Level 2">Finance Director</td><td data-label="Threshold">&gt; EUR 1,000</td><td data-label="Actions"><button class="btn btn-ghost btn-xs"><svg data-lucide="pencil" width="12" height="12"></svg></button></td></tr>
+                    <tr><td data-label="Type">Leave Requests</td><td data-label="Level 1">Direct Manager</td><td data-label="Level 2">HR Director</td><td data-label="Threshold">&gt; 5 days</td><td data-label="Actions"><button class="btn btn-ghost btn-xs"><svg data-lucide="pencil" width="12" height="12"></svg></button></td></tr>
+                    <tr><td data-label="Type">Invoices</td><td data-label="Level 1">Project Manager</td><td data-label="Level 2">Finance Director</td><td data-label="Threshold">All invoices</td><td data-label="Actions"><button class="btn btn-ghost btn-xs"><svg data-lucide="pencil" width="12" height="12"></svg></button></td></tr>
+                  </tbody>
+                </table>
               </div>
 
               <div style="margin-top: var(--space-6); display: flex; justify-content: flex-end;">
@@ -1046,32 +1039,11 @@
 
         <!-- ════════════ TAB 7: Audit Log ════════════ -->
         <div class="tab-content" id="tab-audit">
-          <div class="audit-filters">
-            <select class="form-select form-input-sm" style="width: 150px;">
-              <option value="all">All Actions</option>
-              <option>Created</option>
-              <option>Updated</option>
-              <option>Deleted</option>
-              <option>Approved</option>
-            </select>
-            <select class="form-select form-input-sm" style="width: 150px;">
-              <option value="all">All Entities</option>
-              <option>User</option>
-              <option>Leave</option>
-              <option>Timesheet</option>
-              <option>Expense</option>
-              <option>Department</option>
-              <option>Project</option>
-            </select>
-            <select class="form-select form-input-sm" style="width: 150px;">
-              <option value="all">All Users</option>
-              <option>Sarah Chen</option>
-              <option>John Smith</option>
-              <option>Alice Wang</option>
-            </select>
-            <input type="date" class="form-input form-input-sm" style="width: 150px;" value="2026-04-01">
-            <span style="color: var(--color-text-3);">to</span>
-            <input type="date" class="form-input form-input-sm" style="width: 150px;" value="2026-04-05">
+          <div class="filter-bar-standard mb-4">
+            <div class="filter-search"><svg data-lucide="search" width="16" height="16"></svg><input type="text" placeholder="Search audit log..."></div>
+            <select class="form-select"><option>All Users</option><option>Sarah Chen</option><option>John Smith</option><option>Bob Taylor</option></select>
+            <select class="form-select"><option>All Actions</option><option>Created</option><option>Updated</option><option>Deleted</option><option>Approved</option><option>Rejected</option></select>
+            <button class="btn btn-secondary btn-sm"><svg data-lucide="download" width="14" height="14"></svg> Export</button>
           </div>
 
           <div class="data-table-wrapper">
@@ -1172,16 +1144,18 @@
               </table>
             </div>
             <div class="table-pagination">
-              <span>Showing 1-10 of 47 entries</span>
+              <span>Showing 1-20 of 4,847 entries</span>
               <div class="pagination-buttons">
                 <button disabled>&laquo;</button>
                 <button class="active">1</button>
                 <button>2</button>
                 <button>3</button>
-                <button>5</button>
+                <button>...</button>
+                <button>243</button>
                 <button>&raquo;</button>
               </div>
             </div>
+            <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-2);">Retention policy: 2 years active, auto-archived after 1 year</p>
           </div>
         </div>
 
@@ -1190,8 +1164,8 @@
       <!-- Empty State -->
       <div class="empty-content empty-state">
         <svg data-lucide="settings" width="64" height="64"></svg>
-        <h3>No configuration data</h3>
-        <p>This section is empty. Start by configuring your company settings above.</p>
+        <h3>No settings data</h3>
+        <p>This section is empty. Start by updating your company settings above.</p>
       </div>
 
     </main>

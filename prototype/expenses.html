@@ -1531,10 +1531,17 @@
       aiBtn.disabled = false;
       aiBtn.classList.remove('btn-loading');
 
-      // Auto-fill form
-      document.getElementById('formType').value = 'hotel';
-      document.getElementById('formAmount').value = '340.00';
-      document.getElementById('formDate').value = '2026-04-02';
+      // Auto-fill form from AI scan
+      setTimeout(function() {
+        var typeEl = document.getElementById('formType');
+        var amountEl = document.getElementById('formAmount');
+        var dateEl = document.getElementById('formDate');
+        if (typeEl) typeEl.value = 'Hotel';
+        if (amountEl) amountEl.value = '340.00';
+        if (dateEl) dateEl.value = '2026-04-02';
+      }, 100);
+
+      // Additional auto-fill fields
       document.getElementById('formProject').value = 'acme';
       document.getElementById('formBillable').checked = true;
       document.getElementById('formDesc').value = 'Marriott Hotel Lyon - 2 nights for client workshop';
