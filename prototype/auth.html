@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      padding: var(--space-4);
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 420px;
+    }
+    .auth-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-3);
+      padding: var(--space-10) var(--space-8);
+    }
+    .auth-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+    }
+    .auth-logo .logo-3d {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-white);
+      font-weight: var(--weight-bold);
+      font-size: 24px;
+      box-shadow: var(--shadow-2);
+      animation: logoFloat 6s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(2deg); }
+    }
+    .auth-logo h1 {
+      font-size: var(--text-heading-1);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+    }
+    .auth-logo p {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .auth-form { display: flex; flex-direction: column; gap: var(--space-4); }
+    .auth-form .form-input {
+      height: 44px;
+      padding: 0 var(--space-4);
+      font-size: var(--text-body);
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .password-wrapper .toggle-pass {
+      position: absolute;
+      right: var(--space-3);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--color-text-3);
+      cursor: pointer;
+      padding: 4px;
+    }
+    .password-wrapper .toggle-pass:hover { color: var(--color-text-1); }
+    .auth-submit {
+      width: 100%;
+      height: 44px;
+      font-size: var(--text-body-lg);
+      margin-top: var(--space-2);
+    }
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+      color: var(--color-text-3);
+      font-size: var(--text-body-sm);
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+    .alt-login { display: flex; flex-direction: column; gap: var(--space-3); }
+    .alt-login .btn {
+      width: 100%;
+      height: 44px;
+      font-size: var(--text-body);
+    }
+    .auth-footer {
+      text-align: center;
+      margin-top: var(--space-4);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .auth-footer a { color: var(--color-primary); }
+    .forgot-link {
+      text-align: right;
+      margin-top: calc(-1 * var(--space-2));
+    }
+    .forgot-link a {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .forgot-link a:hover { color: var(--color-primary); }
+
+    /* Error state */
+    .auth-error {
+      display: none;
+      padding: var(--space-3);
+      background: var(--color-error-muted);
+      border: 1px solid var(--color-error);
+      border-radius: var(--radius-md);
+      color: var(--color-error);
+      font-size: var(--text-body-sm);
+      text-align: center;
+    }
+    .auth-error.visible { display: block; }
+
+    /* MFA section */
+    .mfa-section {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .mfa-section.visible { display: flex; }
+    .mfa-input {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: var(--text-heading-2);
+      letter-spacing: 8px;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.4s ease; }
+
+    /* Forgot password view */
+    .auth-view { display: none; }
+    .auth-view.active { display: block; }
+
+    /* Password strength */
+    .strength-meter {
+      display: flex;
+      gap: var(--space-1);
+      margin-top: var(--space-1);
+    }
+    .strength-bar {
+      flex: 1;
+      height: 3px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      transition: background var(--motion-fast);
+    }
+    .strength-bar.weak { background: var(--color-error); }
+    .strength-bar.medium { background: var(--color-warning); }
+    .strength-bar.strong { background: var(--color-success); }
+    .strength-text {
+      font-size: var(--text-caption);
+      margin-top: var(--space-1);
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+      <!-- LOGIN VIEW -->
+      <div class="auth-view active" id="login-view">
+        <div class="auth-card">
+          <div class="auth-logo">
+            <div class="logo-3d">G</div>
+            <h1>GammaHR</h1>
+            <p>Sign in to your workspace</p>
+          </div>
+
+          <div class="auth-error" id="login-error">
+            Invalid email or password. Please try again.
+          </div>
+
+          <form class="auth-form" id="login-form" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="login-email" placeholder="you@company.com" autofocus value="sarah.chen@gammahr.io">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="password-wrapper">
+                <input type="password" class="form-input" id="login-password" placeholder="Enter your password">
+                <button type="button" class="toggle-pass" onclick="togglePassword('login-password', this)">
+                  <svg data-lucide="eye" width="18" height="18"></svg>
+                </button>
+              </div>
+            </div>
+            <div class="forgot-link">
+              <a href="#" onclick="showView('forgot-view')">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg auth-submit" onclick="handleLogin()">
+              <svg data-lucide="log-in" width="18" height="18"></svg>
+              Sign In
+            </button>
+          </form>
+
+          <!-- MFA Section -->
+          <div class="mfa-section" id="mfa-section">
+            <div style="text-align:center; margin-bottom: var(--space-2);">
+              <svg data-lucide="shield-check" width="32" height="32" style="color: var(--color-primary);"></svg>
+              <p style="font-size: var(--text-body); color: var(--color-text-1); margin-top: var(--space-2); font-weight: var(--weight-semibold);">Two-Factor Authentication</p>
+              <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-top: var(--space-1);">Enter the 6-digit code from your authenticator app</p>
+            </div>
+            <input type="text" class="form-input mfa-input" maxlength="6" placeholder="000000" id="mfa-code">
+            <button class="btn btn-primary btn-lg auth-submit" onclick="handleMFA()">
+              Verify Code
+            </button>
+            <p style="text-align: center; font-size: var(--text-body-sm); color: var(--color-text-2);">
+              <a href="#">Use a recovery code</a>
+            </p>
+          </div>
+
+          <div class="auth-divider">or</div>
+
+          <div class="alt-login">
+            <button class="btn btn-secondary btn-lg">
+              <svg data-lucide="key" width="18" height="18"></svg>
+              Sign in with Passkey
+            </button>
+            <button class="btn btn-secondary btn-lg">
+              <svg data-lucide="building" width="18" height="18"></svg>
+              Sign in with SSO
+            </button>
+          </div>
+
+          <div class="auth-footer" style="margin-top: var(--space-6);">
+            <div style="height:1px; background: var(--color-border); margin-bottom: var(--space-4);"></div>
+            Don't have an account?<br>
+            <a href="#">Contact your administrator</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD VIEW -->
+      <div class="auth-view" id="forgot-view">
+        <div class="auth-card">
+          <div class="auth-logo">
+            <div class="logo-3d">G</div>
+            <h1>Reset Password</h1>
+            <p>Enter your email to receive a reset link</p>
+          </div>
+
+          <form class="auth-form" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" placeholder="you@company.com" autofocus>
+            </div>
+            <button class="btn btn-primary btn-lg auth-submit" onclick="handleForgot()">
+              <svg data-lucide="mail" width="18" height="18"></svg>
+              Send Reset Link
+            </button>
+          </form>
+
+          <div class="auth-footer" style="margin-top: var(--space-6);">
+            <a href="#" onclick="showView('login-view')">
+              <svg data-lucide="arrow-left" width="14" height="14" style="vertical-align: -2px;"></svg>
+              Back to Sign In
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESET SENT VIEW -->
+      <div class="auth-view" id="reset-sent-view">
+        <div class="auth-card" style="text-align: center;">
+          <div style="margin-bottom: var(--space-6);">
+            <svg data-lucide="mail-check" width="48" height="48" style="color: var(--color-success);"></svg>
+          </div>
+          <h2 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); margin-bottom: var(--space-2);">Check your email</h2>
+          <p style="color: var(--color-text-2); margin-bottom: var(--space-6);">
+            We sent a password reset link to your email address. The link will expire in 1 hour.
+          </p>
+          <button class="btn btn-secondary btn-lg" style="width: 100%;" onclick="showView('login-view')">
+            <svg data-lucide="arrow-left" width="18" height="18"></svg>
+            Back to Sign In
+          </button>
+        </div>
+      </div>
+
+      <!-- 2FA SETUP VIEW -->
+      <div class="auth-view" id="mfa-setup-view">
+        <div class="auth-card">
+          <div class="auth-logo">
+            <div class="logo-3d">G</div>
+            <h1>Set Up 2FA</h1>
+            <p>Scan this QR code with your authenticator app</p>
+          </div>
+
+          <div style="text-align: center; margin-bottom: var(--space-6);">
+            <!-- Fake QR code -->
+            <div style="width: 180px; height: 180px; background: var(--color-white); border-radius: var(--radius-md); margin: 0 auto; display: flex; align-items: center; justify-content: center; padding: var(--space-4);">
+              <svg width="148" height="148" viewBox="0 0 148 148">
+                <rect fill="currentColor" x="0" y="0" width="20" height="20"/>
+                <rect fill="currentColor" x="24" y="0" width="8" height="8"/>
+                <rect fill="currentColor" x="40" y="0" width="20" height="20"/>
+                <rect fill="currentColor" x="68" y="0" width="12" height="12"/>
+                <rect fill="currentColor" x="88" y="0" width="8" height="8"/>
+                <rect fill="currentColor" x="128" y="0" width="20" height="20"/>
+                <rect fill="currentColor" x="0" y="24" width="8" height="8"/>
+                <rect fill="currentColor" x="16" y="24" width="8" height="8"/>
+                <rect fill="currentColor" x="40" y="24" width="8" height="8"/>
+                <rect fill="currentColor" x="56" y="24" width="8" height="8"/>
+                <rect fill="currentColor" x="72" y="24" width="16" height="8"/>
+                <rect fill="currentColor" x="128" y="24" width="8" height="8"/>
+                <rect fill="currentColor" x="144" y="24" width="4" height="8"/>
+                <rect fill="currentColor" x="0" y="40" width="20" height="20"/>
+                <rect fill="currentColor" x="32" y="40" width="12" height="12"/>
+                <rect fill="currentColor" x="52" y="40" width="8" height="8"/>
+                <rect fill="currentColor" x="80" y="40" width="20" height="8"/>
+                <rect fill="currentColor" x="128" y="40" width="20" height="20"/>
+                <text x="74" y="90" text-anchor="middle" font-size="12" fill="var(--color-text-3)">QR Code</text>
+              </svg>
+            </div>
+            <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-3);">
+              Manual key: <code style="font-family: var(--font-mono); color: var(--color-text-1);">JBSWY3DPEHPK3PXP</code>
+            </p>
+          </div>
+
+          <form class="auth-form" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">Verification Code</label>
+              <input type="text" class="form-input mfa-input" maxlength="6" placeholder="000000">
+            </div>
+            <button class="btn btn-primary btn-lg auth-submit" onclick="showView('login-view')">
+              <svg data-lucide="check" width="18" height="18"></svg>
+              Verify & Enable 2FA
+            </button>
+          </form>
+
+          <div class="auth-footer" style="margin-top: var(--space-4);">
+            <a href="#" onclick="showView('login-view')">Skip for now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
+
+    function showView(viewId) {
+      document.querySelectorAll('.auth-view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+    }
+
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+      } else {
+        input.type = 'password';
+      }
+    }
+
+    function handleLogin() {
+      const form = document.getElementById('login-form');
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const error = document.getElementById('login-error');
+      const mfa = document.getElementById('mfa-section');
+
+      if (!email || !password) {
+        error.classList.add('visible');
+        form.classList.add('shake');
+        setTimeout(() => form.classList.remove('shake'), 400);
+        return;
+      }
+
+      // Simulate login — show loading
+      const btn = form.querySelector('.auth-submit');
+      btn.classList.add('btn-loading');
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.classList.remove('btn-loading');
+        btn.disabled = false;
+        error.classList.remove('visible');
+
+        // Show MFA
+        form.style.display = 'none';
+        mfa.classList.add('visible');
+        document.getElementById('mfa-code').focus();
+      }, 1500);
+    }
+
+    function handleMFA() {
+      const code = document.getElementById('mfa-code').value;
+      if (code.length === 6) {
+        // Redirect to dashboard
+        window.location.href = 'index.html';
+      }
+    }
+
+    function handleForgot() {
+      showView('reset-sent-view');
+    }
+
+    // Enter key handlers
+    document.getElementById('login-password').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('mfa-code')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleMFA();
+    });
+
+    // View switcher links
+    document.querySelectorAll('[data-view]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        showView(link.dataset.view);
+      });
+    });
+  </script>
+</body>
+</html>

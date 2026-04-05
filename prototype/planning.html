@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resource Planning &mdash; GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Planning-specific styles ── */
+
+    /* Capacity month cards */
+    .capacity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    @media (max-width: 1023px) { .capacity-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 639px) { .capacity-grid { grid-template-columns: 1fr; } }
+
+    .capacity-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      box-shadow: var(--shadow-1);
+    }
+    .capacity-card-title {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-3);
+    }
+    .capacity-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-1) 0;
+    }
+    .capacity-label {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .capacity-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .capacity-gap {
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-2);
+      font-family: var(--font-mono);
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-body-sm);
+      text-align: center;
+    }
+    .capacity-gap.surplus { background: var(--color-success-muted); color: var(--color-success); }
+    .capacity-gap.warning { background: var(--color-warning-muted); color: var(--color-warning); }
+    .capacity-gap.deficit { background: var(--color-error-muted); color: var(--color-error); }
+
+    /* Bench forecast */
+    .bench-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .bench-item:last-child { border-bottom: none; }
+    .bench-info { flex: 1; }
+    .bench-name {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-1);
+    }
+    .bench-name a { color: var(--color-text-1); }
+    .bench-name a:hover { color: var(--color-primary); }
+    .bench-detail {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-top: 2px;
+    }
+    .bench-days {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      white-space: nowrap;
+    }
+
+    .forecast-section {
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-4);
+    }
+    .forecast-section-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .forecast-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2) 0;
+      font-size: var(--text-body-sm);
+    }
+    .forecast-label { color: var(--color-text-2); }
+    .forecast-value {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+
+    /* AI recommendation in bench */
+    .ai-rec {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--color-accent-muted);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-2);
+      align-items: flex-start;
+    }
+    .ai-rec:first-of-type { margin-top: var(--space-3); }
+    .ai-rec-icon { flex-shrink: 0; color: var(--color-accent); margin-top: 2px; }
+    .ai-rec-body { flex: 1; }
+    .ai-rec-text {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-2);
+    }
+    .ai-rec-actions { display: flex; gap: var(--space-2); }
+
+    /* Skills matrix gap colors */
+    .gap-deficit { color: var(--color-error); font-weight: var(--weight-semibold); }
+    .gap-surplus { color: var(--color-success); font-weight: var(--weight-semibold); }
+    .gap-balanced { color: var(--color-text-2); }
+
+    /* Scenario section */
+    .scenario-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .scenario-stat {
+      padding: var(--space-3);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+    .scenario-stat-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-bottom: var(--space-1);
+    }
+    .scenario-stat-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+    }
+
+    .impact-section {
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-4);
+    }
+    .impact-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-3);
+    }
+    .impact-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+      font-size: var(--text-body-sm);
+    }
+    .impact-row:last-child { border-bottom: none; }
+    .impact-label { color: var(--color-text-2); }
+    .impact-value { font-weight: var(--weight-medium); color: var(--color-text-1); }
+    .impact-note {
+      font-size: var(--text-caption);
+      color: var(--color-warning);
+      margin-top: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-warning-muted);
+      border-radius: var(--radius-md);
+    }
+
+    /* Scenario results (hidden by default) */
+    .scenario-results {
+      display: none;
+      animation: fadeSlideIn 0.3s var(--ease-out);
+    }
+    .scenario-results.active { display: block; }
+
+    /* Loading spinner */
+    .scenario-loading {
+      display: none;
+      text-align: center;
+      padding: var(--space-6);
+    }
+    .scenario-loading.active { display: block; }
+    .scenario-loading .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto var(--space-3);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hiring pipeline */
+    .hiring-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .hiring-item:last-child { border-bottom: none; }
+    .hiring-info { flex: 1; }
+    .hiring-title {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-1);
+    }
+    .hiring-dept {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-top: 2px;
+    }
+    .hiring-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    /* Chart */
+    .chart-container { padding: var(--space-4); position: relative; }
+    .chart-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-4);
+    }
+    .chart-bar { cursor: pointer; transition: opacity var(--motion-fast); }
+    .chart-bar:hover { opacity: 0.8; }
+
+    /* Empty state toggles */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════ SIDEBAR ════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+        <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item active">
+          <svg data-lucide="bar-chart-3"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════ MAIN WRAPPER ════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Resource Planning</h2>
+      </div>
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="calendar-range" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">2 projects ending this month &mdash; plan reallocation</div>
+                  <div class="notif-time">10 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="users" width="16" height="16" style="color: var(--color-info);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">3 employees currently on bench</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="trending-up" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">React skill demand increased &mdash; consider hiring</div>
+                  <div class="notif-time">Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════ PAGE CONTENT ════════════════ -->
+    <main class="page-content populated-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Resource Planning</h1>
+          <p class="page-subtitle">Capacity forecasting, bench management, and scenario planning</p>
+        </div>
+        <div class="page-header-actions">
+          <div class="dropdown">
+            <button class="btn btn-secondary btn-md" id="scenarioDropdownBtn">
+              <svg data-lucide="git-branch" width="16" height="16"></svg>
+              Scenarios
+              <svg data-lucide="chevron-down" width="14" height="14"></svg>
+            </button>
+            <div class="dropdown-menu" id="scenarioDropdownMenu">
+              <div class="dropdown-label">Saved Scenarios</div>
+              <button class="dropdown-item">Contoso Deal (Win)</button>
+              <button class="dropdown-item">Q3 Hiring Freeze</button>
+              <button class="dropdown-item">Acme Expansion</button>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item"><svg data-lucide="plus" width="16" height="16"></svg> New Scenario</button>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-md">
+            <svg data-lucide="download" width="16" height="16"></svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 1: Capacity Overview -->
+      <div class="mb-6">
+        <div class="capacity-grid">
+          <div class="capacity-card">
+            <div class="capacity-card-title">April 2026</div>
+            <div class="capacity-row">
+              <span class="capacity-label">Available</span>
+              <span class="capacity-value font-mono">2,080h</span>
+            </div>
+            <div class="capacity-row">
+              <span class="capacity-label">Allocated</span>
+              <span class="capacity-value font-mono">1,872h</span>
+            </div>
+            <div class="capacity-gap surplus">Gap: +208h (surplus)</div>
+          </div>
+          <div class="capacity-card">
+            <div class="capacity-card-title">May 2026</div>
+            <div class="capacity-row">
+              <span class="capacity-label">Available</span>
+              <span class="capacity-value font-mono">2,160h</span>
+            </div>
+            <div class="capacity-row">
+              <span class="capacity-label">Allocated</span>
+              <span class="capacity-value font-mono">1,944h</span>
+            </div>
+            <div class="capacity-gap surplus">Gap: +216h (surplus)</div>
+          </div>
+          <div class="capacity-card">
+            <div class="capacity-card-title">June 2026</div>
+            <div class="capacity-row">
+              <span class="capacity-label">Available</span>
+              <span class="capacity-value font-mono">2,080h</span>
+            </div>
+            <div class="capacity-row">
+              <span class="capacity-label">Allocated</span>
+              <span class="capacity-value font-mono">1,664h</span>
+            </div>
+            <div class="capacity-gap warning">Gap: +416h (growing gap)</div>
+          </div>
+        </div>
+
+        <!-- Stacked Bar Chart -->
+        <div class="card">
+          <div class="chart-container">
+            <div class="chart-title">Capacity vs Allocation</div>
+            <svg viewBox="0 0 700 200" preserveAspectRatio="xMidYMid meet">
+              <!-- Y axis labels -->
+              <text x="10" y="24" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">2,500h</text>
+              <text x="10" y="72" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">2,000h</text>
+              <text x="10" y="119" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">1,500h</text>
+              <text x="10" y="167" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">1,000h</text>
+              <!-- Grid -->
+              <line x1="60" y1="68" x2="680" y2="68" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="60" y1="115" x2="680" y2="115" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="60" y1="163" x2="680" y2="163" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="60" y1="180" x2="680" y2="180" stroke="var(--color-border)" stroke-width="1"/>
+              <!-- April: Available 2080 outline, Allocated 1872 filled -->
+              <!-- Scale: 2500h = y20, 0 = y180, range=160. h/2500*160 -->
+              <!-- 2080: height = 133, y = 180-133=47 -->
+              <!-- 1872: height = 120, y = 180-120=60 -->
+              <rect x="120" y="47" width="100" height="133" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
+              <rect x="120" y="60" width="100" height="120" rx="4" fill="var(--color-primary)" opacity="0.8"/>
+              <text x="170" y="55" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">1,872h</text>
+              <!-- May: 2160 avail, 1944 alloc -->
+              <!-- 2160: height=138, y=42 -->
+              <!-- 1944: height=124, y=56 -->
+              <rect x="300" y="42" width="100" height="138" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
+              <rect x="300" y="56" width="100" height="124" rx="4" fill="var(--color-primary)" opacity="0.8"/>
+              <text x="350" y="50" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">1,944h</text>
+              <!-- June: 2080 avail, 1664 alloc -->
+              <!-- 2080: height=133, y=47 -->
+              <!-- 1664: height=106, y=74 -->
+              <rect x="480" y="47" width="100" height="133" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
+              <rect x="480" y="74" width="100" height="106" rx="4" fill="var(--color-primary)" opacity="0.8"/>
+              <text x="530" y="68" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">1,664h</text>
+              <!-- Month labels -->
+              <text x="170" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">April</text>
+              <text x="350" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">May</text>
+              <text x="530" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">June</text>
+            </svg>
+            <div style="display: flex; gap: var(--space-4); justify-content: center; margin-top: var(--space-2);">
+              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
+                <div style="width: 12px; height: 12px; background: var(--color-primary); border-radius: 2px; opacity: 0.8;"></div>
+                Allocated
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
+                <div style="width: 12px; height: 12px; border: 2px dashed var(--color-border-strong); border-radius: 2px;"></div>
+                Available
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Bench Forecast -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="user-minus" width="18" height="18" style="color: var(--color-warning);"></svg>
+            Bench Forecast
+          </span>
+          <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> 3 on bench</span>
+        </div>
+        <div class="card-body">
+          <!-- Currently on bench -->
+          <div style="font-size: var(--text-body-sm); font-weight: var(--weight-semibold); color: var(--color-text-2); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.5px; font-size: var(--text-caption);">Currently on Bench</div>
+          <div class="bench-item">
+            <div class="avatar avatar-sm">BT</div>
+            <div class="bench-info">
+              <div class="bench-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+              <div class="bench-detail">Senior Developer &bull; Python, REST APIs, Django</div>
+            </div>
+            <div class="bench-days">21 days</div>
+          </div>
+          <div class="bench-item">
+            <div class="avatar avatar-sm">JW</div>
+            <div class="bench-info">
+              <div class="bench-name"><a href="employees.html">James Wilson</a></div>
+              <div class="bench-detail">DevOps Engineer &bull; AWS, Docker, Kubernetes</div>
+            </div>
+            <div class="bench-days">14 days</div>
+          </div>
+          <div class="bench-item">
+            <div class="avatar avatar-sm">LM</div>
+            <div class="bench-info">
+              <div class="bench-name"><a href="employees.html">Lisa Martinez</a></div>
+              <div class="bench-detail">Business Analyst &bull; Data Analytics, SQL</div>
+            </div>
+            <div class="bench-days">7 days</div>
+          </div>
+
+          <!-- Forecast (next 30 days) -->
+          <div class="forecast-section">
+            <div class="forecast-section-title">
+              <svg data-lucide="calendar-clock" width="16" height="16" style="color: var(--color-info);"></svg>
+              Forecast (Next 30 Days)
+            </div>
+            <div class="forecast-row">
+              <span class="forecast-label">Ending projects</span>
+              <span class="forecast-value">2 employees</span>
+            </div>
+            <div style="padding-left: var(--space-4); font-size: var(--text-caption); color: var(--color-text-3); margin-bottom: var(--space-2);">
+              <a href="employees.html#alice-wang">Alice Wang</a> &mdash; Acme ends Apr 30 &bull; <a href="employees.html#carol-kim">Carol Kim</a> &mdash; Initech ends Apr 28
+            </div>
+            <div class="forecast-row">
+              <span class="forecast-label">Starting projects</span>
+              <span class="forecast-value">1 employee</span>
+            </div>
+            <div style="padding-left: var(--space-4); font-size: var(--text-caption); color: var(--color-text-3); margin-bottom: var(--space-2);">
+              <a href="employees.html#bob-taylor">Bob Taylor</a> &rarr; Initech, May 1
+            </div>
+            <div class="forecast-row">
+              <span class="forecast-label">Net bench in 30 days</span>
+              <span class="forecast-value" style="color: var(--color-warning);">4 employees</span>
+            </div>
+            <div class="forecast-row">
+              <span class="forecast-label">Revenue at risk</span>
+              <span class="forecast-value font-mono" style="color: var(--color-gold);">&euro;32,000/month</span>
+            </div>
+          </div>
+
+          <!-- AI Recommendations -->
+          <div style="font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-text-2); margin-top: var(--space-4); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="sparkles" width="14" height="14" style="color: var(--color-accent);"></svg>
+            AI Recommendations
+          </div>
+          <div class="ai-rec" id="benchRec1">
+            <div class="ai-rec-icon"><svg data-lucide="sparkles" width="16" height="16"></svg></div>
+            <div class="ai-rec-body">
+              <div class="ai-rec-text">Alice Wang has skills matching Globex Phase 3 requirements (UI/UX Design, React, Figma)</div>
+              <div class="ai-rec-actions">
+                <button class="btn btn-primary btn-xs bench-assign-btn">Assign</button>
+                <button class="btn btn-ghost btn-xs">View Profile</button>
+              </div>
+            </div>
+          </div>
+          <div class="ai-rec" id="benchRec2">
+            <div class="ai-rec-icon"><svg data-lucide="sparkles" width="16" height="16"></svg></div>
+            <div class="ai-rec-body">
+              <div class="ai-rec-text">Carol Kim could support Acme Web Redesign (data analytics needed, Python proficiency)</div>
+              <div class="ai-rec-actions">
+                <button class="btn btn-primary btn-xs bench-assign-btn">Assign</button>
+                <button class="btn btn-ghost btn-xs">View Profile</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Skills Matrix -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="puzzle" width="18" height="18" style="color: var(--color-info);"></svg>
+            Skills Matrix
+          </span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="data-table mobile-cards">
+            <thead>
+              <tr>
+                <th>Skill</th>
+                <th>Available Now</th>
+                <th>Available Next Month</th>
+                <th>Demand</th>
+                <th>Gap</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: var(--weight-medium);">React</td>
+                <td class="cell-mono">4</td>
+                <td class="cell-mono">3</td>
+                <td class="cell-mono">5</td>
+                <td class="cell-mono gap-deficit">-1</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-medium);">Python</td>
+                <td class="cell-mono">3</td>
+                <td class="cell-mono">3</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono gap-surplus">+1</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-medium);">UI/UX Design</td>
+                <td class="cell-mono">1</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono gap-balanced">0</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-medium);">DevOps</td>
+                <td class="cell-mono">1</td>
+                <td class="cell-mono">1</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono gap-deficit">-1</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-medium);">Project Management</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono">2</td>
+                <td class="cell-mono gap-balanced">0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 4: What-If Scenarios -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="git-branch" width="18" height="18" style="color: var(--color-accent);"></svg>
+            What-If Scenarios
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="form-group mb-4">
+            <label class="form-label">Scenario</label>
+            <select class="form-select" id="scenarioSelect">
+              <option selected>What if we win the Contoso deal?</option>
+              <option>What if we lose the Acme contract?</option>
+              <option>What if we hire 5 engineers in Q3?</option>
+            </select>
+          </div>
+
+          <div class="scenario-details">
+            <div class="scenario-stat">
+              <div class="scenario-stat-label">Deal Size</div>
+              <div class="scenario-stat-value">&euro;180,000</div>
+            </div>
+            <div class="scenario-stat">
+              <div class="scenario-stat-label">Duration</div>
+              <div class="scenario-stat-value">6 mo</div>
+            </div>
+            <div class="scenario-stat">
+              <div class="scenario-stat-label">FTEs Needed</div>
+              <div class="scenario-stat-value">8</div>
+            </div>
+            <div class="scenario-stat">
+              <div class="scenario-stat-label">Revenue/Month</div>
+              <div class="scenario-stat-value" style="color: var(--color-gold);">+&euro;30k</div>
+            </div>
+          </div>
+
+          <div style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-3);">
+            <strong>Skills required:</strong> React (3), Python (2), UI/UX (1), PM (1), DevOps (1)
+          </div>
+
+          <!-- Loading state -->
+          <div class="scenario-loading" id="scenarioLoading">
+            <div class="spinner"></div>
+            <div style="font-size: var(--text-body-sm); color: var(--color-text-2);">Running scenario analysis...</div>
+          </div>
+
+          <!-- Results (hidden by default) -->
+          <div class="scenario-results" id="scenarioResults">
+            <div class="impact-section">
+              <div class="impact-title">Impact Analysis</div>
+              <div class="impact-row">
+                <span class="impact-label">Available internally</span>
+                <span class="impact-value">5 FTEs</span>
+              </div>
+              <div class="impact-row">
+                <span class="impact-label">Need to hire</span>
+                <span class="impact-value" style="color: var(--color-error);">3 FTEs (React &times;1, DevOps &times;1, Python &times;1)</span>
+              </div>
+              <div class="impact-row">
+                <span class="impact-label">Reallocation needed</span>
+                <span class="impact-value">Alice Wang from Acme, Carol Kim from Initech</span>
+              </div>
+              <div class="impact-row">
+                <span class="impact-label">Revenue projection</span>
+                <span class="impact-value font-mono" style="color: var(--color-gold);">+&euro;30,000/month</span>
+              </div>
+              <div class="impact-note">
+                <svg data-lucide="alert-triangle" width="14" height="14" style="display: inline-block; vertical-align: -2px; margin-right: 4px;"></svg>
+                Acme may need replacement for Alice &mdash; risk moderate. Recommend discussing with Acme PM before proceeding.
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4);">
+            <button class="btn btn-primary btn-md" id="runScenarioBtn">
+              <svg data-lucide="play" width="16" height="16"></svg>
+              Run Scenario
+            </button>
+            <button class="btn btn-secondary btn-md" id="saveScenarioBtn">
+              <svg data-lucide="save" width="16" height="16"></svg>
+              Save Scenario
+            </button>
+            <button class="btn btn-ghost btn-md" id="resetScenarioBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Hiring Pipeline -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="user-plus" width="18" height="18" style="color: var(--color-success);"></svg>
+            Hiring Pipeline
+          </span>
+          <button class="btn btn-primary btn-sm" id="addPositionBtn">
+            <svg data-lucide="plus" width="14" height="14"></svg>
+            Add Position
+          </button>
+        </div>
+        <div>
+          <div class="hiring-item">
+            <div class="avatar avatar-sm" style="background: var(--color-error-muted); color: var(--color-error);">
+              <svg data-lucide="code" width="16" height="16"></svg>
+            </div>
+            <div class="hiring-info">
+              <div class="hiring-title">Senior React Developer</div>
+              <div class="hiring-dept">Engineering &bull; Remote</div>
+            </div>
+            <div class="hiring-meta">
+              <span class="badge badge-error badge-dot">High</span>
+              <span class="badge badge-primary"><svg data-lucide="users" width="12" height="12"></svg> Interviewing (3)</span>
+            </div>
+          </div>
+          <div class="hiring-item">
+            <div class="avatar avatar-sm" style="background: var(--color-info-muted); color: var(--color-info);">
+              <svg data-lucide="server" width="16" height="16"></svg>
+            </div>
+            <div class="hiring-info">
+              <div class="hiring-title">DevOps Engineer</div>
+              <div class="hiring-dept">Engineering &bull; Brussels</div>
+            </div>
+            <div class="hiring-meta">
+              <span class="badge badge-warning badge-dot">Medium</span>
+              <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Open</span>
+            </div>
+          </div>
+          <div class="hiring-item">
+            <div class="avatar avatar-sm" style="background: var(--color-success-muted); color: var(--color-success);">
+              <svg data-lucide="briefcase" width="16" height="16"></svg>
+            </div>
+            <div class="hiring-info">
+              <div class="hiring-title">Business Analyst</div>
+              <div class="hiring-dept">Operations &bull; Paris</div>
+            </div>
+            <div class="hiring-meta">
+              <span class="badge badge-info badge-dot">Low</span>
+              <span class="badge badge-default"><svg data-lucide="calendar" width="12" height="12"></svg> Planned Q3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Empty State -->
+    <main class="page-content empty-content" style="flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+      <div class="card" style="max-width: 500px; text-align: center; padding: var(--space-8);">
+        <svg data-lucide="calendar-range" width="48" height="48" style="color: var(--color-primary); margin-bottom: var(--space-4);"></svg>
+        <h3 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No planning data yet</h3>
+        <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">Set up your projects and team assignments to start forecasting capacity and planning resources.</p>
+        <a href="projects.html" class="btn btn-primary btn-md">Set Up Projects</a>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<!-- ════════════════ COMMAND PALETTE ════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search people, projects, commands..." id="cmdInput" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Quick Actions</div>
+      <div class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Log Time</div>
+          <div class="item-subtitle">Open timesheet entry</div>
+        </div>
+        <div class="item-shortcut"><kbd>T</kbd></div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="calendar-range" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">New Allocation</div>
+          <div class="item-subtitle">Assign employee to project</div>
+        </div>
+      </div>
+      <div class="cmd-palette-group-label">Pages</div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Dashboard</div>
+          <div class="item-subtitle">Command center overview</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="gantt-chart" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Gantt Chart</div>
+          <div class="item-subtitle">Project timelines</div>
+        </div>
+      </div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&#9166;</kbd> Open</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ TOAST CONTAINER ════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════════════ STATE TOGGLE ════════════════ -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<!-- ════════════════ SCRIPTS ════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  lucide.createIcons();
+
+  // ── DOM refs ──
+  var sidebar        = document.getElementById('sidebar');
+  var collapseBtn    = document.getElementById('sidebarCollapseBtn');
+  var mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var searchTrigger  = document.getElementById('searchTrigger');
+  var cmdPalette     = document.getElementById('cmdPalette');
+  var cmdInput       = document.getElementById('cmdInput');
+  var notifBtn       = document.getElementById('notifBtn');
+  var notifPanel     = document.getElementById('notifPanel');
+  var userMenuBtn    = document.getElementById('userMenuBtn');
+  var userDropdown   = document.getElementById('userDropdown');
+  var stateToggle    = document.getElementById('stateToggle');
+  var toastContainer = document.getElementById('toastContainer');
+
+  // ── Sidebar collapse ──
+  collapseBtn.addEventListener('click', function() { sidebar.classList.toggle('collapsed'); });
+
+  // ── Mobile menu ──
+  mobileMenuBtn.addEventListener('click', function() { sidebar.classList.toggle('mobile-open'); });
+  sidebarOverlay.addEventListener('click', function() { sidebar.classList.remove('mobile-open'); });
+
+  // ── Command Palette ──
+  function openCmdPalette() { cmdPalette.classList.add('active'); setTimeout(function() { cmdInput.focus(); }, 100); }
+  function closeCmdPalette() { cmdPalette.classList.remove('active'); cmdInput.value = ''; }
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', function(e) { if (e.target === cmdPalette) closeCmdPalette(); });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); cmdPalette.classList.contains('active') ? closeCmdPalette() : openCmdPalette(); }
+    if (e.key === 'Escape' && cmdPalette.classList.contains('active')) closeCmdPalette();
+  });
+
+  // ── Notification Panel ──
+  notifBtn.addEventListener('click', function(e) { e.stopPropagation(); notifPanel.classList.toggle('active'); userDropdown.classList.remove('active'); });
+
+  // ── User Dropdown ──
+  userMenuBtn.addEventListener('click', function(e) { e.stopPropagation(); userDropdown.classList.toggle('active'); notifPanel.classList.remove('active'); });
+
+  // ── Scenario Dropdown ──
+  var scenarioDropdownBtn = document.getElementById('scenarioDropdownBtn');
+  var scenarioDropdownMenu = document.getElementById('scenarioDropdownMenu');
+  if (scenarioDropdownBtn) {
+    scenarioDropdownBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      scenarioDropdownMenu.classList.toggle('active');
+    });
+  }
+
+  // ── Close dropdowns on outside click ──
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
+    if (scenarioDropdownMenu && !scenarioDropdownMenu.contains(e.target) && !scenarioDropdownBtn.contains(e.target)) scenarioDropdownMenu.classList.remove('active');
+  });
+
+  // ── Toast ──
+  function showToast(type, title, message) {
+    var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+
+  // ── Scenario Runner ──
+  var runBtn = document.getElementById('runScenarioBtn');
+  var saveBtn = document.getElementById('saveScenarioBtn');
+  var resetBtn = document.getElementById('resetScenarioBtn');
+  var scenarioLoading = document.getElementById('scenarioLoading');
+  var scenarioResults = document.getElementById('scenarioResults');
+
+  runBtn.addEventListener('click', function() {
+    scenarioResults.classList.remove('active');
+    scenarioLoading.classList.add('active');
+    runBtn.classList.add('btn-loading');
+    setTimeout(function() {
+      scenarioLoading.classList.remove('active');
+      scenarioResults.classList.add('active');
+      runBtn.classList.remove('btn-loading');
+      lucide.createIcons({ nodes: [scenarioResults] });
+      showToast('success', 'Scenario Complete', 'Impact analysis has been generated.');
+    }, 2000);
+  });
+
+  saveBtn.addEventListener('click', function() {
+    showToast('success', 'Scenario Saved', 'Contoso deal scenario has been saved.');
+  });
+
+  resetBtn.addEventListener('click', function() {
+    scenarioResults.classList.remove('active');
+    scenarioLoading.classList.remove('active');
+    runBtn.classList.remove('btn-loading');
+    showToast('info', 'Reset', 'Scenario has been reset to defaults.');
+  });
+
+  // ── Bench Assign Buttons ──
+  document.querySelectorAll('.bench-assign-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var rec = this.closest('.ai-rec');
+      showToast('success', 'Assignment Initiated', 'Employee has been queued for assignment. PM will be notified.');
+      if (rec) {
+        rec.style.opacity = '0.5';
+        rec.style.pointerEvents = 'none';
+      }
+    });
+  });
+
+  // ── Add Position Button ──
+  var addPositionBtn = document.getElementById('addPositionBtn');
+  addPositionBtn.addEventListener('click', function() {
+    showToast('info', 'Coming Soon', 'Position creation form will open here.');
+  });
+
+  // ── Scenario Dropdown Items ──
+  document.querySelectorAll('#scenarioDropdownMenu .dropdown-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      scenarioDropdownMenu.classList.remove('active');
+      showToast('info', 'Scenario Loaded', this.textContent.trim() + ' scenario selected.');
+    });
+  });
+
+  // ── Empty State Toggle ──
+  var isPopulated = true;
+  stateToggle.addEventListener('click', function() {
+    isPopulated = !isPopulated;
+    document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+    this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+})();
+</script>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expenses — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Expense page-specific styles ── */
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-select,
+    .filter-bar .form-input {
+      height: 32px;
+      font-size: var(--text-body-sm);
+      min-width: 140px;
+      width: auto;
+    }
+    .filter-bar .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      background: var(--color-surface-3);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: background var(--motion-fast);
+    }
+    .toggle-switch.active {
+      background: var(--color-primary);
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: var(--color-white, #fff);
+      border-radius: 50%;
+      transition: transform var(--motion-fast);
+    }
+    .toggle-switch.active::after {
+      transform: translateX(16px);
+    }
+
+    /* Expense card items */
+    .expense-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .expense-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      transition: all var(--motion-fast);
+    }
+    .expense-item:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-2);
+    }
+    .expense-item.fading {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.4s var(--ease-out);
+    }
+    .expense-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-md);
+      color: var(--color-text-2);
+      flex-shrink: 0;
+    }
+    .expense-icon svg { width: 20px; height: 20px; }
+    .expense-amount {
+      font-family: var(--font-mono);
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      min-width: 100px;
+      flex-shrink: 0;
+    }
+    .expense-details {
+      flex: 1;
+      min-width: 0;
+    }
+    .expense-type {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .expense-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-top: var(--space-1);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      flex-wrap: wrap;
+    }
+    .expense-meta .meta-sep {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--color-text-3);
+      flex-shrink: 0;
+    }
+    .expense-meta a {
+      color: var(--color-primary);
+    }
+    .expense-desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-3);
+      margin-top: var(--space-1);
+    }
+    .expense-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-shrink: 0;
+    }
+    .billable-tag {
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .billable-tag svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .billable-tag.billable {
+      background: var(--color-primary-muted);
+      color: var(--color-primary);
+    }
+    .billable-tag.non-billable {
+      background: var(--color-surface-2);
+      color: var(--color-text-3);
+    }
+    .receipt-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+    }
+    .receipt-indicator svg { width: 14px; height: 14px; }
+    .expense-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+    .rejection-reason {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-caption);
+      color: var(--color-error);
+      margin-top: var(--space-1);
+    }
+    .rejection-reason svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* Submit tab */
+    .submit-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+    @media (max-width: 1023px) {
+      .submit-layout { grid-template-columns: 1fr; }
+    }
+    .upload-area {
+      position: relative;
+    }
+    .upload-zone {
+      min-height: 200px;
+    }
+    .upload-zone svg { width: 40px; height: 40px; }
+    .upload-zone .upload-text {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+    }
+    .upload-zone .upload-hint {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .upload-buttons {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+    .upload-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      border-radius: var(--radius-lg);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--space-3);
+      z-index: 10;
+    }
+    .upload-overlay.active { display: flex; }
+    .upload-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .upload-overlay .scan-text {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-1);
+      font-weight: var(--weight-medium);
+    }
+    .ai-result {
+      display: none;
+      padding: var(--space-4);
+      background: var(--color-primary-muted);
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-3);
+    }
+    .ai-result.active { display: block; }
+    .ai-result-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-primary);
+      margin-bottom: var(--space-3);
+    }
+    .ai-result-header svg { width: 16px; height: 16px; }
+    .ai-result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2);
+    }
+    .ai-result-item {
+      font-size: var(--text-body-sm);
+    }
+    .ai-result-item .label {
+      color: var(--color-text-3);
+      font-size: var(--text-caption);
+    }
+    .ai-result-item .value {
+      color: var(--color-text-1);
+      font-weight: var(--weight-medium);
+    }
+
+    /* Policy checks */
+    .policy-checks {
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+    .policy-checks h4 {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-3);
+    }
+    .policy-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      padding: var(--space-1) 0;
+    }
+    .policy-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .policy-item.pass { color: var(--color-success); }
+    .policy-item.fail { color: var(--color-error); }
+    .policy-item.warn { color: var(--color-warning); }
+
+    /* Approval queue */
+    .approval-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      transition: all var(--motion-fast);
+    }
+    .approval-item:hover {
+      border-color: var(--color-border-strong);
+    }
+    .approval-item.fading {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.4s var(--ease-out);
+    }
+    .approval-employee {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 160px;
+    }
+    .approval-employee .emp-name {
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-body);
+    }
+    .approval-employee .emp-name a {
+      color: var(--color-text-1);
+    }
+    .approval-employee .emp-name a:hover {
+      color: var(--color-primary);
+    }
+    .approval-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .approval-info .info-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .approval-amount {
+      font-family: var(--font-mono);
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+    }
+    .approval-policy {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      margin-top: var(--space-2);
+    }
+    .approval-policy svg { width: 14px; height: 14px; }
+    .approval-policy.ok { color: var(--color-success); }
+    .approval-policy.over { color: var(--color-error); }
+    .approval-policy.warn { color: var(--color-warning); }
+    .approval-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      flex-shrink: 0;
+      min-width: 140px;
+    }
+    .approval-actions .action-btns {
+      display: flex;
+      gap: var(--space-2);
+    }
+    .approval-actions .comment-input {
+      height: 28px;
+      font-size: var(--text-caption);
+      padding: 0 var(--space-2);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-1);
+      font-family: var(--font-sans);
+      width: 100%;
+    }
+    .approval-actions .comment-input::placeholder { color: var(--color-text-3); }
+    .approval-actions .comment-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    /* Rejection modal */
+    .reject-modal-body textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: var(--space-3);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-1);
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+      resize: vertical;
+    }
+    .reject-modal-body textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+
+    /* Expense form */
+    .expense-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    @media (max-width: 639px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-8);
+      text-align: center;
+    }
+    .empty-state.active {
+      display: flex;
+    }
+    .empty-state svg { width: 48px; height: 48px; color: var(--color-text-3); margin-bottom: var(--space-4); }
+    .empty-state h3 {
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-2);
+    }
+    .empty-state p {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      max-width: 400px;
+      margin-bottom: var(--space-4);
+    }
+
+    /* Stat card responsive */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    @media (max-width: 1023px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 639px) { .stats-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+        <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item active">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="bar-chart-3"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Expenses</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="receipt" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">2 expense reports pending your approval</div>
+                  <div class="notif-time">5 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">David Park's equipment expense exceeds daily limit</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Your travel expense (&#8364;450) has been approved</div>
+                  <div class="notif-time">Yesterday</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="x-circle" width="16" height="16" style="color: var(--color-error);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Equipment expense (&#8364;1,200) rejected: over budget limit</div>
+                  <div class="notif-time">2 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+      <div class="page-content-narrow">
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-header-left">
+            <h1 class="page-title">Expense Management</h1>
+            <p class="page-subtitle">Track, submit, and approve team expenses</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="exportExpenses()">
+              <svg data-lucide="download" width="16" height="16"></svg>
+              Export
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="switchTab('submit')">
+              <svg data-lucide="plus" width="16" height="16"></svg>
+              New Expense
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="expenseTabs">
+          <button class="tab active" data-tab="my-expenses">
+            <svg data-lucide="wallet" width="16" height="16"></svg>
+            My Expenses
+          </button>
+          <button class="tab" data-tab="submit">
+            <svg data-lucide="plus-circle" width="16" height="16"></svg>
+            Submit Expense
+          </button>
+          <button class="tab" data-tab="approval">
+            <svg data-lucide="check-circle" width="16" height="16"></svg>
+            Approval Queue
+            <span class="tab-count">4</span>
+          </button>
+        </div>
+
+        <!-- ═══════════════ TAB 1: MY EXPENSES ═══════════════ -->
+        <div class="tab-content active" id="tab-my-expenses">
+          <div style="padding-top: var(--space-6);">
+
+            <!-- Stats -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">This Month</div>
+                <div class="stat-value">&euro;1,240</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="14" height="14"></svg>
+                  +15% vs last month
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value">&euro;340</div>
+                <div class="stat-trend" style="color: var(--color-warning);">
+                  <svg data-lucide="clock" width="14" height="14"></svg>
+                  2 items awaiting review
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Billable</div>
+                <div class="stat-value">78%</div>
+                <div class="stat-trend" style="color: var(--color-text-2);">
+                  <svg data-lucide="target" width="14" height="14"></svg>
+                  of total expenses
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Top Category</div>
+                <div class="stat-value" style="font-family: var(--font-sans); font-size: var(--text-heading-2);">Travel</div>
+                <div class="stat-trend" style="color: var(--color-text-2);">
+                  <svg data-lucide="plane" width="14" height="14"></svg>
+                  &euro;450 this month
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+              <select class="form-select">
+                <option>All Status</option>
+                <option>Approved</option>
+                <option>Pending</option>
+                <option>Rejected</option>
+              </select>
+              <select class="form-select">
+                <option>All Types</option>
+                <option>Travel</option>
+                <option>Hotel</option>
+                <option>Meals</option>
+                <option>Software</option>
+                <option>Equipment</option>
+                <option>Transport</option>
+              </select>
+              <select class="form-select">
+                <option>All Projects</option>
+                <option>Acme Web Redesign</option>
+                <option>Globex Phase 2</option>
+                <option>Initech API</option>
+                <option>Contoso Deal</option>
+              </select>
+              <div class="toggle-wrap">
+                <div class="toggle-switch" id="billableToggle" onclick="this.classList.toggle('active')"></div>
+                <span>Billable only</span>
+              </div>
+              <input type="date" class="form-input" style="width: 150px;" value="2026-01-01">
+              <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
+              <input type="date" class="form-input" style="width: 150px;" value="2026-04-05">
+            </div>
+
+            <!-- Expense List (populated state) -->
+            <div class="expense-list" id="expenseList">
+
+              <!-- 1. Travel - Approved -->
+              <div class="expense-item">
+                <div class="expense-icon" style="background: var(--color-info-muted); color: var(--color-info);">
+                  <svg data-lucide="plane"></svg>
+                </div>
+                <div class="expense-amount">&euro;450.00</div>
+                <div class="expense-details">
+                  <div class="expense-type">Travel</div>
+                  <div class="expense-meta">
+                    <span>Feb 15, 2026</span>
+                    <span class="meta-sep"></span>
+                    <a href="projects.html#detail">Acme Web Redesign</a>
+                  </div>
+                  <div class="expense-desc">Client site visit - Paris to Lyon round trip</div>
+                </div>
+                <div class="expense-right">
+                  <span class="billable-tag billable"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
+                  <div class="receipt-indicator">
+                    <svg data-lucide="paperclip"></svg>
+                    <span>receipt.pdf</span>
+                  </div>
+                  <span class="badge badge-success">
+                    <svg data-lucide="check-circle" width="12" height="12"></svg>
+                    Approved
+                  </span>
+                </div>
+              </div>
+
+              <!-- 2. Hotel - Pending -->
+              <div class="expense-item">
+                <div class="expense-icon" style="background: var(--color-accent-muted); color: var(--color-accent);">
+                  <svg data-lucide="bed"></svg>
+                </div>
+                <div class="expense-amount">&euro;340.00</div>
+                <div class="expense-details">
+                  <div class="expense-type">Hotel</div>
+                  <div class="expense-meta">
+                    <span>Apr 2, 2026</span>
+                    <span class="meta-sep"></span>
+                    <a href="projects.html#detail">Acme Web Redesign</a>
+                  </div>
+                  <div class="expense-desc">Marriott Hotel Lyon - 2 nights client workshop</div>
+                </div>
+                <div class="expense-right">
+                  <span class="billable-tag billable"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
+                  <div class="receipt-indicator">
+                    <svg data-lucide="paperclip"></svg>
+                    <span>receipt.jpg</span>
+                  </div>
+                  <span class="badge badge-warning">
+                    <svg data-lucide="clock" width="12" height="12"></svg>
+                    Pending
+                  </span>
+                  <div class="expense-actions">
+                    <button class="btn btn-ghost btn-xs">Edit</button>
+                    <button class="btn btn-destructive-ghost btn-xs">Cancel</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Software - Approved -->
+              <div class="expense-item">
+                <div class="expense-icon" style="background: hsla(270, 45%, 58%, 0.14); color: hsl(270, 45%, 58%);">
+                  <svg data-lucide="monitor"></svg>
+                </div>
+                <div class="expense-amount">&euro;120.00</div>
+                <div class="expense-details">
+                  <div class="expense-type">Software</div>
+                  <div class="expense-meta">
+                    <span>Jan 20, 2026</span>
+                    <span class="meta-sep"></span>
+                    <span style="color: var(--color-text-3);">&mdash;</span>
+                  </div>
+                  <div class="expense-desc">Figma annual license renewal</div>
+                </div>
+                <div class="expense-right">
+                  <span class="billable-tag non-billable"><svg data-lucide="badge-x" width="12" height="12"></svg> Non-billable</span>
+                  <span class="badge badge-success">
+                    <svg data-lucide="check-circle" width="12" height="12"></svg>
+                    Approved
+                  </span>
+                </div>
+              </div>
+
+              <!-- 4. Meals - Approved -->
+              <div class="expense-item">
+                <div class="expense-icon" style="background: var(--color-gold-muted); color: var(--color-gold);">
+                  <svg data-lucide="utensils"></svg>
+                </div>
+                <div class="expense-amount">&euro;85.50</div>
+                <div class="expense-details">
+                  <div class="expense-type">Meals</div>
+                  <div class="expense-meta">
+                    <span>Mar 10, 2026</span>
+                    <span class="meta-sep"></span>
+                    <a href="projects.html#detail">Globex Phase 2</a>
+                  </div>
+                  <div class="expense-desc">Client lunch - quarterly review meeting</div>
+                </div>
+                <div class="expense-right">
+                  <span class="billable-tag billable"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
+                  <div class="receipt-indicator">
+                    <svg data-lucide="paperclip"></svg>
+                    <span>receipt.pdf</span>
+                  </div>
+                  <span class="badge badge-success">
+                    <svg data-lucide="check-circle" width="12" height="12"></svg>
+                    Approved
+                  </span>
+                </div>
+              </div>
+
+              <!-- 5. Equipment - Rejected -->
+              <div class="expense-item">
+                <div class="expense-icon" style="background: var(--color-error-muted); color: var(--color-error);">
+                  <svg data-lucide="laptop"></svg>
+                </div>
+                <div class="expense-amount">&euro;1,200.00</div>
+                <div class="expense-details">
+                  <div class="expense-type">Equipment</div>
+                  <div class="expense-meta">
+                    <span>Mar 25, 2026</span>
+                    <span class="meta-sep"></span>
+                    <span style="color: var(--color-text-3);">&mdash;</span>
+                  </div>
+                  <div class="expense-desc">External monitor - Dell UltraSharp 27"</div>
+                  <div class="rejection-reason">
+                    <svg data-lucide="alert-circle"></svg>
+                    Reason: "Over budget limit without pre-approval"
+                  </div>
+                </div>
+                <div class="expense-right">
+                  <span class="billable-tag non-billable"><svg data-lucide="badge-x" width="12" height="12"></svg> Non-billable</span>
+                  <span class="badge badge-error">
+                    <svg data-lucide="x-circle" width="12" height="12"></svg>
+                    Rejected
+                  </span>
+                </div>
+              </div>
+
+              <!-- 6. Transport - Pending -->
+              <div class="expense-item">
+                <div class="expense-icon" style="background: var(--color-primary-muted); color: var(--color-primary);">
+                  <svg data-lucide="car"></svg>
+                </div>
+                <div class="expense-amount">&euro;67.30</div>
+                <div class="expense-details">
+                  <div class="expense-type">Transport</div>
+                  <div class="expense-meta">
+                    <span>Apr 1, 2026</span>
+                    <span class="meta-sep"></span>
+                    <a href="projects.html#detail">Initech API</a>
+                  </div>
+                  <div class="expense-desc">Taxi to client office - integration kickoff</div>
+                </div>
+                <div class="expense-right">
+                  <span class="billable-tag billable"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
+                  <span class="badge badge-warning">
+                    <svg data-lucide="clock" width="12" height="12"></svg>
+                    Pending
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-state" id="emptyExpenses">
+              <svg data-lucide="receipt"></svg>
+              <h3>No expenses yet</h3>
+              <p>Submit your first expense to start tracking. All receipts and reimbursements will appear here.</p>
+              <button class="btn btn-primary btn-sm" onclick="switchTab('submit')">
+                <svg data-lucide="plus" width="16" height="16"></svg>
+                Submit Expense
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════ TAB 2: SUBMIT EXPENSE ═══════════════ -->
+        <div class="tab-content" id="tab-submit">
+          <div style="padding-top: var(--space-6);">
+            <div class="submit-layout">
+
+              <!-- Left: Upload + AI -->
+              <div>
+                <div class="upload-area">
+                  <div class="upload-zone" id="uploadZone">
+                    <svg data-lucide="upload-cloud"></svg>
+                    <div class="upload-text">Drop receipt here or click to upload</div>
+                    <div class="upload-hint">Supports PDF, JPG, PNG up to 10MB</div>
+                    <div class="upload-buttons">
+                      <button class="btn btn-secondary btn-sm">
+                        <svg data-lucide="camera" width="16" height="16"></svg>
+                        Camera
+                      </button>
+                      <button class="btn btn-secondary btn-sm">
+                        <svg data-lucide="folder-open" width="16" height="16"></svg>
+                        Browse
+                      </button>
+                    </div>
+                  </div>
+                  <div class="upload-overlay" id="uploadOverlay">
+                    <div class="upload-spinner"></div>
+                    <div class="scan-text">Scanning receipt with AI...</div>
+                  </div>
+                </div>
+
+                <div style="margin-top: var(--space-3);">
+                  <button class="btn btn-accent btn-sm" id="aiScanBtn" onclick="startAiScan()">
+                    <svg data-lucide="sparkles" width="16" height="16"></svg>
+                    Scan with AI
+                  </button>
+                </div>
+
+                <div class="ai-result" id="aiResult">
+                  <div class="ai-result-header">
+                    <svg data-lucide="sparkles"></svg>
+                    AI detected:
+                  </div>
+                  <div class="ai-result-grid">
+                    <div class="ai-result-item">
+                      <div class="label">Vendor</div>
+                      <div class="value">Marriott Hotel Lyon</div>
+                    </div>
+                    <div class="ai-result-item">
+                      <div class="label">Amount</div>
+                      <div class="value font-mono">&euro;340.00</div>
+                    </div>
+                    <div class="ai-result-item">
+                      <div class="label">Date</div>
+                      <div class="value">April 2, 2026</div>
+                    </div>
+                    <div class="ai-result-item">
+                      <div class="label">Category</div>
+                      <div class="value">
+                        Hotel
+                        <span class="badge badge-info" style="margin-left: var(--space-1);"><svg data-lucide="sparkles" width="12" height="12"></svg> suggested</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Policy checks -->
+                <div class="policy-checks">
+                  <h4>Policy Compliance</h4>
+                  <div class="policy-item pass">
+                    <svg data-lucide="check-circle"></svg>
+                    Within &euro;500 daily limit
+                  </div>
+                  <div class="policy-item pass">
+                    <svg data-lucide="check-circle"></svg>
+                    Receipt: Required and attached
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Form -->
+              <div>
+                <div class="expense-form">
+                  <div class="form-group">
+                    <label class="form-label">Type <span class="required">*</span></label>
+                    <select class="form-select" id="formType">
+                      <option value="">Select type...</option>
+                      <option value="travel">Travel</option>
+                      <option value="hotel">Hotel</option>
+                      <option value="meals">Meals</option>
+                      <option value="software">Software</option>
+                      <option value="equipment">Equipment</option>
+                      <option value="transport">Transport</option>
+                      <option value="office">Office Supplies</option>
+                    </select>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Amount <span class="required">*</span></label>
+                      <div style="display: flex; gap: var(--space-2);">
+                        <input type="number" class="form-input" id="formAmount" placeholder="0.00" step="0.01" style="flex: 1;">
+                        <select class="form-select" style="width: 90px;" id="formCurrency">
+                          <option>EUR</option>
+                          <option>USD</option>
+                          <option>GBP</option>
+                          <option>CHF</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Date <span class="required">*</span></label>
+                      <input type="date" class="form-input" id="formDate" value="2026-04-05">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Project</label>
+                    <select class="form-select" id="formProject">
+                      <option value="">None</option>
+                      <option value="acme">Acme Web Redesign</option>
+                      <option value="globex">Globex Phase 2</option>
+                      <option value="initech">Initech API</option>
+                      <option value="contoso">Contoso Deal</option>
+                      <option value="internal">Internal</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-check">
+                      <input type="checkbox" id="formBillable">
+                      <span>Billable expense</span>
+                    </label>
+                    <div class="form-helper">Check if this expense should be invoiced to the client</div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="formDesc" placeholder="Describe the expense..." rows="3"></textarea>
+                  </div>
+
+                  <div class="form-actions">
+                    <button class="btn btn-secondary btn-md" onclick="switchTab('my-expenses')">Cancel</button>
+                    <button class="btn btn-primary btn-md" onclick="submitExpense()">
+                      <svg data-lucide="send" width="16" height="16"></svg>
+                      Submit Expense
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════ TAB 3: APPROVAL QUEUE ═══════════════ -->
+        <div class="tab-content" id="tab-approval">
+          <div style="padding-top: var(--space-6);">
+
+            <div style="margin-bottom: var(--space-4);">
+              <p style="font-size: var(--text-body); color: var(--color-text-2);">
+                <svg data-lucide="shield-check" width="16" height="16" style="display: inline; vertical-align: -3px; margin-right: var(--space-1); color: var(--color-primary);"></svg>
+                4 expenses pending your approval
+              </p>
+            </div>
+
+            <div class="expense-list" id="approvalList">
+
+              <!-- 1. Bob Taylor - Hotel -->
+              <div class="approval-item" data-approval="1">
+                <div class="approval-employee">
+                  <div class="avatar avatar-sm">BT</div>
+                  <div class="emp-name"><a href="employees.html#profile">Bob Taylor</a></div>
+                </div>
+                <div class="approval-info">
+                  <div class="info-row">
+                    <span class="approval-amount">&euro;340.00</span>
+                    <span class="badge badge-default"><svg data-lucide="building" width="12" height="12"></svg> Hotel</span>
+                    <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Apr 2, 2026</span>
+                    <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
+                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div class="receipt-indicator">
+                      <svg data-lucide="paperclip"></svg>
+                      <span>receipt attached</span>
+                    </div>
+                    <div class="approval-policy ok">
+                      <svg data-lucide="check-circle"></svg>
+                      Within limits
+                    </div>
+                  </div>
+                </div>
+                <div class="approval-actions">
+                  <div class="action-btns">
+                    <button class="btn btn-primary btn-xs" onclick="approveItem(this)">
+                      <svg data-lucide="check" width="14" height="14"></svg>
+                      Approve
+                    </button>
+                    <button class="btn btn-destructive-ghost btn-xs" onclick="openRejectModal(this)">
+                      <svg data-lucide="x" width="14" height="14"></svg>
+                      Reject
+                    </button>
+                  </div>
+                  <input type="text" class="comment-input" placeholder="Add a comment...">
+                </div>
+              </div>
+
+              <!-- 2. Carol Kim - Meals -->
+              <div class="approval-item" data-approval="2">
+                <div class="approval-employee">
+                  <div class="avatar avatar-sm">CK</div>
+                  <div class="emp-name"><a href="employees.html#profile">Carol Kim</a></div>
+                </div>
+                <div class="approval-info">
+                  <div class="info-row">
+                    <span class="approval-amount">&euro;85.50</span>
+                    <span class="badge badge-default"><svg data-lucide="utensils" width="12" height="12"></svg> Meals</span>
+                    <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Mar 28, 2026</span>
+                    <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
+                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Initech API</a>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div class="receipt-indicator">
+                      <svg data-lucide="paperclip"></svg>
+                      <span>receipt attached</span>
+                    </div>
+                    <div class="approval-policy ok">
+                      <svg data-lucide="check-circle"></svg>
+                      Within limits
+                    </div>
+                  </div>
+                </div>
+                <div class="approval-actions">
+                  <div class="action-btns">
+                    <button class="btn btn-primary btn-xs" onclick="approveItem(this)">
+                      <svg data-lucide="check" width="14" height="14"></svg>
+                      Approve
+                    </button>
+                    <button class="btn btn-destructive-ghost btn-xs" onclick="openRejectModal(this)">
+                      <svg data-lucide="x" width="14" height="14"></svg>
+                      Reject
+                    </button>
+                  </div>
+                  <input type="text" class="comment-input" placeholder="Add a comment...">
+                </div>
+              </div>
+
+              <!-- 3. David Park - Equipment (OVER LIMIT) -->
+              <div class="approval-item" data-approval="3">
+                <div class="approval-employee">
+                  <div class="avatar avatar-sm">DP</div>
+                  <div class="emp-name"><a href="employees.html#profile">David Park</a></div>
+                </div>
+                <div class="approval-info">
+                  <div class="info-row">
+                    <span class="approval-amount">&euro;1,450.00</span>
+                    <span class="badge badge-default"><svg data-lucide="monitor" width="12" height="12"></svg> Equipment</span>
+                    <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Apr 3, 2026</span>
+                    <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
+                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Globex Phase 2</a>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div class="receipt-indicator">
+                      <svg data-lucide="paperclip"></svg>
+                      <span>receipt attached</span>
+                    </div>
+                    <div class="approval-policy over">
+                      <svg data-lucide="alert-triangle"></svg>
+                      OVER LIMIT - Exceeds &euro;500 daily limit
+                    </div>
+                  </div>
+                </div>
+                <div class="approval-actions">
+                  <div class="action-btns">
+                    <button class="btn btn-primary btn-xs" onclick="approveItem(this)">
+                      <svg data-lucide="check" width="14" height="14"></svg>
+                      Approve
+                    </button>
+                    <button class="btn btn-destructive-ghost btn-xs" onclick="openRejectModal(this)">
+                      <svg data-lucide="x" width="14" height="14"></svg>
+                      Reject
+                    </button>
+                  </div>
+                  <input type="text" class="comment-input" placeholder="Add a comment...">
+                </div>
+              </div>
+
+              <!-- 4. Liam O'Brien - Transport (no receipt) -->
+              <div class="approval-item" data-approval="4">
+                <div class="approval-employee">
+                  <div class="avatar avatar-sm">LO</div>
+                  <div class="emp-name"><a href="employees.html#profile">Liam O'Brien</a></div>
+                </div>
+                <div class="approval-info">
+                  <div class="info-row">
+                    <span class="approval-amount">&euro;67.30</span>
+                    <span class="badge badge-default"><svg data-lucide="car" width="12" height="12"></svg> Transport</span>
+                    <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Apr 1, 2026</span>
+                    <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
+                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div class="receipt-indicator" style="color: var(--color-text-3);">
+                      <svg data-lucide="file-x"></svg>
+                      <span>no receipt</span>
+                    </div>
+                    <div class="approval-policy warn">
+                      <svg data-lucide="alert-circle"></svg>
+                      Receipt required
+                    </div>
+                  </div>
+                </div>
+                <div class="approval-actions">
+                  <div class="action-btns">
+                    <button class="btn btn-primary btn-xs" onclick="approveItem(this)">
+                      <svg data-lucide="check" width="14" height="14"></svg>
+                      Approve
+                    </button>
+                    <button class="btn btn-destructive-ghost btn-xs" onclick="openRejectModal(this)">
+                      <svg data-lucide="x" width="14" height="14"></svg>
+                      Reject
+                    </button>
+                  </div>
+                  <input type="text" class="comment-input" placeholder="Add a comment...">
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search expenses, employees, projects..." id="cmdInput" autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Quick Actions</div>
+      <div class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="plus-circle" width="18" height="18"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Submit New Expense</div>
+          <div class="item-subtitle">Create a new expense report</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="check-circle" width="18" height="18"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Approval Queue</div>
+          <div class="item-subtitle">Review pending expenses</div>
+        </div>
+      </div>
+      <div class="cmd-palette-group-label">Navigation</div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="18" height="18"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Dashboard</div>
+          <div class="item-subtitle">Main overview</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="clock" width="18" height="18"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Timesheets</div>
+          <div class="item-subtitle">Time tracking</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="users" width="18" height="18"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Team Directory</div>
+          <div class="item-subtitle">Employee management</div>
+        </div>
+      </div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&crarr;</kbd> Select</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ REJECTION MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="rejectModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Reject Expense</h3>
+      <button class="modal-close" onclick="closeRejectModal()">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body reject-modal-body">
+      <div class="form-group">
+        <label class="form-label">Rejection reason <span class="required">*</span></label>
+        <textarea id="rejectReason" placeholder="Explain why this expense is being rejected..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: var(--space-2);">
+      <button class="btn btn-secondary btn-sm" onclick="closeRejectModal()">Cancel</button>
+      <button class="btn btn-destructive btn-sm" onclick="confirmReject()">
+        <svg data-lucide="x-circle" width="16" height="16"></svg>
+        Reject Expense
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ TOAST CONTAINER ════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════════════════════════════════════ EMPTY STATE TOGGLE ════════════════════════════════════════ -->
+<button class="state-toggle" id="stateToggle" onclick="toggleEmptyState()">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  Toggle empty state
+</button>
+
+<!-- ════════════════════════════════════════ SCRIPTS ════════════════════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── Sidebar collapse ──
+  const sidebar = document.getElementById('sidebar');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  collapseBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // Mobile menu
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
+  }
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('mobile-open');
+    });
+  }
+
+  // ── Command Palette ──
+  const cmdPalette = document.getElementById('cmdPalette');
+  const cmdInput = document.getElementById('cmdInput');
+  const searchTrigger = document.getElementById('searchTrigger');
+
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    setTimeout(() => cmdInput.focus(), 50);
+  }
+  function closeCmdPalette() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  }
+
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', (e) => {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      if (cmdPalette.classList.contains('active')) {
+        closeCmdPalette();
+      } else {
+        openCmdPalette();
+      }
+    }
+    if (e.key === 'Escape') {
+      closeCmdPalette();
+      closeRejectModal();
+    }
+  });
+
+  // ── Notification panel ──
+  const notifBtn = document.getElementById('notifBtn');
+  const notifPanel = document.getElementById('notifPanel');
+  notifBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User dropdown ──
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  const userDropdown = document.getElementById('userDropdown');
+  userMenuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // Click outside closes dropdowns
+  document.addEventListener('click', (e) => {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+      notifPanel.classList.remove('active');
+    }
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
+      userDropdown.classList.remove('active');
+    }
+  });
+
+  // ── Tab switching ──
+  const tabs = document.querySelectorAll('#expenseTabs .tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  function switchTab(tabId) {
+    tabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(tc => tc.classList.remove('active'));
+
+    const targetTab = document.querySelector(`[data-tab="${tabId}"]`);
+    const targetContent = document.getElementById(`tab-${tabId}`);
+    if (targetTab) targetTab.classList.add('active');
+    if (targetContent) targetContent.classList.add('active');
+
+    window.location.hash = tabId;
+  }
+  window.switchTab = switchTab;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      switchTab(tab.dataset.tab);
+    });
+  });
+
+  // Hash-based tab routing
+  function handleHash() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(`tab-${hash}`)) {
+      switchTab(hash);
+    }
+  }
+  handleHash();
+  window.addEventListener('hashchange', handleHash);
+
+  // ── AI Scan Simulation ──
+  window.startAiScan = function() {
+    const overlay = document.getElementById('uploadOverlay');
+    const aiResult = document.getElementById('aiResult');
+    const aiBtn = document.getElementById('aiScanBtn');
+
+    aiBtn.disabled = true;
+    aiBtn.classList.add('btn-loading');
+    overlay.classList.add('active');
+    aiResult.classList.remove('active');
+
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      aiResult.classList.add('active');
+      aiBtn.disabled = false;
+      aiBtn.classList.remove('btn-loading');
+
+      // Auto-fill form
+      document.getElementById('formType').value = 'hotel';
+      document.getElementById('formAmount').value = '340.00';
+      document.getElementById('formDate').value = '2026-04-02';
+      document.getElementById('formProject').value = 'acme';
+      document.getElementById('formBillable').checked = true;
+      document.getElementById('formDesc').value = 'Marriott Hotel Lyon - 2 nights for client workshop';
+
+      lucide.createIcons();
+    }, 2000);
+  };
+
+  // ── Upload zone drag/drop ──
+  const uploadZone = document.getElementById('uploadZone');
+  if (uploadZone) {
+    ['dragenter', 'dragover'].forEach(evt => {
+      uploadZone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+      uploadZone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+      });
+    });
+    uploadZone.addEventListener('click', () => {
+      // Simulate file picker
+    });
+  }
+
+  // ── Submit expense (ISSUE-16 + ISSUE-41) ──
+  window.submitExpense = function() {
+    // Clear previous errors
+    document.querySelectorAll('.form-input-error').forEach(function(el) { el.classList.remove('form-input-error'); });
+    document.querySelectorAll('.field-error-text').forEach(function(el) { el.remove(); });
+
+    var type = document.getElementById('formType').value;
+    var amount = document.getElementById('formAmount').value;
+    var date = document.getElementById('formDate').value;
+    var project = document.getElementById('formProject');
+    var projectText = project.options[project.selectedIndex] ? project.options[project.selectedIndex].text : '';
+    var billable = document.getElementById('formBillable').checked;
+    var desc = document.getElementById('formDesc').value;
+    var typeSelect = document.getElementById('formType');
+    var typeText = typeSelect.options[typeSelect.selectedIndex] ? typeSelect.options[typeSelect.selectedIndex].text : '';
+    var currency = document.getElementById('formCurrency').value;
+
+    // Validation (ISSUE-41)
+    var valid = true;
+    function markError(el, msg) {
+      el.classList.add('form-input-error');
+      el.style.borderColor = 'var(--color-error)';
+      var errSpan = document.createElement('span');
+      errSpan.className = 'field-error-text';
+      errSpan.style.cssText = 'color:var(--color-error);font-size:var(--text-caption);margin-top:var(--space-1);display:block;';
+      errSpan.textContent = msg;
+      el.parentNode.appendChild(errSpan);
+      valid = false;
+    }
+
+    if (!type) markError(document.getElementById('formType'), 'Please select an expense type.');
+    if (!amount || parseFloat(amount) <= 0) markError(document.getElementById('formAmount'), 'Amount must be greater than 0.');
+    if (!date) markError(document.getElementById('formDate'), 'Please select a date.');
+
+    if (!valid) {
+      showToast('error', 'Missing fields', 'Please fill in the required fields.');
+      return;
+    }
+
+    var btn = document.querySelector('#tab-submit .btn-primary');
+    btn.classList.add('btn-loading');
+
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+
+      var iconMap = { travel: 'plane', hotel: 'bed', meals: 'utensils', software: 'monitor', equipment: 'laptop', transport: 'car', office: 'package' };
+      var icon = iconMap[type] || 'receipt';
+      var currSymbol = currency === 'EUR' ? '\u20ac' : (currency === 'USD' ? '$' : (currency === 'GBP' ? '\u00a3' : currency));
+      var formattedAmount = parseFloat(amount).toFixed(2);
+      var dateObj = new Date(date + 'T00:00:00');
+      var dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      var list = document.getElementById('expenseList');
+      var newItem = document.createElement('div');
+      newItem.className = 'expense-item';
+      newItem.style.animation = 'slideIn 0.3s ease';
+      newItem.innerHTML =
+        '<div class="expense-icon" style="background:var(--color-primary-muted);color:var(--color-primary);">' +
+          '<svg data-lucide="' + icon + '"></svg>' +
+        '</div>' +
+        '<div class="expense-amount">' + currSymbol + formattedAmount + '</div>' +
+        '<div class="expense-details">' +
+          '<div class="expense-type">' + typeText + '</div>' +
+          '<div class="expense-meta">' +
+            '<span>' + dateStr + '</span>' +
+            (projectText && projectText !== 'None' ? '<span class="meta-sep"></span><a href="projects.html#detail">' + projectText + '</a>' : '') +
+          '</div>' +
+          (desc ? '<div class="expense-desc">' + desc + '</div>' : '') +
+        '</div>' +
+        '<div class="expense-right">' +
+          '<span class="billable-tag ' + (billable ? 'billable' : 'non-billable') + '">' +
+            '<svg data-lucide="' + (billable ? 'badge-check' : 'badge-x') + '" width="12" height="12"></svg> ' +
+            (billable ? 'Billable' : 'Non-billable') +
+          '</span>' +
+          '<span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>' +
+          '<div class="expense-actions">' +
+            '<button class="btn btn-ghost btn-xs">Edit</button>' +
+            '<button class="btn btn-destructive-ghost btn-xs">Cancel</button>' +
+          '</div>' +
+        '</div>';
+      list.prepend(newItem);
+      lucide.createIcons({ nodes: [newItem] });
+
+      // Clear form
+      document.getElementById('formType').value = '';
+      document.getElementById('formAmount').value = '';
+      document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('formProject').value = '';
+      document.getElementById('formBillable').checked = false;
+      document.getElementById('formDesc').value = '';
+
+      // Switch tab and toast
+      switchTab('my-expenses');
+      showToast('success', 'Expense submitted', 'Your expense of ' + currSymbol + formattedAmount + ' has been submitted for approval.');
+    }, 1000);
+  };
+
+  // ── Export ──
+  window.exportExpenses = function() {
+    showToast('info', 'Export started', 'Your expense report is being generated...');
+  };
+
+  // ── Approval actions ──
+  let currentRejectItem = null;
+
+  window.approveItem = function(btn) {
+    btn.classList.add('btn-loading');
+    setTimeout(() => {
+      btn.classList.remove('btn-loading');
+      const item = btn.closest('.approval-item');
+      item.classList.add('fading');
+      setTimeout(() => {
+        item.remove();
+        updateApprovalCount();
+      }, 400);
+      showToast('success', 'Expense approved', 'The expense has been approved successfully.');
+    }, 1000);
+  };
+
+  window.openRejectModal = function(btn) {
+    currentRejectItem = btn.closest('.approval-item');
+    document.getElementById('rejectModal').classList.add('active');
+    document.getElementById('rejectReason').value = '';
+    setTimeout(() => document.getElementById('rejectReason').focus(), 100);
+  };
+
+  window.closeRejectModal = function() {
+    document.getElementById('rejectModal').classList.remove('active');
+    currentRejectItem = null;
+  };
+
+  window.confirmReject = function() {
+    const reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+      document.getElementById('rejectReason').style.borderColor = 'var(--color-error)';
+      return;
+    }
+    if (currentRejectItem) {
+      currentRejectItem.classList.add('fading');
+      setTimeout(() => {
+        currentRejectItem.remove();
+        updateApprovalCount();
+        currentRejectItem = null;
+      }, 400);
+    }
+    closeRejectModal();
+    showToast('error', 'Expense rejected', 'The expense has been rejected with your reason.');
+  };
+
+  function updateApprovalCount() {
+    const remaining = document.querySelectorAll('#approvalList .approval-item:not(.fading)').length;
+    const countBadge = document.querySelector('[data-tab="approval"] .tab-count');
+    if (countBadge) countBadge.textContent = remaining;
+  }
+
+  // ── Toast system ──
+  function showToast(type, title, message) {
+    const container = document.getElementById('toastContainer');
+    const iconMap = {
+      success: 'check-circle',
+      error: 'x-circle',
+      warning: 'alert-triangle',
+      info: 'info'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+      <div class="toast-icon"><svg data-lucide="${iconMap[type]}" width="20" height="20"></svg></div>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button class="toast-close" onclick="this.closest('.toast').remove()">
+        <svg data-lucide="x" width="16" height="16"></svg>
+      </button>
+    `;
+    container.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+
+    setTimeout(() => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+  window.showToast = showToast;
+
+  // ── Empty state toggle ──
+  let isEmpty = false;
+  window.toggleEmptyState = function() {
+    isEmpty = !isEmpty;
+    const list = document.getElementById('expenseList');
+    const empty = document.getElementById('emptyExpenses');
+    if (isEmpty) {
+      list.style.display = 'none';
+      empty.classList.add('active');
+    } else {
+      list.style.display = '';
+      empty.classList.remove('active');
+    }
+  };
+
+  // ── Init icons ──
+  lucide.createIcons();
+
+})();
+</script>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item active"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insights &mdash; GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Insights-specific styles ── */
+
+    /* NL Query Bar */
+    .nl-query-section {
+      margin-bottom: var(--space-6);
+    }
+    .nl-query-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
+    }
+    .nl-query-bar:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+    .nl-query-bar svg { color: var(--color-accent); flex-shrink: 0; }
+    .nl-query-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--color-text-1);
+      font-size: var(--text-body-lg);
+      outline: none;
+      font-family: var(--font-sans);
+    }
+    .nl-query-bar input::placeholder { color: var(--color-text-3); }
+    .nl-query-bar .query-submit {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px;
+      background: var(--color-primary);
+      border: none; border-radius: var(--radius-md);
+      color: var(--color-text-inv); cursor: pointer;
+      transition: background var(--motion-fast);
+    }
+    .nl-query-bar .query-submit:hover { background: var(--color-primary-hover); }
+
+    .query-chips {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .query-chip {
+      padding: var(--space-1-5) var(--space-3);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-2);
+      font-size: var(--text-body-sm);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .query-chip:hover {
+      background: var(--color-primary-muted);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* AI Response Card */
+    .ai-response {
+      margin-top: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-left: 3px solid var(--color-accent);
+      border-radius: var(--radius-lg);
+      display: none;
+      animation: fadeSlideIn 0.3s var(--ease-out);
+    }
+    .ai-response.active { display: block; }
+    .ai-response-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+      font-size: var(--text-caption);
+      color: var(--color-accent);
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ai-response-text {
+      font-size: var(--text-body);
+      color: var(--color-text-1);
+      line-height: 1.6;
+      margin-bottom: var(--space-3);
+    }
+    .ai-response-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    /* Insight Cards */
+    .insight-card {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-3);
+      transition: all var(--motion-normal);
+    }
+    .insight-card:last-child { margin-bottom: 0; }
+    .insight-card.removing {
+      opacity: 0;
+      transform: translateX(20px);
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      max-height: 0;
+      overflow: hidden;
+    }
+    .insight-icon {
+      flex-shrink: 0;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      margin-top: 2px;
+    }
+    .insight-icon.high { background: var(--color-error-muted); color: var(--color-error); }
+    .insight-icon.medium { background: var(--color-warning-muted); color: var(--color-warning); }
+    .insight-icon.low { background: var(--color-info-muted); color: var(--color-info); }
+    .insight-icon.positive { background: var(--color-success-muted); color: var(--color-success); }
+    .insight-icon.neutral { background: var(--color-surface-2); color: var(--color-text-2); }
+    .insight-icon.recommend { background: var(--color-accent-muted); color: var(--color-accent); }
+
+    .insight-body { flex: 1; }
+    .insight-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-1);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .insight-desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      line-height: 1.5;
+      margin-bottom: var(--space-2);
+    }
+    .insight-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .insight-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    /* Chart containers */
+    .chart-container {
+      padding: var(--space-4);
+    }
+    .chart-container svg {
+      width: 100%;
+      overflow: visible;
+    }
+    .chart-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-4);
+    }
+
+    /* SVG chart tooltip */
+    .chart-tooltip {
+      position: absolute;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-caption);
+      color: var(--color-text-1);
+      font-family: var(--font-mono);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--motion-fast);
+      z-index: 100;
+      white-space: nowrap;
+      box-shadow: var(--shadow-3);
+    }
+    .chart-tooltip.visible { opacity: 1; }
+
+    /* Chart data points */
+    .chart-dot {
+      cursor: pointer;
+      transition: r var(--motion-fast);
+    }
+    .chart-dot:hover { r: 6; }
+
+    /* Chart bars */
+    .chart-bar {
+      cursor: pointer;
+      transition: opacity var(--motion-fast);
+    }
+    .chart-bar:hover { opacity: 0.8; }
+
+    /* Donut section */
+    .donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+      padding: var(--space-4);
+    }
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .donut-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .donut-legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .donut-legend-label {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      flex: 1;
+    }
+    .donut-legend-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+
+    /* Work Time table */
+    .worktime-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-width: 100px;
+    }
+    .worktime-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .worktime-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width var(--motion-slow);
+    }
+    .worktime-pct {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* Empty state toggles */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════ SIDEBAR ════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item"><svg data-lucide="layout-dashboard"></svg><span class="nav-label">Dashboard</span></a>
+        <a href="timesheets.html" class="nav-item"><svg data-lucide="clock"></svg><span class="nav-label">Timesheets</span><span class="nav-badge">7</span></a>
+        <a href="expenses.html" class="nav-item"><svg data-lucide="receipt"></svg><span class="nav-label">Expenses</span><span class="nav-badge">2</span></a>
+        <a href="leaves.html" class="nav-item"><svg data-lucide="palm-tree"></svg><span class="nav-label">Leaves</span><span class="nav-badge">3</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item"><svg data-lucide="folder-kanban"></svg><span class="nav-label">Projects</span></a>
+        <a href="clients.html" class="nav-item"><svg data-lucide="building-2"></svg><span class="nav-label">Clients</span></a>
+        <a href="planning.html" class="nav-item"><svg data-lucide="calendar-range"></svg><span class="nav-label">Resource Planning</span></a>
+        <a href="gantt.html" class="nav-item"><svg data-lucide="gantt-chart"></svg><span class="nav-label">Gantt Chart</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item"><svg data-lucide="file-text"></svg><span class="nav-label">Invoices</span></a>
+        <a href="insights.html" class="nav-item active"><svg data-lucide="sparkles"></svg><span class="nav-label">AI Insights</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="employees.html" class="nav-item"><svg data-lucide="users"></svg><span class="nav-label">Team Directory</span></a>
+        <a href="approvals.html" class="nav-item"><svg data-lucide="check-square"></svg><span class="nav-label">Approvals</span><span class="nav-badge">12</span></a>
+        <a href="admin.html" class="nav-item"><svg data-lucide="settings"></svg><span class="nav-label">Configuration</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════ MAIN WRAPPER ════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">AI Insights &amp; Analytics</h2>
+      </div>
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="sparkles" width="16" height="16" style="color: var(--color-accent);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">3 new AI insights detected for your team</div>
+                  <div class="notif-time">5 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Unusual expense pattern detected for Bob Taylor</div>
+                  <div class="notif-time">18 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="trending-up" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Team work time hit 78% this month &mdash; highest in Q1</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════ PAGE CONTENT ════════════════ -->
+    <main class="page-content populated-content">
+
+      <!-- NL Query Bar -->
+      <div class="nl-query-section">
+        <div class="nl-query-bar">
+          <svg data-lucide="sparkles" width="22" height="22"></svg>
+          <input type="text" id="nlQueryInput" placeholder="Ask anything about your team..." autocomplete="off">
+          <button class="query-submit" id="nlQuerySubmit"><svg data-lucide="arrow-right" width="18" height="18"></svg></button>
+        </div>
+        <div class="query-chips">
+          <span class="query-chip" data-query="Who has capacity next week?">Who has capacity next week?</span>
+          <span class="query-chip" data-query="Show me unbilled hours in March">Show me unbilled hours in March</span>
+          <span class="query-chip" data-query="Which projects are running over budget?">Which projects are running over budget?</span>
+          <span class="query-chip" data-query="Top performers this quarter">Top performers this quarter</span>
+        </div>
+        <div class="ai-response" id="aiResponse">
+          <div class="ai-response-header">
+            <svg data-lucide="sparkles" width="14" height="14"></svg>
+            AI Response
+          </div>
+          <div class="ai-response-text" id="aiResponseText"></div>
+          <div class="ai-response-actions">
+            <button class="btn btn-secondary btn-sm"><svg data-lucide="table" width="14" height="14"></svg> Show Data</button>
+            <button class="btn btn-ghost btn-sm"><svg data-lucide="download" width="14" height="14"></svg> Export</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Insight Cards -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="sparkles" width="18" height="18" style="color: var(--color-accent);"></svg>
+            AI Insights
+          </span>
+        </div>
+
+        <!-- Insight Tabs -->
+        <div class="tabs">
+          <button class="tab active" data-tab="tab-anomalies">Anomalies <span class="tab-count">3</span></button>
+          <button class="tab" data-tab="tab-trends">Trends <span class="tab-count">2</span></button>
+          <button class="tab" data-tab="tab-recommendations">Recommendations <span class="tab-count">3</span></button>
+        </div>
+
+        <!-- Anomalies Tab -->
+        <div class="tab-content active" id="tab-anomalies">
+          <div class="card-body">
+            <div class="insight-card" id="insight-1">
+              <div class="insight-icon high"><svg data-lucide="alert-triangle" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Unusual expense pattern
+                  <span class="badge badge-error"><svg data-lucide="arrow-up" width="12" height="12"></svg> High</span>
+                </div>
+                <div class="insight-desc">Bob Taylor's <span class="font-mono">&euro;340</span> hotel expense is 2x his average. This deviates significantly from his typical spending pattern and warrants review.</div>
+                <div class="insight-meta">
+                  <span>Affected: <a href="employees.html">Bob Taylor</a></span>
+                  <span>Detected: 2 hours ago</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-secondary btn-sm insight-action" data-action="review">Review Expense</button>
+                  <button class="btn btn-ghost btn-sm insight-dismiss">Mark as OK</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card" id="insight-2">
+              <div class="insight-icon medium"><svg data-lucide="calendar-x" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Timesheet gap detected
+                  <span class="badge badge-warning"><svg data-lucide="minus" width="12" height="12"></svg> Medium</span>
+                </div>
+                <div class="insight-desc">David Park has no entries for Mar 28-29, possibly missed. This may affect invoicing accuracy for the Infra Overhaul project.</div>
+                <div class="insight-meta">
+                  <span>Affected: <a href="employees.html">David Park</a></span>
+                  <span>Detected: 5 hours ago</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-secondary btn-sm insight-action" data-action="notify">Notify Employee</button>
+                  <button class="btn btn-ghost btn-sm insight-dismiss">Dismiss</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card" id="insight-3">
+              <div class="insight-icon low"><svg data-lucide="copy" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Duplicate expense suspected
+                  <span class="badge badge-info"><svg data-lucide="arrow-down" width="12" height="12"></svg> Low</span>
+                </div>
+                <div class="insight-desc">Carol Kim submitted similar <span class="font-mono">&euro;85</span> meals expense twice this week. Both entries reference client dinners on consecutive days.</div>
+                <div class="insight-meta">
+                  <span>Affected: <a href="employees.html">Carol Kim</a></span>
+                  <span>Detected: 1 day ago</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-secondary btn-sm insight-action" data-action="review">Review Both</button>
+                  <button class="btn btn-ghost btn-sm insight-dismiss">Dismiss</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trends Tab -->
+        <div class="tab-content" id="tab-trends">
+          <div class="card-body">
+            <div class="insight-card">
+              <div class="insight-icon positive"><svg data-lucide="trending-up" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Work Time trending up
+                  <span class="badge badge-success"><svg data-lucide="trending-up" width="12" height="12"></svg> Positive</span>
+                </div>
+                <div class="insight-desc">Team avg work time rose from 72% to 78% over last 3 months. This suggests improved resource allocation and reduced bench time across the organization.</div>
+                <div class="insight-meta">
+                  <span>Affected: Entire team</span>
+                  <span>Period: Jan &ndash; Mar 2026</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-secondary btn-sm">View Details</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="insight-icon neutral"><svg data-lucide="bar-chart-3" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Expense growth in travel
+                  <span class="badge badge-default"><svg data-lucide="minus" width="12" height="12"></svg> Neutral</span>
+                </div>
+                <div class="insight-desc">Travel expenses up 35% vs last quarter, driven by Acme project on-site requirements. This aligns with project scope but may need budget review if trend continues.</div>
+                <div class="insight-meta">
+                  <span>Category: Travel</span>
+                  <span>Period: Q1 2026</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-secondary btn-sm">View Breakdown</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendations Tab -->
+        <div class="tab-content" id="tab-recommendations">
+          <div class="card-body">
+            <div class="insight-card" id="rec-1">
+              <div class="insight-icon recommend"><svg data-lucide="user-plus" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Assign Bob Taylor to Initech API
+                  <span class="badge badge-accent"><svg data-lucide="lightbulb" width="12" height="12"></svg> Recommendation</span>
+                </div>
+                <div class="insight-desc">Bob has been on bench 3 weeks. Skills match Initech API needs (Python, REST APIs). Assigning would improve work time and fill a critical gap on the Initech team.</div>
+                <div class="insight-meta">
+                  <span>Affected: <a href="employees.html">Bob Taylor</a></span>
+                  <span>Match confidence: 92%</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary btn-sm insight-action" data-action="assign">Assign Now</button>
+                  <button class="btn btn-ghost btn-sm">View Profile</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card" id="rec-2">
+              <div class="insight-icon recommend"><svg data-lucide="alert-circle" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Review Acme project budget
+                  <span class="badge badge-accent"><svg data-lucide="lightbulb" width="12" height="12"></svg> Recommendation</span>
+                </div>
+                <div class="insight-desc">At current burn rate, budget exhausted by May 20. Consider rate adjustment or scope review. Current spend is <span class="font-mono">&euro;142,000</span> of <span class="font-mono">&euro;180,000</span> total budget.</div>
+                <div class="insight-meta">
+                  <span>Project: <a href="projects.html">Acme Corp Redesign</a></span>
+                  <span>Days remaining: ~45</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-secondary btn-sm">View Burndown</button>
+                  <button class="btn btn-ghost btn-sm insight-action" data-action="notify-pm">Notify PM</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="insight-card" id="rec-3">
+              <div class="insight-icon recommend"><svg data-lucide="calendar-check" width="20" height="20"></svg></div>
+              <div class="insight-body">
+                <div class="insight-title">
+                  Schedule Carol Kim's review
+                  <span class="badge badge-accent"><svg data-lucide="lightbulb" width="12" height="12"></svg> Recommendation</span>
+                </div>
+                <div class="insight-desc">Carol has completed 3 months on Initech. Performance review due per company policy. Her work time has been consistently above 85%.</div>
+                <div class="insight-meta">
+                  <span>Affected: <a href="employees.html">Carol Kim</a></span>
+                  <span>Tenure: 3 months</span>
+                </div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary btn-sm insight-action" data-action="schedule">Schedule Review</button>
+                  <button class="btn btn-ghost btn-sm insight-dismiss">Dismiss</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Section -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Analytics</span>
+        </div>
+
+        <!-- Analytics Tabs -->
+        <div class="tabs">
+          <button class="tab active" data-tab="tab-worktime">Work Time</button>
+          <button class="tab" data-tab="tab-revenue">Revenue</button>
+          <button class="tab" data-tab="tab-expenses">Expenses</button>
+          <button class="tab" data-tab="tab-projects">Projects</button>
+        </div>
+
+        <!-- Work Time Tab -->
+        <div class="tab-content active" id="tab-worktime">
+          <div class="chart-container" style="position: relative;">
+            <div class="chart-title">Team Work Time Over Time</div>
+            <div class="chart-tooltip" id="utilTooltip"></div>
+            <svg id="utilChart" viewBox="0 0 700 250" preserveAspectRatio="xMidYMid meet">
+              <!-- Y axis -->
+              <line x1="50" y1="20" x2="50" y2="210" stroke="var(--color-border)" stroke-width="1"/>
+              <text x="10" y="24" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">100%</text>
+              <text x="15" y="72" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">75%</text>
+              <text x="15" y="119" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">50%</text>
+              <text x="15" y="167" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">25%</text>
+              <text x="20" y="214" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">0%</text>
+              <!-- Grid lines -->
+              <line x1="50" y1="68" x2="680" y2="68" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="50" y1="115" x2="680" y2="115" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="50" y1="163" x2="680" y2="163" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <!-- X axis -->
+              <line x1="50" y1="210" x2="680" y2="210" stroke="var(--color-border)" stroke-width="1"/>
+              <!-- Area fill -->
+              <defs>
+                <linearGradient id="utilGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <polygon points="102,77 155,82 207,70 260,75 312,63 365,58 417,55 470,60 522,52 575,49 627,44 680,42 680,210 102,210" fill="url(#utilGrad)"/>
+              <!-- Line -->
+              <polyline points="102,77 155,82 207,70 260,75 312,63 365,58 417,55 470,60 522,52 575,49 627,44 680,42" fill="none" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Data points -->
+              <circle class="chart-dot" cx="102" cy="77" r="4" fill="var(--color-primary)" data-label="May: 70%" />
+              <circle class="chart-dot" cx="155" cy="82" r="4" fill="var(--color-primary)" data-label="Jun: 68%" />
+              <circle class="chart-dot" cx="207" cy="70" r="4" fill="var(--color-primary)" data-label="Jul: 74%" />
+              <circle class="chart-dot" cx="260" cy="75" r="4" fill="var(--color-primary)" data-label="Aug: 71%" />
+              <circle class="chart-dot" cx="312" cy="63" r="4" fill="var(--color-primary)" data-label="Sep: 77%" />
+              <circle class="chart-dot" cx="365" cy="58" r="4" fill="var(--color-primary)" data-label="Oct: 80%" />
+              <circle class="chart-dot" cx="417" cy="55" r="4" fill="var(--color-primary)" data-label="Nov: 81%" />
+              <circle class="chart-dot" cx="470" cy="60" r="4" fill="var(--color-primary)" data-label="Dec: 79%" />
+              <circle class="chart-dot" cx="522" cy="52" r="4" fill="var(--color-primary)" data-label="Jan: 83%" />
+              <circle class="chart-dot" cx="575" cy="49" r="4" fill="var(--color-primary)" data-label="Feb: 85%" />
+              <circle class="chart-dot" cx="627" cy="44" r="4" fill="var(--color-primary)" data-label="Mar: 78%" />
+              <circle class="chart-dot" cx="680" cy="42" r="4" fill="var(--color-primary)" data-label="Apr: 78%" />
+              <!-- X labels -->
+              <text x="102" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">May</text>
+              <text x="155" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Jun</text>
+              <text x="207" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Jul</text>
+              <text x="260" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Aug</text>
+              <text x="312" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Sep</text>
+              <text x="365" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Oct</text>
+              <text x="417" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Nov</text>
+              <text x="470" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Dec</text>
+              <text x="522" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Jan</text>
+              <text x="575" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Feb</text>
+              <text x="627" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Mar</text>
+              <text x="680" y="228" fill="var(--color-text-3)" font-size="9" text-anchor="middle">Apr</text>
+            </svg>
+          </div>
+
+          <!-- Top Utilized Employees -->
+          <div style="padding: 0 var(--space-4) var(--space-4);">
+            <div class="chart-title">Top 5 Most Utilized Employees</div>
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Work Time</th>
+                    <th>Trend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td class="cell-secondary">Engineering</td>
+                    <td>
+                      <div class="worktime-bar-wrap">
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:95%; background: var(--color-error);"></div></div>
+                        <span class="worktime-pct">95%</span>
+                      </div>
+                    </td>
+                    <td><span style="color: var(--color-success);">&uarr;</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="employees.html">Carol Kim</a></td>
+                    <td class="cell-secondary">Engineering</td>
+                    <td>
+                      <div class="worktime-bar-wrap">
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:90%; background: var(--color-warning);"></div></div>
+                        <span class="worktime-pct">90%</span>
+                      </div>
+                    </td>
+                    <td><span style="color: var(--color-success);">&uarr;</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="employees.html">Marco Rossi</a></td>
+                    <td class="cell-secondary">Engineering</td>
+                    <td>
+                      <div class="worktime-bar-wrap">
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:88%; background: var(--color-primary);"></div></div>
+                        <span class="worktime-pct">88%</span>
+                      </div>
+                    </td>
+                    <td><span style="color: var(--color-text-3);">&rarr;</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="employees.html">John Smith</a></td>
+                    <td class="cell-secondary">Engineering</td>
+                    <td>
+                      <div class="worktime-bar-wrap">
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:82%; background: var(--color-primary);"></div></div>
+                        <span class="worktime-pct">82%</span>
+                      </div>
+                    </td>
+                    <td><span style="color: var(--color-success);">&uarr;</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="employees.html">Emma Laurent</a></td>
+                    <td class="cell-secondary">QA</td>
+                    <td>
+                      <div class="worktime-bar-wrap">
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:78%; background: var(--color-primary);"></div></div>
+                        <span class="worktime-pct">78%</span>
+                      </div>
+                    </td>
+                    <td><span style="color: var(--color-error);">&darr;</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Tab -->
+        <div class="tab-content" id="tab-revenue">
+          <div class="chart-container" style="position: relative;">
+            <div class="chart-title">Monthly Revenue</div>
+            <div class="chart-tooltip" id="revTooltip"></div>
+            <svg id="revChart" viewBox="0 0 700 250" preserveAspectRatio="xMidYMid meet">
+              <!-- Y axis -->
+              <line x1="50" y1="20" x2="50" y2="210" stroke="var(--color-border)" stroke-width="1"/>
+              <text x="8" y="24" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">&euro;60k</text>
+              <text x="8" y="72" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">&euro;45k</text>
+              <text x="8" y="119" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">&euro;30k</text>
+              <text x="8" y="167" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">&euro;15k</text>
+              <text x="16" y="214" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">&euro;0</text>
+              <!-- Grid -->
+              <line x1="50" y1="68" x2="680" y2="68" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="50" y1="115" x2="680" y2="115" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="50" y1="163" x2="680" y2="163" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
+              <line x1="50" y1="210" x2="680" y2="210" stroke="var(--color-border)" stroke-width="1"/>
+              <!-- Bars: Nov 42k, Dec 45k, Jan 38k, Feb 51k, Mar 47k, Apr 45k -->
+              <!-- Max 60k = y20, 0 = y210, range=190. value/60000*190 = height from bottom -->
+              <rect class="chart-bar" x="90" y="77" width="70" height="133" rx="4" fill="var(--color-gold)" data-label="Nov: &euro;42,000"/>
+              <rect class="chart-bar" x="195" y="67" width="70" height="143" rx="4" fill="var(--color-gold)" data-label="Dec: &euro;45,000"/>
+              <rect class="chart-bar" x="300" y="89" width="70" height="121" rx="4" fill="var(--color-gold)" data-label="Jan: &euro;38,000"/>
+              <rect class="chart-bar" x="405" y="48" width="70" height="162" rx="4" fill="var(--color-gold)" data-label="Feb: &euro;51,000"/>
+              <rect class="chart-bar" x="510" y="61" width="70" height="149" rx="4" fill="var(--color-gold)" data-label="Mar: &euro;47,000"/>
+              <rect class="chart-bar" x="615" y="67" width="70" height="143" rx="4" fill="var(--color-gold)" data-label="Apr: &euro;45,000"/>
+              <!-- Labels -->
+              <text x="125" y="228" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Nov</text>
+              <text x="230" y="228" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Dec</text>
+              <text x="335" y="228" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Jan</text>
+              <text x="440" y="228" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Feb</text>
+              <text x="545" y="228" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Mar</text>
+              <text x="650" y="228" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Apr</text>
+              <!-- Value labels -->
+              <text x="125" y="72" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;42k</text>
+              <text x="230" y="62" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;45k</text>
+              <text x="335" y="84" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;38k</text>
+              <text x="440" y="43" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;51k</text>
+              <text x="545" y="56" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;47k</text>
+              <text x="650" y="62" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;45k</text>
+            </svg>
+          </div>
+
+          <!-- Revenue by Client Donut -->
+          <div class="donut-wrap">
+            <svg viewBox="0 0 200 200" width="180" height="180">
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-surface-2)" stroke-width="28"/>
+              <!-- Acme 45% = 162deg -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-1)" stroke-width="28"
+                stroke-dasharray="282.74 157.08" stroke-dashoffset="110" transform="rotate(-90 100 100)"/>
+              <!-- Globex 30% = 108deg -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-2)" stroke-width="28"
+                stroke-dasharray="131.95 307.87" stroke-dashoffset="-172.74" transform="rotate(-90 100 100)"/>
+              <!-- Initech 15% = 54deg -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-4)" stroke-width="28"
+                stroke-dasharray="65.97 373.85" stroke-dashoffset="-304.69" transform="rotate(-90 100 100)"/>
+              <!-- Other 10% = 36deg -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-5)" stroke-width="28"
+                stroke-dasharray="43.98 395.84" stroke-dashoffset="-370.66" transform="rotate(-90 100 100)"/>
+              <!-- Center text -->
+              <text x="100" y="95" text-anchor="middle" fill="var(--color-text-1)" font-size="18" font-weight="700" font-family="var(--font-mono)">&euro;268k</text>
+              <text x="100" y="115" text-anchor="middle" fill="var(--color-text-3)" font-size="10">Total Revenue</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-1);"></div>
+                <span class="donut-legend-label">Acme Corp</span>
+                <span class="donut-legend-value">45%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-2);"></div>
+                <span class="donut-legend-label">Globex Inc</span>
+                <span class="donut-legend-value">30%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-4);"></div>
+                <span class="donut-legend-label">Initech Ltd</span>
+                <span class="donut-legend-value">15%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-5);"></div>
+                <span class="donut-legend-label">Other</span>
+                <span class="donut-legend-value">10%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expenses Tab -->
+        <div class="tab-content" id="tab-expenses">
+          <!-- Expenses by Category Donut -->
+          <div class="donut-wrap">
+            <svg viewBox="0 0 200 200" width="180" height="180">
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-surface-2)" stroke-width="28"/>
+              <!-- Travel 35% -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-1)" stroke-width="28"
+                stroke-dasharray="153.94 285.88" stroke-dashoffset="110" transform="rotate(-90 100 100)"/>
+              <!-- Hotel 25% -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-2)" stroke-width="28"
+                stroke-dasharray="109.96 329.86" stroke-dashoffset="-43.94" transform="rotate(-90 100 100)"/>
+              <!-- Meals 15% -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-3)" stroke-width="28"
+                stroke-dasharray="65.97 373.85" stroke-dashoffset="-153.90" transform="rotate(-90 100 100)"/>
+              <!-- Software 10% -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-4)" stroke-width="28"
+                stroke-dasharray="43.98 395.84" stroke-dashoffset="-219.87" transform="rotate(-90 100 100)"/>
+              <!-- Equipment 10% -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-5)" stroke-width="28"
+                stroke-dasharray="43.98 395.84" stroke-dashoffset="-263.85" transform="rotate(-90 100 100)"/>
+              <!-- Other 5% -->
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-chart-6)" stroke-width="28"
+                stroke-dasharray="21.99 417.83" stroke-dashoffset="-307.83" transform="rotate(-90 100 100)"/>
+              <!-- Center -->
+              <text x="100" y="95" text-anchor="middle" fill="var(--color-text-1)" font-size="18" font-weight="700" font-family="var(--font-mono)">&euro;84k</text>
+              <text x="100" y="115" text-anchor="middle" fill="var(--color-text-3)" font-size="10">Total Expenses</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-1);"></div>
+                <span class="donut-legend-label">Travel</span>
+                <span class="donut-legend-value">35%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-2);"></div>
+                <span class="donut-legend-label">Hotel</span>
+                <span class="donut-legend-value">25%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-3);"></div>
+                <span class="donut-legend-label">Meals</span>
+                <span class="donut-legend-value">15%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-4);"></div>
+                <span class="donut-legend-label">Software</span>
+                <span class="donut-legend-value">10%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-5);"></div>
+                <span class="donut-legend-label">Equipment</span>
+                <span class="donut-legend-value">10%</span>
+              </div>
+              <div class="donut-legend-item">
+                <div class="donut-legend-dot" style="background: var(--color-chart-6);"></div>
+                <span class="donut-legend-label">Other</span>
+                <span class="donut-legend-value">5%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Expense Trend -->
+          <div class="chart-container" style="position: relative;">
+            <div class="chart-title">Monthly Expense Trend</div>
+            <svg viewBox="0 0 700 200" preserveAspectRatio="xMidYMid meet">
+              <line x1="50" y1="170" x2="680" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+              <!-- Bars: Nov 12k, Dec 14k, Jan 11k, Feb 16k, Mar 18k, Apr 13k -->
+              <rect class="chart-bar" x="90" y="56" width="70" height="114" rx="4" fill="var(--color-chart-3)" opacity="0.8"/>
+              <rect class="chart-bar" x="195" y="37" width="70" height="133" rx="4" fill="var(--color-chart-3)" opacity="0.8"/>
+              <rect class="chart-bar" x="300" y="66" width="70" height="104" rx="4" fill="var(--color-chart-3)" opacity="0.8"/>
+              <rect class="chart-bar" x="405" y="18" width="70" height="152" rx="4" fill="var(--color-chart-3)" opacity="0.8"/>
+              <rect class="chart-bar" x="510" y="0" width="70" height="170" rx="4" fill="var(--color-chart-3)" opacity="0.8"/>
+              <rect class="chart-bar" x="615" y="47" width="70" height="123" rx="4" fill="var(--color-chart-3)" opacity="0.8"/>
+              <!-- Labels -->
+              <text x="125" y="188" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Nov</text>
+              <text x="230" y="188" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Dec</text>
+              <text x="335" y="188" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Jan</text>
+              <text x="440" y="188" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Feb</text>
+              <text x="545" y="188" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Mar</text>
+              <text x="650" y="188" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Apr</text>
+              <!-- Values -->
+              <text x="125" y="50" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;12k</text>
+              <text x="230" y="31" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;14k</text>
+              <text x="335" y="60" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;11k</text>
+              <text x="440" y="12" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;16k</text>
+              <text x="545" y="-6" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;18k</text>
+              <text x="650" y="41" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">&euro;13k</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Projects Tab -->
+        <div class="tab-content" id="tab-projects">
+          <div style="padding: var(--space-4); overflow-x: auto;">
+            <div class="chart-title">Project Profitability</div>
+            <table class="data-table mobile-cards">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Client</th>
+                  <th>Revenue</th>
+                  <th>Costs</th>
+                  <th>Margin</th>
+                  <th>Health</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="projects.html">Acme Web Redesign</a></td>
+                  <td><a href="clients.html">Acme Corp</a></td>
+                  <td class="cell-mono">&euro;85,000</td>
+                  <td class="cell-mono">&euro;62,000</td>
+                  <td><span class="font-mono" style="color: var(--color-success);">27%</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="heart-pulse" width="12" height="12"></svg> Healthy</span></td>
+                </tr>
+                <tr>
+                  <td><a href="projects.html">Globex Platform</a></td>
+                  <td><a href="clients.html">Globex Inc</a></td>
+                  <td class="cell-mono">&euro;120,000</td>
+                  <td class="cell-mono">&euro;78,000</td>
+                  <td><span class="font-mono" style="color: var(--color-success);">35%</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="heart-pulse" width="12" height="12"></svg> Healthy</span></td>
+                </tr>
+                <tr>
+                  <td><a href="projects.html">Initech API</a></td>
+                  <td><a href="clients.html">Initech Ltd</a></td>
+                  <td class="cell-mono">&euro;45,000</td>
+                  <td class="cell-mono">&euro;38,000</td>
+                  <td><span class="font-mono" style="color: var(--color-warning);">16%</span></td>
+                  <td><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
+                </tr>
+                <tr>
+                  <td><a href="projects.html">Meridian Portal</a></td>
+                  <td><a href="clients.html">Meridian Corp</a></td>
+                  <td class="cell-mono">&euro;68,000</td>
+                  <td class="cell-mono">&euro;52,000</td>
+                  <td><span class="font-mono" style="color: var(--color-success);">24%</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="heart-pulse" width="12" height="12"></svg> Healthy</span></td>
+                </tr>
+                <tr>
+                  <td><a href="projects.html">Atlas Redesign</a></td>
+                  <td><a href="clients.html">Atlas Group</a></td>
+                  <td class="cell-mono">&euro;35,000</td>
+                  <td class="cell-mono">&euro;31,000</td>
+                  <td><span class="font-mono" style="color: var(--color-error);">11%</span></td>
+                  <td><span class="badge badge-error"><svg data-lucide="alert-octagon" width="12" height="12"></svg> Critical</span></td>
+                </tr>
+                <tr>
+                  <td><a href="projects.html">Infra Overhaul</a></td>
+                  <td><a href="clients.html">Internal</a></td>
+                  <td class="cell-mono">&euro;0</td>
+                  <td class="cell-mono">&euro;24,000</td>
+                  <td><span class="font-mono" style="color: var(--color-text-3);">N/A</span></td>
+                  <td><span class="badge badge-info"><svg data-lucide="lock" width="12" height="12"></svg> Internal</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Headcount Trend -->
+          <div class="chart-container">
+            <div class="chart-title">Headcount Trend</div>
+            <svg viewBox="0 0 700 180" preserveAspectRatio="xMidYMid meet">
+              <line x1="50" y1="150" x2="680" y2="150" stroke="var(--color-border)" stroke-width="1"/>
+              <!-- Bars: Nov 42, Dec 44, Jan 45, Feb 46, Mar 47, Apr 48 -->
+              <rect class="chart-bar" x="90" y="30" width="70" height="120" rx="4" fill="var(--color-chart-4)" opacity="0.7"/>
+              <rect class="chart-bar" x="195" y="22" width="70" height="128" rx="4" fill="var(--color-chart-4)" opacity="0.7"/>
+              <rect class="chart-bar" x="300" y="18" width="70" height="132" rx="4" fill="var(--color-chart-4)" opacity="0.7"/>
+              <rect class="chart-bar" x="405" y="14" width="70" height="136" rx="4" fill="var(--color-chart-4)" opacity="0.7"/>
+              <rect class="chart-bar" x="510" y="10" width="70" height="140" rx="4" fill="var(--color-chart-4)" opacity="0.7"/>
+              <rect class="chart-bar" x="615" y="6" width="70" height="144" rx="4" fill="var(--color-chart-4)" opacity="0.7"/>
+              <!-- Labels -->
+              <text x="125" y="166" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Nov</text>
+              <text x="230" y="166" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Dec</text>
+              <text x="335" y="166" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Jan</text>
+              <text x="440" y="166" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Feb</text>
+              <text x="545" y="166" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Mar</text>
+              <text x="650" y="166" fill="var(--color-text-3)" font-size="10" text-anchor="middle">Apr</text>
+              <!-- Values -->
+              <text x="125" y="24" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">42</text>
+              <text x="230" y="16" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">44</text>
+              <text x="335" y="12" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">45</text>
+              <text x="440" y="8" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">46</text>
+              <text x="545" y="4" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">47</text>
+              <text x="650" y="0" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">48</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Empty State -->
+    <main class="page-content empty-content" style="flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+      <div class="card" style="max-width: 500px; text-align: center; padding: var(--space-8);">
+        <svg data-lucide="sparkles" width="48" height="48" style="color: var(--color-accent); margin-bottom: var(--space-4);"></svg>
+        <h3 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No insights yet</h3>
+        <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">AI insights will appear here once you have enough timesheet, expense, and project data. Start logging to unlock powerful analytics.</p>
+        <a href="timesheets.html" class="btn btn-primary btn-md">Log Your First Timesheet</a>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<!-- ════════════════ COMMAND PALETTE ════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search people, projects, commands..." id="cmdInput" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Quick Actions</div>
+      <div class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Log Time</div>
+          <div class="item-subtitle">Open timesheet entry</div>
+        </div>
+        <div class="item-shortcut"><kbd>T</kbd></div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="receipt" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">New Expense</div>
+          <div class="item-subtitle">Submit expense report</div>
+        </div>
+        <div class="item-shortcut"><kbd>E</kbd></div>
+      </div>
+      <div class="cmd-palette-group-label">Pages</div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Dashboard</div>
+          <div class="item-subtitle">Command center overview</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="bar-chart-3" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Analytics</div>
+          <div class="item-subtitle">Charts and reports</div>
+        </div>
+      </div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&#9166;</kbd> Open</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ TOAST CONTAINER ════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════════════ STATE TOGGLE ════════════════ -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<!-- ════════════════ SCRIPTS ════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  lucide.createIcons();
+
+  // ── DOM refs ──
+  var sidebar        = document.getElementById('sidebar');
+  var collapseBtn    = document.getElementById('sidebarCollapseBtn');
+  var mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var searchTrigger  = document.getElementById('searchTrigger');
+  var cmdPalette     = document.getElementById('cmdPalette');
+  var cmdInput       = document.getElementById('cmdInput');
+  var notifBtn       = document.getElementById('notifBtn');
+  var notifPanel     = document.getElementById('notifPanel');
+  var userMenuBtn    = document.getElementById('userMenuBtn');
+  var userDropdown   = document.getElementById('userDropdown');
+  var stateToggle    = document.getElementById('stateToggle');
+  var toastContainer = document.getElementById('toastContainer');
+  var nlQueryInput   = document.getElementById('nlQueryInput');
+  var nlQuerySubmit  = document.getElementById('nlQuerySubmit');
+  var aiResponse     = document.getElementById('aiResponse');
+  var aiResponseText = document.getElementById('aiResponseText');
+
+  // ── Sidebar collapse ──
+  collapseBtn.addEventListener('click', function() { sidebar.classList.toggle('collapsed'); });
+
+  // ── Mobile menu ──
+  mobileMenuBtn.addEventListener('click', function() { sidebar.classList.toggle('mobile-open'); });
+  sidebarOverlay.addEventListener('click', function() { sidebar.classList.remove('mobile-open'); });
+
+  // ── Command Palette ──
+  function openCmdPalette() { cmdPalette.classList.add('active'); setTimeout(function() { cmdInput.focus(); }, 100); }
+  function closeCmdPalette() { cmdPalette.classList.remove('active'); cmdInput.value = ''; }
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', function(e) { if (e.target === cmdPalette) closeCmdPalette(); });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); cmdPalette.classList.contains('active') ? closeCmdPalette() : openCmdPalette(); }
+    if (e.key === 'Escape' && cmdPalette.classList.contains('active')) closeCmdPalette();
+  });
+
+  // ── Notification Panel ──
+  notifBtn.addEventListener('click', function(e) { e.stopPropagation(); notifPanel.classList.toggle('active'); userDropdown.classList.remove('active'); });
+
+  // ── User Dropdown ──
+  userMenuBtn.addEventListener('click', function(e) { e.stopPropagation(); userDropdown.classList.toggle('active'); notifPanel.classList.remove('active'); });
+
+  // ── Close dropdowns on outside click ──
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
+  });
+
+  // ── Toast ──
+  function showToast(type, title, message) {
+    var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+
+  // ── Tabs (hash-based) ──
+  var allTabs = document.querySelectorAll('.tab[data-tab]');
+  var allTabContents = document.querySelectorAll('.tab-content');
+
+  function activateTab(tabId) {
+    // Find sibling tabs within the same .tabs container
+    var tabBtn = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    if (!tabBtn) return;
+    var container = tabBtn.parentElement;
+    var siblingTabs = container.querySelectorAll('.tab[data-tab]');
+    siblingTabs.forEach(function(t) { t.classList.remove('active'); });
+    tabBtn.classList.add('active');
+    // Activate corresponding content and hide siblings
+    siblingTabs.forEach(function(t) {
+      var content = document.getElementById(t.getAttribute('data-tab'));
+      if (content) content.classList.remove('active');
+    });
+    var activeContent = document.getElementById(tabId);
+    if (activeContent) activeContent.classList.add('active');
+  }
+
+  allTabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabId = this.getAttribute('data-tab');
+      activateTab(tabId);
+      window.location.hash = tabId;
+    });
+  });
+
+  var hashTab = window.location.hash.replace('#', '');
+  if (hashTab && document.getElementById(hashTab)) activateTab(hashTab);
+
+  // ── NL Query Bar ──
+  var fakeResponses = {
+    'Who has capacity next week?': 'Based on current allocations, <strong>3 team members</strong> have significant capacity next week: <strong>Bob Taylor</strong> (100% available, currently on bench), <strong>James Wilson</strong> (80% available), and <strong>David Park</strong> (60% available after Infra Overhaul wraps up). Consider assigning Bob to the Initech API project which needs Python developers.',
+    'Show me unbilled hours in March': 'In March 2026, there were <strong>142 unbilled hours</strong> across the team, worth approximately <strong class="font-mono">&euro;14,200</strong> in potential revenue. The largest gaps: David Park (32h on internal work), Bob Taylor (48h on bench), and 62h of admin/meeting time distributed across the team.',
+    'Which projects are running over budget?': 'Two projects are at risk: <strong>Atlas Redesign</strong> is at 89% budget work time with only 65% completion (11% margin). <strong>Initech API</strong> is at 84% budget with 70% completion and a 16% margin that is thinning. Recommend immediate scope reviews for both.',
+    'Top performers this quarter': 'Top performers in Q1 2026 by composite score (work time + delivery + quality): <strong>1. Sarah Chen</strong> (95% work time, 100% on-time delivery), <strong>2. Carol Kim</strong> (90% work time, all sprints completed), <strong>3. Marco Rossi</strong> (88% work time, zero defects). Consider scheduling performance reviews and recognition.'
+  };
+
+  function submitQuery() {
+    var query = nlQueryInput.value.trim();
+    if (!query) return;
+    var response = fakeResponses[query] || 'Based on your team data, I found relevant information about "' + query + '". Your team of 48 members currently has an average work time of 78%. There are 3 employees on bench and 5 pending expense approvals. Would you like me to drill deeper into any specific area?';
+    aiResponseText.innerHTML = response;
+    aiResponse.classList.add('active');
+  }
+
+  nlQuerySubmit.addEventListener('click', submitQuery);
+  nlQueryInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') submitQuery(); });
+
+  document.querySelectorAll('.query-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      nlQueryInput.value = this.getAttribute('data-query');
+      submitQuery();
+    });
+  });
+
+  // ── Insight Dismiss/Action ──
+  document.querySelectorAll('.insight-dismiss').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var card = this.closest('.insight-card');
+      if (card) {
+        card.classList.add('removing');
+        setTimeout(function() { card.style.display = 'none'; }, 400);
+        showToast('info', 'Dismissed', 'Insight has been dismissed.');
+      }
+    });
+  });
+
+  document.querySelectorAll('.insight-action').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var action = this.getAttribute('data-action');
+      var card = this.closest('.insight-card');
+      var actionLabels = {
+        'review': 'Opening expense review...',
+        'notify': 'Notification sent to employee.',
+        'assign': 'Assignment initiated.',
+        'notify-pm': 'PM has been notified.',
+        'schedule': 'Review scheduled.'
+      };
+      showToast('success', 'Action Taken', actionLabels[action] || 'Action completed.');
+      if (card) {
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+      }
+    });
+  });
+
+  // ── Chart Tooltips ──
+  document.querySelectorAll('.chart-dot, .chart-bar').forEach(function(el) {
+    el.addEventListener('mouseenter', function(e) {
+      var tooltip = this.closest('.chart-container').querySelector('.chart-tooltip');
+      if (!tooltip) return;
+      var label = this.getAttribute('data-label');
+      if (!label) return;
+      tooltip.textContent = label;
+      tooltip.classList.add('visible');
+      var rect = this.closest('.chart-container').getBoundingClientRect();
+      var svgRect = this.closest('svg').getBoundingClientRect();
+      var elRect = this.getBoundingClientRect();
+      tooltip.style.left = (elRect.left - rect.left + elRect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+      tooltip.style.top = (elRect.top - rect.top - tooltip.offsetHeight - 8) + 'px';
+    });
+    el.addEventListener('mouseleave', function() {
+      var tooltip = this.closest('.chart-container').querySelector('.chart-tooltip');
+      if (tooltip) tooltip.classList.remove('visible');
+    });
+  });
+
+  // ── Empty State Toggle ──
+  var isPopulated = true;
+  stateToggle.addEventListener('click', function() {
+    isPopulated = !isPopulated;
+    document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+    this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+})();
+</script>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

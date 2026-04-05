@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR &mdash; GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── HR-specific styles ── */
+    .hr-tabs { margin-bottom: var(--space-4); }
+
+    /* ── Kanban Pipeline ── */
+    .kanban {
+      display: flex;
+      gap: var(--space-4);
+      overflow-x: auto;
+      padding-bottom: var(--space-4);
+      scrollbar-width: thin;
+    }
+    .kanban::-webkit-scrollbar { height: 6px; }
+    .kanban::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+
+    .kanban-column {
+      min-width: 280px;
+      max-width: 320px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .kanban-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-bottom: 2px solid var(--color-primary);
+    }
+    .kanban-header .col-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .kanban-header .col-count {
+      background: var(--color-surface-2);
+      padding: 1px 8px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
+    }
+    .kanban-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      min-height: 200px;
+    }
+
+    /* Stage-specific border colors */
+    .kanban-column.stage-applied .kanban-header { border-bottom-color: var(--color-info); }
+    .kanban-column.stage-screening .kanban-header { border-bottom-color: var(--color-warning); }
+    .kanban-column.stage-interview .kanban-header { border-bottom-color: var(--color-accent); }
+    .kanban-column.stage-offer .kanban-header { border-bottom-color: var(--color-chart-5); }
+    .kanban-column.stage-hired .kanban-header { border-bottom-color: var(--color-success); }
+
+    .candidate-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .candidate-card:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-2);
+      transform: translateY(-1px);
+    }
+    .candidate-card .cand-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+    .candidate-card .cand-name {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      font-size: var(--text-body);
+    }
+    .candidate-card .cand-position {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-2);
+    }
+    .candidate-card .cand-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .candidate-card .cand-meta .meta-sep { color: var(--color-border-strong); }
+
+    .source-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 1px var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+    }
+    .source-tag.linkedin { background: var(--color-info-muted); color: var(--color-info); }
+    .source-tag.referral { background: var(--color-success-muted); color: var(--color-success); }
+    .source-tag.website { background: var(--color-surface-2); color: var(--color-text-2); }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 2px var(--space-2);
+      background: var(--color-warning-muted);
+      color: var(--color-warning);
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      font-family: var(--font-mono);
+    }
+
+    .interview-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      margin-top: var(--space-2);
+      padding-top: var(--space-2);
+      border-top: 1px solid var(--color-border-subtle);
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .interview-info .info-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .interview-info .info-row svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    .offer-amount {
+      font-family: var(--font-mono);
+      font-size: var(--text-body);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      margin-top: var(--space-2);
+    }
+
+    /* ── Onboarding Cards ── */
+    .onboard-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-1);
+      overflow: hidden;
+    }
+    .onboard-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .onboard-card-header .onboard-info { flex: 1; }
+    .onboard-card-header .onboard-name {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      font-size: var(--text-body);
+    }
+    .onboard-card-header .onboard-role {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .onboard-card-header .onboard-date {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .onboard-card-body { padding: var(--space-4); }
+
+    .progress-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-2);
+    }
+    .progress-label .progress-pct {
+      font-weight: var(--weight-semibold);
+      font-family: var(--font-mono);
+    }
+
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+    }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .checklist-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .checklist-item.done {
+      color: var(--color-text-3);
+      text-decoration: line-through;
+    }
+    .checklist-item .buddy-name {
+      color: var(--color-primary);
+      font-weight: var(--weight-medium);
+      text-decoration: none;
+    }
+
+    /* ── Template Cards ── */
+    .template-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .template-card:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-2);
+      transform: translateY(-2px);
+    }
+    .template-card .tpl-icon {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-muted);
+      color: var(--color-primary);
+      margin-bottom: var(--space-3);
+    }
+    .template-card .tpl-name {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      font-size: var(--text-body);
+      margin-bottom: var(--space-1);
+    }
+    .template-card .tpl-meta {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+
+    /* ── Offboarding ── */
+    .offboard-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-1);
+      overflow: hidden;
+    }
+    .offboard-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .offboard-card-header .offboard-info { flex: 1; }
+    .offboard-card-header .offboard-name {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .offboard-card-header .offboard-role {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .offboard-card-body { padding: var(--space-4); }
+
+    .last-day-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 2px var(--space-2);
+      background: var(--color-error-muted);
+      color: var(--color-error);
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+    }
+    .last-day-tag svg { width: 12px; height: 12px; }
+
+    /* ── Lifecycle Table ── */
+    .lifecycle-event {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .lifecycle-event .event-icon {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      flex-shrink: 0;
+    }
+    .event-icon.promotion { background: var(--color-success-muted); color: var(--color-success); }
+    .event-icon.renewal { background: var(--color-info-muted); color: var(--color-info); }
+    .event-icon.probation { background: var(--color-warning-muted); color: var(--color-warning); }
+    .event-icon.termination { background: var(--color-error-muted); color: var(--color-error); }
+
+    /* ── Section headings ── */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      margin-top: var(--space-6);
+    }
+    .section-heading h3 {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+
+    /* ── Empty state ── */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+    .empty-state {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-6);
+      text-align: center;
+      color: var(--color-text-3);
+      gap: var(--space-4);
+    }
+    .empty-state svg { color: var(--color-text-3); opacity: 0.5; }
+    .empty-state h3 { font-size: var(--text-heading-2); color: var(--color-text-2); }
+    .empty-state p { max-width: 400px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1023px) {
+      .kanban { flex-wrap: nowrap; }
+      .kanban-column { min-width: 260px; }
+    }
+    @media (max-width: 639px) {
+      .kanban-column { min-width: 85vw; }
+    }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item active">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="bar-chart-3"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Human Resources</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <button class="mobile-search-btn" id="mobileSearchBtn">
+        <svg data-lucide="search" width="20" height="20"></svg>
+      </button>
+
+      <div class="header-right">
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="briefcase" width="16" height="16" style="color: var(--color-primary);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">5 new applications received for open positions</div>
+                  <div class="notif-time">Just now</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="user-plus" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Yuki Tanaka's onboarding started today</div>
+                  <div class="notif-time">2 hours ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="calendar" width="16" height="16" style="color: var(--color-accent);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Elena Kowalski's 2nd round interview at 2pm</div>
+                  <div class="notif-time">3 hours ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Human Resources</h1>
+          <p class="page-subtitle">Manage recruitment, onboarding, offboarding, and employee lifecycle</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-md" id="newJobBtn">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            New Job Posting
+          </button>
+        </div>
+      </div>
+
+      <!-- Populated content -->
+      <div class="populated-content">
+
+        <!-- Tabs -->
+        <div class="tabs hr-tabs">
+          <button class="tab active" data-tab="recruitment">
+            <svg data-lucide="briefcase" width="16" height="16"></svg>
+            Recruitment <span class="tab-count">47</span>
+          </button>
+          <button class="tab" data-tab="onboarding">
+            <svg data-lucide="user-plus" width="16" height="16"></svg>
+            Onboarding <span class="tab-count">3</span>
+          </button>
+          <button class="tab" data-tab="offboarding">
+            <svg data-lucide="user-minus" width="16" height="16"></svg>
+            Offboarding <span class="tab-count">2</span>
+          </button>
+          <button class="tab" data-tab="records">
+            <svg data-lucide="file-text" width="16" height="16"></svg>
+            Employee Records
+          </button>
+        </div>
+
+        <!-- ══════════════════ TAB 1: RECRUITMENT ══════════════════ -->
+        <div class="tab-content active" id="tab-recruitment">
+
+          <!-- KPI Cards -->
+          <div class="grid-3 mb-6" style="margin-top: var(--space-4);">
+            <div class="stat-card">
+              <div class="stat-label">Open Positions</div>
+              <div class="stat-value">8</div>
+              <div class="stat-trend up">
+                <svg data-lucide="trending-up" width="14" height="14"></svg>
+                +2 this month
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Candidates</div>
+              <div class="stat-value">47</div>
+              <div class="stat-trend" style="color: var(--color-info);">
+                <svg data-lucide="users" width="14" height="14"></svg>
+                12 in interview stage
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Avg. Time to Hire</div>
+              <div class="stat-value">28<span style="font-size: var(--text-body); font-weight: var(--weight-medium); color: var(--color-text-2);"> days</span></div>
+              <div class="stat-trend up">
+                <svg data-lucide="trending-down" width="14" height="14"></svg>
+                -3 days vs last quarter
+              </div>
+            </div>
+          </div>
+
+          <!-- Kanban Pipeline -->
+          <div class="section-heading">
+            <h3>Recruitment Pipeline</h3>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-secondary btn-sm">
+                <svg data-lucide="filter" width="14" height="14"></svg>
+                Filter
+              </button>
+              <button class="btn btn-secondary btn-sm">
+                <svg data-lucide="download" width="14" height="14"></svg>
+                Export
+              </button>
+            </div>
+          </div>
+
+          <div class="kanban">
+
+            <!-- APPLIED Column -->
+            <div class="kanban-column stage-applied">
+              <div class="kanban-header">
+                <span class="col-title">Applied</span>
+                <span class="col-count">15</span>
+              </div>
+              <div class="kanban-body">
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">MS</div>
+                    <div>
+                      <div class="cand-name">Maria Santos</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Senior Frontend Developer</div>
+                  <div class="cand-meta">
+                    <span>Apr 1, 2026</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span class="source-tag linkedin"><svg data-lucide="linkedin" width="10" height="10"></svg> LinkedIn</span>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">JW</div>
+                    <div>
+                      <div class="cand-name">James Wilson</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">DevOps Engineer</div>
+                  <div class="cand-meta">
+                    <span>Mar 28, 2026</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span class="source-tag referral"><svg data-lucide="user-check" width="10" height="10"></svg> Referral: Sarah Chen</span>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">AP</div>
+                    <div>
+                      <div class="cand-name">Aisha Patel</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">UX Designer</div>
+                  <div class="cand-meta">
+                    <span>Mar 25, 2026</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span class="source-tag website"><svg data-lucide="globe" width="10" height="10"></svg> Website</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SCREENING Column -->
+            <div class="kanban-column stage-screening">
+              <div class="kanban-header">
+                <span class="col-title">Screening</span>
+                <span class="col-count">8</span>
+              </div>
+              <div class="kanban-body">
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">TM</div>
+                    <div>
+                      <div class="cand-name">Thomas Mueller</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Backend Developer</div>
+                  <div class="cand-meta">
+                    <span>Mar 22, 2026</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span class="source-tag linkedin"><svg data-lucide="linkedin" width="10" height="10"></svg> LinkedIn</span>
+                  </div>
+                  <div style="margin-top: var(--space-2);">
+                    <span class="score-badge"><svg data-lucide="star" width="10" height="10"></svg> 85/100</span>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">LS</div>
+                    <div>
+                      <div class="cand-name">Lucia Sanchez</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Marketing Manager</div>
+                  <div class="cand-meta">
+                    <span>Mar 20, 2026</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span class="source-tag referral"><svg data-lucide="user-check" width="10" height="10"></svg> Referral</span>
+                  </div>
+                  <div style="margin-top: var(--space-2);">
+                    <span class="score-badge"><svg data-lucide="star" width="10" height="10"></svg> 72/100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- INTERVIEW Column -->
+            <div class="kanban-column stage-interview">
+              <div class="kanban-header">
+                <span class="col-title">Interview</span>
+                <span class="col-count">12</span>
+              </div>
+              <div class="kanban-body">
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">EK</div>
+                    <div>
+                      <div class="cand-name">Elena Kowalski</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Project Manager</div>
+                  <div class="cand-meta">
+                    <span class="badge badge-accent" style="font-size: var(--text-caption);">2nd Round</span>
+                  </div>
+                  <div class="interview-info">
+                    <div class="info-row"><svg data-lucide="calendar" width="12" height="12"></svg> Apr 7, 2026 at 2:00 PM</div>
+                    <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: John Smith</div>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">NK</div>
+                    <div>
+                      <div class="cand-name">Nina Karlsson</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Senior Backend Developer</div>
+                  <div class="cand-meta">
+                    <span class="badge badge-info" style="font-size: var(--text-caption);">1st Round</span>
+                  </div>
+                  <div class="interview-info">
+                    <div class="info-row"><svg data-lucide="calendar" width="12" height="12"></svg> Apr 8, 2026 at 10:00 AM</div>
+                    <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: David Park</div>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">PM</div>
+                    <div>
+                      <div class="cand-name">Pierre Martin</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Data Engineer</div>
+                  <div class="cand-meta">
+                    <span class="badge badge-success" style="font-size: var(--text-caption);">Final Round</span>
+                  </div>
+                  <div class="interview-info">
+                    <div class="info-row"><svg data-lucide="calendar" width="12" height="12"></svg> Apr 9, 2026 at 3:00 PM</div>
+                    <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: Sarah Chen</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- OFFER Column -->
+            <div class="kanban-column stage-offer">
+              <div class="kanban-header">
+                <span class="col-title">Offer</span>
+                <span class="col-count">4</span>
+              </div>
+              <div class="kanban-body">
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">RK</div>
+                    <div>
+                      <div class="cand-name">Raj Krishnan</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Data Analyst</div>
+                  <div class="offer-amount">&euro;55,000<span style="font-size: var(--text-caption); font-weight: var(--weight-regular); color: var(--color-text-3);"> / yr</span></div>
+                  <div class="cand-meta" style="margin-top: var(--space-2);">
+                    <span class="badge badge-warning badge-dot">Pending</span>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">SO</div>
+                    <div>
+                      <div class="cand-name">Sofia Oliveira</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Product Designer</div>
+                  <div class="offer-amount">&euro;62,000<span style="font-size: var(--text-caption); font-weight: var(--weight-regular); color: var(--color-text-3);"> / yr</span></div>
+                  <div class="cand-meta" style="margin-top: var(--space-2);">
+                    <span class="badge badge-success badge-dot">Accepted</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HIRED Column -->
+            <div class="kanban-column stage-hired">
+              <div class="kanban-header">
+                <span class="col-title">Hired</span>
+                <span class="col-count">8</span>
+              </div>
+              <div class="kanban-body">
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">YT</div>
+                    <div>
+                      <div class="cand-name">Yuki Tanaka</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">QA Engineer</div>
+                  <div class="cand-meta">
+                    <span class="badge badge-success"><svg data-lucide="check-circle" width="10" height="10"></svg> Starts May 5</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span>Engineering</span>
+                  </div>
+                </div>
+
+                <div class="candidate-card">
+                  <div class="cand-top">
+                    <div class="avatar avatar-sm">AH</div>
+                    <div>
+                      <div class="cand-name">Ahmed Hassan</div>
+                    </div>
+                  </div>
+                  <div class="cand-position">Sales Executive</div>
+                  <div class="cand-meta">
+                    <span class="badge badge-success"><svg data-lucide="check-circle" width="10" height="10"></svg> Starts Apr 14</span>
+                    <span class="meta-sep">&middot;</span>
+                    <span>Sales</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /kanban -->
+        </div><!-- /tab-recruitment -->
+
+        <!-- ══════════════════ TAB 2: ONBOARDING ══════════════════ -->
+        <div class="tab-content" id="tab-onboarding">
+
+          <div class="section-heading" style="margin-top: var(--space-4);">
+            <h3>Active Onboardings</h3>
+            <button class="btn btn-secondary btn-sm">
+              <svg data-lucide="plus" width="14" height="14"></svg>
+              Start Onboarding
+            </button>
+          </div>
+
+          <div class="grid-3 mb-6">
+            <!-- Yuki Tanaka -->
+            <div class="onboard-card">
+              <div class="onboard-card-header">
+                <div class="avatar avatar-md">YT</div>
+                <div class="onboard-info">
+                  <div class="onboard-name">Yuki Tanaka</div>
+                  <div class="onboard-role">QA Engineer &mdash; Engineering</div>
+                  <div class="onboard-date">Started Apr 1, 2026</div>
+                </div>
+              </div>
+              <div class="onboard-card-body">
+                <div class="progress-label">
+                  <span>5 of 8 tasks complete</span>
+                  <span class="progress-pct">62%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 62.5%;"></div>
+                </div>
+                <div class="checklist">
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Contract signed</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment ordered</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> IT access created</label>
+                  <label class="checklist-item"><input type="checkbox"> Welcome email sent</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Buddy assigned: <span class="buddy-name">Sophie Dubois</span></label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> First day orientation scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ahmed Hassan -->
+            <div class="onboard-card">
+              <div class="onboard-card-header">
+                <div class="avatar avatar-md">AH</div>
+                <div class="onboard-info">
+                  <div class="onboard-name">Ahmed Hassan</div>
+                  <div class="onboard-role">Sales Executive &mdash; Sales</div>
+                  <div class="onboard-date">Starts Apr 14, 2026</div>
+                </div>
+              </div>
+              <div class="onboard-card-body">
+                <div class="progress-label">
+                  <span>2 of 8 tasks complete</span>
+                  <span class="progress-pct">25%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill warning" style="width: 25%;"></div>
+                </div>
+                <div class="checklist">
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Contract signed</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment ordered</label>
+                  <label class="checklist-item"><input type="checkbox"> IT access created</label>
+                  <label class="checklist-item"><input type="checkbox"> Welcome email sent</label>
+                  <label class="checklist-item"><input type="checkbox"> Buddy assigned</label>
+                  <label class="checklist-item"><input type="checkbox"> First day orientation scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Clara Bergmann -->
+            <div class="onboard-card">
+              <div class="onboard-card-header">
+                <div class="avatar avatar-md">CB</div>
+                <div class="onboard-info">
+                  <div class="onboard-name">Clara Bergmann</div>
+                  <div class="onboard-role">Junior Developer &mdash; Engineering</div>
+                  <div class="onboard-date">Starts Apr 21, 2026</div>
+                </div>
+              </div>
+              <div class="onboard-card-body">
+                <div class="progress-label">
+                  <span>0 of 8 tasks complete</span>
+                  <span class="progress-pct">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="checklist">
+                  <label class="checklist-item"><input type="checkbox"> Contract signed</label>
+                  <label class="checklist-item"><input type="checkbox"> Equipment ordered</label>
+                  <label class="checklist-item"><input type="checkbox"> IT access created</label>
+                  <label class="checklist-item"><input type="checkbox"> Welcome email sent</label>
+                  <label class="checklist-item"><input type="checkbox"> Buddy assigned</label>
+                  <label class="checklist-item"><input type="checkbox"> First day orientation scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Onboarding Templates -->
+          <div class="section-heading">
+            <h3>Onboarding Templates</h3>
+            <button class="btn btn-ghost btn-sm">
+              <svg data-lucide="plus" width="14" height="14"></svg>
+              New Template
+            </button>
+          </div>
+
+          <div class="grid-3">
+            <div class="template-card">
+              <div class="tpl-icon"><svg data-lucide="code" width="20" height="20"></svg></div>
+              <div class="tpl-name">Engineering Onboarding</div>
+              <div class="tpl-meta">12 tasks &middot; Used 23 times</div>
+            </div>
+            <div class="template-card">
+              <div class="tpl-icon"><svg data-lucide="megaphone" width="20" height="20"></svg></div>
+              <div class="tpl-name">Sales Onboarding</div>
+              <div class="tpl-meta">10 tasks &middot; Used 15 times</div>
+            </div>
+            <div class="template-card">
+              <div class="tpl-icon"><svg data-lucide="building" width="20" height="20"></svg></div>
+              <div class="tpl-name">General Onboarding</div>
+              <div class="tpl-meta">8 tasks &middot; Used 45 times</div>
+            </div>
+          </div>
+        </div><!-- /tab-onboarding -->
+
+        <!-- ══════════════════ TAB 3: OFFBOARDING ══════════════════ -->
+        <div class="tab-content" id="tab-offboarding">
+
+          <div class="section-heading" style="margin-top: var(--space-4);">
+            <h3>Active Offboardings</h3>
+          </div>
+
+          <div class="grid-2 mb-6">
+            <!-- Offboarding 1 -->
+            <div class="offboard-card">
+              <div class="offboard-card-header">
+                <div class="avatar avatar-md">ML</div>
+                <div class="offboard-info">
+                  <div class="offboard-name">Marc Lefevre</div>
+                  <div class="offboard-role">Senior Consultant &mdash; Operations</div>
+                </div>
+                <div class="last-day-tag"><svg data-lucide="calendar-x"></svg> Last day: Apr 15, 2026</div>
+              </div>
+              <div class="offboard-card-body">
+                <div class="progress-label">
+                  <span>3 of 5 tasks complete</span>
+                  <span class="progress-pct">60%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 60%;"></div>
+                </div>
+                <div class="checklist">
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Knowledge transfer documented</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment return scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> IT access revocation</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Exit interview completed</label>
+                  <label class="checklist-item"><input type="checkbox"> Final settlement processed</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Offboarding 2 -->
+            <div class="offboard-card">
+              <div class="offboard-card-header">
+                <div class="avatar avatar-md">JR</div>
+                <div class="offboard-info">
+                  <div class="offboard-name">Julia Ramos</div>
+                  <div class="offboard-role">Marketing Specialist &mdash; Marketing</div>
+                </div>
+                <div class="last-day-tag"><svg data-lucide="calendar-x"></svg> Last day: Apr 30, 2026</div>
+              </div>
+              <div class="offboard-card-body">
+                <div class="progress-label">
+                  <span>1 of 5 tasks complete</span>
+                  <span class="progress-pct">20%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill warning" style="width: 20%;"></div>
+                </div>
+                <div class="checklist">
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Knowledge transfer documented</label>
+                  <label class="checklist-item"><input type="checkbox"> Equipment return scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> IT access revocation</label>
+                  <label class="checklist-item"><input type="checkbox"> Exit interview completed</label>
+                  <label class="checklist-item"><input type="checkbox"> Final settlement processed</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Completed Offboardings -->
+          <div class="section-heading">
+            <h3>Completed Offboardings</h3>
+          </div>
+
+          <div class="data-table-wrapper">
+            <table class="data-table mobile-cards">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Department</th>
+                  <th>Last Working Day</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">KN</div>
+                      <span>Karl Nielsen</span>
+                    </div>
+                  </td>
+                  <td data-label="Department">Engineering</td>
+                  <td data-label="Last Day">Mar 15, 2026</td>
+                  <td data-label="Reason"><span class="badge badge-default">Resignation</span></td>
+                  <td data-label="Status"><span class="badge badge-success badge-dot">Complete</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">IL</div>
+                      <span>Irene Li</span>
+                    </div>
+                  </td>
+                  <td data-label="Department">Design</td>
+                  <td data-label="Last Day">Feb 28, 2026</td>
+                  <td data-label="Reason"><span class="badge badge-default">Contract End</span></td>
+                  <td data-label="Status"><span class="badge badge-success badge-dot">Complete</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">PV</div>
+                      <span>Pavel Volkov</span>
+                    </div>
+                  </td>
+                  <td data-label="Department">Sales</td>
+                  <td data-label="Last Day">Jan 31, 2026</td>
+                  <td data-label="Reason"><span class="badge badge-default">Relocation</span></td>
+                  <td data-label="Status"><span class="badge badge-success badge-dot">Complete</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /tab-offboarding -->
+
+        <!-- ══════════════════ TAB 4: EMPLOYEE RECORDS ══════════════════ -->
+        <div class="tab-content" id="tab-records">
+
+          <!-- Stat Cards -->
+          <div class="grid-4 mb-6" style="margin-top: var(--space-4);">
+            <div class="stat-card">
+              <div class="stat-label">Total Employees</div>
+              <div class="stat-value">48</div>
+              <div class="stat-trend up">
+                <svg data-lucide="trending-up" width="14" height="14"></svg>
+                +3 this quarter
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Contracts</div>
+              <div class="stat-value">45</div>
+              <div class="stat-trend" style="color: var(--color-text-3);">
+                <svg data-lucide="file-check" width="14" height="14"></svg>
+                93.8% of total
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">On Probation</div>
+              <div class="stat-value">3</div>
+              <div class="stat-trend" style="color: var(--color-warning);">
+                <svg data-lucide="clock" width="14" height="14"></svg>
+                1 ending this month
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Upcoming Renewals</div>
+              <div class="stat-value">2</div>
+              <div class="stat-trend" style="color: var(--color-info);">
+                <svg data-lucide="calendar" width="14" height="14"></svg>
+                Within 30 days
+              </div>
+            </div>
+          </div>
+
+          <!-- Lifecycle Events -->
+          <div class="section-heading">
+            <h3>Recent Lifecycle Events</h3>
+            <button class="btn btn-secondary btn-sm">
+              <svg data-lucide="filter" width="14" height="14"></svg>
+              Filter
+            </button>
+          </div>
+
+          <div class="data-table-wrapper">
+            <table class="data-table mobile-cards">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Event</th>
+                  <th>Details</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">SD</div>
+                      <span style="font-weight: var(--weight-semibold);">Sophie Dubois</span>
+                    </div>
+                  </td>
+                  <td data-label="Event">
+                    <div class="lifecycle-event">
+                      <div class="event-icon promotion"><svg data-lucide="award" width="16" height="16"></svg></div>
+                      <span>Promotion</span>
+                    </div>
+                  </td>
+                  <td data-label="Details"><span style="color: var(--color-text-2);">Promoted to Senior Developer</span></td>
+                  <td data-label="Date">Mar 15, 2026</td>
+                  <td data-label="Status"><span class="badge badge-success badge-dot">Effective</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">LO</div>
+                      <span style="font-weight: var(--weight-semibold);">Liam O'Brien</span>
+                    </div>
+                  </td>
+                  <td data-label="Event">
+                    <div class="lifecycle-event">
+                      <div class="event-icon renewal"><svg data-lucide="refresh-cw" width="16" height="16"></svg></div>
+                      <span>Contract Renewal</span>
+                    </div>
+                  </td>
+                  <td data-label="Details"><span style="color: var(--color-text-2);">2-year contract renewed</span></td>
+                  <td data-label="Date">Mar 1, 2026</td>
+                  <td data-label="Status"><span class="badge badge-success badge-dot">Completed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">DP</div>
+                      <span style="font-weight: var(--weight-semibold);">David Park</span>
+                    </div>
+                  </td>
+                  <td data-label="Event">
+                    <div class="lifecycle-event">
+                      <div class="event-icon probation"><svg data-lucide="shield-check" width="16" height="16"></svg></div>
+                      <span>End of Probation</span>
+                    </div>
+                  </td>
+                  <td data-label="Details"><span style="color: var(--color-text-2);">6-month probation review</span></td>
+                  <td data-label="Date">Apr 10, 2026</td>
+                  <td data-label="Status"><span class="badge badge-warning badge-dot">Upcoming</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">AW</div>
+                      <span style="font-weight: var(--weight-semibold);">Alice Wang</span>
+                    </div>
+                  </td>
+                  <td data-label="Event">
+                    <div class="lifecycle-event">
+                      <div class="event-icon renewal"><svg data-lucide="refresh-cw" width="16" height="16"></svg></div>
+                      <span>Contract Renewal</span>
+                    </div>
+                  </td>
+                  <td data-label="Details"><span style="color: var(--color-text-2);">Contract expires Apr 30</span></td>
+                  <td data-label="Date">Apr 30, 2026</td>
+                  <td data-label="Status"><span class="badge badge-warning badge-dot">Pending Review</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Employee">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">MR</div>
+                      <span style="font-weight: var(--weight-semibold);">Marco Rossi</span>
+                    </div>
+                  </td>
+                  <td data-label="Event">
+                    <div class="lifecycle-event">
+                      <div class="event-icon promotion"><svg data-lucide="award" width="16" height="16"></svg></div>
+                      <span>Salary Adjustment</span>
+                    </div>
+                  </td>
+                  <td data-label="Details"><span style="color: var(--color-text-2);">Annual compensation review</span></td>
+                  <td data-label="Date">Feb 15, 2026</td>
+                  <td data-label="Status"><span class="badge badge-success badge-dot">Effective</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /tab-records -->
+
+      </div><!-- /populated-content -->
+
+      <!-- Empty State -->
+      <div class="empty-content empty-state">
+        <svg data-lucide="briefcase" width="64" height="64"></svg>
+        <h3>No HR data yet</h3>
+        <p>Start building your HR pipeline by creating a new job posting or initiating an onboarding process.</p>
+        <button class="btn btn-primary btn-md">
+          <svg data-lucide="plus" width="16" height="16"></svg>
+          Create Job Posting
+        </button>
+      </div>
+
+    </main>
+  </div><!-- /main-wrapper -->
+</div><!-- /app -->
+
+<!-- Command Palette -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" id="cmdInput" placeholder="Search anything..." autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Pages</div>
+      <a href="index.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Dashboard</div></div>
+      </a>
+      <a href="timesheets.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Timesheets</div></div>
+      </a>
+      <a href="expenses.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="receipt" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Expenses</div></div>
+      </a>
+      <a href="leaves.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="palm-tree" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Leaves</div></div>
+      </a>
+      <a href="hr.html" class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="briefcase" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Human Resources</div></div>
+      </a>
+      <a href="employees.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Team Directory</div></div>
+      </a>
+      <a href="projects.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="folder" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Projects</div></div>
+      </a>
+      <a href="invoices.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Invoices</div></div>
+      </a>
+      <a href="approvals.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="check-square" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Approvals</div></div>
+      </a>
+      <a href="admin.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="settings" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Settings</div></div>
+      </a>
+      <div class="cmd-palette-group-label">HR Actions</div>
+      <a href="#" class="cmd-palette-item" onclick="document.getElementById('newJobBtn').click();return false;">
+        <div class="item-icon"><svg data-lucide="plus-circle" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">New Job Posting</div><div class="item-subtitle">Create a new open position</div></div>
+      </a>
+      <a href="#" class="cmd-palette-item" onclick="switchTab('onboarding');return false;">
+        <div class="item-icon"><svg data-lucide="user-plus" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Start Onboarding</div><div class="item-subtitle">Begin onboarding for a new hire</div></div>
+      </a>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&crarr;</kbd> Open</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Empty State Toggle -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── DOM refs ──
+  var sidebar = document.getElementById('sidebar');
+  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  var mobileSearchBtn = document.getElementById('mobileSearchBtn');
+  var searchTrigger = document.getElementById('searchTrigger');
+  var cmdPalette = document.getElementById('cmdPalette');
+  var cmdInput = document.getElementById('cmdInput');
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var userMenuBtn = document.getElementById('userMenuBtn');
+  var userDropdown = document.getElementById('userDropdown');
+  var toastContainer = document.getElementById('toastContainer');
+  var stateToggle = document.getElementById('stateToggle');
+
+  // ── Sidebar Collapse ──
+  sidebarCollapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // ── Mobile Menu ──
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Command Palette ──
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    cmdInput.focus();
+  }
+  function closeCmdPalette() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  }
+  searchTrigger.addEventListener('click', openCmdPalette);
+  if (mobileSearchBtn) {
+    mobileSearchBtn.addEventListener('click', openCmdPalette);
+  }
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      cmdPalette.classList.contains('active') ? closeCmdPalette() : openCmdPalette();
+    }
+    if (e.key === 'Escape' && cmdPalette.classList.contains('active')) closeCmdPalette();
+  });
+
+  // ── Notification Panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User Dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
+  });
+
+  // ── Toast Notifications ──
+  function showToast(type, title, message) {
+    var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+  window.showToast = showToast;
+
+  // ── Tab Switching ──
+  var tabs = document.querySelectorAll('.hr-tabs .tab');
+  var tabContents = document.querySelectorAll('.tab-content');
+
+  function switchTab(tabId) {
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    tabContents.forEach(function(tc) { tc.classList.remove('active'); });
+
+    var targetTab = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    var targetContent = document.getElementById('tab-' + tabId);
+
+    if (targetTab) targetTab.classList.add('active');
+    if (targetContent) targetContent.classList.add('active');
+  }
+  window.switchTab = switchTab;
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabId = this.getAttribute('data-tab');
+      switchTab(tabId);
+    });
+  });
+
+  // Handle hash-based tab navigation
+  function handleHash() {
+    var hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById('tab-' + hash)) {
+      switchTab(hash);
+    }
+  }
+  handleHash();
+  window.addEventListener('hashchange', handleHash);
+
+  // ── New Job Posting Button ──
+  document.getElementById('newJobBtn').addEventListener('click', function() {
+    showToast('info', 'New Job Posting', 'The job posting form would open here in the full application.');
+  });
+
+  // ── Empty State Toggle ──
+  stateToggle.addEventListener('click', function() {
+    var body = document.body;
+    if (body.classList.contains('show-populated')) {
+      body.classList.remove('show-populated');
+      body.classList.add('show-empty');
+    } else {
+      body.classList.remove('show-empty');
+      body.classList.add('show-populated');
+    }
+  });
+
+  // ── Candidate Card Click ──
+  document.querySelectorAll('.candidate-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var name = this.querySelector('.cand-name').textContent;
+      showToast('info', 'Candidate Profile', 'Opening ' + name + "'s full profile...");
+    });
+  });
+
+  // ── Onboarding Checkbox interactivity ──
+  document.querySelectorAll('.checklist-item input[type="checkbox"]:not([disabled])').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var item = this.closest('.checklist-item');
+      var card = this.closest('.onboard-card, .offboard-card');
+
+      if (this.checked) {
+        item.classList.add('done');
+      } else {
+        item.classList.remove('done');
+      }
+
+      // Update progress
+      if (card) {
+        var allBoxes = card.querySelectorAll('.checklist-item input[type="checkbox"]');
+        var checkedBoxes = card.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
+        var total = allBoxes.length;
+        var done = checkedBoxes.length;
+        var pct = Math.round((done / total) * 100);
+
+        var progressLabel = card.querySelector('.progress-label');
+        if (progressLabel) {
+          progressLabel.querySelector('span:first-child').textContent = done + ' of ' + total + ' tasks complete';
+          progressLabel.querySelector('.progress-pct').textContent = pct + '%';
+        }
+
+        var progressFill = card.querySelector('.progress-fill');
+        if (progressFill) {
+          progressFill.style.width = pct + '%';
+          // Update color based on progress
+          progressFill.classList.remove('warning');
+          if (pct < 50) progressFill.classList.add('warning');
+        }
+
+        var taskLabel = done + ' of ' + total + ' tasks';
+        showToast('success', 'Task Updated', taskLabel + ' complete (' + pct + '%)');
+      }
+    });
+  });
+
+  // ── Initialize Lucide Icons ──
+  lucide.createIcons();
+
+})();
+</script>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

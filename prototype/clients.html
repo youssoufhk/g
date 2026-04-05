@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Clients-specific styles ── */
+
+    /* Client cards */
+    .client-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--motion-fast) var(--ease-out);
+      margin-bottom: var(--space-3);
+    }
+    .client-card:last-child { margin-bottom: 0; }
+    .client-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-3);
+      border-color: var(--color-border-strong);
+    }
+    .client-logo {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: var(--weight-bold);
+      font-size: 16px;
+      color: var(--color-text-inv);
+      flex-shrink: 0;
+    }
+    .client-info { flex: 1; min-width: 0; }
+    .client-name {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-1);
+    }
+    .client-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .client-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .client-meta-item svg { width: 14px; height: 14px; color: var(--color-text-3); }
+    .client-revenue {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-semibold);
+      color: var(--color-gold);
+      font-size: var(--text-body);
+      text-align: right;
+      flex-shrink: 0;
+      min-width: 120px;
+    }
+    .client-revenue-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      font-family: var(--font-sans);
+      font-weight: var(--weight-regular);
+    }
+
+    /* Detail header */
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-6);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .detail-logo {
+      width: 80px; height: 80px;
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: var(--weight-bold);
+      font-size: 28px;
+      color: var(--color-text-inv);
+      flex-shrink: 0;
+    }
+    .detail-info { flex: 1; }
+    .detail-title {
+      font-size: var(--text-display-lg);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-2);
+    }
+    .detail-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+    }
+    .detail-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .detail-meta-item svg { width: 16px; height: 16px; color: var(--color-text-3); }
+
+    /* Contact cards */
+    .contact-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-subtle);
+    }
+    .contact-card .contact-info { flex: 1; }
+    .contact-card .contact-name {
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-body);
+      color: var(--color-text-1);
+    }
+    .contact-card .contact-role {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .contact-card .contact-email {
+      font-size: var(--text-body-sm);
+      color: var(--color-primary);
+    }
+
+    /* Revenue chart bars (reused from dashboard) */
+    .revenue-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-2);
+      height: 140px;
+      padding-top: var(--space-2);
+    }
+    .revenue-bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-1);
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .revenue-bar {
+      width: 100%;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      background: var(--color-gold);
+      transition: height var(--motion-slow);
+      min-height: 4px;
+    }
+    .revenue-bar:hover { background: var(--color-gold-hover); }
+    .revenue-label {
+      font-size: var(--text-overline);
+      color: var(--color-text-3);
+    }
+    .revenue-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-overline);
+      color: var(--color-text-2);
+    }
+
+    /* Notes area */
+    .notes-area {
+      width: 100%;
+      min-height: 100px;
+      padding: var(--space-3);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-1);
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+      resize: vertical;
+    }
+    .notes-area:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+
+    /* Team member row */
+    .team-member-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .team-member-row:last-child { border-bottom: none; }
+    .team-member-row:hover { background: var(--color-surface-1); }
+    .team-member-info { flex: 1; }
+    .team-member-name {
+      font-weight: var(--weight-medium);
+      font-size: var(--text-body);
+    }
+    .team-member-name a { color: var(--color-text-1); }
+    .team-member-name a:hover { color: var(--color-primary); }
+    .team-member-role {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+
+    /* Document row */
+    .doc-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
+      cursor: pointer;
+      transition: background var(--motion-fast);
+    }
+    .doc-row:last-child { border-bottom: none; }
+    .doc-row:hover { background: var(--color-surface-1); }
+    .doc-icon {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      background: var(--color-surface-2);
+      color: var(--color-text-2);
+      flex-shrink: 0;
+    }
+    .doc-info { flex: 1; }
+    .doc-name { font-weight: var(--weight-medium); font-size: var(--text-body); color: var(--color-text-1); }
+    .doc-meta { font-size: var(--text-caption); color: var(--color-text-3); }
+
+    /* Back button */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--color-text-2);
+      font-size: var(--text-body);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-md);
+      transition: all var(--motion-fast);
+      text-decoration: none;
+      background: none;
+      border: none;
+    }
+    .back-btn:hover { color: var(--color-text-1); background: var(--color-surface-1); }
+    .back-btn svg { width: 18px; height: 18px; }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-select,
+    .filter-bar .form-input {
+      height: 36px;
+      min-width: 160px;
+      background: var(--color-surface-0);
+    }
+    .filter-bar .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+    .filter-bar .search-wrapper svg {
+      position: absolute;
+      left: var(--space-3);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-3);
+      width: 16px; height: 16px;
+      pointer-events: none;
+    }
+    .filter-bar .search-wrapper .form-input {
+      padding-left: 36px;
+    }
+
+    /* View transitions */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* Empty state overrides */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+        <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item active">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="bar-chart-3"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Clients</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="building-2" width="16" height="16" style="color: var(--color-info);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">New client onboarded: Contoso Inc added to your portfolio</div>
+                  <div class="notif-time">30 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Acme Corp: Project budget at 85% work time</div>
+                  <div class="notif-time">2 hours ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Invoice INV-2026-045 paid by Acme Corp</div>
+                  <div class="notif-time">1 day ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════════════════════════════ PAGE CONTENT ════════════════════════════════════════ -->
+    <div class="page-content">
+
+      <!-- ═══════ LIST VIEW ═══════ -->
+      <div class="view" id="listView">
+        <div class="populated-content">
+          <!-- Page header -->
+          <div class="page-header">
+            <div class="page-header-left">
+              <h1 class="page-title">Clients</h1>
+              <p class="page-subtitle">Manage your client relationships and projects</p>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn btn-secondary btn-md" id="exportBtn">
+                <svg data-lucide="download" width="16" height="16"></svg> Export
+              </button>
+              <button class="btn btn-primary btn-md" id="newClientBtn">
+                <svg data-lucide="plus" width="16" height="16"></svg> New Client
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter bar -->
+          <div class="filter-bar">
+            <select class="form-select form-input-sm">
+              <option>All Statuses</option>
+              <option>Active</option>
+              <option>Inactive</option>
+              <option>New</option>
+            </select>
+            <select class="form-select form-input-sm">
+              <option>All Industries</option>
+              <option>Technology</option>
+              <option>Manufacturing</option>
+              <option>Finance</option>
+              <option>Consulting</option>
+            </select>
+            <div class="search-wrapper">
+              <svg data-lucide="search"></svg>
+              <input type="text" class="form-input form-input-sm" placeholder="Search clients...">
+            </div>
+          </div>
+
+          <!-- Client Cards -->
+          <div id="clientList">
+            <!-- Acme Corp -->
+            <div class="client-card" data-client="acme">
+              <div class="client-logo" style="background: linear-gradient(135deg, hsl(200, 60%, 45%), hsl(220, 60%, 55%));">AC</div>
+              <div class="client-info">
+                <div class="client-name">Acme Corp</div>
+                <div class="client-meta">
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 3 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="users"></svg> 12 team members</span>
+                  <span class="client-meta-item"><svg data-lucide="user"></svg> Jane Doe (jane@acme.com)</span>
+                  <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Jan 2024</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
+                </div>
+              </div>
+              <div class="client-revenue">
+                <span class="font-mono">&euro;95,900</span>
+                <div class="client-revenue-label">YTD Revenue</div>
+              </div>
+            </div>
+
+            <!-- Globex Corporation -->
+            <div class="client-card" data-client="globex">
+              <div class="client-logo" style="background: linear-gradient(135deg, hsl(155, 40%, 40%), hsl(170, 40%, 50%));">GC</div>
+              <div class="client-info">
+                <div class="client-name">Globex Corporation</div>
+                <div class="client-meta">
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="users"></svg> 6 team members</span>
+                  <span class="client-meta-item"><svg data-lucide="user"></svg> Bob Smith</span>
+                  <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since May 2025</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
+                </div>
+              </div>
+              <div class="client-revenue">
+                <span class="font-mono">&euro;89,000</span>
+                <div class="client-revenue-label">YTD Revenue</div>
+              </div>
+            </div>
+
+            <!-- Initech -->
+            <div class="client-card" data-client="initech">
+              <div class="client-logo" style="background: var(--color-gold);">IN</div>
+              <div class="client-info">
+                <div class="client-name">Initech</div>
+                <div class="client-meta">
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 active project</span>
+                  <span class="client-meta-item"><svg data-lucide="users"></svg> 3 team members</span>
+                  <span class="client-meta-item"><svg data-lucide="user"></svg> Bill Lumbergh</span>
+                  <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Sep 2025</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
+                </div>
+              </div>
+              <div class="client-revenue">
+                <span class="font-mono">&euro;42,000</span>
+                <div class="client-revenue-label">YTD Revenue</div>
+              </div>
+            </div>
+
+            <!-- Contoso Inc -->
+            <div class="client-card" data-client="contoso">
+              <div class="client-logo" style="background: var(--color-primary);">CO</div>
+              <div class="client-info">
+                <div class="client-name">Contoso Inc</div>
+                <div class="client-meta">
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project (planning)</span>
+                  <span class="client-meta-item"><svg data-lucide="users"></svg> 2 team members</span>
+                  <span class="client-meta-item"><svg data-lucide="user"></svg> Michael Scott</span>
+                  <span class="badge badge-info"><svg data-lucide="sparkles" width="12" height="12"></svg> New</span>
+                </div>
+              </div>
+              <div class="client-revenue">
+                <span class="font-mono">&euro;0</span>
+                <div class="client-revenue-label">YTD Revenue</div>
+              </div>
+            </div>
+
+            <!-- Stark Industries -->
+            <div class="client-card" data-client="stark">
+              <div class="client-logo" style="background: var(--color-surface-3);">SI</div>
+              <div class="client-info">
+                <div class="client-name">Stark Industries</div>
+                <div class="client-meta">
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 0 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="users"></svg> 0 team members</span>
+                  <span class="client-meta-item"><svg data-lucide="user"></svg> Pepper Potts</span>
+                  <span class="client-meta-item"><svg data-lucide="calendar"></svg> Last project: Dec 2025</span>
+                  <span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Inactive</span>
+                </div>
+              </div>
+              <div class="client-revenue">
+                <span class="font-mono">&euro;67,000</span>
+                <div class="client-revenue-label">YTD Revenue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-content">
+          <div class="empty-state">
+            <svg data-lucide="building-2" class="empty-icon"></svg>
+            <div class="empty-title">No clients yet</div>
+            <div class="empty-desc">Add your first client to start managing projects, invoices, and team assignments.</div>
+            <button class="btn btn-primary btn-md" id="emptyNewClientBtn">
+              <svg data-lucide="plus" width="16" height="16"></svg> Add First Client
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ DETAIL VIEW ═══════ -->
+      <div class="view" id="detailView">
+        <button class="back-btn" id="backToList">
+          <svg data-lucide="arrow-left"></svg>
+          Clients
+        </button>
+
+        <div style="margin-top: var(--space-4);">
+          <!-- Detail Header -->
+          <div class="detail-header">
+            <div class="detail-logo" style="background: linear-gradient(135deg, hsl(200, 60%, 45%), hsl(220, 60%, 55%));">AC</div>
+            <div class="detail-info">
+              <h1 class="detail-title">Acme Corp</h1>
+              <div class="detail-meta">
+                <span class="detail-meta-item"><svg data-lucide="factory"></svg> Technology</span>
+                <span class="detail-meta-item"><svg data-lucide="globe"></svg> <a href="#">acme.com</a></span>
+                <span class="badge badge-success badge-lg" id="detail-status-badge"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span>
+                <span class="detail-meta-item"><svg data-lucide="calendar"></svg> Client since January 2024</span>
+              </div>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn btn-secondary btn-sm"><svg data-lucide="pencil" width="14" height="14"></svg> Edit</button>
+              <button class="btn btn-secondary btn-sm"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
+            </div>
+          </div>
+
+          <!-- Contact Info Card -->
+          <div class="card mb-6">
+            <div class="card-header">
+              <span class="card-title">Contacts</span>
+            </div>
+            <div class="card-body">
+              <div class="grid-3" style="gap: var(--space-3);">
+                <div class="contact-card">
+                  <div class="avatar avatar-md">JD</div>
+                  <div class="contact-info">
+                    <div class="contact-name">Jane Doe</div>
+                    <div class="contact-role">CTO &middot; Primary Contact</div>
+                    <div class="contact-email">jane@acme.com</div>
+                  </div>
+                </div>
+                <div class="contact-card">
+                  <div class="avatar avatar-md" style="background: var(--color-gold);">TB</div>
+                  <div class="contact-info">
+                    <div class="contact-name">Tom Brown</div>
+                    <div class="contact-role">Project Sponsor</div>
+                    <div class="contact-email">tom.brown@acme.com</div>
+                  </div>
+                </div>
+                <div class="contact-card">
+                  <div class="avatar avatar-md" style="background: var(--color-success);">LG</div>
+                  <div class="contact-info">
+                    <div class="contact-name">Lisa Green</div>
+                    <div class="contact-role">Finance</div>
+                    <div class="contact-email">lisa.green@acme.com</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="tabs" id="detailTabs">
+            <button class="tab active" data-tab="tab-overview">Overview</button>
+            <button class="tab" data-tab="tab-projects">Projects <span class="tab-count">5</span></button>
+            <button class="tab" data-tab="tab-team">Team <span class="tab-count">8</span></button>
+            <button class="tab" data-tab="tab-invoices">Invoices <span class="tab-count">6</span></button>
+            <button class="tab" data-tab="tab-documents">Documents <span class="tab-count">3</span></button>
+          </div>
+
+          <!-- Tab: Overview -->
+          <div class="tab-content active" id="tab-overview">
+            <div style="padding-top: var(--space-4);">
+              <!-- Stat cards -->
+              <div class="grid-4 mb-6">
+                <div class="stat-card">
+                  <div class="stat-label">Total Revenue</div>
+                  <div class="stat-value font-mono" id="detail-total-revenue">&euro;95,900</div>
+                  <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +18% vs last year</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Active Projects</div>
+                  <div class="stat-value">3</div>
+                  <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> 1 new this quarter</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Team Members</div>
+                  <div class="stat-value">12</div>
+                  <div class="stat-trend" style="color: var(--color-text-2);">Across all projects</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Avg Project Health</div>
+                  <div class="stat-value" style="font-size: var(--text-heading-2);">On Track</div>
+                  <div class="stat-trend up"><svg data-lucide="check-circle" width="14" height="14"></svg> All projects healthy</div>
+                </div>
+              </div>
+
+              <div class="grid-60-40">
+                <!-- Revenue chart -->
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">Revenue (Last 6 Months)</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="revenue-bars">
+                      <div class="revenue-bar-col">
+                        <div class="revenue-value">&euro;18k</div>
+                        <div class="revenue-bar" style="height: 55%;"></div>
+                        <div class="revenue-label">Nov</div>
+                      </div>
+                      <div class="revenue-bar-col">
+                        <div class="revenue-value">&euro;22k</div>
+                        <div class="revenue-bar" style="height: 67%;"></div>
+                        <div class="revenue-label">Dec</div>
+                      </div>
+                      <div class="revenue-bar-col">
+                        <div class="revenue-value">&euro;28k</div>
+                        <div class="revenue-bar" style="height: 85%;"></div>
+                        <div class="revenue-label">Jan</div>
+                      </div>
+                      <div class="revenue-bar-col">
+                        <div class="revenue-value">&euro;25k</div>
+                        <div class="revenue-bar" style="height: 76%;"></div>
+                        <div class="revenue-label">Feb</div>
+                      </div>
+                      <div class="revenue-bar-col">
+                        <div class="revenue-value">&euro;33k</div>
+                        <div class="revenue-bar" style="height: 100%;"></div>
+                        <div class="revenue-label">Mar</div>
+                      </div>
+                      <div class="revenue-bar-col">
+                        <div class="revenue-value">&euro;19k</div>
+                        <div class="revenue-bar" style="height: 58%;"></div>
+                        <div class="revenue-label">Apr</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">Notes</span>
+                    <button class="btn btn-ghost btn-xs">Save</button>
+                  </div>
+                  <div class="card-body">
+                    <textarea class="notes-area">Key client — strategic partnership since 2024. Expanding into mobile app development. Jane prefers bi-weekly check-ins on Tuesdays at 10am CET.
+
+Budget discussions for Q3 expansion planned for May 2026.</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Projects -->
+          <div class="tab-content" id="tab-projects">
+            <div style="padding-top: var(--space-4);" id="acme-projects-content">
+              <div class="data-table-wrapper">
+                <table class="data-table mobile-cards">
+                  <thead>
+                    <tr>
+                      <th>Project Name</th>
+                      <th>Status</th>
+                      <th>Revenue</th>
+                      <th>Budget Used</th>
+                      <th>Margin</th>
+                      <th>Health</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><a href="projects.html#detail/acme-web">Web Redesign</a></td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td class="font-mono">&euro;32,200</td>
+                      <td class="font-mono">64%</td>
+                      <td class="font-mono">48%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="projects.html#detail/acme-mobile">Mobile App</a></td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td class="font-mono">&euro;18,500</td>
+                      <td class="font-mono">45%</td>
+                      <td class="font-mono">42%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="projects.html">CRM Integration</a></td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td class="font-mono">&euro;24,800</td>
+                      <td class="font-mono">72%</td>
+                      <td class="font-mono">38%</td>
+                      <td><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="projects.html">Brand Guidelines</a></td>
+                      <td><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                      <td class="font-mono">&euro;8,400</td>
+                      <td class="font-mono">100%</td>
+                      <td class="font-mono">52%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="projects.html">Security Audit</a></td>
+                      <td><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                      <td class="font-mono">&euro;12,000</td>
+                      <td class="font-mono">100%</td>
+                      <td class="font-mono">55%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
+                      <td><strong>TOTAL</strong></td>
+                      <td></td>
+                      <td class="font-mono"><strong>&euro;95,900</strong></td>
+                      <td></td>
+                      <td class="font-mono"><strong>45%</strong></td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+            <div style="padding-top: var(--space-4); display:none;" id="globex-projects-content">
+              <div class="data-table-wrapper">
+                <table class="data-table mobile-cards">
+                  <thead>
+                    <tr>
+                      <th>Project Name</th>
+                      <th>Status</th>
+                      <th>Revenue</th>
+                      <th>Budget Used</th>
+                      <th>Margin</th>
+                      <th>Health</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><a href="projects.html#detail/globex-phase2">Phase 2</a></td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td class="font-mono">&euro;22,400</td>
+                      <td class="font-mono">35%</td>
+                      <td class="font-mono">44%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="projects.html">DataViz Dashboard</a></td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td class="font-mono">&euro;8,600</td>
+                      <td class="font-mono">18%</td>
+                      <td class="font-mono">46%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="projects.html">Data Migration</a></td>
+                      <td><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                      <td class="font-mono">&euro;120,000</td>
+                      <td class="font-mono">100%</td>
+                      <td class="font-mono">38%</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
+                      <td><strong>TOTAL</strong></td>
+                      <td></td>
+                      <td class="font-mono"><strong>&euro;151,000</strong></td>
+                      <td></td>
+                      <td class="font-mono"><strong>40%</strong></td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Team -->
+          <div class="tab-content" id="tab-team">
+            <div style="padding-top: var(--space-4);">
+              <div class="data-table-wrapper">
+                <div class="team-member-row" style="background: var(--color-surface-0); border-bottom: 1px solid var(--color-border);">
+                  <div style="width: 40px;"></div>
+                  <div style="flex:1; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Name</div>
+                  <div style="width: 140px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Role</div>
+                  <div style="width: 180px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Current Project</div>
+                  <div style="width: 120px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium); text-align: right;">Hours This Month</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm">SC</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html#sarah-chen">Sarah Chen</a></div>
+                    <div class="team-member-role">Senior Developer</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">42h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-gold);">JS</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html#john-smith">John Smith</a></div>
+                    <div class="team-member-role">Project Manager</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">PM</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">22h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-info);">AW</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html#alice-wang">Alice Wang</a></div>
+                    <div class="team-member-role">UI Designer</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Designer</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">34h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-error);">MR</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html#marco-rossi">Marco Rossi</a></div>
+                    <div class="team-member-role">Frontend Developer</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">30h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-primary);">EL</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html#emma-laurent">Emma Laurent</a></div>
+                    <div class="team-member-role">Backend Developer</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Mobile App</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">38h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-success);">BT</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+                    <div class="team-member-role">QA Engineer</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">QA</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Mobile App</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">28h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-warning);">DK</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html">David Kim</a></div>
+                    <div class="team-member-role">DevOps Engineer</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">DevOps</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">CRM Integration</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">18h</div>
+                </div>
+                <div class="team-member-row">
+                  <div class="avatar avatar-sm" style="background: var(--color-primary);">NP</div>
+                  <div class="team-member-info">
+                    <div class="team-member-name"><a href="employees.html">Nina Patel</a></div>
+                    <div class="team-member-role">Business Analyst</div>
+                  </div>
+                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Analyst</div>
+                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">CRM Integration</div>
+                  <div style="width: 120px; text-align: right;" class="font-mono">15h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Invoices -->
+          <div class="tab-content" id="tab-invoices">
+            <div style="padding-top: var(--space-4);" id="acme-invoices-content">
+              <div class="data-table-wrapper">
+                <table class="data-table mobile-cards">
+                  <thead>
+                    <tr>
+                      <th>Invoice</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-048</a></td>
+                      <td>Mar 15, 2026</td>
+                      <td class="font-mono">&euro;12,400</td>
+                      <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-045</a></td>
+                      <td>Feb 15, 2026</td>
+                      <td class="font-mono">&euro;11,200</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-043</a></td>
+                      <td>Feb 15, 2026</td>
+                      <td class="font-mono">&euro;5,000</td>
+                      <td><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-041</a></td>
+                      <td>Jan 15, 2026</td>
+                      <td class="font-mono">&euro;8,500</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-039</a></td>
+                      <td>Jan 15, 2026</td>
+                      <td class="font-mono">&euro;8,600</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2025-031</a></td>
+                      <td>Nov 1, 2025</td>
+                      <td class="font-mono">&euro;9,200</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div style="padding-top: var(--space-4); display:none;" id="globex-invoices-content">
+              <div class="data-table-wrapper">
+                <table class="data-table mobile-cards">
+                  <thead>
+                    <tr>
+                      <th>Invoice</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-047</a></td>
+                      <td>Mar 28, 2026</td>
+                      <td class="font-mono">&euro;8,200</td>
+                      <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-044</a></td>
+                      <td>Feb 28, 2026</td>
+                      <td class="font-mono">&euro;9,400</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="invoices.html#detail">INV-2026-040</a></td>
+                      <td>Jan 1, 2026</td>
+                      <td class="font-mono">&euro;15,000</td>
+                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Documents -->
+          <div class="tab-content" id="tab-documents">
+            <div style="padding-top: var(--space-4);">
+              <div class="card">
+                <div class="doc-row">
+                  <div class="doc-icon"><svg data-lucide="file-text" width="18" height="18"></svg></div>
+                  <div class="doc-info">
+                    <div class="doc-name">Master Services Agreement.pdf</div>
+                    <div class="doc-meta">Uploaded Jan 15, 2024 &middot; 2.4 MB</div>
+                  </div>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+                </div>
+                <div class="doc-row">
+                  <div class="doc-icon"><svg data-lucide="file-spreadsheet" width="18" height="18"></svg></div>
+                  <div class="doc-info">
+                    <div class="doc-name">Rate Card 2026.xlsx</div>
+                    <div class="doc-meta">Uploaded Dec 20, 2025 &middot; 156 KB</div>
+                  </div>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+                </div>
+                <div class="doc-row">
+                  <div class="doc-icon"><svg data-lucide="file-image" width="18" height="18"></svg></div>
+                  <div class="doc-info">
+                    <div class="doc-name">Brand Guidelines v3.pdf</div>
+                    <div class="doc-meta">Uploaded Mar 5, 2026 &middot; 8.1 MB</div>
+                  </div>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-wrapper -->
+</div><!-- /app -->
+
+<!-- ════════════════════════════════════════ NEW CLIENT MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="newClientModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 class="modal-title">New Client</h3>
+      <button class="modal-close" id="closeNewClient"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="flex-col gap-4">
+        <div class="grid-2" style="gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Client Name <span class="required">*</span></label>
+            <input type="text" class="form-input" placeholder="e.g. Acme Corp">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Industry</label>
+            <select class="form-select">
+              <option>Select industry...</option>
+              <option>Technology</option>
+              <option>Manufacturing</option>
+              <option>Finance</option>
+              <option>Healthcare</option>
+              <option>Consulting</option>
+              <option>Retail</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2" style="gap: var(--space-4);">
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input type="text" class="form-input" placeholder="https://example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-input" placeholder="123 Business St, City">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" placeholder="Any additional notes about this client..."></textarea>
+        </div>
+
+        <div style="border-top: 1px solid var(--color-border-subtle); padding-top: var(--space-4); margin-top: var(--space-2);">
+          <h4 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin-bottom: var(--space-3);">Primary Contact</h4>
+          <div class="grid-2" style="gap: var(--space-4);">
+            <div class="form-group">
+              <label class="form-label">Contact Name <span class="required">*</span></label>
+              <input type="text" class="form-input" placeholder="Jane Doe">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email <span class="required">*</span></label>
+              <input type="email" class="form-input" placeholder="jane@example.com">
+            </div>
+          </div>
+          <div class="grid-2" style="gap: var(--space-4); margin-top: var(--space-4);">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-input" placeholder="+1 (555) 000-0000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <input type="text" class="form-input" placeholder="e.g. CTO, Project Manager">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" id="cancelNewClient">Cancel</button>
+      <button class="btn btn-primary btn-md" id="createClient">Create Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search commands, clients, projects..." id="cmdInput">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Quick Actions</div>
+      <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="plus" width="16" height="16"></svg></div><div class="item-text"><div class="item-title">New Client</div><div class="item-subtitle">Add a new client</div></div></div>
+      <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div><div class="item-text"><div class="item-title">Generate Invoice</div><div class="item-subtitle">Create a new invoice</div></div></div>
+      <div class="cmd-palette-group-label">Navigation</div>
+      <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div><div class="item-text"><div class="item-title">Dashboard</div></div></div>
+      <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="building-2" width="16" height="16"></svg></div><div class="item-text"><div class="item-title">Clients</div></div></div>
+      <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div><div class="item-text"><div class="item-title">Invoices</div></div></div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>Enter</kbd> Select</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Empty State Toggle -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  // ── Initialize Lucide Icons ──
+  lucide.createIcons();
+
+  // ── Element refs ──
+  var sidebar = document.getElementById('sidebar');
+  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var userMenuBtn = document.getElementById('userMenuBtn');
+  var userDropdown = document.getElementById('userDropdown');
+  var searchTrigger = document.getElementById('searchTrigger');
+  var cmdPalette = document.getElementById('cmdPalette');
+  var cmdInput = document.getElementById('cmdInput');
+  var toastContainer = document.getElementById('toastContainer');
+  var stateToggle = document.getElementById('stateToggle');
+
+  var newClientBtn = document.getElementById('newClientBtn');
+  var emptyNewClientBtn = document.getElementById('emptyNewClientBtn');
+  var newClientModal = document.getElementById('newClientModal');
+  var closeNewClient = document.getElementById('closeNewClient');
+  var cancelNewClient = document.getElementById('cancelNewClient');
+  var createClientBtn = document.getElementById('createClient');
+  var backToList = document.getElementById('backToList');
+  var exportBtn = document.getElementById('exportBtn');
+
+  var listView = document.getElementById('listView');
+  var detailView = document.getElementById('detailView');
+
+  // ── Sidebar collapse ──
+  sidebarCollapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // ── Mobile menu ──
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Notification panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // ── Close dropdowns on outside click ──
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+      notifPanel.classList.remove('active');
+    }
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
+      userDropdown.classList.remove('active');
+    }
+  });
+
+  // ── Command palette ──
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    setTimeout(function() { cmdInput.focus(); }, 100);
+  }
+  function closeCmdPalette() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  }
+
+  searchTrigger.addEventListener('click', openCmdPalette);
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openCmdPalette();
+    }
+    if (e.key === 'Escape') {
+      closeCmdPalette();
+      closeModal(newClientModal);
+    }
+  });
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+
+  // ── Client data for detail variants ──
+  var clientData = {
+    'acme': {
+      logo: 'AC',
+      logoStyle: 'background: linear-gradient(135deg, hsl(200, 60%, 45%), hsl(220, 60%, 55%));',
+      name: 'Acme Corp',
+      industry: 'Technology',
+      website: 'acme.com',
+      since: 'January 2024',
+      revenue: '&euro;95,900',
+      activeProjects: '3',
+      teamMembers: '12'
+    },
+    'globex': {
+      logo: 'GC',
+      logoStyle: 'background: linear-gradient(135deg, hsl(155, 40%, 40%), hsl(170, 40%, 50%));',
+      name: 'Globex Corporation',
+      industry: 'Manufacturing',
+      website: 'globex.com',
+      since: 'May 2025',
+      revenue: '&euro;151,000',
+      activeProjects: '2',
+      teamMembers: '6'
+    }
+  };
+
+  var currentClient = 'acme';
+
+  function applyClientVariant(clientId) {
+    var data = clientData[clientId] || clientData['acme'];
+    currentClient = clientId;
+
+    // Update header
+    document.querySelector('.detail-logo').textContent = data.logo;
+    document.querySelector('.detail-logo').setAttribute('style', data.logoStyle);
+    document.querySelector('.detail-title').textContent = data.name;
+
+    // Update meta
+    var metaItems = document.querySelectorAll('.detail-meta-item');
+    if (metaItems[0]) metaItems[0].innerHTML = '<svg data-lucide="factory"></svg> ' + data.industry;
+    if (metaItems[1]) metaItems[1].innerHTML = '<svg data-lucide="globe"></svg> <a href="#">' + data.website + '</a>';
+    if (metaItems[2]) metaItems[2].innerHTML = '<svg data-lucide="calendar"></svg> Client since ' + data.since;
+
+    // Update stats
+    var revEl = document.getElementById('detail-total-revenue');
+    if (revEl) revEl.innerHTML = data.revenue;
+
+    // Toggle content sections
+    var isAcme = (clientId === 'acme');
+    ['acme-projects-content','acme-invoices-content'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = isAcme ? '' : 'none';
+    });
+    ['globex-projects-content','globex-invoices-content'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = isAcme ? 'none' : '';
+    });
+
+    lucide.createIcons();
+  }
+
+  // ── View switching ──
+  function showView(view) {
+    listView.classList.remove('active');
+    detailView.classList.remove('active');
+    if (view === 'detail') {
+      detailView.classList.add('active');
+    } else {
+      listView.classList.add('active');
+    }
+  }
+
+  function handleHash() {
+    var hash = window.location.hash.replace('#', '');
+    if (hash.startsWith('detail')) {
+      var parts = hash.split('/');
+      var clientId = parts[1] || 'acme';
+      applyClientVariant(clientId);
+      showView('detail');
+    } else {
+      showView('list');
+    }
+  }
+
+  window.addEventListener('hashchange', handleHash);
+  handleHash();
+
+  // ── Client card click → detail view ──
+  document.querySelectorAll('.client-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var clientId = this.getAttribute('data-client') || 'acme';
+      window.location.hash = 'detail/' + clientId;
+    });
+  });
+
+  // ── Back to list ──
+  backToList.addEventListener('click', function() {
+    window.location.hash = 'list';
+  });
+
+  // ── Detail Tabs ──
+  var detailTabs = document.querySelectorAll('#detailTabs .tab');
+  var tabContents = document.querySelectorAll('.tab-content');
+
+  detailTabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabId = this.getAttribute('data-tab');
+      detailTabs.forEach(function(t) { t.classList.remove('active'); });
+      tabContents.forEach(function(tc) { tc.classList.remove('active'); });
+      this.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  // ── Modal helpers ──
+  function openModal(modal) {
+    modal.classList.add('active');
+  }
+  function closeModal(modal) {
+    modal.classList.remove('active');
+  }
+
+  // ── New Client Modal ──
+  newClientBtn.addEventListener('click', function() { openModal(newClientModal); });
+  emptyNewClientBtn.addEventListener('click', function() { openModal(newClientModal); });
+  closeNewClient.addEventListener('click', function() { closeModal(newClientModal); });
+  cancelNewClient.addEventListener('click', function() { closeModal(newClientModal); });
+  newClientModal.addEventListener('click', function(e) {
+    if (e.target === newClientModal) closeModal(newClientModal);
+  });
+
+  createClientBtn.addEventListener('click', function() {
+    closeModal(newClientModal);
+    showToast('success', 'Client Created', 'New client has been added to your portfolio.');
+  });
+
+  // ── Export ──
+  exportBtn.addEventListener('click', function() {
+    showToast('info', 'Export Started', 'Client data is being exported to CSV...');
+  });
+
+  // ── Toast Notifications ──
+  function showToast(type, title, message) {
+    var iconMap = {
+      success: 'check-circle',
+      error: 'x-circle',
+      warning: 'alert-triangle',
+      info: 'info'
+    };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content">' +
+        '<div class="toast-title">' + title + '</div>' +
+        '<div class="toast-message">' + message + '</div>' +
+      '</div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+
+    toast.querySelector('.toast-close').addEventListener('click', function() {
+      removeToast(toast);
+    });
+
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 200);
+  }
+
+  // ── Empty State Toggle ──
+  var isPopulated = true;
+  stateToggle.addEventListener('click', function() {
+    isPopulated = !isPopulated;
+    document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+    this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+})();
+</script>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

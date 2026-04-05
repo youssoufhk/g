@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GammaHR v2 — Palette Selector</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    /* Default: Earth & Sage (the new final one) */
+    --bg:        hsl(35,16%,5%);
+    --sf0:       hsl(35,13%,8%);
+    --sf1:       hsl(35,10%,12%);
+    --sf2:       hsl(35,8%,17%);
+    --bd:        hsl(35,10%,15%);
+    --pr:        hsl(155,26%,46%);
+    --prm:       hsla(155,26%,46%,.14);
+    --ac:        hsl(30,58%,50%);
+    --ok:        hsl(152,22%,44%);
+    --warn:      hsl(38,65%,50%);
+    --err:       hsl(5,58%,50%);
+    --t1:        hsl(40,28%,90%);
+    --t2:        hsl(35,10%,55%);
+    --t3:        hsl(30,6%,36%);
+    --gold:      hsl(38,60%,48%);
+  }
+
+  body { font-family:'Inter',sans-serif; background:#000; overflow:hidden; height:100vh; }
+
+  /* ─── SWITCHER ─── */
+  .sw {
+    position:fixed; top:14px; left:50%; transform:translateX(-50%);
+    z-index:999; display:flex; gap:6px; padding:5px;
+    background:rgba(0,0,0,.88); border:1px solid rgba(255,255,255,.07);
+    border-radius:13px; backdrop-filter:blur(20px);
+  }
+  .sw-btn {
+    padding:7px 16px; border-radius:8px; border:none; font-size:12px;
+    font-weight:600; cursor:pointer; color:rgba(255,255,255,.4);
+    background:transparent; font-family:inherit; transition:all .2s; white-space:nowrap;
+  }
+  .sw-btn:hover { color:rgba(255,255,255,.7); }
+  #btn-f.active { background:hsl(155,26%,40%); color:#e8f0ec; }
+  #btn-a.active { background:hsl(210,100%,56%); color:#fff; }
+  #btn-b.active { background:hsl(168,80%,46%); color:#051a14; }
+  #btn-c.active { background:hsl(348,48%,40%); color:#f0e4e4; }
+  #btn-d.active { background:hsl(38,58%,44%); color:#1a1008; }
+
+  /* ─── APP ─── */
+  .app {
+    display:flex; height:100vh; width:100vw;
+    background:var(--bg); color:var(--t1);
+    transition:background .35s, color .35s;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width:216px; min-width:216px; height:100vh;
+    background:var(--sf0); border-right:1px solid var(--bd);
+    display:flex; flex-direction:column;
+    transition:background .35s, border-color .35s;
+  }
+  .logo-row {
+    height:54px; display:flex; align-items:center; gap:10px;
+    padding:0 16px; border-bottom:1px solid var(--bd); flex-shrink:0;
+  }
+  .logo-icon {
+    width:26px; height:26px; border-radius:7px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--pr),var(--ac));
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#fff;
+  }
+  .logo-name { font-size:14px; font-weight:700; color:var(--t1); }
+  .logo-v {
+    margin-left:auto; font-size:10px; font-weight:600; padding:2px 6px;
+    background:var(--prm); color:var(--pr); border-radius:4px;
+  }
+  .nav { flex:1; padding:10px 0; overflow:auto; }
+  .nav-sec { padding:0 7px; margin-bottom:2px; }
+  .nav-lbl {
+    font-size:9.5px; font-weight:700; color:var(--t3);
+    text-transform:uppercase; letter-spacing:.9px; padding:8px 10px 4px;
+  }
+  .ni {
+    display:flex; align-items:center; gap:9px; padding:7px 10px;
+    border-radius:7px; cursor:pointer; font-size:12.5px; font-weight:500;
+    color:var(--t2); transition:all .15s; position:relative;
+  }
+  .ni:hover { background:var(--sf1); color:var(--t1); }
+  .ni.on { background:var(--prm); color:var(--pr); font-weight:600; }
+  .ni.on::before {
+    content:''; position:absolute; left:0; top:5px; bottom:5px;
+    width:3px; background:var(--pr); border-radius:0 2px 2px 0;
+  }
+  .ni-ic { font-size:14px; width:16px; text-align:center; flex-shrink:0; }
+  .ni-badge {
+    margin-left:auto; font-size:9.5px; font-weight:700; min-width:17px; height:17px;
+    background:var(--err); color:#fff; border-radius:9px;
+    display:flex; align-items:center; justify-content:center; padding:0 4px;
+  }
+  .sb-bot { padding:10px 7px; border-top:1px solid var(--bd); flex-shrink:0; }
+  .user-row {
+    display:flex; align-items:center; gap:9px; padding:8px 10px;
+    border-radius:7px; cursor:pointer; transition:background .15s;
+  }
+  .user-row:hover { background:var(--sf1); }
+  .av {
+    width:28px; height:28px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,var(--pr),var(--ac));
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700; color:#fff; position:relative;
+  }
+  .av-dot {
+    position:absolute; bottom:0; right:0; width:7px; height:7px;
+    background:var(--ok); border-radius:50%; border:2px solid var(--sf0);
+  }
+  .u-name { font-size:12px; font-weight:600; color:var(--t1); }
+  .u-role { font-size:10.5px; color:var(--t3); }
+
+  /* ─── MAIN ─── */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .hdr {
+    height:54px; display:flex; align-items:center; padding:0 22px; gap:14px;
+    border-bottom:1px solid var(--bd); background:var(--sf0);
+    backdrop-filter:blur(20px); flex-shrink:0;
+    transition:background .35s, border-color .35s;
+  }
+  .bc { font-size:12.5px; color:var(--t2); }
+  .bc span { color:var(--t1); font-weight:600; }
+  .hdr-sp { flex:1; }
+  .srch {
+    display:flex; align-items:center; gap:7px; padding:5px 13px;
+    background:var(--sf1); border:1px solid var(--bd); border-radius:7px;
+    font-size:12px; color:var(--t3); cursor:pointer; transition:all .15s;
+  }
+  .srch:hover { border-color:var(--pr); }
+  .kbd {
+    font-size:9.5px; background:var(--sf2); border:1px solid var(--bd);
+    padding:1px 5px; border-radius:3px; color:var(--t3);
+  }
+  .hbtn {
+    width:32px; height:32px; border-radius:7px; border:1px solid var(--bd);
+    background:var(--sf1); display:flex; align-items:center; justify-content:center;
+    font-size:15px; cursor:pointer; color:var(--t2); position:relative;
+    transition:all .15s;
+  }
+  .hbtn:hover { border-color:var(--pr); color:var(--t1); }
+  .n-dot {
+    position:absolute; top:6px; right:6px; width:6px; height:6px;
+    background:var(--err); border-radius:50%; border:1.5px solid var(--sf0);
+  }
+
+  /* ─── CONTENT ─── */
+  .content { flex:1; overflow:auto; padding:22px; display:flex; flex-direction:column; gap:20px; }
+  .pg-title { font-size:19px; font-weight:700; color:var(--t1); }
+  .pg-sub { font-size:12.5px; color:var(--t2); margin-top:2px; }
+
+  /* ─── STAT CARDS ─── */
+  .sg { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .sc {
+    background:var(--sf0); border:1px solid var(--bd); border-radius:11px;
+    padding:16px; cursor:pointer; transition:all .2s;
+  }
+  .sc:hover { border-color:var(--pr); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.35); }
+  .st { display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+  .si {
+    width:34px; height:34px; border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:15px; flex-shrink:0;
+  }
+  .sl { font-size:11.5px; color:var(--t2); font-weight:500; }
+  .sv { font-size:24px; font-weight:700; color:var(--t1); line-height:1; }
+  .str { font-size:11.5px; margin-top:5px; font-weight:500; }
+  .up { color:var(--ok); } .dn { color:var(--err); }
+  .spark { margin-top:9px; height:26px; display:flex; align-items:flex-end; gap:2px; }
+  .sb { flex:1; border-radius:2px 2px 0 0; background:var(--pr); opacity:.22; min-height:3px; }
+  .sb.hi { opacity:.6; }
+  .sb.la { opacity:1; }
+
+  /* ─── LAYOUT ─── */
+  .two { display:grid; grid-template-columns:2fr 1fr; gap:14px; }
+  .three { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .card {
+    background:var(--sf0); border:1px solid var(--bd); border-radius:11px;
+    padding:18px; transition:background .35s, border-color .35s;
+  }
+  .ct {
+    font-size:13px; font-weight:600; color:var(--t1); margin-bottom:12px;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+  .ct-l { display:flex; align-items:center; gap:7px; }
+  .cd { width:6px; height:6px; border-radius:50%; background:var(--pr); flex-shrink:0; }
+  .ct-link { font-size:11px; color:var(--pr); cursor:pointer; font-weight:600; }
+
+  /* ─── TABLE ─── */
+  .tbl { width:100%; border-collapse:collapse; }
+  .tbl th {
+    font-size:10.5px; font-weight:600; color:var(--t3); text-transform:uppercase;
+    letter-spacing:.6px; padding:0 10px 9px; text-align:left;
+    border-bottom:1px solid var(--bd);
+  }
+  .tbl td { font-size:12.5px; padding:10px 10px; border-bottom:1px solid var(--bd); color:var(--t2); vertical-align:middle; }
+  .tbl tr:last-child td { border-bottom:none; }
+  .tbl tr:hover td { background:var(--sf1); }
+  .ec { display:flex; align-items:center; gap:9px; }
+  .en { font-weight:600; color:var(--t1); font-size:12.5px; }
+  .er { font-size:10.5px; color:var(--t3); }
+  .badge {
+    display:inline-flex; align-items:center; gap:3px; padding:3px 8px;
+    border-radius:5px; font-size:10.5px; font-weight:600;
+  }
+  .b-ok   { background:hsla(152,22%,44%,.14); color:hsl(152,30%,58%); }
+  .b-warn { background:hsla(38,65%,50%,.14);  color:hsl(38,70%,62%); }
+  .b-err  { background:hsla(5,58%,50%,.14);   color:hsl(5,60%,62%); }
+  .b-muted{ background:var(--sf2);             color:var(--t3); }
+  .b-pr   { background:var(--prm);             color:var(--pr); }
+  .prog { height:4px; background:var(--sf2); border-radius:2px; width:72px; overflow:hidden; }
+  .pf   { height:100%; border-radius:2px; background:var(--pr); }
+
+  /* ─── PRESENCE ─── */
+  .pl { display:flex; flex-direction:column; gap:9px; }
+  .pi { display:flex; align-items:center; gap:9px; }
+  .p-info { flex:1; }
+  .p-name { font-size:12px; font-weight:600; color:var(--t1); }
+  .p-page { font-size:10.5px; color:var(--t3); }
+  .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .d-ok   { background:var(--ok); box-shadow:0 0 5px var(--ok); }
+  .d-warn { background:var(--warn); }
+  .d-mute { background:var(--t3); }
+  .d-err  { background:var(--err); }
+
+  /* ─── APPROVALS ─── */
+  .al { display:flex; flex-direction:column; gap:7px; }
+  .ai {
+    display:flex; align-items:center; gap:11px; padding:9px 11px;
+    background:var(--sf1); border-radius:7px; border:1px solid var(--bd);
+    cursor:pointer; transition:border-color .15s;
+  }
+  .ai:hover { border-color:var(--pr); }
+  .a-ico { font-size:15px; flex-shrink:0; }
+  .a-d { flex:1; }
+  .a-title { font-size:12px; font-weight:600; color:var(--t1); }
+  .a-sub { font-size:10.5px; color:var(--t3); margin-top:1px; }
+  .btn-xs {
+    padding:4px 10px; border-radius:5px; border:none; font-size:11px; font-weight:600;
+    cursor:pointer; font-family:inherit; transition:all .15s;
+  }
+  .btn-pr { background:var(--pr); color:#fff; }
+  .btn-pr:hover { filter:brightness(1.12); }
+
+  /* ─── GANTT ─── */
+  .gr { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+  .ge { width:114px; font-size:11.5px; font-weight:500; color:var(--t1); flex-shrink:0; }
+  .gtrack {
+    flex:1; height:19px; background:var(--sf1); border-radius:4px;
+    position:relative; overflow:hidden;
+  }
+  .gbar {
+    position:absolute; height:100%; border-radius:4px;
+    font-size:9.5px; font-weight:600; color:rgba(255,255,255,.9);
+    display:flex; align-items:center; padding:0 7px; white-space:nowrap; overflow:hidden;
+  }
+
+  /* ─── MINI BARS ─── */
+  .mbc { display:flex; align-items:flex-end; gap:3px; height:44px; }
+  .mb  { flex:1; border-radius:2px 2px 0 0; background:var(--pr); opacity:.65; }
+  .mb.hi { opacity:1; }
+  .mb.ac { background:var(--ac); }
+  .mb.go { background:var(--gold); }
+  .mb-labs { display:flex; gap:3px; margin-top:5px; }
+  .mb-lab { flex:1; font-size:9px; text-align:center; color:var(--t3); }
+
+  /* ─── REVENUE BAR ─── */
+  .rev-bar { height:6px; background:var(--sf2); border-radius:3px; margin:10px 0 5px; overflow:hidden; }
+  .rev-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--pr),var(--ac)); }
+
+  /* ─── AI ALERT ─── */
+  .ai-alert {
+    padding:11px 14px; border-radius:8px; border-left:3px solid var(--ac);
+    background:linear-gradient(90deg,hsla(30,58%,50%,.08),transparent);
+    font-size:12px; color:var(--t2); line-height:1.5; margin-bottom:8px;
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .ai-ico { font-size:16px; flex-shrink:0; margin-top:1px; }
+  .ai-body strong { color:var(--t1); }
+  .ai-link { color:var(--pr); font-weight:600; cursor:pointer; font-size:11px; white-space:nowrap; }
+
+  /* ─── CHOICE BAR ─── */
+  .cbar {
+    position:fixed; bottom:0; left:0; right:0; padding:14px 24px;
+    background:rgba(0,0,0,.92); border-top:1px solid rgba(255,255,255,.06);
+    backdrop-filter:blur(24px); display:flex; align-items:center;
+    justify-content:center; gap:12px; flex-wrap:wrap;
+  }
+  .c-lbl { font-size:12.5px; color:rgba(255,255,255,.45); }
+  .cbtn {
+    padding:8px 18px; border-radius:8px; border:1.5px solid; font-size:12.5px;
+    font-weight:700; cursor:pointer; font-family:inherit; transition:all .22s;
+  }
+  .cbtn-f { color:hsl(155,30%,62%); border-color:hsl(155,26%,46%); background:transparent; }
+  .cbtn-f:hover { background:hsl(155,26%,46%); color:#fff; box-shadow:0 0 18px hsla(155,26%,46%,.35); }
+  .cbtn-a { color:hsl(210,100%,68%); border-color:hsl(210,100%,58%); background:transparent; }
+  .cbtn-a:hover { background:hsl(210,100%,58%); color:#fff; box-shadow:0 0 18px hsla(210,100%,58%,.35); }
+  .cbtn-b { color:hsl(168,80%,58%); border-color:hsl(168,80%,48%); background:transparent; }
+  .cbtn-b:hover { background:hsl(168,80%,48%); color:#051a14; box-shadow:0 0 18px hsla(168,80%,48%,.35); }
+  .cbtn-c { color:hsl(348,50%,62%); border-color:hsl(348,48%,42%); background:transparent; }
+  .cbtn-c:hover { background:hsl(348,48%,42%); color:#fff; box-shadow:0 0 18px hsla(348,48%,42%,.35); }
+  .cbtn-d { color:hsl(38,62%,62%); border-color:hsl(38,58%,48%); background:transparent; }
+  .cbtn-d:hover { background:hsl(38,58%,48%); color:#1a1008; box-shadow:0 0 18px hsla(38,58%,48%,.35); }
+</style>
+</head>
+<body>
+
+<!-- SWITCHER -->
+<div class="sw">
+  <button class="sw-btn active" id="btn-f" onclick="set('f')">✦ F — Earth &amp; Sage</button>
+  <button class="sw-btn" id="btn-a" onclick="set('a')">A — Deep Ocean</button>
+  <button class="sw-btn" id="btn-b" onclick="set('b')">B — Neon Mint</button>
+  <button class="sw-btn" id="btn-c" onclick="set('c')">C — Earth Crimson</button>
+  <button class="sw-btn" id="btn-d" onclick="set('d')">D — Earth Creamy</button>
+</div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-row">
+      <div class="logo-icon">G</div>
+      <div class="logo-name">GammaHR</div>
+      <div class="logo-v">v2</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec">
+        <div class="ni on"><span class="ni-ic">⊞</span>Dashboard</div>
+        <div class="ni"><span class="ni-ic">⏱</span>Timesheets</div>
+        <div class="ni"><span class="ni-ic">💳</span>Expenses</div>
+        <div class="ni"><span class="ni-ic">🏖</span>Leaves</div>
+        <div class="ni"><span class="ni-ic">📅</span>Calendar</div>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">Work</div>
+        <div class="ni"><span class="ni-ic">📁</span>Projects</div>
+        <div class="ni"><span class="ni-ic">🏢</span>Clients</div>
+        <div class="ni"><span class="ni-ic">📊</span>Gantt</div>
+        <div class="ni"><span class="ni-ic">🔮</span>Planning</div>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">Admin</div>
+        <div class="ni"><span class="ni-ic">👥</span>Team</div>
+        <div class="ni"><span class="ni-ic">✅</span>Approvals<span class="ni-badge">7</span></div>
+        <div class="ni"><span class="ni-ic">🧠</span>Insights</div>
+      </div>
+    </nav>
+    <div class="sb-bot">
+      <div class="user-row">
+        <div class="av">SC<div class="av-dot"></div></div>
+        <div style="flex:1;min-width:0">
+          <div class="u-name">Sarah Chen</div>
+          <div class="u-role">Administrator</div>
+        </div>
+        <span style="font-size:13px;color:var(--t3)">⚙</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="hdr">
+      <div class="bc">Dashboard</div>
+      <div class="hdr-sp"></div>
+      <div class="srch">🔍 Search anything… <span class="kbd">⌘K</span></div>
+      <div class="hbtn">🔔<div class="n-dot"></div></div>
+      <div class="hbtn">👤</div>
+    </div>
+
+    <div class="content">
+
+      <div>
+        <div class="pg-title">Good morning, Sarah ☀️</div>
+        <div class="pg-sub">Monday, April 5, 2026 · 3 approvals need your attention</div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="sg">
+        <div class="sc">
+          <div class="st"><div class="si" style="background:var(--prm)">⏱</div><div class="sl">Billable Hours</div></div>
+          <div class="sv">142.5</div>
+          <div class="str up">↑ 12% vs last month</div>
+          <div class="spark">
+            <div class="sb" style="height:40%"></div><div class="sb" style="height:55%"></div>
+            <div class="sb hi" style="height:62%"></div><div class="sb hi" style="height:72%"></div>
+            <div class="sb hi" style="height:65%"></div><div class="sb hi" style="height:80%"></div>
+            <div class="sb la" style="height:92%"></div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="st"><div class="si" style="background:hsla(152,22%,44%,.14)">📈</div><div class="sl">Utilization</div></div>
+          <div class="sv" style="color:var(--ok)">87%</div>
+          <div class="str up">↑ 3% vs last month</div>
+          <div class="spark">
+            <div class="sb" style="height:55%;background:var(--ok)"></div>
+            <div class="sb" style="height:68%;background:var(--ok)"></div>
+            <div class="sb hi" style="height:62%;background:var(--ok)"></div>
+            <div class="sb hi" style="height:78%;background:var(--ok)"></div>
+            <div class="sb hi" style="height:74%;background:var(--ok)"></div>
+            <div class="sb hi" style="height:85%;background:var(--ok)"></div>
+            <div class="sb la" style="height:90%;background:var(--ok)"></div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="st"><div class="si" style="background:hsla(5,58%,50%,.12)">⚡</div><div class="sl">Pending Approvals</div></div>
+          <div class="sv" style="color:var(--err)">7</div>
+          <div class="str dn">3 overdue · needs attention</div>
+        </div>
+        <div class="sc">
+          <div class="st"><div class="si" style="background:hsla(38,65%,50%,.14)">💰</div><div class="sl">Revenue This Month</div></div>
+          <div class="sv">€42k</div>
+          <div class="str up">Target €60k</div>
+          <div class="rev-bar"><div class="rev-fill" style="width:70%"></div></div>
+          <div style="font-size:10.5px;color:var(--t3)">70% of target</div>
+        </div>
+      </div>
+
+      <!-- TWO COL -->
+      <div class="two">
+        <!-- Team table -->
+        <div class="card">
+          <div class="ct">
+            <div class="ct-l"><div class="cd"></div>Team Directory</div>
+            <span class="ct-link">View all →</span>
+          </div>
+          <table class="tbl">
+            <thead><tr>
+              <th>Employee</th><th>Project</th><th>Utilization</th><th>Status</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="ec"><div class="av" style="width:26px;height:26px;font-size:10px">SC<div class="av-dot"></div></div><div><div class="en">Sarah Chen</div><div class="er">Sr. Engineer</div></div></div></td>
+                <td style="color:var(--t1);font-weight:500;font-size:12px">Acme Redesign</td>
+                <td><div class="prog"><div class="pf" style="width:87%"></div></div></td>
+                <td><span class="badge b-ok">Active</span></td>
+              </tr>
+              <tr>
+                <td><div class="ec"><div class="av" style="width:26px;height:26px;font-size:10px;background:linear-gradient(135deg,var(--ac),var(--gold))">JS</div><div><div class="en">John Smith</div><div class="er">PM</div></div></div></td>
+                <td style="color:var(--t1);font-weight:500;font-size:12px">Globex Phase 2</td>
+                <td><div class="prog"><div class="pf" style="width:92%"></div></div></td>
+                <td><span class="badge b-ok">Active</span></td>
+              </tr>
+              <tr>
+                <td><div class="ec"><div class="av" style="width:26px;height:26px;font-size:10px;background:linear-gradient(135deg,hsl(155,26%,36%),hsl(155,26%,52%))">AW</div><div><div class="en">Alice Wang</div><div class="er">Designer</div></div></div></td>
+                <td style="color:var(--t3);font-style:italic;font-size:12px">On leave</td>
+                <td><div class="prog"><div class="pf" style="width:45%;background:var(--t3)"></div></div></td>
+                <td><span class="badge b-warn">On Leave</span></td>
+              </tr>
+              <tr>
+                <td><div class="ec"><div class="av" style="width:26px;height:26px;font-size:10px;background:linear-gradient(135deg,hsl(5,50%,38%),hsl(30,55%,48%))">BT</div><div><div class="en">Bob Taylor</div><div class="er">Backend Dev</div></div></div></td>
+                <td style="color:var(--err);font-weight:600;font-size:12px">⚠ Bench</td>
+                <td><div class="prog"><div class="pf" style="width:0%"></div></div></td>
+                <td><span class="badge b-muted">Bench</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Right col -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <!-- Presence -->
+          <div class="card">
+            <div class="ct"><div class="ct-l"><div class="cd"></div>Team Presence</div></div>
+            <div class="pl">
+              <div class="pi"><div class="dot d-ok"></div><div class="av" style="width:22px;height:22px;font-size:9px">SC</div><div class="p-info"><div class="p-name">Sarah (you)</div><div class="p-page">Dashboard</div></div></div>
+              <div class="pi"><div class="dot d-ok"></div><div class="av" style="width:22px;height:22px;font-size:9px;background:linear-gradient(135deg,var(--ac),var(--gold))">JS</div><div class="p-info"><div class="p-name">John Smith</div><div class="p-page">Timesheets</div></div></div>
+              <div class="pi"><div class="dot d-warn"></div><div class="av" style="width:22px;height:22px;font-size:9px;background:linear-gradient(135deg,hsl(155,26%,36%),hsl(155,26%,52%))">AW</div><div class="p-info"><div class="p-name">Alice Wang</div><div class="p-page">Away · 5 min</div></div></div>
+              <div class="pi"><div class="dot d-mute"></div><div class="av" style="width:22px;height:22px;font-size:9px;background:linear-gradient(135deg,hsl(5,50%,38%),hsl(30,55%,48%))">BT</div><div class="p-info"><div class="p-name">Bob Taylor</div><div class="p-page">Offline</div></div></div>
+            </div>
+          </div>
+
+          <!-- AI alert -->
+          <div class="card">
+            <div class="ct"><div class="ct-l"><div class="cd" style="background:var(--ac)"></div>AI Insights</div></div>
+            <div class="ai-alert">
+              <div class="ai-ico">🤖</div>
+              <div class="ai-body"><strong>Bob Taylor</strong> has been on bench 3 weeks. Initech API matches his skills. <span class="ai-link">Assign →</span></div>
+            </div>
+            <div class="ai-alert" style="border-left-color:var(--warn);background:linear-gradient(90deg,hsla(38,65%,50%,.08),transparent)">
+              <div class="ai-ico">📈</div>
+              <div class="ai-body"><strong>Acme budget</strong> trending 15% over. Exhausted by May 20. <span class="ai-link">View →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GANTT PREVIEW -->
+      <div class="card">
+        <div class="ct">
+          <div class="ct-l"><div class="cd"></div>Resource Gantt — April 2026</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="badge b-pr" style="font-size:10px">All Clients</span>
+            <span class="badge b-pr" style="font-size:10px">All Depts</span>
+            <button class="btn-xs" style="background:var(--sf1);color:var(--t2);border:1px solid var(--bd)">＋ Filter</button>
+          </div>
+        </div>
+        <div>
+          <div class="gr">
+            <div class="ge">🟢 Sarah Chen</div>
+            <div class="gtrack">
+              <div class="gbar" style="left:0;width:68%;background:var(--pr)">Acme — Web Redesign</div>
+              <div class="gbar" style="left:50%;width:50%;background:var(--ac);opacity:.85">Initech — API</div>
+            </div>
+          </div>
+          <div class="gr">
+            <div class="ge">🟢 John Smith</div>
+            <div class="gtrack">
+              <div class="gbar" style="left:0;width:100%;background:var(--ok)">Globex — Phase 2</div>
+            </div>
+          </div>
+          <div class="gr">
+            <div class="ge">🟡 Alice Wang</div>
+            <div class="gtrack">
+              <div class="gbar" style="left:0;width:44%;background:var(--t3);opacity:.55">Annual Leave</div>
+              <div class="gbar" style="left:44%;width:56%;background:var(--gold)">Acme — Web Redesign</div>
+            </div>
+          </div>
+          <div class="gr">
+            <div class="ge">⚫ Bob Taylor</div>
+            <div class="gtrack" style="background:hsla(5,58%,50%,.07)">
+              <div class="gbar" style="left:0;width:100%;background:transparent;color:var(--err)">⚠ Unassigned — Bench</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="three">
+        <div class="card">
+          <div class="ct"><div class="ct-l"><div class="cd"></div>Billable vs Internal</div></div>
+          <div class="mbc">
+            <div class="mb" style="height:55%"></div>
+            <div class="mb hi" style="height:70%"></div>
+            <div class="mb" style="height:60%"></div>
+            <div class="mb hi" style="height:80%"></div>
+            <div class="mb hi" style="height:72%"></div>
+            <div class="mb hi" style="height:88%"></div>
+            <div class="mb hi ac" style="height:45%"></div>
+            <div class="mb hi ac" style="height:38%"></div>
+            <div class="mb hi ac" style="height:42%"></div>
+            <div class="mb hi ac" style="height:30%"></div>
+            <div class="mb hi ac" style="height:35%"></div>
+            <div class="mb hi ac" style="height:28%"></div>
+          </div>
+          <div class="mb-labs">
+            <div class="mb-lab">Jan</div><div class="mb-lab">Feb</div>
+            <div class="mb-lab">Mar</div><div class="mb-lab">Apr</div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:8px">
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t2)"><div style="width:8px;height:8px;border-radius:2px;background:var(--pr)"></div>Billable</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t2)"><div style="width:8px;height:8px;border-radius:2px;background:var(--ac)"></div>Internal</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct"><div class="ct-l"><div class="cd"></div>Action Required</div><span class="ct-link">All 7 →</span></div>
+          <div class="al">
+            <div class="ai"><div class="a-ico">⏱</div><div class="a-d"><div class="a-title">John's Timesheet</div><div class="a-sub">Mar 23–29 · 42h · 3d overdue</div></div><button class="btn-xs btn-pr">Approve</button></div>
+            <div class="ai"><div class="a-ico">🏖</div><div class="a-d"><div class="a-title">Alice — Leave</div><div class="a-sub">Apr 28–29 · 2 days</div></div><button class="btn-xs btn-pr">Approve</button></div>
+            <div class="ai"><div class="a-ico">💳</div><div class="a-d"><div class="a-title">Bob Expense €340</div><div class="a-sub">Hotel · Acme project</div></div><button class="btn-xs btn-pr">Approve</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct"><div class="ct-l"><div class="cd" style="background:var(--gold)"></div>Revenue Trend</div></div>
+          <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:4px">€42,800</div>
+          <div style="font-size:11.5px;color:var(--t2);margin-bottom:10px">April 2026 · Target €60k</div>
+          <div class="rev-bar" style="height:8px"><div class="rev-fill" style="width:71%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t3);margin-top:4px"><span>0</span><span style="color:var(--pr);font-weight:600">71%</span><span>€60k</span></div>
+          <div class="mbc" style="margin-top:10px;height:32px">
+            <div class="mb go" style="height:55%;opacity:.7"></div>
+            <div class="mb go" style="height:65%;opacity:.7"></div>
+            <div class="mb go" style="height:72%;opacity:.7"></div>
+            <div class="mb go hi" style="height:85%"></div>
+            <div class="mb go hi" style="height:78%"></div>
+            <div class="mb go hi" style="height:90%"></div>
+          </div>
+          <div class="mb-labs" style="margin-top:4px">
+            <div class="mb-lab">Nov</div><div class="mb-lab">Dec</div><div class="mb-lab">Jan</div>
+            <div class="mb-lab">Feb</div><div class="mb-lab">Mar</div><div class="mb-lab">Apr</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:24px"></div>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- CHOICE BAR -->
+<div class="cbar">
+  <span class="c-lbl">Choose your palette:</span>
+  <button class="cbtn cbtn-f" onclick="choose('F')">✦ F — Earth &amp; Sage (new)</button>
+  <button class="cbtn cbtn-a" onclick="choose('A')">A — Deep Ocean</button>
+  <button class="cbtn cbtn-b" onclick="choose('B')">B — Neon Mint</button>
+  <button class="cbtn cbtn-c" onclick="choose('C')">C — Earth Crimson</button>
+  <button class="cbtn cbtn-d" onclick="choose('D')">D — Earth Creamy</button>
+</div>
+
+<script>
+const P = {
+  f: {
+    bg:'hsl(35,16%,5%)',    sf0:'hsl(35,13%,8%)',   sf1:'hsl(35,10%,12%)', sf2:'hsl(35,8%,17%)',
+    bd:'hsl(35,10%,15%)',   pr:'hsl(155,26%,46%)',  prm:'hsla(155,26%,46%,.14)',
+    ac:'hsl(30,58%,50%)',   ok:'hsl(152,22%,44%)',  warn:'hsl(38,65%,50%)',
+    err:'hsl(5,58%,50%)',   t1:'hsl(40,28%,90%)',   t2:'hsl(35,10%,55%)',
+    t3:'hsl(30,6%,36%)',    gold:'hsl(38,60%,48%)',
+  },
+  a: {
+    bg:'hsl(222,47%,5%)',   sf0:'hsl(222,35%,8%)',  sf1:'hsl(222,30%,12%)', sf2:'hsl(222,25%,16%)',
+    bd:'hsl(222,20%,15%)',  pr:'hsl(210,100%,60%)', prm:'hsla(210,100%,60%,.12)',
+    ac:'hsl(35,95%,55%)',   ok:'hsl(152,60%,48%)',  warn:'hsl(40,90%,55%)',
+    err:'hsl(0,72%,55%)',   t1:'hsl(0,0%,93%)',     t2:'hsl(222,15%,55%)',
+    t3:'hsl(222,10%,38%)',  gold:'hsl(38,78%,52%)',
+  },
+  b: {
+    bg:'hsl(240,15%,4%)',   sf0:'hsl(240,12%,7%)',  sf1:'hsl(240,10%,11%)', sf2:'hsl(240,8%,15%)',
+    bd:'hsl(240,10%,14%)',  pr:'hsl(168,80%,50%)',  prm:'hsla(168,80%,50%,.12)',
+    ac:'hsl(270,80%,65%)',  ok:'hsl(140,70%,45%)',  warn:'hsl(45,90%,55%)',
+    err:'hsl(350,80%,55%)', t1:'hsl(0,0%,95%)',     t2:'hsl(240,8%,55%)',
+    t3:'hsl(240,5%,38%)',   gold:'hsl(45,85%,55%)',
+  },
+  c: {
+    bg:'hsl(12,15%,5%)',    sf0:'hsl(12,12%,8%)',   sf1:'hsl(12,10%,12%)', sf2:'hsl(12,8%,17%)',
+    bd:'hsl(12,10%,15%)',   pr:'hsl(348,50%,42%)',  prm:'hsla(348,50%,42%,.14)',
+    ac:'hsl(30,60%,52%)',   ok:'hsl(152,22%,44%)',  warn:'hsl(38,70%,50%)',
+    err:'hsl(0,62%,52%)',   t1:'hsl(28,22%,88%)',   t2:'hsl(20,8%,54%)',
+    t3:'hsl(15,5%,36%)',    gold:'hsl(38,60%,46%)',
+  },
+  d: {
+    bg:'hsl(38,18%,5%)',    sf0:'hsl(38,14%,9%)',   sf1:'hsl(38,11%,13%)', sf2:'hsl(38,9%,18%)',
+    bd:'hsl(38,10%,16%)',   pr:'hsl(38,58%,48%)',   prm:'hsla(38,58%,48%,.15)',
+    ac:'hsl(18,50%,50%)',   ok:'hsl(148,20%,44%)',  warn:'hsl(42,65%,50%)',
+    err:'hsl(5,60%,50%)',   t1:'hsl(42,35%,92%)',   t2:'hsl(35,12%,56%)',
+    t3:'hsl(30,8%,38%)',    gold:'hsl(38,58%,48%)',
+  },
+};
+
+function set(id) {
+  const p = P[id];
+  const r = document.documentElement.style;
+  r.setProperty('--bg',   p.bg);
+  r.setProperty('--sf0',  p.sf0);
+  r.setProperty('--sf1',  p.sf1);
+  r.setProperty('--sf2',  p.sf2);
+  r.setProperty('--bd',   p.bd);
+  r.setProperty('--pr',   p.pr);
+  r.setProperty('--prm',  p.prm);
+  r.setProperty('--ac',   p.ac);
+  r.setProperty('--ok',   p.ok);
+  r.setProperty('--warn', p.warn);
+  r.setProperty('--err',  p.err);
+  r.setProperty('--t1',   p.t1);
+  r.setProperty('--t2',   p.t2);
+  r.setProperty('--t3',   p.t3);
+  r.setProperty('--gold', p.gold);
+  document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + id).classList.add('active');
+}
+
+function choose(id) {
+  const names = { F:'Earth & Sage', A:'Deep Ocean', B:'Neon Mint', C:'Earth Crimson', D:'Earth Creamy' };
+  alert('You chose: ' + id + ' — ' + names[id] + '\n\nTell Claude: "I choose ' + id + '"\nWe\'ll lock it in and launch Phase 1 agents!');
+}
+</script>
+</body>
+</html>

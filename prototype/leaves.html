@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaves — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Leave-specific styles ── */
+
+    /* Leave balance cards */
+    .leave-balance-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 1023px) { .leave-balance-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 639px)  { .leave-balance-grid { grid-template-columns: 1fr; } }
+
+    .balance-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--motion-normal) var(--ease-out), box-shadow var(--motion-normal) var(--ease-out);
+    }
+    .balance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
+    }
+    .balance-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .balance-card.type-annual::before  { background: var(--color-info); }
+    .balance-card.type-sick::before    { background: var(--color-chart-5); }
+    .balance-card.type-personal::before { background: var(--color-accent); }
+    .balance-card.type-wfh::before     { background: var(--color-wfh); }
+
+    .balance-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+    .balance-card-type {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+    }
+    .balance-card-type svg { width: 18px; height: 18px; }
+    .type-annual .balance-card-type svg  { color: var(--color-info); }
+    .type-sick .balance-card-type svg    { color: var(--color-chart-5); }
+    .type-personal .balance-card-type svg { color: var(--color-accent); }
+    .type-wfh .balance-card-type svg     { color: var(--color-wfh); }
+
+    .balance-remaining {
+      font-size: var(--text-display-lg);
+      font-weight: var(--weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-text-1);
+      line-height: 1.1;
+    }
+    .balance-remaining small {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-regular);
+      color: var(--color-text-3);
+      font-family: var(--font-sans);
+    }
+
+    .balance-meta {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .balance-meta-item {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .balance-meta-item span {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
+    }
+
+    .balance-bar {
+      height: 6px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .balance-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width var(--motion-slow) var(--ease-out);
+    }
+    .type-annual .balance-bar-fill  { background: var(--color-info); }
+    .type-sick .balance-bar-fill    { background: var(--color-chart-5); }
+    .type-personal .balance-bar-fill { background: var(--color-accent); }
+    .type-wfh .balance-bar-fill     { background: var(--color-wfh); }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-select {
+      width: auto;
+      min-width: 140px;
+      height: 32px;
+      font-size: var(--text-body-sm);
+      background: var(--color-surface-1);
+    }
+    .filter-bar .form-input {
+      width: auto;
+      min-width: 140px;
+      height: 32px;
+      font-size: var(--text-body-sm);
+      background: var(--color-surface-1);
+    }
+
+    /* Leave request cards */
+    .leave-request-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+    .leave-request-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      transition: background var(--motion-fast);
+    }
+    .leave-request-card:hover {
+      background: var(--color-surface-1);
+    }
+
+    .leave-request-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .leave-request-icon svg { width: 20px; height: 20px; }
+    .leave-request-icon.annual  { background: var(--color-info-muted); color: var(--color-info); }
+    .leave-request-icon.sick    { background: var(--color-chart-5-muted); color: var(--color-chart-5); }
+    .leave-request-icon.personal { background: var(--color-accent-muted); color: var(--color-accent); }
+    .leave-request-icon.wfh     { background: var(--color-wfh-muted); color: var(--color-wfh); }
+
+    .leave-request-body { flex: 1; min-width: 0; }
+    .leave-request-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-1);
+    }
+    .leave-request-dates {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .leave-request-type {
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+    }
+    .leave-request-days {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .leave-request-detail {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-3);
+      margin-top: var(--space-1);
+    }
+    .leave-request-detail .note-text {
+      color: var(--color-text-2);
+      font-style: italic;
+    }
+    .leave-request-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    /* Mini heatmap calendar */
+    .heatmap-section {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .heatmap-section .section-title {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-3);
+    }
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: 40px repeat(31, 1fr);
+      gap: 2px;
+      font-size: var(--text-overline);
+    }
+    .heatmap-month-label {
+      font-size: var(--text-overline);
+      color: var(--color-text-3);
+      display: flex;
+      align-items: center;
+      padding-right: var(--space-2);
+      font-weight: var(--weight-medium);
+    }
+    .heatmap-cell {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 2px;
+      background: var(--color-surface-1);
+      min-width: 0;
+    }
+    .heatmap-cell.annual  { background: var(--color-info); }
+    .heatmap-cell.sick    { background: var(--color-chart-5); }
+    .heatmap-cell.personal { background: var(--color-accent); }
+    .heatmap-cell.wfh     { background: var(--color-wfh); }
+    .heatmap-cell.empty   { background: transparent; }
+
+    .heatmap-legend {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .heatmap-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .heatmap-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+    .heatmap-legend-dot.annual  { background: var(--color-info); }
+    .heatmap-legend-dot.sick    { background: var(--color-chart-5); }
+    .heatmap-legend-dot.personal { background: var(--color-accent); }
+    .heatmap-legend-dot.wfh     { background: var(--color-wfh); }
+
+    /* Heatmap mobile responsiveness */
+    .heatmap-mobile-summary { display: none; }
+    @media (max-width: 639px) {
+      .heatmap-grid { display: none; }
+      .heatmap-mobile-summary {
+        display: block;
+        font-size: var(--text-body-sm);
+        color: var(--color-text-2);
+      }
+      .heatmap-mobile-month {
+        padding: var(--space-2) 0;
+        border-bottom: 1px solid var(--color-border-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-1);
+      }
+      .heatmap-mobile-month:last-child { border-bottom: none; }
+      .heatmap-mobile-month-label {
+        font-weight: var(--weight-semibold);
+        color: var(--color-text-1);
+        min-width: 60px;
+      }
+      .heatmap-mobile-pills {
+        display: flex;
+        gap: var(--space-1);
+        flex-wrap: wrap;
+      }
+      .heatmap-mobile-pill {
+        font-size: var(--text-caption);
+        padding: 1px var(--space-1-5);
+        border-radius: var(--radius-sm);
+        font-weight: var(--weight-medium);
+      }
+      .heatmap-mobile-pill.annual  { background: var(--color-info-muted); color: var(--color-info); }
+      .heatmap-mobile-pill.sick    { background: var(--color-chart-5-muted); color: var(--color-chart-5); }
+      .heatmap-mobile-pill.personal { background: var(--color-accent-muted); color: var(--color-accent); }
+      .heatmap-mobile-pill.wfh     { background: var(--color-wfh-muted); color: var(--color-wfh); }
+    }
+
+    /* Worked-days summary row */
+    .heatmap-month-summary {
+      grid-column: 1 / -1;
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      padding: var(--space-1) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+      font-family: var(--font-mono);
+    }
+    .heatmap-month-summary span {
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+    }
+
+    /* Team leaves table */
+    .bulk-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-bottom: none;
+    }
+    .conflict-warning {
+      font-size: var(--text-caption);
+      color: var(--color-warning);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .conflict-warning svg { width: 12px; height: 12px; }
+
+    /* Calendar */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .calendar-nav .month-label {
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      min-width: 160px;
+      text-align: center;
+    }
+    .calendar-view-toggle {
+      display: flex;
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .calendar-view-toggle button {
+      padding: var(--space-1-5) var(--space-3);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .calendar-view-toggle button.active {
+      background: var(--color-primary);
+      color: var(--color-text-inv);
+    }
+    .calendar-view-toggle button:hover:not(.active) {
+      background: var(--color-surface-2);
+    }
+
+    .calendar-grid {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .calendar-weekday {
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    .calendar-day {
+      min-height: 100px;
+      border-right: 1px solid var(--color-border-subtle);
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: var(--space-1-5);
+      cursor: pointer;
+      transition: background var(--motion-fast);
+      position: relative;
+    }
+    .calendar-day:nth-child(7n) { border-right: none; }
+    .calendar-day:hover { background: var(--color-surface-1); }
+    .calendar-day.weekend { background: var(--color-surface-1); opacity: 0.6; }
+    .calendar-day.weekend:hover { opacity: 0.8; }
+    .calendar-day.other-month { opacity: 0.3; }
+    .calendar-day.today .day-number {
+      background: var(--color-primary);
+      color: var(--color-text-inv);
+      border-radius: var(--radius-full);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .day-number {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+    }
+    .calendar-event {
+      font-size: 10px;
+      padding: 1px var(--space-1);
+      border-radius: 3px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: var(--weight-medium);
+      line-height: 1.6;
+    }
+    .calendar-event.annual  { background: var(--color-info-muted); color: var(--color-info); }
+    .calendar-event.sick    { background: var(--color-chart-5-muted); color: var(--color-chart-5); }
+    .calendar-event.personal { background: var(--color-accent-muted); color: var(--color-accent); }
+    .calendar-event.wfh     { background: var(--color-wfh-muted); color: var(--color-wfh); }
+    .calendar-event.pending {
+      border: 1px dashed currentColor;
+      background: transparent;
+      opacity: 0.7;
+    }
+    .calendar-event.holiday {
+      background: var(--color-error-muted);
+      color: var(--color-error);
+    }
+
+    /* Modal form helpers */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    .form-calc {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-1);
+    }
+    .form-calc-item {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .form-calc-item strong {
+      font-family: var(--font-mono);
+      color: var(--color-text-1);
+    }
+    .conflict-check {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-body-sm);
+      margin-top: var(--space-1);
+    }
+    .conflict-check svg { width: 16px; height: 16px; }
+    .conflict-check.no-conflict {
+      background: var(--color-success-muted);
+      color: var(--color-success);
+    }
+    .conflict-check.has-conflict {
+      background: var(--color-warning-muted);
+      color: var(--color-warning);
+    }
+
+    /* Populated/empty toggle */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+
+    .empty-state {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16);
+      text-align: center;
+      color: var(--color-text-3);
+    }
+    .empty-state svg { width: 64px; height: 64px; margin-bottom: var(--space-4); opacity: 0.3; }
+    .empty-state h3 {
+      font-size: var(--text-heading-2);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-2);
+    }
+    .empty-state p {
+      font-size: var(--text-body);
+      max-width: 400px;
+    }
+
+    /* Confirmation modal */
+    .confirm-body {
+      text-align: center;
+      padding: var(--space-4) 0;
+    }
+    .confirm-body svg { color: var(--color-warning); margin-bottom: var(--space-3); }
+    .confirm-body p { color: var(--color-text-2); margin-top: var(--space-2); }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item active">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder-kanban"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="calendar-range"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Leaves</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="palm-tree" width="16" height="16" style="color: var(--color-info);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Leave approved: Your annual leave (Mar 22-26) was approved by John Smith</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Pending request: Alice Wang requested annual leave (Apr 1-11)</div>
+                  <div class="notif-time">3 hours ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Leave balance reset: Your 2026 balances have been updated</div>
+                  <div class="notif-time">Jan 1, 2026</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Leaves</h1>
+          <p class="page-subtitle">Manage leave requests, balances, and team availability</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-secondary btn-md" id="exportBtn">
+            <svg data-lucide="download" width="16" height="16"></svg>
+            Export
+          </button>
+          <button class="btn btn-primary btn-md" id="requestLeaveBtn">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            Request Leave
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs mb-6">
+        <button class="tab active" data-tab="my-leaves">
+          <svg data-lucide="user" width="16" height="16"></svg>
+          My Leaves
+        </button>
+        <button class="tab" data-tab="team">
+          <svg data-lucide="users" width="16" height="16"></svg>
+          Team Leaves
+          <span class="tab-count">8</span>
+        </button>
+        <button class="tab" data-tab="calendar">
+          <svg data-lucide="calendar" width="16" height="16"></svg>
+          Leave Calendar
+        </button>
+      </div>
+
+      <!-- ═══════════════ TAB 1: MY LEAVES ═══════════════ -->
+      <div class="tab-content active" id="my-leaves">
+        <div class="populated-content">
+
+          <!-- Leave Balance Cards -->
+          <div class="leave-balance-grid">
+            <div class="balance-card type-annual">
+              <div class="balance-card-header">
+                <div class="balance-card-type">
+                  <svg data-lucide="sun"></svg>
+                  Annual Leave
+                </div>
+              </div>
+              <div class="balance-remaining">18 <small>of 25 days</small></div>
+              <div class="balance-meta">
+                <div class="balance-meta-item">Used: <span>5</span></div>
+                <div class="balance-meta-item">Pending: <span>2</span></div>
+              </div>
+              <div class="balance-bar">
+                <div class="balance-bar-fill" style="width: 72%;"></div>
+              </div>
+            </div>
+
+            <div class="balance-card type-sick">
+              <div class="balance-card-header">
+                <div class="balance-card-type">
+                  <svg data-lucide="thermometer"></svg>
+                  Sick Leave
+                </div>
+              </div>
+              <div class="balance-remaining">10 <small>of 12 days</small></div>
+              <div class="balance-meta">
+                <div class="balance-meta-item">Used: <span>2</span></div>
+                <div class="balance-meta-item">Pending: <span>0</span></div>
+              </div>
+              <div class="balance-bar">
+                <div class="balance-bar-fill" style="width: 83%;"></div>
+              </div>
+            </div>
+
+            <div class="balance-card type-personal">
+              <div class="balance-card-header">
+                <div class="balance-card-type">
+                  <svg data-lucide="heart"></svg>
+                  Personal
+                </div>
+              </div>
+              <div class="balance-remaining">3 <small>of 3 days</small></div>
+              <div class="balance-meta">
+                <div class="balance-meta-item">Used: <span>0</span></div>
+                <div class="balance-meta-item">Pending: <span>0</span></div>
+              </div>
+              <div class="balance-bar">
+                <div class="balance-bar-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div class="balance-card type-wfh">
+              <div class="balance-card-header">
+                <div class="balance-card-type">
+                  <svg data-lucide="home"></svg>
+                  Remote Work
+                </div>
+              </div>
+              <div class="balance-remaining">5 <small>of 5 days</small></div>
+              <div class="balance-meta">
+                <div class="balance-meta-item">Used: <span>0</span></div>
+                <div class="balance-meta-item">Pending: <span>0</span></div>
+              </div>
+              <div class="balance-bar">
+                <div class="balance-bar-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="filter-bar">
+            <select class="form-select form-input-sm">
+              <option value="">All Statuses</option>
+              <option>Approved</option>
+              <option>Pending</option>
+              <option>Rejected</option>
+              <option>Cancelled</option>
+            </select>
+            <select class="form-select form-input-sm">
+              <option value="">All Types</option>
+              <option>Annual Leave</option>
+              <option>Sick Leave</option>
+              <option>Personal</option>
+              <option>Remote Work</option>
+            </select>
+            <input type="date" class="form-input form-input-sm" value="2025-01-01" title="From date">
+            <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
+            <input type="date" class="form-input form-input-sm" value="2026-12-31" title="To date">
+          </div>
+
+          <!-- My Leave Requests -->
+          <div class="leave-request-list">
+
+            <!-- Request 1: Approved -->
+            <div class="leave-request-card">
+              <div class="leave-request-icon annual">
+                <svg data-lucide="sun"></svg>
+              </div>
+              <div class="leave-request-body">
+                <div class="leave-request-top">
+                  <span class="leave-request-dates">Mar 22 &ndash; 26, 2026</span>
+                  <span class="leave-request-type">Annual Leave</span>
+                  <span class="leave-request-days">5 days</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="leave-request-detail">
+                  Approved by John Smith on Mar 15 &bull; <span class="note-text">"Family vacation"</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Request 2: Pending -->
+            <div class="leave-request-card" id="pendingRequest1">
+              <div class="leave-request-icon annual">
+                <svg data-lucide="sun"></svg>
+              </div>
+              <div class="leave-request-body">
+                <div class="leave-request-top">
+                  <span class="leave-request-dates">Apr 28 &ndash; 29, 2026</span>
+                  <span class="leave-request-type">Annual Leave</span>
+                  <span class="leave-request-days">2 days</span>
+                  <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
+                </div>
+                <div class="leave-request-detail">
+                  Submitted Apr 3 &bull; Awaiting: John Smith &bull; <span class="note-text">"Moving day"</span>
+                </div>
+              </div>
+              <div class="leave-request-actions">
+                <button class="btn btn-destructive-ghost btn-sm cancel-request-btn">Cancel Request</button>
+              </div>
+            </div>
+
+            <!-- Request 3: Approved Sick -->
+            <div class="leave-request-card">
+              <div class="leave-request-icon sick">
+                <svg data-lucide="thermometer"></svg>
+              </div>
+              <div class="leave-request-body">
+                <div class="leave-request-top">
+                  <span class="leave-request-dates">Jan 15 &ndash; 16, 2026</span>
+                  <span class="leave-request-type">Sick Leave</span>
+                  <span class="leave-request-days">2 days</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="leave-request-detail">
+                  Approved by John Smith on Jan 15 &bull; <span class="note-text">"Flu"</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Request 4: Approved Annual -->
+            <div class="leave-request-card">
+              <div class="leave-request-icon annual">
+                <svg data-lucide="sun"></svg>
+              </div>
+              <div class="leave-request-body">
+                <div class="leave-request-top">
+                  <span class="leave-request-dates">Dec 24 &ndash; 31, 2025</span>
+                  <span class="leave-request-type">Annual Leave</span>
+                  <span class="leave-request-days">5 days</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="leave-request-detail">
+                  Approved by John Smith on Dec 10 &bull; <span class="note-text">"Christmas break"</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Request 5: Approved Personal -->
+            <div class="leave-request-card">
+              <div class="leave-request-icon personal">
+                <svg data-lucide="heart"></svg>
+              </div>
+              <div class="leave-request-body">
+                <div class="leave-request-top">
+                  <span class="leave-request-dates">Nov 3, 2025</span>
+                  <span class="leave-request-type">Personal</span>
+                  <span class="leave-request-days">1 day</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="leave-request-detail">
+                  <span class="note-text">"Personal errand"</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mini Heatmap Calendar -->
+          <div class="heatmap-section">
+            <div class="section-title">Leave History &mdash; 2025/2026</div>
+            <div class="heatmap-grid" id="heatmapGrid">
+              <!-- Generated by JS -->
+            </div>
+            <div class="heatmap-mobile-summary" id="heatmapMobileSummary">
+              <!-- Generated by JS -->
+            </div>
+            <div class="heatmap-legend">
+              <div class="heatmap-legend-item"><div class="heatmap-legend-dot annual"></div> Annual</div>
+              <div class="heatmap-legend-item"><div class="heatmap-legend-dot sick"></div> Sick</div>
+              <div class="heatmap-legend-item"><div class="heatmap-legend-dot personal"></div> Personal</div>
+              <div class="heatmap-legend-item"><div class="heatmap-legend-dot wfh"></div> Remote Work</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-content empty-state">
+          <svg data-lucide="palm-tree"></svg>
+          <h3>No leave requests yet</h3>
+          <p>Submit your first leave request to get started. Your balance and history will appear here.</p>
+          <button class="btn btn-primary btn-md mt-4" onclick="document.getElementById('requestLeaveBtn').click()">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            Request Leave
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══════════════ TAB 2: TEAM LEAVES ═══════════════ -->
+      <div class="tab-content" id="team">
+        <div class="populated-content">
+
+          <!-- Filters -->
+          <div class="filter-bar">
+            <select class="form-select form-input-sm">
+              <option value="">All Departments</option>
+              <option>Engineering</option>
+              <option>Design</option>
+              <option>Marketing</option>
+              <option>Sales</option>
+              <option>Operations</option>
+            </select>
+            <select class="form-select form-input-sm">
+              <option value="">All Statuses</option>
+              <option>Approved</option>
+              <option>Pending</option>
+              <option>Rejected</option>
+            </select>
+            <input type="date" class="form-input form-input-sm" value="2026-04-01" title="From date">
+            <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
+            <input type="date" class="form-input form-input-sm" value="2026-06-30" title="To date">
+          </div>
+
+          <!-- Bulk actions -->
+          <div class="bulk-actions">
+            <label class="form-check" style="font-size: var(--text-body-sm);">
+              <input type="checkbox" id="selectAllTeam"> Select All
+            </label>
+            <button class="btn btn-primary btn-xs" id="approveSelectedBtn" disabled>
+              <svg data-lucide="check" width="14" height="14"></svg> Approve Selected
+            </button>
+            <button class="btn btn-destructive btn-xs" id="rejectSelectedBtn" disabled>
+              <svg data-lucide="x" width="14" height="14"></svg> Reject Selected
+            </button>
+            <span id="selectedCount" style="font-size: var(--text-caption); color: var(--color-text-3); margin-left: auto;"></span>
+          </div>
+
+          <!-- Team Table -->
+          <div class="data-table-wrapper" style="border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+            <table class="data-table mobile-cards">
+              <thead>
+                <tr>
+                  <th class="row-check" style="width:40px;"></th>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Dates</th>
+                  <th>Days</th>
+                  <th>Status</th>
+                  <th>Approver</th>
+                  <th>Impact</th>
+                  <th style="width:120px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">AW</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td>Apr 1 &ndash; 11</td>
+                  <td class="cell-mono">9</td>
+                  <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  <td style="color: var(--color-text-2);">Sarah Chen</td>
+                  <td><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
+                  <td>
+                    <div class="flex gap-1">
+                      <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
+                      <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">BT</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Bob Taylor</a>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td>Apr 14 &ndash; 18</td>
+                  <td class="cell-mono">5</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td style="color: var(--color-text-2);">Sarah Chen</td>
+                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td></td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">EL</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
+                    </div>
+                  </td>
+                  <td><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
+                  <td>Apr 7 &ndash; 8</td>
+                  <td class="cell-mono">2</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td style="color: var(--color-text-2);">Sarah Chen</td>
+                  <td><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> Alice also off</span></td>
+                  <td></td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">JK</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">James Kim</a>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td>Apr 21 &ndash; 25</td>
+                  <td class="cell-mono">5</td>
+                  <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  <td style="color: var(--color-text-2);">Sarah Chen</td>
+                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td>
+                    <div class="flex gap-1">
+                      <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
+                      <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">YT</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Yuki Tanaka</a>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
+                  <td>Apr 10</td>
+                  <td class="cell-mono">1</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td style="color: var(--color-text-2);">John Smith</td>
+                  <td><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
+                  <td></td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">MR</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Maria Rodriguez</a>
+                    </div>
+                  </td>
+                  <td><span class="badge" style="background: var(--color-wfh-muted); color: var(--color-wfh);"><svg data-lucide="home" width="12" height="12"></svg> Remote Work</span></td>
+                  <td>Apr 15</td>
+                  <td class="cell-mono">1</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td style="color: var(--color-text-2);">Sarah Chen</td>
+                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td></td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">DP</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">David Park</a>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td>May 5 &ndash; 9</td>
+                  <td class="cell-mono">5</td>
+                  <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  <td style="color: var(--color-text-2);">Sarah Chen</td>
+                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td>
+                    <div class="flex gap-1">
+                      <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
+                      <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="team-leave-row">
+                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="avatar avatar-xs">LN</div>
+                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Lisa Nguyen</a>
+                    </div>
+                  </td>
+                  <td><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
+                  <td>Apr 3</td>
+                  <td class="cell-mono">1</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td style="color: var(--color-text-2);">John Smith</td>
+                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+        <div class="empty-content empty-state">
+          <svg data-lucide="users"></svg>
+          <h3>No team leave requests</h3>
+          <p>Team members' leave requests will appear here once submitted.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════ TAB 3: LEAVE CALENDAR ═══════════════ -->
+      <div class="tab-content" id="calendar">
+        <div class="populated-content">
+
+          <!-- Calendar Header -->
+          <div class="calendar-header">
+            <div class="calendar-nav">
+              <button class="btn btn-secondary btn-sm" id="calPrev">
+                <svg data-lucide="chevron-left" width="16" height="16"></svg>
+              </button>
+              <span class="month-label" id="calMonthLabel">April 2026</span>
+              <button class="btn btn-secondary btn-sm" id="calNext">
+                <svg data-lucide="chevron-right" width="16" height="16"></svg>
+              </button>
+              <button class="btn btn-ghost btn-sm" id="calToday" style="margin-left: var(--space-2);">Today</button>
+            </div>
+            <div class="calendar-view-toggle">
+              <button class="active" data-view="month">Month</button>
+              <button data-view="quarter">Quarter</button>
+              <button data-view="year">Year</button>
+            </div>
+          </div>
+
+          <!-- Calendar Grid -->
+          <div class="calendar-grid">
+            <div class="calendar-weekdays">
+              <div class="calendar-weekday">Mon</div>
+              <div class="calendar-weekday">Tue</div>
+              <div class="calendar-weekday">Wed</div>
+              <div class="calendar-weekday">Thu</div>
+              <div class="calendar-weekday">Fri</div>
+              <div class="calendar-weekday">Sat</div>
+              <div class="calendar-weekday">Sun</div>
+            </div>
+            <div class="calendar-days" id="calendarDays">
+              <!-- Generated by JS -->
+            </div>
+          </div>
+
+        </div>
+        <div class="empty-content empty-state">
+          <svg data-lucide="calendar"></svg>
+          <h3>No leave events to show</h3>
+          <p>Leave events will appear on the calendar once requests are submitted.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ LEAVE REQUEST MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="leaveModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Request Leave</h3>
+      <button class="modal-close" id="leaveModalClose">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="flex-col gap-4">
+        <div class="form-group">
+          <label class="form-label">Leave Type <span class="required">*</span></label>
+          <select class="form-select" id="modalLeaveType">
+            <option value="annual">Annual Leave</option>
+            <option value="sick">Sick Leave</option>
+            <option value="personal">Personal</option>
+            <option value="wfh">Remote Work</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Start Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="modalStartDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date <span class="required">*</span></label>
+            <input type="date" class="form-input" id="modalEndDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duration</label>
+          <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+            <label class="form-check"><input type="radio" name="halfDay" value="full" checked id="halfDayFull"><span>Full day</span></label>
+            <label class="form-check"><input type="radio" name="halfDay" value="morning" id="halfDayMorning"><span>Half day (morning)</span></label>
+            <label class="form-check"><input type="radio" name="halfDay" value="afternoon" id="halfDayAfternoon"><span>Half day (afternoon)</span></label>
+          </div>
+        </div>
+        <div class="form-calc" id="modalCalcInfo">
+          <div class="form-calc-item">Working days: <strong id="modalWorkingDays">0</strong></div>
+          <div class="form-calc-item">Balance after: <strong id="modalBalanceAfter">18 days remaining</strong></div>
+        </div>
+        <div class="conflict-check no-conflict" id="modalConflict">
+          <svg data-lucide="check-circle"></svg>
+          <span>No conflicts detected</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="modalNotes" placeholder="Optional reason for leave..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" id="leaveModalCancel">Cancel</button>
+      <button class="btn btn-primary btn-md" id="leaveModalSubmit">
+        <svg data-lucide="send" width="16" height="16"></svg>
+        Submit Request
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ CONFIRMATION MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Cancel Leave Request</h3>
+      <button class="modal-close" id="confirmModalClose">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="confirm-body">
+        <svg data-lucide="alert-triangle" width="48" height="48"></svg>
+        <h3 style="font-size: var(--text-heading-3); color: var(--color-text-1);">Are you sure?</h3>
+        <p>This will cancel your leave request for Apr 28 &ndash; 29, 2026. This action cannot be undone.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" id="confirmNo">Keep Request</button>
+      <button class="btn btn-destructive btn-md" id="confirmYes">Cancel Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search pages, people, actions..." id="cmdInput" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Pages</div>
+      <a href="index.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Dashboard</div></div>
+      </a>
+      <a href="timesheets.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Timesheets</div></div>
+      </a>
+      <a href="leaves.html" class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="palm-tree" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Leaves</div></div>
+      </a>
+      <a href="employees.html#profile" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Team Directory</div></div>
+      </a>
+      <a href="invoices.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Invoices</div></div>
+      </a>
+      <div class="cmd-palette-group-label">Actions</div>
+      <div class="cmd-palette-item" onclick="document.getElementById('requestLeaveBtn').click(); closeCmdPalette();">
+        <div class="item-icon"><svg data-lucide="plus" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Request Leave</div><div class="item-subtitle">Submit a new leave request</div></div>
+      </div>
+      <div class="cmd-palette-item" onclick="activateTab('team'); closeCmdPalette();">
+        <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">View Team Leaves</div><div class="item-subtitle">Switch to team leave view</div></div>
+      </div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&crarr;</kbd> Open</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ REJECTION REASON MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="rejectReasonModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Reject Leave Request</h3>
+      <button class="modal-close" id="rejectReasonModalClose">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Rejection reason <span class="required">*</span></label>
+        <textarea class="form-textarea" id="rejectReasonText" placeholder="Please provide a reason for rejecting this leave request (min 10 characters)..." rows="4"></textarea>
+        <span class="form-helper" id="rejectReasonHelper">Minimum 10 characters required. This will be sent to the employee.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" id="rejectReasonCancelBtn">Cancel</button>
+      <button class="btn btn-destructive btn-md" id="rejectReasonConfirmBtn">
+        <svg data-lucide="x-circle" width="16" height="16"></svg>
+        Reject Request
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Empty State Toggle -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── Element Refs ──
+  var sidebar = document.getElementById('sidebar');
+  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  var searchTrigger = document.getElementById('searchTrigger');
+  var cmdPalette = document.getElementById('cmdPalette');
+  var cmdInput = document.getElementById('cmdInput');
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var userMenuBtn = document.getElementById('userMenuBtn');
+  var userDropdown = document.getElementById('userDropdown');
+  var toastContainer = document.getElementById('toastContainer');
+  var stateToggle = document.getElementById('stateToggle');
+  var requestLeaveBtn = document.getElementById('requestLeaveBtn');
+  var leaveModal = document.getElementById('leaveModal');
+  var leaveModalClose = document.getElementById('leaveModalClose');
+  var leaveModalCancel = document.getElementById('leaveModalCancel');
+  var leaveModalSubmit = document.getElementById('leaveModalSubmit');
+  var confirmModal = document.getElementById('confirmModal');
+  var confirmModalClose = document.getElementById('confirmModalClose');
+  var confirmNo = document.getElementById('confirmNo');
+  var confirmYes = document.getElementById('confirmYes');
+  var modalStartDate = document.getElementById('modalStartDate');
+  var modalEndDate = document.getElementById('modalEndDate');
+  var modalLeaveType = document.getElementById('modalLeaveType');
+  var modalWorkingDays = document.getElementById('modalWorkingDays');
+  var modalBalanceAfter = document.getElementById('modalBalanceAfter');
+  var modalConflict = document.getElementById('modalConflict');
+
+  // ── Sidebar Collapse ──
+  sidebarCollapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Command Palette ──
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    setTimeout(function() { cmdInput.focus(); }, 100);
+  }
+  window.closeCmdPalette = function() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  };
+
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      if (cmdPalette.classList.contains('active')) closeCmdPalette();
+      else openCmdPalette();
+    }
+    if (e.key === 'Escape') {
+      if (cmdPalette.classList.contains('active')) closeCmdPalette();
+      if (leaveModal.classList.contains('active')) closeLeaveModal();
+      if (confirmModal.classList.contains('active')) closeConfirmModal();
+      if (rejectReasonModal && rejectReasonModal.classList.contains('active')) closeRejectReasonModal();
+    }
+  });
+
+  // ── Notification Panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User Dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+      notifPanel.classList.remove('active');
+    }
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
+      userDropdown.classList.remove('active');
+    }
+  });
+
+  // ── Tab Switching ──
+  var tabs = document.querySelectorAll('.tab[data-tab]');
+  var tabContents = document.querySelectorAll('.tab-content');
+
+  window.activateTab = function(tabId) {
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    tabContents.forEach(function(tc) { tc.classList.remove('active'); });
+    var activeTabBtn = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    var activeContent = document.getElementById(tabId);
+    if (activeTabBtn) activeTabBtn.classList.add('active');
+    if (activeContent) activeContent.classList.add('active');
+  };
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabId = this.getAttribute('data-tab');
+      activateTab(tabId);
+      window.location.hash = tabId;
+    });
+  });
+
+  var hashTab = window.location.hash.replace('#', '');
+  if (hashTab && document.getElementById(hashTab)) {
+    activateTab(hashTab);
+  } else {
+    activateTab('my-leaves');
+  }
+
+  // ── Toast Notifications ──
+  function showToast(type, title, message) {
+    var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+
+  // ── Leave Request Modal ──
+  function openLeaveModal(prefillDate) {
+    leaveModal.classList.add('active');
+    if (prefillDate) {
+      modalStartDate.value = prefillDate;
+      modalEndDate.value = prefillDate;
+    } else {
+      var today = new Date();
+      var yyyy = today.getFullYear();
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
+      var dd = String(today.getDate()).padStart(2, '0');
+      modalStartDate.value = yyyy + '-' + mm + '-' + dd;
+      modalEndDate.value = yyyy + '-' + mm + '-' + dd;
+    }
+    updateModalCalc();
+  }
+
+  function closeLeaveModal() {
+    leaveModal.classList.remove('active');
+    modalLeaveType.value = 'annual';
+    document.getElementById('modalNotes').value = '';
+  }
+
+  requestLeaveBtn.addEventListener('click', function() { openLeaveModal(); });
+  leaveModalClose.addEventListener('click', closeLeaveModal);
+  leaveModalCancel.addEventListener('click', closeLeaveModal);
+  leaveModal.addEventListener('click', function(e) { if (e.target === leaveModal) closeLeaveModal(); });
+
+  // Calculate working days
+  function getWorkingDays(start, end) {
+    if (!start || !end) return 0;
+    var s = new Date(start);
+    var e = new Date(end);
+    if (e < s) return 0;
+    var count = 0;
+    var cur = new Date(s);
+    while (cur <= e) {
+      var day = cur.getDay();
+      if (day !== 0 && day !== 6) count++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return count;
+  }
+
+  var balances = { annual: { remaining: 18, total: 25 }, sick: { remaining: 10, total: 12 }, personal: { remaining: 3, total: 3 }, wfh: { remaining: 5, total: 5 } };
+
+  // Half-day radio change
+  document.querySelectorAll('input[name="halfDay"]').forEach(function(radio) {
+    radio.addEventListener('change', updateModalCalc);
+  });
+
+  function getHalfDayMode() {
+    var checked = document.querySelector('input[name="halfDay"]:checked');
+    return checked ? checked.value : 'full';
+  }
+
+  function updateModalCalc() {
+    var fullDays = getWorkingDays(modalStartDate.value, modalEndDate.value);
+    var halfMode = getHalfDayMode();
+    var days = fullDays;
+    if (halfMode !== 'full' && fullDays > 0) {
+      days = fullDays * 0.5;
+    }
+    modalWorkingDays.textContent = days;
+    var type = modalLeaveType.value;
+    var bal = balances[type];
+    var after = bal.remaining - days;
+    modalBalanceAfter.textContent = Math.max(0, after) + ' days remaining';
+    if (after < 0) {
+      modalBalanceAfter.style.color = 'var(--color-error)';
+    } else {
+      modalBalanceAfter.style.color = '';
+    }
+
+    // Conflict check (fake: warn if Apr 7-11 overlaps)
+    var startD = new Date(modalStartDate.value);
+    var endD = new Date(modalEndDate.value);
+    var conflictStart = new Date('2026-04-07');
+    var conflictEnd = new Date('2026-04-11');
+    if (startD <= conflictEnd && endD >= conflictStart) {
+      modalConflict.className = 'conflict-check has-conflict';
+      modalConflict.innerHTML = '<svg data-lucide="alert-triangle"></svg><span>2 others off that week (Alice Wang, Emma Laurent)</span>';
+    } else {
+      modalConflict.className = 'conflict-check no-conflict';
+      modalConflict.innerHTML = '<svg data-lucide="check-circle"></svg><span>No conflicts detected</span>';
+    }
+    lucide.createIcons({ nodes: [modalConflict] });
+  }
+
+  modalStartDate.addEventListener('change', updateModalCalc);
+  modalEndDate.addEventListener('change', updateModalCalc);
+  modalLeaveType.addEventListener('change', updateModalCalc);
+
+  // Submit leave request
+  leaveModalSubmit.addEventListener('click', function() {
+    var fullDays = getWorkingDays(modalStartDate.value, modalEndDate.value);
+    var halfMode = getHalfDayMode();
+    var days = fullDays;
+    if (halfMode !== 'full' && fullDays > 0) days = fullDays * 0.5;
+    if (days <= 0) {
+      showToast('error', 'Invalid Dates', 'Please select a valid date range.');
+      return;
+    }
+    var btn = this;
+    btn.classList.add('btn-loading');
+    var typeLabel = modalLeaveType.options[modalLeaveType.selectedIndex].text;
+    var halfLabel = halfMode !== 'full' ? ' (' + halfMode + ')' : '';
+
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+
+      // Add to the list
+      var list = document.querySelector('#my-leaves .leave-request-list');
+      if (list) {
+        var iconClass = modalLeaveType.value;
+        var iconMap = { annual: 'sun', sick: 'thermometer', personal: 'heart', wfh: 'home' };
+        var s = new Date(modalStartDate.value);
+        var e = new Date(modalEndDate.value);
+        var opts = { month: 'short', day: 'numeric', year: 'numeric' };
+        var dateStr = s.toLocaleDateString('en-US', opts);
+        if (modalStartDate.value !== modalEndDate.value) {
+          dateStr += ' \u2013 ' + e.toLocaleDateString('en-US', opts);
+        }
+        var note = document.getElementById('modalNotes').value;
+
+        var card = document.createElement('div');
+        card.className = 'leave-request-card';
+        card.innerHTML =
+          '<div class="leave-request-icon ' + iconClass + '"><svg data-lucide="' + iconMap[iconClass] + '"></svg></div>' +
+          '<div class="leave-request-body">' +
+            '<div class="leave-request-top">' +
+              '<span class="leave-request-dates">' + dateStr + halfLabel + '</span>' +
+              '<span class="leave-request-type">' + typeLabel + '</span>' +
+              '<span class="leave-request-days">' + days + ' day' + (days !== 1 ? 's' : '') + '</span>' +
+              '<span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>' +
+            '</div>' +
+            '<div class="leave-request-detail">Just submitted \u2022 Awaiting: John Smith' +
+              (note ? ' \u2022 <span class="note-text">\u201C' + note + '\u201D</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="leave-request-actions"><button class="btn btn-destructive-ghost btn-sm cancel-request-btn">Cancel Request</button></div>';
+
+        list.insertBefore(card, list.children[1]);
+        lucide.createIcons({ nodes: [card] });
+        bindCancelButtons();
+      }
+
+      closeLeaveModal();
+      showToast('success', 'Leave Requested', days + ' day' + (days !== 1 ? 's' : '') + ' of ' + typeLabel + halfLabel + ' submitted for approval.');
+    }, 1000);
+  });
+
+  // ── Cancel Request ──
+  var cancelTarget = null;
+  function bindCancelButtons() {
+    document.querySelectorAll('.cancel-request-btn').forEach(function(btn) {
+      btn.onclick = function() {
+        cancelTarget = this.closest('.leave-request-card');
+        confirmModal.classList.add('active');
+      };
+    });
+  }
+  bindCancelButtons();
+
+  function closeConfirmModal() {
+    confirmModal.classList.remove('active');
+    cancelTarget = null;
+  }
+  confirmModalClose.addEventListener('click', closeConfirmModal);
+  confirmNo.addEventListener('click', closeConfirmModal);
+  confirmModal.addEventListener('click', function(e) { if (e.target === confirmModal) closeConfirmModal(); });
+
+  confirmYes.addEventListener('click', function() {
+    if (cancelTarget) {
+      cancelTarget.style.transition = 'opacity 0.3s, transform 0.3s';
+      cancelTarget.style.opacity = '0';
+      cancelTarget.style.transform = 'translateX(-20px)';
+      setTimeout(function() {
+        if (cancelTarget && cancelTarget.parentNode) cancelTarget.parentNode.removeChild(cancelTarget);
+        cancelTarget = null;
+      }, 300);
+    }
+    closeConfirmModal();
+    showToast('success', 'Request Cancelled', 'Your leave request has been cancelled.');
+  });
+
+  // ── Team Actions ──
+  // Select All
+  var selectAllTeam = document.getElementById('selectAllTeam');
+  var approveSelectedBtn = document.getElementById('approveSelectedBtn');
+  var rejectSelectedBtn = document.getElementById('rejectSelectedBtn');
+  var selectedCountEl = document.getElementById('selectedCount');
+
+  function updateBulkState() {
+    var checks = document.querySelectorAll('.team-check:checked');
+    var count = checks.length;
+    approveSelectedBtn.disabled = count === 0;
+    rejectSelectedBtn.disabled = count === 0;
+    selectedCountEl.textContent = count > 0 ? count + ' selected' : '';
+  }
+
+  selectAllTeam.addEventListener('change', function() {
+    document.querySelectorAll('.team-check').forEach(function(cb) { cb.checked = selectAllTeam.checked; });
+    updateBulkState();
+  });
+  document.querySelectorAll('.team-check').forEach(function(cb) {
+    cb.addEventListener('change', updateBulkState);
+  });
+
+  // Approve / Reject individual
+  document.querySelectorAll('.team-approve-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var approveBtn = this;
+      var row = this.closest('tr');
+      var name = row.querySelector('a').textContent;
+      approveBtn.classList.add('btn-loading');
+      setTimeout(function() {
+        approveBtn.classList.remove('btn-loading');
+        var statusCell = row.querySelector('.badge-warning');
+        if (statusCell) {
+          statusCell.className = 'badge badge-success';
+          statusCell.innerHTML = '<svg data-lucide="check-circle" width="12" height="12"></svg> Approved';
+          lucide.createIcons({ nodes: [statusCell] });
+        }
+        approveBtn.closest('td').innerHTML = '';
+        showToast('success', 'Approved', name + "'s leave has been approved.");
+      }, 1000);
+    });
+  });
+
+  // ── ISSUE-17: Team reject with reason modal ──
+  var rejectReasonModal = document.getElementById('rejectReasonModal');
+  var rejectReasonText = document.getElementById('rejectReasonText');
+  var rejectReasonHelper = document.getElementById('rejectReasonHelper');
+  var rejectTargetRow = null;
+
+  function openRejectReasonModal(row) {
+    rejectTargetRow = row;
+    rejectReasonText.value = '';
+    rejectReasonText.style.borderColor = '';
+    rejectReasonHelper.style.color = '';
+    rejectReasonHelper.textContent = 'Minimum 10 characters required. This will be sent to the employee.';
+    rejectReasonModal.classList.add('active');
+    setTimeout(function() { rejectReasonText.focus(); }, 100);
+  }
+
+  function closeRejectReasonModal() {
+    rejectReasonModal.classList.remove('active');
+    rejectTargetRow = null;
+  }
+
+  document.getElementById('rejectReasonModalClose').addEventListener('click', closeRejectReasonModal);
+  document.getElementById('rejectReasonCancelBtn').addEventListener('click', closeRejectReasonModal);
+  rejectReasonModal.addEventListener('click', function(e) { if (e.target === rejectReasonModal) closeRejectReasonModal(); });
+
+  document.getElementById('rejectReasonConfirmBtn').addEventListener('click', function() {
+    var reason = rejectReasonText.value.trim();
+    if (reason.length < 10) {
+      rejectReasonText.style.borderColor = 'var(--color-error)';
+      rejectReasonHelper.style.color = 'var(--color-error)';
+      rejectReasonHelper.textContent = 'Please provide at least 10 characters.';
+      return;
+    }
+    var btn = this;
+    btn.classList.add('btn-loading');
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      if (rejectTargetRow) {
+        var name = rejectTargetRow.querySelector('a').textContent;
+        var statusCell = rejectTargetRow.querySelector('.badge-warning');
+        if (statusCell) {
+          statusCell.className = 'badge badge-error';
+          statusCell.innerHTML = '<svg data-lucide="x-circle" width="12" height="12"></svg> Rejected';
+          lucide.createIcons({ nodes: [statusCell] });
+        }
+        var actTd = rejectTargetRow.querySelector('td:last-child');
+        if (actTd) actTd.innerHTML = '';
+        // Animate row removal
+        rejectTargetRow.style.transition = 'opacity 0.4s, transform 0.4s';
+        rejectTargetRow.style.opacity = '0';
+        rejectTargetRow.style.transform = 'translateX(20px)';
+        var rowRef = rejectTargetRow;
+        setTimeout(function() { if (rowRef.parentNode) rowRef.parentNode.removeChild(rowRef); }, 400);
+        showToast('error', 'Rejected', name + "'s leave has been rejected. Reason: \"" + reason + '"');
+      }
+      closeRejectReasonModal();
+    }, 1000);
+  });
+
+  document.querySelectorAll('.team-reject-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var row = this.closest('tr');
+      openRejectReasonModal(row);
+    });
+  });
+
+  // Bulk approve/reject
+  approveSelectedBtn.addEventListener('click', function() {
+    var checks = document.querySelectorAll('.team-check:checked');
+    var count = 0;
+    checks.forEach(function(cb) {
+      var row = cb.closest('tr');
+      var statusCell = row.querySelector('.badge-warning');
+      if (statusCell) {
+        statusCell.className = 'badge badge-success';
+        statusCell.innerHTML = '<svg data-lucide="check-circle" width="12" height="12"></svg> Approved';
+        lucide.createIcons({ nodes: [statusCell] });
+        var actTd = row.querySelector('td:last-child');
+        if (actTd.querySelector('.team-approve-btn')) actTd.innerHTML = '';
+        count++;
+      }
+      cb.checked = false;
+    });
+    selectAllTeam.checked = false;
+    updateBulkState();
+    if (count > 0) showToast('success', 'Bulk Approved', count + ' request(s) approved.');
+  });
+
+  rejectSelectedBtn.addEventListener('click', function() {
+    var checks = document.querySelectorAll('.team-check:checked');
+    var count = 0;
+    checks.forEach(function(cb) {
+      var row = cb.closest('tr');
+      var statusCell = row.querySelector('.badge-warning');
+      if (statusCell) {
+        statusCell.className = 'badge badge-error';
+        statusCell.innerHTML = '<svg data-lucide="x-circle" width="12" height="12"></svg> Rejected';
+        lucide.createIcons({ nodes: [statusCell] });
+        var actTd = row.querySelector('td:last-child');
+        if (actTd.querySelector('.team-reject-btn')) actTd.innerHTML = '';
+        count++;
+      }
+      cb.checked = false;
+    });
+    selectAllTeam.checked = false;
+    updateBulkState();
+    if (count > 0) showToast('error', 'Bulk Rejected', count + ' request(s) rejected.');
+  });
+
+  // ── Calendar ──
+  var calYear = 2026;
+  var calMonth = 3; // April (0-indexed)
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  var leaveEvents = [
+    { name: 'Alice Wang', type: 'annual', startDay: 1, endDay: 11, month: 3, pending: false },
+    { name: 'Sarah Chen', type: 'annual', startDay: 28, endDay: 29, month: 3, pending: true },
+    { name: 'Emma Laurent', type: 'sick', startDay: 7, endDay: 8, month: 3, pending: false },
+    { name: 'Yuki Tanaka', type: 'personal', startDay: 10, endDay: 10, month: 3, pending: false },
+    { name: 'Bob Taylor', type: 'annual', startDay: 14, endDay: 18, month: 3, pending: false },
+    { name: 'Maria Rodriguez', type: 'wfh', startDay: 15, endDay: 15, month: 3, pending: false },
+    { name: 'James Kim', type: 'annual', startDay: 21, endDay: 25, month: 3, pending: true },
+  ];
+
+  function renderCalendar() {
+    document.getElementById('calMonthLabel').textContent = monthNames[calMonth] + ' ' + calYear;
+    var container = document.getElementById('calendarDays');
+    container.innerHTML = '';
+
+    var firstDay = new Date(calYear, calMonth, 1);
+    var lastDay = new Date(calYear, calMonth + 1, 0);
+    var startDow = (firstDay.getDay() + 6) % 7; // Monday=0
+    var daysInMonth = lastDay.getDate();
+
+    // Previous month fill
+    var prevMonthLast = new Date(calYear, calMonth, 0).getDate();
+    for (var i = startDow - 1; i >= 0; i--) {
+      var d = prevMonthLast - i;
+      var cell = document.createElement('div');
+      cell.className = 'calendar-day other-month';
+      cell.innerHTML = '<div class="day-number">' + d + '</div>';
+      container.appendChild(cell);
+    }
+
+    // Current month
+    var today = new Date();
+    for (var day = 1; day <= daysInMonth; day++) {
+      var cell = document.createElement('div');
+      var date = new Date(calYear, calMonth, day);
+      var dow = date.getDay();
+      var classes = ['calendar-day'];
+
+      if (dow === 0 || dow === 6) classes.push('weekend');
+      if (day === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()) classes.push('today');
+
+      cell.className = classes.join(' ');
+      cell.innerHTML = '<div class="day-number">' + day + '</div>';
+
+      // Add events for this day
+      if (calMonth === 3) { // April
+        for (var ev = 0; ev < leaveEvents.length; ev++) {
+          var le = leaveEvents[ev];
+          if (le.month === calMonth && day >= le.startDay && day <= le.endDay) {
+            var eventEl = document.createElement('div');
+            var evClasses = 'calendar-event ' + le.type;
+            if (le.pending) evClasses += ' pending';
+            eventEl.className = evClasses;
+            eventEl.textContent = le.name.split(' ')[0];
+            cell.appendChild(eventEl);
+          }
+        }
+      }
+
+      // Click to open leave modal
+      (function(d) {
+        cell.addEventListener('click', function() {
+          var dateStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+          console.log('Calendar day clicked:', dateStr);
+          openLeaveModal(dateStr);
+        });
+      })(day);
+
+      container.appendChild(cell);
+    }
+
+    // Next month fill
+    var totalCells = startDow + daysInMonth;
+    var remaining = (7 - (totalCells % 7)) % 7;
+    for (var j = 1; j <= remaining; j++) {
+      var cell = document.createElement('div');
+      cell.className = 'calendar-day other-month';
+      cell.innerHTML = '<div class="day-number">' + j + '</div>';
+      container.appendChild(cell);
+    }
+  }
+
+  document.getElementById('calPrev').addEventListener('click', function() {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  });
+  document.getElementById('calNext').addEventListener('click', function() {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+  document.getElementById('calToday').addEventListener('click', function() {
+    var t = new Date();
+    calYear = t.getFullYear();
+    calMonth = t.getMonth();
+    renderCalendar();
+  });
+
+  // Calendar view toggles
+  document.querySelectorAll('.calendar-view-toggle button').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.calendar-view-toggle button').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      showToast('info', 'View Changed', this.getAttribute('data-view').charAt(0).toUpperCase() + this.getAttribute('data-view').slice(1) + ' view selected');
+    });
+  });
+
+  renderCalendar();
+
+  // ── Mini Heatmap ──
+  function renderHeatmap() {
+    var grid = document.getElementById('heatmapGrid');
+    grid.innerHTML = '';
+
+    // Leave data: month (0-indexed), days, type
+    var leaveData = [
+      { year: 2025, month: 10, days: [3], type: 'personal' },
+      { year: 2025, month: 11, days: [24,25,26,29,30,31], type: 'annual' },
+      { year: 2026, month: 0, days: [15,16], type: 'sick' },
+      { year: 2026, month: 2, days: [22,23,24,25,26], type: 'annual' },
+      { year: 2026, month: 3, days: [28,29], type: 'annual' },
+    ];
+
+    var months = [
+      { label: 'Nov', year: 2025, month: 10, daysInMonth: 30 },
+      { label: 'Dec', year: 2025, month: 11, daysInMonth: 31 },
+      { label: 'Jan', year: 2026, month: 0, daysInMonth: 31 },
+      { label: 'Feb', year: 2026, month: 1, daysInMonth: 28 },
+      { label: 'Mar', year: 2026, month: 2, daysInMonth: 31 },
+      { label: 'Apr', year: 2026, month: 3, daysInMonth: 30 },
+    ];
+
+    months.forEach(function(m) {
+      var label = document.createElement('div');
+      label.className = 'heatmap-month-label';
+      label.textContent = m.label;
+      grid.appendChild(label);
+
+      for (var d = 1; d <= 31; d++) {
+        var cell = document.createElement('div');
+        if (d > m.daysInMonth) {
+          cell.className = 'heatmap-cell empty';
+        } else {
+          cell.className = 'heatmap-cell';
+          // Check if this day has leave
+          for (var l = 0; l < leaveData.length; l++) {
+            if (leaveData[l].year === m.year && leaveData[l].month === m.month && leaveData[l].days.indexOf(d) !== -1) {
+              cell.classList.add(leaveData[l].type);
+              cell.title = m.label + ' ' + d + ': ' + leaveData[l].type;
+            }
+          }
+        }
+        grid.appendChild(cell);
+      }
+    });
+  }
+  renderHeatmap();
+
+  // ── Empty State Toggle ──
+  var isPopulated = true;
+  stateToggle.addEventListener('click', function() {
+    isPopulated = !isPopulated;
+    document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+    this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+  // ── Export button ──
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    showToast('info', 'Export Started', 'Your leave data is being exported as CSV...');
+  });
+
+  // ── Initialize Lucide Icons ──
+  lucide.createIcons();
+
+})();
+</script>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item active"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

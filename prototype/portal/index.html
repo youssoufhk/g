@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Portal — GammaHR Quantum</title>
+  <link rel="stylesheet" href="../_tokens.css">
+  <link rel="stylesheet" href="../_components.css">
+  <link rel="stylesheet" href="../_layout.css">
+  <style>
+    /* ── Portal Shell (lighter, client-facing) ── */
+    .portal-app {
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+    .portal-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-6);
+      background: var(--color-surface-0);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .portal-header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .portal-client-logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-gold));
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-white);
+      font-weight: var(--weight-bold);
+      font-size: 14px;
+    }
+    .portal-client-name {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .portal-powered {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-left: var(--space-2);
+    }
+    .portal-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .portal-user {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      cursor: pointer;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-md);
+    }
+    .portal-user:hover { background: var(--color-surface-1); }
+
+    /* Portal Nav */
+    .portal-nav {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 var(--space-6);
+      background: var(--color-surface-0);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .portal-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-body);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all var(--motion-fast);
+      text-decoration: none;
+    }
+    .portal-nav-item:hover { color: var(--color-text-1); }
+    .portal-nav-item.active {
+      color: var(--color-accent);
+      border-bottom-color: var(--color-accent);
+    }
+    .portal-nav-item svg { width: 18px; height: 18px; }
+    @media (max-width: 639px) {
+      .portal-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .portal-nav-item { white-space: nowrap; min-height: 44px; }
+    }
+
+    /* Portal Content */
+    .portal-content {
+      padding: var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .portal-section { display: none; }
+    .portal-section.active { display: block; }
+
+    /* Project cards */
+    .project-card-portal {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+    .project-card-portal:hover {
+      border-color: var(--color-border-strong);
+    }
+    .project-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+    .project-name-portal {
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .project-meta {
+      display: flex;
+      gap: var(--space-6);
+      margin-bottom: var(--space-4);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .project-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .project-meta-item svg { width: 14px; height: 14px; }
+
+    /* Milestone tracker */
+    .milestone-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: var(--space-4);
+    }
+    .milestone-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+    .milestone-dot {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border);
+      background: var(--color-surface-0);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1;
+      position: relative;
+    }
+    .milestone-dot.completed { background: var(--color-success); border-color: var(--color-success); }
+    .milestone-dot.completed svg { color: var(--color-white); }
+    .milestone-dot.active { border-color: var(--color-accent); background: var(--color-accent-muted); }
+    .milestone-dot.active svg { color: var(--color-accent); }
+    .milestone-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      text-align: center;
+      margin-top: var(--space-2);
+      max-width: 100px;
+    }
+    .milestone-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: calc(50% + 12px);
+      right: calc(-50% + 12px);
+      height: 2px;
+      background: var(--color-border);
+    }
+    .milestone-step.done::after { background: var(--color-success); }
+
+    /* Invoice table in portal */
+    .invoice-status-paid { color: var(--color-success); }
+    .invoice-status-sent { color: var(--color-info); }
+    .invoice-status-overdue { color: var(--color-error); }
+
+    /* Team members grid */
+    .team-grid-portal {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-4);
+    }
+    .team-member-portal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+    .team-member-portal .member-name {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .team-member-portal .member-role {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+
+    /* Document list */
+    .doc-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .doc-item:last-child { border-bottom: none; }
+    .doc-item svg { color: var(--color-text-3); flex-shrink: 0; }
+    .doc-item .doc-name { flex: 1; color: var(--color-text-1); font-size: var(--text-body); }
+    .doc-item .doc-date { font-size: var(--text-caption); color: var(--color-text-3); }
+
+    /* Avatar color classes */
+    .avatar-sage { background: linear-gradient(135deg, var(--color-success), var(--color-info)); }
+    .avatar-amber { background: linear-gradient(135deg, var(--color-gold), var(--color-warning)); }
+    .avatar-violet { background: linear-gradient(135deg, var(--color-accent), var(--color-info)); }
+    .avatar-sage-gold { background: linear-gradient(135deg, var(--color-success), var(--color-gold)); }
+    .avatar-coral { background: linear-gradient(135deg, var(--color-error), var(--color-gold)); }
+  </style>
+</head>
+<body>
+  <div class="portal-app">
+    <!-- Portal Header -->
+    <header class="portal-header">
+      <div class="portal-header-left">
+        <div class="portal-client-logo">AC</div>
+        <span class="portal-client-name">Acme Corp</span>
+        <span class="portal-powered">Powered by GammaHR</span>
+      </div>
+      <div class="portal-header-right">
+        <button class="header-icon-btn" style="position:relative;">
+          <svg data-lucide="bell" width="20" height="20"></svg>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="portal-user">
+          <div class="avatar avatar-sm avatar-violet">JD</div>
+          <div>
+            <div style="font-size: var(--text-body-sm); font-weight: var(--weight-medium); color: var(--color-text-1);">Jane Doe</div>
+            <div style="font-size: var(--text-caption); color: var(--color-text-3);">CTO</div>
+          </div>
+          <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+        </div>
+        <a href="../auth.html" class="btn btn-ghost btn-sm">
+          <svg data-lucide="log-out" width="16" height="16"></svg>
+          Sign out
+        </a>
+      </div>
+    </header>
+
+    <!-- Portal Navigation -->
+    <nav class="portal-nav">
+      <a class="portal-nav-item active" data-tab="dashboard">
+        <svg data-lucide="layout-dashboard"></svg>
+        Dashboard
+      </a>
+      <a class="portal-nav-item" data-tab="projects">
+        <svg data-lucide="folder"></svg>
+        Projects
+      </a>
+      <a class="portal-nav-item" data-tab="timesheets">
+        <svg data-lucide="clock"></svg>
+        Timesheets
+      </a>
+      <a class="portal-nav-item" data-tab="invoices">
+        <svg data-lucide="file-text"></svg>
+        Invoices
+      </a>
+      <a class="portal-nav-item" data-tab="documents">
+        <svg data-lucide="paperclip"></svg>
+        Documents
+      </a>
+    </nav>
+
+    <!-- Portal Content -->
+    <main class="portal-content">
+
+      <!-- DASHBOARD -->
+      <section class="portal-section active" id="sec-dashboard">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Welcome, Jane</h2>
+
+        <!-- Stat Cards -->
+        <div class="grid-4 mb-6">
+          <div class="stat-card">
+            <div class="stat-label">Active Projects</div>
+            <div class="stat-value" style="font-size: var(--text-heading-2);">3</div>
+            <div class="stat-trend up">All on track</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Hours This Month</div>
+            <div class="stat-value" style="font-size: var(--text-heading-2);">342h</div>
+            <div class="stat-trend up">+8% vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Outstanding Invoices</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€20,600</div>
+            <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">2 invoices pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Team Members</div>
+            <div class="stat-value" style="font-size: var(--text-heading-2);">12</div>
+            <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">Across 3 projects</div>
+          </div>
+        </div>
+
+        <!-- Active Projects -->
+        <div class="card mb-6">
+          <div class="card-header">
+            <span class="card-title">Active Projects</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div style="padding: var(--space-4);">
+              <!-- Project 1 -->
+              <div class="project-card-portal">
+                <div class="project-header-row">
+                  <span class="project-name-portal">Website Redesign</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+                <div class="project-meta">
+                  <span class="project-meta-item"><svg data-lucide="calendar"></svg> Feb 1 — Jul 31, 2026</span>
+                  <span class="project-meta-item"><svg data-lucide="users"></svg> 5 team members</span>
+                  <span class="project-meta-item"><svg data-lucide="clock"></svg> 288h logged</span>
+                </div>
+                <div class="progress-bar" style="margin-bottom: var(--space-2);">
+                  <div class="progress-fill" style="width: 55%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: var(--text-caption); color: var(--color-text-2);">
+                  <span>55% complete</span>
+                  <span>Budget: <span class="font-mono">€24,500</span> / <span class="font-mono">€50,000</span></span>
+                </div>
+                <!-- Milestones -->
+                <div class="milestone-track" style="margin-top: var(--space-5);">
+                  <div class="milestone-step done">
+                    <div class="milestone-dot completed"><svg data-lucide="check" width="12" height="12"></svg></div>
+                    <div class="milestone-label">Discovery</div>
+                  </div>
+                  <div class="milestone-step done">
+                    <div class="milestone-dot completed"><svg data-lucide="check" width="12" height="12"></svg></div>
+                    <div class="milestone-label">Design</div>
+                  </div>
+                  <div class="milestone-step">
+                    <div class="milestone-dot active"><svg data-lucide="loader" width="12" height="12"></svg></div>
+                    <div class="milestone-label">Sprint 1</div>
+                  </div>
+                  <div class="milestone-step">
+                    <div class="milestone-dot"></div>
+                    <div class="milestone-label">Sprint 2</div>
+                  </div>
+                  <div class="milestone-step">
+                    <div class="milestone-dot"></div>
+                    <div class="milestone-label">QA</div>
+                  </div>
+                  <div class="milestone-step">
+                    <div class="milestone-dot"></div>
+                    <div class="milestone-label">Launch</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Project 2 -->
+              <div class="project-card-portal">
+                <div class="project-header-row">
+                  <span class="project-name-portal">Mobile App</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+                <div class="project-meta">
+                  <span class="project-meta-item"><svg data-lucide="calendar"></svg> Mar 1 — Sep 30, 2026</span>
+                  <span class="project-meta-item"><svg data-lucide="users"></svg> 2 team members</span>
+                  <span class="project-meta-item"><svg data-lucide="clock"></svg> 64h logged</span>
+                </div>
+                <div class="progress-bar" style="margin-bottom: var(--space-2);">
+                  <div class="progress-fill" style="width: 15%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: var(--text-caption); color: var(--color-text-2);">
+                  <span>15% complete</span>
+                  <span>Budget: <span class="font-mono">€5,440</span> / <span class="font-mono">€35,000</span></span>
+                </div>
+              </div>
+
+              <!-- Project 3 -->
+              <div class="project-card-portal">
+                <div class="project-header-row">
+                  <span class="project-name-portal">CRM Integration</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+                <div class="project-meta">
+                  <span class="project-meta-item"><svg data-lucide="calendar"></svg> Mar 15 — Jun 30, 2026</span>
+                  <span class="project-meta-item"><svg data-lucide="users"></svg> 3 team members</span>
+                  <span class="project-meta-item"><svg data-lucide="clock"></svg> 42h logged</span>
+                </div>
+                <div class="progress-bar" style="margin-bottom: var(--space-2);">
+                  <div class="progress-fill" style="width: 20%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: var(--text-caption); color: var(--color-text-2);">
+                  <span>20% complete</span>
+                  <span>Budget: <span class="font-mono">€3,570</span> / <span class="font-mono">€18,000</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Activity</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="notif-item">
+              <div class="avatar avatar-sm avatar-sage">SC</div>
+              <div class="notif-text">
+                <div class="notif-title">Sarah Chen submitted timesheet — 40h on Website Redesign</div>
+                <div class="notif-time">2 hours ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="avatar avatar-sm avatar-amber">MR</div>
+              <div class="notif-text">
+                <div class="notif-title">Marco Rossi completed Sprint 1 — Design Phase milestone</div>
+                <div class="notif-time">Yesterday</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="avatar avatar-sm avatar-violet">JS</div>
+              <div class="notif-text">
+                <div class="notif-title">John Smith sent Invoice INV-2026-048 — €12,400</div>
+                <div class="notif-time">2 days ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="avatar avatar-sm avatar-sage-gold">AW</div>
+              <div class="notif-text">
+                <div class="notif-title">Alice Wang uploaded revised mockups to Website Redesign</div>
+                <div class="notif-time">3 days ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="portal-section" id="sec-projects">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Projects</h2>
+        <div class="project-card-portal">
+          <div class="project-header-row">
+            <span class="project-name-portal">Website Redesign</span>
+            <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+          </div>
+          <div class="project-meta">
+            <span class="project-meta-item"><svg data-lucide="calendar"></svg> Feb 1 — Jul 31, 2026</span>
+            <span class="project-meta-item"><svg data-lucide="users"></svg> 5 team members</span>
+          </div>
+          <h4 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-4) 0 var(--space-3);">Team</h4>
+          <div class="team-grid-portal">
+            <div class="team-member-portal">
+              <div class="avatar avatar-md avatar-sage">SC</div>
+              <div class="member-name">Sarah Chen</div>
+              <div class="member-role">Lead Developer</div>
+            </div>
+            <div class="team-member-portal">
+              <div class="avatar avatar-md avatar-violet">JS</div>
+              <div class="member-name">John Smith</div>
+              <div class="member-role">Project Manager</div>
+            </div>
+            <div class="team-member-portal">
+              <div class="avatar avatar-md avatar-sage-gold">AW</div>
+              <div class="member-name">Alice Wang</div>
+              <div class="member-role">UI/UX Designer</div>
+            </div>
+            <div class="team-member-portal">
+              <div class="avatar avatar-md avatar-amber">MR</div>
+              <div class="member-name">Marco Rossi</div>
+              <div class="member-role">Frontend Developer</div>
+            </div>
+            <div class="team-member-portal">
+              <div class="avatar avatar-md avatar-coral">LO</div>
+              <div class="member-name">Liam O'Brien</div>
+              <div class="member-role">Junior Developer</div>
+            </div>
+          </div>
+          <h4 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-6) 0 var(--space-3);">Milestones</h4>
+          <div class="data-table-wrapper">
+            <table class="data-table mobile-cards">
+              <thead>
+                <tr>
+                  <th>Milestone</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Discovery & Requirements</td>
+                  <td>Feb 14, 2026</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Complete</span></td>
+                </tr>
+                <tr>
+                  <td>Design Phase</td>
+                  <td>Mar 15, 2026</td>
+                  <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Complete</span></td>
+                </tr>
+                <tr>
+                  <td>Development Sprint 1</td>
+                  <td>Apr 15, 2026</td>
+                  <td><span class="badge badge-primary"><svg data-lucide="loader" width="12" height="12"></svg> In Progress</span></td>
+                </tr>
+                <tr>
+                  <td>Development Sprint 2</td>
+                  <td>May 15, 2026</td>
+                  <td><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
+                </tr>
+                <tr>
+                  <td>Testing & QA</td>
+                  <td>Jun 15, 2026</td>
+                  <td><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
+                </tr>
+                <tr>
+                  <td>Launch</td>
+                  <td>Jul 1, 2026</td>
+                  <td><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIMESHEETS -->
+      <section class="portal-section" id="sec-timesheets">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Approved Timesheets</h2>
+        <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">Hours logged by your assigned team members, approved and verified.</p>
+        <div class="data-table-wrapper">
+          <table class="data-table mobile-cards">
+            <thead>
+              <tr>
+                <th>Week</th>
+                <th>Project</th>
+                <th>Team Member</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mar 30 - Apr 5</td>
+                <td>Website Redesign</td>
+                <td>Sarah Chen</td>
+                <td class="font-mono">31h</td>
+                <td class="font-mono">€85/h</td>
+                <td class="font-mono">€2,635</td>
+                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+              </tr>
+              <tr>
+                <td>Mar 30 - Apr 5</td>
+                <td>Website Redesign</td>
+                <td>Marco Rossi</td>
+                <td class="font-mono">40h</td>
+                <td class="font-mono">€85/h</td>
+                <td class="font-mono">€3,400</td>
+                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+              </tr>
+              <tr>
+                <td>Mar 30 - Apr 5</td>
+                <td>Website Redesign</td>
+                <td>Alice Wang</td>
+                <td class="font-mono">24h</td>
+                <td class="font-mono">€75/h</td>
+                <td class="font-mono">€1,800</td>
+                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+              </tr>
+              <tr>
+                <td>Mar 30 - Apr 5</td>
+                <td>Website Redesign</td>
+                <td>John Smith</td>
+                <td class="font-mono">15h</td>
+                <td class="font-mono">€95/h</td>
+                <td class="font-mono">€1,425</td>
+                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+              </tr>
+              <tr>
+                <td>Mar 30 - Apr 5</td>
+                <td>Website Redesign</td>
+                <td>Liam O'Brien</td>
+                <td class="font-mono">32h</td>
+                <td class="font-mono">€65/h</td>
+                <td class="font-mono">€2,080</td>
+                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+              </tr>
+              <tr>
+                <td>Mar 23 - 29</td>
+                <td>Website Redesign</td>
+                <td>Sarah Chen</td>
+                <td class="font-mono">40h</td>
+                <td class="font-mono">€85/h</td>
+                <td class="font-mono">€3,400</td>
+                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-pagination">
+            <span>Showing 6 of 24 entries</span>
+            <div class="pagination-buttons">
+              <button>1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>4</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: var(--space-4); display: flex; justify-content: flex-end;">
+          <button class="btn btn-secondary btn-sm"><svg data-lucide="download" width="14" height="14"></svg> Export Report</button>
+        </div>
+      </section>
+
+      <!-- INVOICES -->
+      <section class="portal-section" id="sec-invoices">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Invoices</h2>
+        <div class="data-table-wrapper">
+          <table class="data-table mobile-cards">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Project</th>
+                <th>Issue Date</th>
+                <th>Due Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">INV-2026-048</td>
+                <td>Website Redesign</td>
+                <td>Apr 1, 2026</td>
+                <td>Apr 30, 2026</td>
+                <td class="font-mono" style="font-weight: var(--weight-semibold);">€12,400.00</td>
+                <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-primary btn-xs" onclick="markPaid(this)"><svg data-lucide="check" width="14" height="14"></svg> Mark Paid</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">INV-2026-045</td>
+                <td>Website Redesign</td>
+                <td>Mar 1, 2026</td>
+                <td>Mar 31, 2026</td>
+                <td class="font-mono" style="font-weight: var(--weight-semibold);">€11,200.00</td>
+                <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">INV-2026-043</td>
+                <td>Mobile App</td>
+                <td>Feb 15, 2026</td>
+                <td>Mar 15, 2026</td>
+                <td class="font-mono" style="font-weight: var(--weight-semibold);">€5,000.00</td>
+                <td><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> Overdue</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-primary btn-xs" onclick="markPaid(this)"><svg data-lucide="check" width="14" height="14"></svg> Mark Paid</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">INV-2026-041</td>
+                <td>CRM Integration</td>
+                <td>Jan 15, 2026</td>
+                <td>Feb 14, 2026</td>
+                <td class="font-mono" style="font-weight: var(--weight-semibold);">€8,200.00</td>
+                <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-6);">
+          <div class="stat-card" style="flex:1;">
+            <div class="stat-label">Total Paid (YTD)</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-success);">€19,400</div>
+          </div>
+          <div class="stat-card" style="flex:1;">
+            <div class="stat-label">Outstanding</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€12,400</div>
+          </div>
+          <div class="stat-card" style="flex:1;">
+            <div class="stat-label">Overdue</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-error);">€5,000</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCUMENTS -->
+      <section class="portal-section" id="sec-documents">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Shared Documents</h2>
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="doc-item">
+              <svg data-lucide="file-text" width="20" height="20"></svg>
+              <span class="doc-name">Master Services Agreement — Acme Corp.pdf</span>
+              <span class="doc-date">Jan 15, 2024</span>
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+            </div>
+            <div class="doc-item">
+              <svg data-lucide="file-text" width="20" height="20"></svg>
+              <span class="doc-name">Statement of Work — Website Redesign.pdf</span>
+              <span class="doc-date">Feb 1, 2026</span>
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+            </div>
+            <div class="doc-item">
+              <svg data-lucide="file-text" width="20" height="20"></svg>
+              <span class="doc-name">Statement of Work — Mobile App.pdf</span>
+              <span class="doc-date">Mar 1, 2026</span>
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+            </div>
+            <div class="doc-item">
+              <svg data-lucide="image" width="20" height="20"></svg>
+              <span class="doc-name">Website Redesign — Approved Mockups.zip</span>
+              <span class="doc-date">Mar 15, 2026</span>
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+            </div>
+            <div class="doc-item">
+              <svg data-lucide="file-spreadsheet" width="20" height="20"></svg>
+              <span class="doc-name">Q1 2026 Hours Report — Acme.xlsx</span>
+              <span class="doc-date">Apr 1, 2026</span>
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EMPTY STATE -->
+      <section class="portal-section" id="sec-empty" style="display: none;">
+        <div class="empty-state">
+          <svg data-lucide="folder-open" width="64" height="64" class="empty-icon"></svg>
+          <div class="empty-title">No data yet</div>
+          <div class="empty-desc">Your project team hasn't shared any information yet. Check back soon.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Empty State Toggle -->
+  <button class="state-toggle" onclick="toggleEmptyState()">
+    <svg data-lucide="eye" width="14" height="14"></svg>
+    Toggle Empty State
+  </button>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
+
+    // Tab switching
+    let currentTab = 'dashboard';
+    document.querySelectorAll('.portal-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const tab = item.dataset.tab;
+        document.querySelectorAll('.portal-nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-' + tab).classList.add('active');
+        currentTab = tab;
+        window.location.hash = tab;
+      });
+    });
+
+    // Handle hash on load
+    const hash = window.location.hash.slice(1);
+    if (hash && document.getElementById('sec-' + hash)) {
+      document.querySelectorAll('.portal-nav-item').forEach(i => {
+        i.classList.toggle('active', i.dataset.tab === hash);
+      });
+      document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + hash).classList.add('active');
+      currentTab = hash;
+    }
+
+    // Mark as paid
+    function markPaid(btn) {
+      const row = btn.closest('tr');
+      const statusCell = row.querySelector('td:nth-child(6)');
+      statusCell.innerHTML = '<span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span>';
+      btn.remove();
+      lucide.createIcons();
+      showToast('Payment confirmed', 'Invoice marked as paid. Thank you!', 'success');
+    }
+
+    // Toast
+    function showToast(title, message, type) {
+      const container = document.getElementById('toast-container');
+      const iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.innerHTML = `
+        <div class="toast-icon"><svg data-lucide="${iconMap[type]}" width="20" height="20"></svg></div>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()"><svg data-lucide="x" width="16" height="16"></svg></button>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => { toast.classList.add('removing'); setTimeout(() => toast.remove(), 200); }, 5000);
+    }
+
+    // Empty state toggle
+    let isEmpty = false;
+    function toggleEmptyState() {
+      isEmpty = !isEmpty;
+      document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
+      if (isEmpty) {
+        document.getElementById('sec-empty').style.display = 'block';
+        document.getElementById('sec-empty').classList.add('active');
+      } else {
+        document.getElementById('sec-empty').style.display = 'none';
+        document.getElementById('sec-' + currentTab).classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

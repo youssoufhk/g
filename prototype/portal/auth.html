@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Portal — Sign In</title>
+  <link rel="stylesheet" href="../_tokens.css">
+  <link rel="stylesheet" href="../_components.css">
+  <style>
+    .portal-auth {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      padding: var(--space-4);
+    }
+    .portal-auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-3);
+      padding: var(--space-10) var(--space-8);
+    }
+    .portal-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+    }
+    .portal-logo .client-logo {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-gold));
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-weight: var(--weight-bold);
+      font-size: 28px;
+      box-shadow: var(--shadow-2);
+    }
+    .portal-logo h1 {
+      font-size: var(--text-heading-1);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+    }
+    .portal-logo .powered-by {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .portal-form { display: flex; flex-direction: column; gap: var(--space-4); }
+    .portal-form .form-input {
+      height: 44px;
+      padding: 0 var(--space-4);
+      font-size: var(--text-body);
+    }
+    .portal-submit {
+      width: 100%;
+      height: 44px;
+      font-size: var(--text-body-lg);
+      margin-top: var(--space-2);
+      background: var(--color-accent);
+      color: var(--color-text-inv);
+    }
+    .portal-submit:hover { background: var(--color-accent-hover); }
+    .portal-footer {
+      text-align: center;
+      margin-top: var(--space-6);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-3);
+    }
+    .portal-error {
+      display: none;
+      padding: var(--space-3);
+      background: var(--color-error-muted);
+      border: 1px solid var(--color-error);
+      border-radius: var(--radius-md);
+      color: var(--color-error);
+      font-size: var(--text-body-sm);
+      text-align: center;
+    }
+    .portal-error.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="portal-auth">
+    <div class="portal-auth-card">
+      <div class="portal-logo">
+        <div class="client-logo">AC</div>
+        <h1>Client Portal</h1>
+        <p class="powered-by">Powered by GammaHR</p>
+      </div>
+
+      <div class="portal-error" id="portal-error">Invalid email or password.</div>
+
+      <form class="portal-form" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="you@acme.com" value="jane@acme.com" autofocus>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="Enter your password" value="password123" id="portal-pass">
+        </div>
+        <div style="text-align: right; margin-top: calc(-1 * var(--space-2));">
+          <a href="#" style="font-size: var(--text-body-sm); color: var(--color-text-2);">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-lg portal-submit" onclick="handlePortalLogin()">
+          Sign In to Portal
+        </button>
+      </form>
+
+      <div class="portal-footer">
+        <div style="height:1px; background: var(--color-border); margin-bottom: var(--space-4);"></div>
+        Need access? Contact your project team.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handlePortalLogin() {
+      const btn = document.querySelector('.portal-submit');
+      btn.classList.add('btn-loading');
+      btn.style.color = 'transparent';
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1200);
+    }
+
+    document.getElementById('portal-pass').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handlePortalLogin();
+    });
+  </script>
+</body>
+</html>

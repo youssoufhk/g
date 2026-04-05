@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Projects-specific styles ── */
+
+    /* View toggle group */
+    .view-toggle {
+      display: inline-flex;
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .view-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1-5) var(--space-3);
+      background: transparent;
+      border: none;
+      color: var(--color-text-2);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+      font-family: var(--font-sans);
+    }
+    .view-toggle-btn:hover { color: var(--color-text-1); }
+    .view-toggle-btn.active {
+      background: var(--color-primary);
+      color: var(--color-text-inv);
+    }
+    .view-toggle-btn svg { width: 14px; height: 14px; }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-select {
+      width: auto;
+      min-width: 140px;
+      height: 32px;
+      font-size: var(--text-body-sm);
+      background-color: var(--color-surface-1);
+    }
+
+    /* ── KANBAN BOARD ── */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      min-height: 400px;
+    }
+    @media (max-width: 1023px) { .kanban-board { grid-template-columns: 1fr; } }
+
+    .kanban-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .kanban-column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+    }
+    .kanban-column-header .col-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .kanban-column-header .col-count {
+      background: var(--color-surface-2);
+      padding: 1px 8px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      font-weight: var(--weight-semibold);
+    }
+    .kanban-column:nth-child(1) .kanban-column-header { border-bottom-color: var(--color-info); }
+    .kanban-column:nth-child(2) .kanban-column-header { border-bottom-color: var(--color-primary); }
+    .kanban-column:nth-child(3) .kanban-column-header { border-bottom-color: var(--color-success); }
+
+    .kanban-cards {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    /* Project card */
+    .project-card {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      cursor: pointer;
+      transition: all var(--motion-normal) var(--ease-out);
+    }
+    .project-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-3);
+      border-color: var(--color-border-strong);
+    }
+    .project-card-name {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-2);
+    }
+    .project-card-name:hover { color: var(--color-primary); }
+    .project-card-client {
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-3);
+    }
+    .project-card-client a { color: var(--color-text-2); }
+    .project-card-client a:hover { color: var(--color-primary); }
+    .project-card-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-bottom: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .project-card-meta .meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .project-card-meta svg { width: 12px; height: 12px; }
+
+    /* Budget progress in card */
+    .card-budget {
+      margin-top: var(--space-3);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+    .card-budget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-1);
+    }
+    .card-budget-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .card-budget-pct {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
+    }
+    .progress-bar {
+      height: 4px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width var(--motion-slow) var(--ease-gentle);
+    }
+    .progress-bar-fill.green { background: var(--color-success); }
+    .progress-bar-fill.yellow { background: var(--color-warning); }
+    .progress-bar-fill.red { background: var(--color-error); }
+    .progress-bar-fill.blue { background: var(--color-info); }
+    .progress-bar-fill.primary { background: var(--color-primary); }
+
+    /* Revenue/rating for completed cards */
+    .card-revenue {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+    }
+    .card-revenue .amount {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-semibold);
+      color: var(--color-gold);
+    }
+    .card-stars { color: var(--color-gold); font-size: var(--text-caption); letter-spacing: 1px; }
+
+    /* ── LIST VIEW TABLE ── */
+    .list-view { display: none; }
+    .list-view.active { display: block; }
+    .board-view { display: block; }
+    .board-view.hidden { display: none; }
+
+    /* ── DETAIL VIEW ── */
+    #detailView { display: none; }
+    #detailView.active { display: block; }
+    #listView { display: block; }
+    #listView.active { display: block; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-4);
+      cursor: pointer;
+      transition: color var(--motion-fast);
+    }
+    .back-link:hover { color: var(--color-primary); }
+    .back-link svg { width: 16px; height: 16px; }
+
+    /* Project detail header */
+    .project-detail-header {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .project-detail-title {
+      font-size: var(--text-heading-1);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-1);
+    }
+    .project-detail-client {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-4);
+    }
+    .project-detail-client a { color: var(--color-primary); }
+
+    .project-detail-badges {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-5);
+    }
+    .project-detail-badges .detail-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .project-detail-badges .detail-badge svg { width: 14px; height: 14px; }
+    .project-detail-badges .separator {
+      width: 1px;
+      height: 16px;
+      background: var(--color-border);
+    }
+
+    /* Progress rows */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-3);
+    }
+    .progress-row:last-child { margin-bottom: 0; }
+    .progress-row .progress-label {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+    .progress-row .progress-bar-wrap { flex: 1; }
+    .progress-row .progress-bar { height: 6px; }
+    .progress-row .progress-values {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      min-width: 180px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Detail tabs content */
+    .detail-tabs-content { margin-top: var(--space-6); }
+
+    /* Stats row in Overview */
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 1023px) { .overview-stats { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 639px) { .overview-stats { grid-template-columns: 1fr; } }
+
+    /* Chart containers */
+    .chart-container {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .chart-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-4);
+    }
+    .chart-svg { width: 100%; }
+
+    /* Team table */
+    .team-member-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    /* Milestone tracker */
+    .milestone-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .milestone-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+      position: relative;
+    }
+    .milestone-item:last-child { border-bottom: none; }
+    .milestone-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+    .milestone-icon.complete {
+      background: var(--color-success-muted);
+      color: var(--color-success);
+    }
+    .milestone-icon.in-progress {
+      background: var(--color-info-muted);
+      color: var(--color-info);
+    }
+    .milestone-icon.upcoming {
+      background: var(--color-surface-2);
+      color: var(--color-text-3);
+    }
+    .milestone-icon svg { width: 16px; height: 16px; }
+    .milestone-content { flex: 1; }
+    .milestone-name {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-1);
+    }
+    .milestone-dates {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-bottom: var(--space-2);
+    }
+    .milestone-progress {
+      max-width: 200px;
+    }
+
+    /* Activity feed */
+    .activity-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .activity-item {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-text {
+      flex: 1;
+      font-size: var(--text-body-sm);
+      color: var(--color-text-1);
+    }
+    .activity-text .name { font-weight: var(--weight-semibold); }
+    .activity-text .highlight { color: var(--color-primary); font-weight: var(--weight-medium); }
+    .activity-time {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Color picker in modal */
+    .color-picker-row {
+      display: flex;
+      gap: var(--space-2);
+    }
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all var(--motion-fast);
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected { border-color: var(--color-text-1); box-shadow: 0 0 0 2px var(--color-bg); }
+
+    /* Empty state */
+    .empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-6);
+      text-align: center;
+    }
+    .empty-state.active { display: flex; }
+    .empty-state svg { width: 64px; height: 64px; color: var(--color-text-3); margin-bottom: var(--space-4); }
+    .empty-state h3 {
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-2);
+    }
+    .empty-state p {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      max-width: 400px;
+      margin-bottom: var(--space-6);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item active">
+          <svg data-lucide="folder-kanban"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="calendar-range"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Projects</h2>
+      </div>
+
+      <button class="mobile-search-btn" id="mobileSearchBtn" aria-label="Search">
+        <svg data-lucide="search" width="20" height="20"></svg>
+      </button>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Initech API Integration is at risk &mdash; budget 72% consumed</div>
+                  <div class="notif-time">15 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-info);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Sarah Chen submitted 40h timesheet for Acme Web Redesign</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Globex Data Migration marked as completed</div>
+                  <div class="notif-time">Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════════════════════════════ PAGE CONTENT ════════════════════════════════════════ -->
+    <main class="page-content">
+
+      <!-- ═══════════════════ VIEW 1: PROJECTS LIST ═══════════════════ -->
+      <div id="listView">
+
+        <!-- Page header -->
+        <div class="page-header">
+          <div class="page-header-left">
+            <h1 class="page-title">Projects</h1>
+            <p class="page-subtitle">Manage and track all your projects</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-md" id="exportBtn">
+              <svg data-lucide="download" width="16" height="16"></svg>
+              Export
+            </button>
+            <button class="btn btn-primary btn-md" id="newProjectBtn">
+              <svg data-lucide="plus" width="16" height="16"></svg>
+              New Project
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="view-toggle">
+            <button class="view-toggle-btn active" data-view="board">
+              <svg data-lucide="kanban" width="14" height="14"></svg>
+              Board
+            </button>
+            <button class="view-toggle-btn" data-view="list">
+              <svg data-lucide="list" width="14" height="14"></svg>
+              List
+            </button>
+            <button class="view-toggle-btn" data-view="timeline">
+              <svg data-lucide="gantt-chart" width="14" height="14"></svg>
+              Timeline
+            </button>
+          </div>
+          <div style="flex: 1;"></div>
+          <select class="form-select" id="filterStatus">
+            <option value="">All Statuses</option>
+            <option value="planning">Planning</option>
+            <option value="active">Active</option>
+            <option value="on-hold">On Hold</option>
+            <option value="completed">Completed</option>
+          </select>
+          <select class="form-select" id="filterClient">
+            <option value="">All Clients</option>
+            <option>Acme Corp</option>
+            <option>Globex Corp</option>
+            <option>Initech</option>
+            <option>Contoso Inc</option>
+            <option>Internal</option>
+          </select>
+          <select class="form-select" id="filterBilling">
+            <option value="">All Billing</option>
+            <option>Hourly</option>
+            <option>Daily</option>
+            <option>Fixed Price</option>
+            <option>Retainer</option>
+          </select>
+        </div>
+
+        <!-- ── Board View ── -->
+        <div class="board-view" id="boardView">
+          <div class="kanban-board">
+
+            <!-- Column: Planning -->
+            <div class="kanban-column">
+              <div class="kanban-column-header">
+                <div class="col-title">
+                  <svg data-lucide="circle-dashed" width="16" height="16" style="color: var(--color-info);"></svg>
+                  Planning
+                </div>
+                <span class="col-count">3</span>
+              </div>
+              <div class="kanban-cards">
+
+                <div class="project-card" data-project="contoso-deal" onclick="showDetail('contoso-deal')">
+                  <div class="project-card-name">Contoso Deal</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/contoso" onclick="event.stopPropagation()">Contoso Inc</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="credit-card"></svg> Fixed price</span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
+                  </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+
+                <div class="project-card" data-project="internal-portal" onclick="showDetail('internal-portal')">
+                  <div class="project-card-name">Internal Portal v2</div>
+                  <div class="project-card-client">Internal</div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="credit-card"></svg> &mdash;</span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 0 members</span>
+                  </div>
+                  <span class="badge badge-default"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
+                </div>
+
+                <div class="project-card" data-project="dataviz-dashboard" onclick="showDetail('dataviz-dashboard')">
+                  <div class="project-card-name">DataViz Dashboard</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 1 member</span>
+                  </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Column: Active -->
+            <div class="kanban-column">
+              <div class="kanban-column-header">
+                <div class="col-title">
+                  <svg data-lucide="circle-dot" width="16" height="16" style="color: var(--color-primary);"></svg>
+                  Active
+                </div>
+                <span class="col-count">4</span>
+              </div>
+              <div class="kanban-cards">
+
+                <div class="project-card" data-project="acme-web" onclick="showDetail('acme-web')">
+                  <div class="project-card-name">Acme Web Redesign</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;85/h</span></span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 5 members</span>
+                  </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                  <div class="card-budget">
+                    <div class="card-budget-header">
+                      <span class="card-budget-label">Budget</span>
+                      <span class="card-budget-pct">64%</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-bar-fill green" style="width: 64%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="project-card" data-project="globex-phase2" onclick="showDetail('globex-phase2')">
+                  <div class="project-card-name">Globex Phase 2</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;90/h</span></span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 4 members</span>
+                  </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                  <div class="card-budget">
+                    <div class="card-budget-header">
+                      <span class="card-budget-label">Budget</span>
+                      <span class="card-budget-pct">35%</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-bar-fill green" style="width: 35%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="project-card" data-project="initech-api" onclick="showDetail('initech-api')">
+                  <div class="project-card-name">Initech API Integration</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 3 members</span>
+                  </div>
+                  <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span>
+                  <div class="card-budget">
+                    <div class="card-budget-header">
+                      <span class="card-budget-label">Budget</span>
+                      <span class="card-budget-pct">72%</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-bar-fill yellow" style="width: 72%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="project-card" data-project="acme-mobile" onclick="showDetail('acme-mobile')">
+                  <div class="project-card-name">Acme Mobile App</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;85/h</span></span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
+                  </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                  <div class="card-budget">
+                    <div class="card-budget-header">
+                      <span class="card-budget-label">Budget</span>
+                      <span class="card-budget-pct">15%</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-bar-fill green" style="width: 15%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Column: Completed -->
+            <div class="kanban-column">
+              <div class="kanban-column-header">
+                <div class="col-title">
+                  <svg data-lucide="check-circle-2" width="16" height="16" style="color: var(--color-success);"></svg>
+                  Completed
+                </div>
+                <span class="col-count">3</span>
+              </div>
+              <div class="kanban-cards">
+
+                <div class="project-card" data-project="globex-migration" onclick="showDetail('globex-migration')">
+                  <div class="project-card-name">Globex Data Migration</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;120k</span></span>
+                  </div>
+                  <div class="card-revenue">
+                    Revenue: <span class="amount">&euro;120,000</span>
+                  </div>
+                  <div style="margin-top: var(--space-2);">
+                    <span class="card-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                  </div>
+                </div>
+
+                <div class="project-card" data-project="acme-crm" onclick="showDetail('acme-crm')">
+                  <div class="project-card-name">Acme CRM Setup</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;80/h</span></span>
+                  </div>
+                  <div class="card-revenue">
+                    Revenue: <span class="amount">&euro;45,000</span>
+                  </div>
+                </div>
+
+                <div class="project-card" data-project="initech-audit" onclick="showDetail('initech-audit')">
+                  <div class="project-card-name">Initech Security Audit</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;30k</span></span>
+                  </div>
+                  <div class="card-revenue">
+                    Revenue: <span class="amount">&euro;30,000</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── List View ── -->
+        <div class="list-view" id="listViewTable">
+          <div class="data-table-wrapper">
+            <table class="data-table mobile-cards">
+              <thead>
+                <tr>
+                  <th>Project Name</th>
+                  <th>Client</th>
+                  <th>Billing</th>
+                  <th>Team Size</th>
+                  <th>Budget %</th>
+                  <th>Health</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="cursor:pointer;" onclick="showDetail('acme-web')">
+                  <td><strong>Acme Web Redesign</strong></td>
+                  <td><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
+                  <td class="cell-mono">&euro;85/h</td>
+                  <td>5</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);">
+                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill green" style="width:64%;"></div></div>
+                      <span class="font-mono" style="font-size:var(--text-caption);">64%</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                  <td><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('globex-phase2')">
+                  <td><strong>Globex Phase 2</strong></td>
+                  <td><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
+                  <td class="cell-mono">&euro;90/h</td>
+                  <td>4</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);">
+                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill green" style="width:35%;"></div></div>
+                      <span class="font-mono" style="font-size:var(--text-caption);">35%</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                  <td><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('initech-api')">
+                  <td><strong>Initech API Integration</strong></td>
+                  <td><a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></td>
+                  <td class="cell-mono">&euro;95/h</td>
+                  <td>3</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);">
+                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill yellow" style="width:72%;"></div></div>
+                      <span class="font-mono" style="font-size:var(--text-caption);">72%</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
+                  <td><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('acme-mobile')">
+                  <td><strong>Acme Mobile App</strong></td>
+                  <td><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
+                  <td class="cell-mono">&euro;85/h</td>
+                  <td>2</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);">
+                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill green" style="width:15%;"></div></div>
+                      <span class="font-mono" style="font-size:var(--text-caption);">15%</span>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                  <td><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('contoso-deal')">
+                  <td><strong>Contoso Deal</strong></td>
+                  <td><a href="clients.html#detail/contoso" onclick="event.stopPropagation()">Contoso Inc</a></td>
+                  <td class="cell-mono">Fixed</td>
+                  <td>2</td>
+                  <td><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                  <td><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('internal-portal')">
+                  <td><strong>Internal Portal v2</strong></td>
+                  <td>Internal</td>
+                  <td class="cell-mono">&mdash;</td>
+                  <td>0</td>
+                  <td><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
+                  <td><span class="badge badge-default"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                  <td><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('dataviz-dashboard')">
+                  <td><strong>DataViz Dashboard</strong></td>
+                  <td><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></td>
+                  <td class="cell-mono">&euro;95/h</td>
+                  <td>1</td>
+                  <td><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                  <td><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('globex-migration')">
+                  <td><strong>Globex Data Migration</strong></td>
+                  <td><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></td>
+                  <td class="cell-mono">Fixed &euro;120k</td>
+                  <td>&mdash;</td>
+                  <td><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;120,000</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('acme-crm')">
+                  <td><strong>Acme CRM Setup</strong></td>
+                  <td><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
+                  <td class="cell-mono">&euro;80/h</td>
+                  <td>&mdash;</td>
+                  <td><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;45,000</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                </tr>
+                <tr style="cursor:pointer;" onclick="showDetail('initech-audit')">
+                  <td><strong>Initech Security Audit</strong></td>
+                  <td><a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></td>
+                  <td class="cell-mono">Fixed &euro;30k</td>
+                  <td>&mdash;</td>
+                  <td><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;30,000</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                  <td><span class="badge badge-success"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── Empty State ── -->
+        <div class="empty-state" id="emptyState">
+          <svg data-lucide="folder-kanban"></svg>
+          <h3>No projects yet</h3>
+          <p>Get started by creating your first project. Track time, budgets, and team performance all in one place.</p>
+          <button class="btn btn-primary btn-md" onclick="document.getElementById('newProjectBtn').click()">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            Create First Project
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════ VIEW 2: PROJECT DETAIL ═══════════════════ -->
+      <div id="detailView">
+
+        <!-- Back link -->
+        <a class="back-link" onclick="showList()">
+          <svg data-lucide="arrow-left"></svg>
+          Projects
+        </a>
+
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs mb-4">
+          <a href="projects.html">Projects</a>
+          <span class="separator">&rsaquo;</span>
+          <span class="current" id="breadcrumb-project-name">Acme Web Redesign</span>
+        </nav>
+
+        <!-- Project detail header -->
+        <div class="project-detail-header" id="project-detail-header">
+          <div class="project-detail-title" id="detail-title">Acme Corp &mdash; Website Redesign</div>
+          <div class="project-detail-client" id="detail-client">Client: <a href="clients.html#detail/acme">Acme Corp</a></div>
+
+          <div class="project-detail-badges" id="detail-badges">
+            <span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span>
+            <span class="separator"></span>
+            <span class="detail-badge">
+              <svg data-lucide="credit-card"></svg>
+              <span class="font-mono">Hourly</span>
+            </span>
+            <span class="separator"></span>
+            <span class="detail-badge">
+              <svg data-lucide="calendar"></svg>
+              Start: Feb 1, 2026
+            </span>
+          </div>
+
+          <!-- Budget progress -->
+          <div class="progress-row" id="detail-budget-row">
+            <span class="progress-label">Budget</span>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar" style="height:6px;">
+                <div class="progress-bar-fill primary" id="detail-budget-bar" style="width: 64%;"></div>
+              </div>
+            </div>
+            <span class="progress-values font-mono" id="detail-budget-text">&euro;32,200 / &euro;50,000 (64%)</span>
+          </div>
+
+          <!-- Timeline progress -->
+          <div class="progress-row">
+            <span class="progress-label">Timeline</span>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar" style="height:6px;">
+                <div class="progress-bar-fill blue" style="width: 55%;"></div>
+              </div>
+            </div>
+            <span class="progress-values">Feb 1 &mdash; Jul 31 (55%)</span>
+          </div>
+        </div>
+
+        <!-- 7 Tabs -->
+        <div class="tabs" id="detailTabs">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="team">Team</button>
+          <button class="tab" data-tab="timesheets">Timesheets</button>
+          <button class="tab" data-tab="expenses">Expenses</button>
+          <button class="tab" data-tab="invoices">Invoices</button>
+          <button class="tab" data-tab="milestones">Milestones</button>
+          <button class="tab" data-tab="activity">Activity</button>
+        </div>
+
+        <div class="detail-tabs-content">
+
+          <!-- ── Tab: Overview ── -->
+          <div class="tab-content active" id="tab-overview">
+            <div class="ai-insight-card mb-4" id="acme-ai-insight">
+              <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Project Intelligence</div>
+              <div class="ai-body">
+                <strong>Budget Alert:</strong> Acme Web Redesign is burning budget 15% faster than planned. At current rate, budget will be exhausted by <strong>May 20</strong>. Team velocity has declined 12% in the last 2 sprints.<br><br>
+                <strong>Risk Assessment:</strong> Risk score 7/10. Primary risks: scope creep on the analytics module and Sarah Chen's overallocation (assigned to 2 other projects simultaneously).<br><br>
+                <strong>Recommendation:</strong> Consider reducing Sprint 3 scope or renegotiating timeline with Acme Corp. Reassigning 1 developer from Globex Phase 2 could recover 2 weeks.
+              </div>
+            </div>
+            <div class="ai-insight-card mb-4" id="initech-ai-insight" style="display:none;">
+              <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Project Intelligence</div>
+              <div class="ai-body">
+                <strong>Budget Alert:</strong> Initech API Integration is at 69% budget with timeline at 55%. Burn rate is accelerating &mdash; projected overrun of 8% if current pace continues.<br><br>
+                <strong>Risk Assessment:</strong> Risk score 6/10. API complexity higher than estimated. 3 integration endpoints behind schedule.<br><br>
+                <strong>Recommendation:</strong> Prioritize core endpoints and defer non-critical integrations to Phase 2. Schedule technical review with Diana Park to reassess estimates.
+              </div>
+            </div>
+            <div class="overview-stats" id="acme-overview-stats">
+              <div class="stat-card">
+                <div class="stat-label">Total Hours</div>
+                <div class="stat-value font-mono">388h</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  +12% this week
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Budget Used</div>
+                <div class="stat-value font-mono">64%</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  On track
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Revenue</div>
+                <div class="stat-value font-mono">&euro;32,200</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  +&euro;4,800 this month
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Margin</div>
+                <div class="stat-value font-mono">48%</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  +2% vs last month
+                </div>
+              </div>
+            </div>
+            <div class="overview-stats" id="initech-overview-stats" style="display:none;">
+              <div class="stat-card">
+                <div class="stat-label">Total Hours</div>
+                <div class="stat-value font-mono">305h</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  +8% this week
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Budget Used</div>
+                <div class="stat-value font-mono">69%</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  On pace
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Revenue</div>
+                <div class="stat-value font-mono">&euro;27,495</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  +&euro;3,100 this month
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Margin</div>
+                <div class="stat-value font-mono">47%</div>
+                <div class="stat-trend up">
+                  <svg data-lucide="trending-up" width="12" height="12"></svg>
+                  +1% vs last month
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-2 gap-6">
+              <!-- Hours Trend Chart -->
+              <div class="chart-container">
+                <div class="chart-title">Weekly Hours Trend</div>
+                <svg class="chart-svg" viewBox="0 0 400 160" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--color-success)" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="var(--color-success)" stop-opacity="0.02"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Grid lines -->
+                  <line x1="0" y1="40" x2="400" y2="40" stroke="var(--color-border)" stroke-width="0.5"/>
+                  <line x1="0" y1="80" x2="400" y2="80" stroke="var(--color-border)" stroke-width="0.5"/>
+                  <line x1="0" y1="120" x2="400" y2="120" stroke="var(--color-border)" stroke-width="0.5"/>
+                  <!-- Area -->
+                  <path d="M0,120 L57,100 L114,110 L171,80 L228,60 L285,70 L342,45 L400,35 L400,160 L0,160 Z" fill="url(#areaGrad)"/>
+                  <!-- Line -->
+                  <polyline points="0,120 57,100 114,110 171,80 228,60 285,70 342,45 400,35" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Dots -->
+                  <circle cx="0" cy="120" r="3" fill="var(--color-success)"/>
+                  <circle cx="57" cy="100" r="3" fill="var(--color-success)"/>
+                  <circle cx="114" cy="110" r="3" fill="var(--color-success)"/>
+                  <circle cx="171" cy="80" r="3" fill="var(--color-success)"/>
+                  <circle cx="228" cy="60" r="3" fill="var(--color-success)"/>
+                  <circle cx="285" cy="70" r="3" fill="var(--color-success)"/>
+                  <circle cx="342" cy="45" r="3" fill="var(--color-success)"/>
+                  <circle cx="400" cy="35" r="3" fill="var(--color-success)"/>
+                  <!-- X labels -->
+                  <text x="0" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W6</text>
+                  <text x="57" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W7</text>
+                  <text x="114" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W8</text>
+                  <text x="171" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W9</text>
+                  <text x="228" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W10</text>
+                  <text x="285" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W11</text>
+                  <text x="342" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W12</text>
+                  <text x="390" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">W13</text>
+                </svg>
+              </div>
+
+              <!-- Budget Burndown -->
+              <div class="chart-container">
+                <div class="chart-title">Budget Burndown</div>
+                <svg class="chart-svg" viewBox="0 0 400 160" preserveAspectRatio="none">
+                  <!-- Grid lines -->
+                  <line x1="0" y1="40" x2="400" y2="40" stroke="var(--color-border)" stroke-width="0.5"/>
+                  <line x1="0" y1="80" x2="400" y2="80" stroke="var(--color-border)" stroke-width="0.5"/>
+                  <line x1="0" y1="120" x2="400" y2="120" stroke="var(--color-border)" stroke-width="0.5"/>
+                  <!-- Ideal burndown (dashed) -->
+                  <line x1="0" y1="20" x2="400" y2="140" stroke="var(--color-text-3)" stroke-width="1" stroke-dasharray="4,4"/>
+                  <!-- Actual burndown -->
+                  <polyline points="0,20 67,35 133,55 200,72 267,92 333,108" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="333" cy="108" r="4" fill="var(--color-gold)"/>
+                  <!-- Labels -->
+                  <text x="5" y="15" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">&euro;50k</text>
+                  <text x="5" y="145" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">&euro;0</text>
+                  <text x="0" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">Feb</text>
+                  <text x="67" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">Mar</text>
+                  <text x="133" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">Apr</text>
+                  <text x="200" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">May</text>
+                  <text x="267" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">Jun</text>
+                  <text x="333" y="155" fill="var(--color-text-3)" font-size="9" font-family="Inter, sans-serif">Jul</text>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Tab: Team ── -->
+          <div class="tab-content" id="tab-team">
+            <div id="acme-team-tab">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">
+              <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);">Team Members</h3>
+              <button class="btn btn-primary btn-sm" id="addTeamMemberBtn">
+                <svg data-lucide="plus" width="14" height="14"></svg>
+                Add Team Member
+              </button>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Role</th>
+                    <th>Bill Rate</th>
+                    <th>Hours</th>
+                    <th>Revenue</th>
+                    <th>Cost Rate</th>
+                    <th>Cost</th>
+                    <th>Gross Margin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm">SC</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Sarah Chen</a>
+                      </div>
+                    </td>
+                    <td>Lead Developer</td>
+                    <td class="font-mono">&euro;85/h</td>
+                    <td class="font-mono">120h</td>
+                    <td class="font-mono">&euro;10,200</td>
+                    <td class="font-mono">&euro;45/h</td>
+                    <td class="font-mono">&euro;5,400</td>
+                    <td class="font-mono">&euro;4,800 (47%)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-info);">JS</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">John Smith</a>
+                      </div>
+                    </td>
+                    <td>Project Manager</td>
+                    <td class="font-mono">&euro;95/h</td>
+                    <td class="font-mono">80h</td>
+                    <td class="font-mono">&euro;7,600</td>
+                    <td class="font-mono">&euro;50/h</td>
+                    <td class="font-mono">&euro;4,000</td>
+                    <td class="font-mono">&euro;3,600 (47%)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-gold);">AW</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Alice Wang</a>
+                      </div>
+                    </td>
+                    <td>Designer</td>
+                    <td class="font-mono">&euro;75/h</td>
+                    <td class="font-mono">88h</td>
+                    <td class="font-mono">&euro;6,600</td>
+                    <td class="font-mono">&euro;40/h</td>
+                    <td class="font-mono">&euro;3,520</td>
+                    <td class="font-mono">&euro;3,080 (47%)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-error);">MR</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Marco Rossi</a>
+                      </div>
+                    </td>
+                    <td>Frontend Dev</td>
+                    <td class="font-mono">&euro;85/h</td>
+                    <td class="font-mono">65h</td>
+                    <td class="font-mono">&euro;5,525</td>
+                    <td class="font-mono">&euro;42/h</td>
+                    <td class="font-mono">&euro;2,730</td>
+                    <td class="font-mono">&euro;2,795 (51%)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-primary);">LO</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Liam O&rsquo;Brien</a>
+                      </div>
+                    </td>
+                    <td>Junior Dev</td>
+                    <td class="font-mono">&euro;65/h</td>
+                    <td class="font-mono">35h</td>
+                    <td class="font-mono">&euro;2,275</td>
+                    <td class="font-mono">&euro;35/h</td>
+                    <td class="font-mono">&euro;1,225</td>
+                    <td class="font-mono">&euro;1,050 (46%)</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
+                    <td colspan="2"><strong>TOTALS</strong></td>
+                    <td></td>
+                    <td class="font-mono"><strong>388h</strong></td>
+                    <td class="font-mono"><strong>&euro;32,200</strong></td>
+                    <td></td>
+                    <td class="font-mono"><strong>&euro;16,875</strong></td>
+                    <td class="font-mono"><strong>&euro;15,325 (48%)</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            </div>
+            <div id="initech-team-tab" style="display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">
+              <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);">Team Members</h3>
+              <button class="btn btn-primary btn-sm" onclick="showToast('info','Coming Soon','Team member assignment will be available in the next release.')">
+                <svg data-lucide="plus" width="14" height="14"></svg>
+                Add Team Member
+              </button>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Role</th>
+                    <th>Bill Rate</th>
+                    <th>Hours</th>
+                    <th>Revenue</th>
+                    <th>Cost Rate</th>
+                    <th>Cost</th>
+                    <th>Gross Margin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-warning);">DP</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Diana Park</a>
+                      </div>
+                    </td>
+                    <td>Lead Backend Dev</td>
+                    <td class="font-mono">&euro;95/h</td>
+                    <td class="font-mono">145h</td>
+                    <td class="font-mono">&euro;13,775</td>
+                    <td class="font-mono">&euro;52/h</td>
+                    <td class="font-mono">&euro;7,540</td>
+                    <td class="font-mono">&euro;6,235 (45%)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-info);">TN</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Tom Nguyen</a>
+                      </div>
+                    </td>
+                    <td>DevOps Engineer</td>
+                    <td class="font-mono">&euro;90/h</td>
+                    <td class="font-mono">92h</td>
+                    <td class="font-mono">&euro;8,280</td>
+                    <td class="font-mono">&euro;48/h</td>
+                    <td class="font-mono">&euro;4,416</td>
+                    <td class="font-mono">&euro;3,864 (47%)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="team-member-row">
+                        <div class="avatar avatar-sm" style="background:var(--color-error);">RM</div>
+                        <a href="employees.html" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Rachel Moore</a>
+                      </div>
+                    </td>
+                    <td>QA Engineer</td>
+                    <td class="font-mono">&euro;80/h</td>
+                    <td class="font-mono">68h</td>
+                    <td class="font-mono">&euro;5,440</td>
+                    <td class="font-mono">&euro;38/h</td>
+                    <td class="font-mono">&euro;2,584</td>
+                    <td class="font-mono">&euro;2,856 (53%)</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
+                    <td colspan="2"><strong>TOTALS</strong></td>
+                    <td></td>
+                    <td class="font-mono"><strong>305h</strong></td>
+                    <td class="font-mono"><strong>&euro;27,495</strong></td>
+                    <td></td>
+                    <td class="font-mono"><strong>&euro;14,540</strong></td>
+                    <td class="font-mono"><strong>&euro;12,955 (47%)</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            </div>
+          </div>
+
+          <!-- ── Tab: Timesheets ── -->
+          <div class="tab-content" id="tab-timesheets">
+            <div id="acme-timesheets-tab">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Weekly Summary</h3>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Week</th>
+                    <th>Billable Hours</th>
+                    <th>Non-Billable</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Mar 30 &mdash; Apr 5</td>
+                    <td class="cell-mono">38h</td>
+                    <td class="cell-mono">4h</td>
+                    <td class="cell-mono">42h</td>
+                    <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 23 &mdash; Mar 29</td>
+                    <td class="cell-mono">40h</td>
+                    <td class="cell-mono">2h</td>
+                    <td class="cell-mono">42h</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 16 &mdash; Mar 22</td>
+                    <td class="cell-mono">36h</td>
+                    <td class="cell-mono">6h</td>
+                    <td class="cell-mono">42h</td>
+                    <td>
+                      <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                      <span class="badge badge-info" style="margin-left:var(--space-1);"><svg data-lucide="file-text" width="12" height="12"></svg> Invoiced (INV-2026-048)</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Mar 9 &mdash; Mar 15</td>
+                    <td class="cell-mono">42h</td>
+                    <td class="cell-mono">3h</td>
+                    <td class="cell-mono">45h</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 2 &mdash; Mar 8</td>
+                    <td class="cell-mono">35h</td>
+                    <td class="cell-mono">5h</td>
+                    <td class="cell-mono">40h</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>Feb 16 &mdash; Feb 22</td>
+                    <td class="cell-mono">40h</td>
+                    <td class="cell-mono">2h</td>
+                    <td class="cell-mono">42h</td>
+                    <td>
+                      <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                      <span class="badge badge-info" style="margin-left:var(--space-1);"><svg data-lucide="file-text" width="12" height="12"></svg> Invoiced (INV-2026-045)</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </div>
+            <div id="initech-timesheets-tab" style="display:none;">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Weekly Summary</h3>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Week</th>
+                    <th>Billable Hours</th>
+                    <th>Non-Billable</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Mar 30 &mdash; Apr 5</td>
+                    <td class="cell-mono">32h</td>
+                    <td class="cell-mono">3h</td>
+                    <td class="cell-mono">35h</td>
+                    <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 23 &mdash; Mar 29</td>
+                    <td class="cell-mono">35h</td>
+                    <td class="cell-mono">5h</td>
+                    <td class="cell-mono">40h</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 16 &mdash; Mar 22</td>
+                    <td class="cell-mono">30h</td>
+                    <td class="cell-mono">4h</td>
+                    <td class="cell-mono">34h</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </div>
+          </div>
+
+          <!-- ── Tab: Expenses ── -->
+          <div class="tab-content" id="tab-expenses">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Project Expenses</h3>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Apr 2, 2026</td>
+                    <td><a href="employees.html">Alice Wang</a></td>
+                    <td>Software License</td>
+                    <td class="cell-mono">&euro;450.00</td>
+                    <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 28, 2026</td>
+                    <td><a href="employees.html">John Smith</a></td>
+                    <td>Travel</td>
+                    <td class="cell-mono">&euro;280.00</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 15, 2026</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td>Hardware</td>
+                    <td class="cell-mono">&euro;1,200.00</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>Feb 20, 2026</td>
+                    <td><a href="employees.html">Marco Rossi</a></td>
+                    <td>Training</td>
+                    <td class="cell-mono">&euro;350.00</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── Tab: Invoices ── -->
+          <div class="tab-content" id="tab-invoices">
+            <div id="acme-invoices-tab">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Project Invoices</h3>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Invoice</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="invoices.html#detail" style="font-weight:var(--weight-medium);">INV-2026-048</a></td>
+                    <td>Mar 15, 2026</td>
+                    <td class="font-mono">&euro;12,400</td>
+                    <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="invoices.html#detail" style="font-weight:var(--weight-medium);">INV-2026-045</a></td>
+                    <td>Feb 15, 2026</td>
+                    <td class="font-mono">&euro;11,200</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="invoices.html#detail" style="font-weight:var(--weight-medium);">INV-2026-039</a></td>
+                    <td>Jan 15, 2026</td>
+                    <td class="font-mono">&euro;8,600</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </div>
+            <div id="initech-invoices-tab" style="display:none;">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Project Invoices</h3>
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Invoice</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="invoices.html#detail" style="font-weight:var(--weight-medium);">INV-2026-046</a></td>
+                    <td>Mar 15, 2026</td>
+                    <td class="font-mono">&euro;7,800</td>
+                    <td><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
+                  </tr>
+                  <tr>
+                    <td><a href="invoices.html#detail" style="font-weight:var(--weight-medium);">INV-2026-038</a></td>
+                    <td>Feb 1, 2026</td>
+                    <td class="font-mono">&euro;9,200</td>
+                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            </div>
+          </div>
+
+          <!-- ── Tab: Milestones ── -->
+          <div class="tab-content" id="tab-milestones">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Milestone Tracker</h3>
+            <div class="card">
+              <div class="card-body" style="padding:0;">
+                <div class="milestone-list" style="padding:var(--space-4);">
+
+                  <div class="milestone-item">
+                    <div class="milestone-icon complete">
+                      <svg data-lucide="check" width="16" height="16"></svg>
+                    </div>
+                    <div class="milestone-content">
+                      <div class="milestone-name">Discovery &amp; Requirements</div>
+                      <div class="milestone-dates">Feb 1 &mdash; Feb 14, 2026</div>
+                      <span class="badge badge-success">Complete</span>
+                    </div>
+                  </div>
+
+                  <div class="milestone-item">
+                    <div class="milestone-icon complete">
+                      <svg data-lucide="check" width="16" height="16"></svg>
+                    </div>
+                    <div class="milestone-content">
+                      <div class="milestone-name">Design Phase</div>
+                      <div class="milestone-dates">Feb 15 &mdash; Mar 15, 2026</div>
+                      <span class="badge badge-success">Complete</span>
+                    </div>
+                  </div>
+
+                  <div class="milestone-item">
+                    <div class="milestone-icon in-progress">
+                      <svg data-lucide="loader" width="16" height="16"></svg>
+                    </div>
+                    <div class="milestone-content">
+                      <div class="milestone-name">Development Sprint 1</div>
+                      <div class="milestone-dates">Mar 16 &mdash; Apr 15, 2026</div>
+                      <span class="badge badge-info"><svg data-lucide="loader" width="12" height="12"></svg> In Progress</span>
+                      <div class="milestone-progress" style="margin-top:var(--space-2);">
+                        <div class="progress-bar" style="height:6px;">
+                          <div class="progress-bar-fill blue" style="width:60%;"></div>
+                        </div>
+                        <span style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">60%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="milestone-item">
+                    <div class="milestone-icon upcoming">
+                      <svg data-lucide="circle" width="16" height="16"></svg>
+                    </div>
+                    <div class="milestone-content">
+                      <div class="milestone-name">Development Sprint 2</div>
+                      <div class="milestone-dates">Apr 16 &mdash; May 15, 2026</div>
+                      <span class="badge badge-default">Upcoming</span>
+                    </div>
+                  </div>
+
+                  <div class="milestone-item">
+                    <div class="milestone-icon upcoming">
+                      <svg data-lucide="circle" width="16" height="16"></svg>
+                    </div>
+                    <div class="milestone-content">
+                      <div class="milestone-name">Testing &amp; QA</div>
+                      <div class="milestone-dates">May 16 &mdash; Jun 15, 2026</div>
+                      <span class="badge badge-default">Upcoming</span>
+                    </div>
+                  </div>
+
+                  <div class="milestone-item">
+                    <div class="milestone-icon upcoming">
+                      <svg data-lucide="circle" width="16" height="16"></svg>
+                    </div>
+                    <div class="milestone-content">
+                      <div class="milestone-name">Launch</div>
+                      <div class="milestone-dates">Jul 1, 2026</div>
+                      <span class="badge badge-default">Upcoming</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Tab: Activity ── -->
+          <div class="tab-content" id="tab-activity">
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Recent Activity</h3>
+            <div class="card">
+              <div class="card-body" style="padding:0;">
+                <div class="activity-feed" style="padding:var(--space-4);">
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs">SC</div>
+                    <div class="activity-text">
+                      <span class="name">Sarah Chen</span> submitted timesheet for <span class="highlight">40h</span>
+                    </div>
+                    <span class="activity-time">2 hours ago</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs" style="background:var(--color-info);">JS</div>
+                    <div class="activity-text">
+                      <span class="name">John Smith</span> approved <a href="employees.html">Alice Wang</a>'s expense <span class="highlight">&euro;450</span>
+                    </div>
+                    <span class="activity-time">3 hours ago</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs" style="background:var(--color-gold);">AW</div>
+                    <div class="activity-text">
+                      <span class="name">Alice Wang</span> uploaded 3 design mockups to <span class="highlight">Design Phase</span>
+                    </div>
+                    <span class="activity-time">5 hours ago</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs" style="background:var(--color-error);">MR</div>
+                    <div class="activity-text">
+                      <span class="name">Marco Rossi</span> completed task <span class="highlight">Header Component</span>
+                    </div>
+                    <span class="activity-time">Yesterday</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs" style="background:var(--color-primary);">LO</div>
+                    <div class="activity-text">
+                      <span class="name">Liam O'Brien</span> pushed 12 commits to <span class="highlight">feature/auth</span>
+                    </div>
+                    <span class="activity-time">Yesterday</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs" style="background:var(--color-info);">JS</div>
+                    <div class="activity-text">
+                      <span class="name">John Smith</span> updated milestone <span class="highlight">Development Sprint 1</span> to 60%
+                    </div>
+                    <span class="activity-time">2 days ago</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs">SC</div>
+                    <div class="activity-text">
+                      <span class="name">Sarah Chen</span> generated invoice <a href="invoices.html" class="highlight">INV-2026-048</a> for <span class="font-mono">&euro;12,400</span>
+                    </div>
+                    <span class="activity-time">3 days ago</span>
+                  </div>
+
+                  <div class="activity-item">
+                    <div class="avatar avatar-xs" style="background:var(--color-gold);">AW</div>
+                    <div class="activity-text">
+                      <span class="name">Alice Wang</span> submitted expense <span class="highlight">Figma Pro License &euro;450</span>
+                    </div>
+                    <span class="activity-time">4 days ago</span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ NEW PROJECT MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="newProjectModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 class="modal-title">New Project</h3>
+      <button class="modal-close" onclick="closeModal()">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Project Name <span class="required">*</span></label>
+          <input type="text" class="form-input" placeholder="e.g. Website Redesign">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client <span class="required">*</span></label>
+          <select class="form-select">
+            <option value="">Select a client...</option>
+            <option>Acme Corp</option>
+            <option>Globex Corp</option>
+            <option>Initech</option>
+            <option>Contoso Inc</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Billing Model <span class="required">*</span></label>
+          <select class="form-select" id="billingModelSelect">
+            <option value="">Select billing model...</option>
+            <option value="hourly">Hourly</option>
+            <option value="daily">Daily</option>
+            <option value="fixed">Fixed Price</option>
+            <option value="retainer">Retainer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rate / Amount</label>
+          <input type="text" class="form-input font-mono" placeholder="e.g. 85.00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" rows="3" placeholder="Brief project description..."></textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Color</label>
+          <div class="color-picker-row">
+            <div class="color-swatch selected" style="background:var(--color-success);" data-color="sage"></div>
+            <div class="color-swatch" style="background:var(--color-info);" data-color="blue"></div>
+            <div class="color-swatch" style="background:var(--color-terracotta, hsl(30,58%,50%));" data-color="terracotta"></div>
+            <div class="color-swatch" style="background:var(--color-gold);" data-color="gold"></div>
+            <div class="color-swatch" style="background:var(--color-primary);" data-color="purple"></div>
+            <div class="color-swatch" style="background:var(--color-error);" data-color="red"></div>
+            <div class="color-swatch" style="background:var(--color-pink, hsl(340,50%,55%));" data-color="pink"></div>
+            <div class="color-swatch" style="background:var(--color-teal, hsl(180,30%,45%));" data-color="teal"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="createProject()">
+        <svg data-lucide="plus" width="16" height="16"></svg>
+        Create Project
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search projects, clients, team members..." autofocus id="cmdInput">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Projects</div>
+      <div class="cmd-palette-item" onclick="showDetail('acme-web'); closeCmdPalette();">
+        <div class="item-icon"><svg data-lucide="folder-kanban" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Acme Web Redesign</div>
+          <div class="item-subtitle">Acme Corp &middot; Active</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item" onclick="showDetail('globex-phase2'); closeCmdPalette();">
+        <div class="item-icon"><svg data-lucide="folder-kanban" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Globex Phase 2</div>
+          <div class="item-subtitle">Globex Corp &middot; Active</div>
+        </div>
+      </div>
+      <div class="cmd-palette-group-label">Actions</div>
+      <div class="cmd-palette-item" onclick="document.getElementById('newProjectBtn').click(); closeCmdPalette();">
+        <div class="item-icon"><svg data-lucide="plus" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Create New Project</div>
+        </div>
+        <span class="item-shortcut">N</span>
+      </div>
+      <div class="cmd-palette-item" onclick="closeCmdPalette(); window.location='timesheets.html';">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Go to Timesheets</div>
+        </div>
+        <span class="item-shortcut">T</span>
+      </div>
+    </div>
+    <div class="cmd-palette-footer" style="display:flex;gap:var(--space-4);padding:var(--space-2) var(--space-4);border-top:1px solid var(--color-border-subtle);font-size:var(--text-caption);color:var(--color-text-3);">
+      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:10px;">&#8593;&#8595;</kbd> Navigate</span>
+      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:10px;">&#9166;</kbd> Open</span>
+      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:10px;">ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ TOAST CONTAINER ════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+<!-- ════════════════════════════════════════ EMPTY STATE TOGGLE ════════════════════════════════════════ -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  Empty state
+</button>
+
+
+<!-- ════════════════════════════════════════ SCRIPTS ════════════════════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── Init Lucide icons ──
+  lucide.createIcons();
+
+  // ── DOM refs ──
+  const sidebar = document.getElementById('sidebar');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const notifBtn = document.getElementById('notifBtn');
+  const notifPanel = document.getElementById('notifPanel');
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  const userDropdown = document.getElementById('userDropdown');
+  const searchTrigger = document.getElementById('searchTrigger');
+  const cmdPalette = document.getElementById('cmdPalette');
+  const cmdInput = document.getElementById('cmdInput');
+  const listView = document.getElementById('listView');
+  const detailView = document.getElementById('detailView');
+  const boardView = document.getElementById('boardView');
+  const listViewTable = document.getElementById('listViewTable');
+  const newProjectModal = document.getElementById('newProjectModal');
+  const toastContainer = document.getElementById('toastContainer');
+  const stateToggle = document.getElementById('stateToggle');
+  const emptyState = document.getElementById('emptyState');
+
+  let isEmptyState = false;
+
+  // ── Sidebar collapse ──
+  collapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // ── Mobile menu ──
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Notification panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function() {
+    notifPanel.classList.remove('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── Command Palette ──
+  searchTrigger.addEventListener('click', openCmdPalette);
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openCmdPalette();
+    }
+    if (e.key === 'Escape') {
+      closeCmdPalette();
+      closeModal();
+    }
+  });
+
+  window.openCmdPalette = function() {
+    cmdPalette.classList.add('active');
+    setTimeout(function() { cmdInput.focus(); }, 100);
+  };
+
+  window.closeCmdPalette = function() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  };
+
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+
+  // ── View Toggle (Board / List / Timeline) ──
+  document.querySelectorAll('.view-toggle-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.view-toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var view = btn.dataset.view;
+      if (view === 'board') {
+        boardView.classList.remove('hidden');
+        boardView.style.display = 'block';
+        listViewTable.classList.remove('active');
+        listViewTable.style.display = 'none';
+      } else if (view === 'list') {
+        boardView.classList.add('hidden');
+        boardView.style.display = 'none';
+        listViewTable.classList.add('active');
+        listViewTable.style.display = 'block';
+      } else {
+        // Timeline: show board with a toast
+        boardView.classList.remove('hidden');
+        boardView.style.display = 'block';
+        listViewTable.classList.remove('active');
+        listViewTable.style.display = 'none';
+        showToast('info', 'Timeline View', 'Switch to the Gantt Chart page for the full timeline view.');
+      }
+    });
+  });
+
+  // ── Hash-based routing ──
+  function handleRoute() {
+    var hash = window.location.hash || '#list';
+
+    if (hash.startsWith('#detail')) {
+      listView.style.display = 'none';
+      detailView.style.display = 'block';
+      detailView.classList.add('active');
+
+      // Handle: #detail/projectId or #detail/projectId/tabName
+      var parts = hash.replace('#detail','').split('/').filter(Boolean);
+      var projectId = parts[0] || currentProject || 'acme-web';
+      var tabName = parts[1] || 'overview';
+
+      currentProject = projectId;
+      applyProjectVariant(projectId);
+      switchTab(tabName);
+    } else {
+      listView.style.display = 'block';
+      detailView.style.display = 'none';
+      detailView.classList.remove('active');
+    }
+  }
+
+  window.addEventListener('hashchange', handleRoute);
+  handleRoute();
+
+  // ── Project data map for detail variants ──
+  var currentProject = 'acme-web';
+  var projectData = {
+    'acme-web': {
+      title: 'Acme Corp &mdash; Website Redesign',
+      client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
+      budgetPct: 64,
+      budgetText: '&euro;32,200 / &euro;50,000 (64%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Feb 1, 2026</span>'
+    },
+    'initech-api': {
+      title: 'Initech &mdash; API Integration',
+      client: 'Client: <a href="clients.html#detail/initech">Initech</a>',
+      budgetPct: 69,
+      budgetText: '&euro;27,495 / &euro;40,000 (69%)',
+      badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>'
+    }
+  };
+
+  function applyProjectVariant(id) {
+    var isAcme = (id === 'acme-web');
+    var isInitech = (id === 'initech-api');
+
+    // Toggle variant sections
+    var acmeSections = ['acme-team-tab','acme-invoices-tab','acme-timesheets-tab','acme-overview-stats'];
+    var initechSections = ['initech-team-tab','initech-invoices-tab','initech-timesheets-tab','initech-overview-stats'];
+
+    acmeSections.forEach(function(sId) {
+      var el = document.getElementById(sId);
+      if (el) el.style.display = isAcme ? '' : 'none';
+    });
+    initechSections.forEach(function(sId) {
+      var el = document.getElementById(sId);
+      if (el) el.style.display = isInitech ? '' : 'none';
+    });
+
+    // Update header
+    var data = projectData[id] || projectData['acme-web'];
+    document.getElementById('detail-title').innerHTML = data.title;
+    document.getElementById('detail-client').innerHTML = data.client;
+    document.getElementById('detail-badges').innerHTML = data.badges;
+    document.getElementById('detail-budget-bar').style.width = data.budgetPct + '%';
+    document.getElementById('detail-budget-text').innerHTML = data.budgetText;
+
+    lucide.createIcons();
+  }
+
+  // ── Show detail view ──
+  window.showDetail = function(projectId) {
+    currentProject = projectId;
+    window.location.hash = '#detail/' + projectId;
+  };
+
+  // ── Show list view ──
+  window.showList = function() {
+    window.location.hash = '#list';
+  };
+
+  // ── Tab switching ──
+  function switchTab(tabName) {
+    document.querySelectorAll('#detailTabs .tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.tab-content').forEach(function(tc) {
+      tc.classList.remove('active');
+    });
+    var target = document.getElementById('tab-' + tabName);
+    if (target) target.classList.add('active');
+  }
+
+  document.querySelectorAll('#detailTabs .tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabName = tab.dataset.tab;
+      window.location.hash = '#detail/' + currentProject + '/' + tabName;
+    });
+  });
+
+  // ── New Project Modal ──
+  document.getElementById('newProjectBtn').addEventListener('click', function() {
+    newProjectModal.classList.add('active');
+  });
+
+  window.closeModal = function() {
+    newProjectModal.classList.remove('active');
+  };
+
+  newProjectModal.addEventListener('click', function(e) {
+    if (e.target === newProjectModal) closeModal();
+  });
+
+  window.createProject = function() {
+    closeModal();
+    showToast('success', 'Project Created', 'Your new project has been created successfully.');
+  };
+
+  // ── Color swatch picker ──
+  document.querySelectorAll('.color-swatch').forEach(function(swatch) {
+    swatch.addEventListener('click', function() {
+      document.querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('selected'); });
+      swatch.classList.add('selected');
+    });
+  });
+
+  // ── Toast system ──
+  window.showToast = function(type, title, message) {
+    var iconMap = {
+      success: 'check-circle',
+      error: 'alert-circle',
+      warning: 'alert-triangle',
+      info: 'info'
+    };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content">' +
+        '<div class="toast-title">' + title + '</div>' +
+        '<div class="toast-message">' + message + '</div>' +
+      '</div>' +
+      '<button class="toast-close" onclick="this.parentElement.remove()"><svg data-lucide="x" width="14" height="14"></svg></button>';
+
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+
+    setTimeout(function() {
+      toast.classList.add('removing');
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 4000);
+  };
+
+  // ── Export button ──
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    showToast('success', 'Export Started', 'Project data is being exported to CSV...');
+  });
+
+  // ── Add Team Member button ──
+  document.getElementById('addTeamMemberBtn').addEventListener('click', function() {
+    showToast('info', 'Coming Soon', 'Team member assignment will be available in the next release.');
+  });
+
+  // ── Empty State Toggle ──
+  stateToggle.addEventListener('click', function() {
+    isEmptyState = !isEmptyState;
+    if (isEmptyState) {
+      boardView.style.display = 'none';
+      listViewTable.style.display = 'none';
+      emptyState.classList.add('active');
+      stateToggle.innerHTML = '<svg data-lucide="toggle-right" width="16" height="16"></svg> Data state';
+    } else {
+      var activeView = document.querySelector('.view-toggle-btn.active');
+      if (activeView && activeView.dataset.view === 'list') {
+        listViewTable.style.display = 'block';
+      } else {
+        boardView.style.display = 'block';
+      }
+      emptyState.classList.remove('active');
+      stateToggle.innerHTML = '<svg data-lucide="toggle-left" width="16" height="16"></svg> Empty state';
+    }
+    lucide.createIcons({ nodes: [stateToggle] });
+  });
+
+})();
+</script>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

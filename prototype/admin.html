@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Admin-specific styles ── */
+    .admin-tabs { margin-bottom: var(--space-6); }
+
+    .settings-section {
+      margin-bottom: var(--space-8);
+    }
+    .settings-section-title {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+    @media (max-width: 1023px) { .settings-grid { grid-template-columns: 1fr; } }
+
+    .settings-grid .form-group-full {
+      grid-column: 1 / -1;
+    }
+
+    .workdays-row {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .workday-check {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      cursor: pointer;
+    }
+    .workday-check input {
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    /* Color dot for leave types */
+    .color-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    /* Status badges in tables */
+    .status-active { color: var(--color-success); }
+    .status-inactive { color: var(--color-text-3); }
+
+    /* Audit log changes preview */
+    .changes-preview {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      background: var(--color-surface-1);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-2);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    /* Holiday year selector */
+    .year-selector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    /* Audit filter bar */
+    .audit-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    /* Action badge colors */
+    .action-created { background: var(--color-success-muted); color: var(--color-success); }
+    .action-updated { background: var(--color-info-muted); color: var(--color-info); }
+    .action-deleted { background: var(--color-error-muted); color: var(--color-error); }
+    .action-approved { background: var(--color-primary-muted); color: var(--color-primary); }
+
+    /* Empty state */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+    .empty-state {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-6);
+      text-align: center;
+      color: var(--color-text-3);
+      gap: var(--space-4);
+    }
+    .empty-state svg { color: var(--color-text-3); opacity: 0.5; }
+    .empty-state h3 { font-size: var(--text-heading-2); color: var(--color-text-2); }
+    .empty-state p { max-width: 400px; }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder-kanban"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="calendar-range"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item active">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Administration</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="user-plus" width="16" height="16" style="color: var(--color-primary);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">New user invitation accepted: Yuki Tanaka joined Engineering</div>
+                  <div class="notif-time">10 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="shield" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Security: New login from unfamiliar IP for John Smith</div>
+                  <div class="notif-time">2 hours ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Administration</h1>
+          <p class="page-subtitle">Manage company settings, users, and system configuration</p>
+        </div>
+      </div>
+
+      <!-- Populated content -->
+      <div class="populated-content">
+
+        <!-- Tabs -->
+        <div class="tabs admin-tabs">
+          <button class="tab active" data-tab="tab-settings">Company Settings</button>
+          <button class="tab" data-tab="tab-users">Users</button>
+          <button class="tab" data-tab="tab-departments">Departments</button>
+          <button class="tab" data-tab="tab-leave-types">Leave Types</button>
+          <button class="tab" data-tab="tab-expense-types">Expense Types</button>
+          <button class="tab" data-tab="tab-holidays">Holidays</button>
+          <button class="tab" data-tab="tab-audit">Audit Log</button>
+        </div>
+
+        <!-- ════════════ TAB 1: Company Settings ════════════ -->
+        <div class="tab-content active" id="tab-settings">
+          <div class="card">
+            <div class="card-body" style="padding: var(--space-6);">
+
+              <!-- General -->
+              <div class="settings-section">
+                <h3 class="settings-section-title">General</h3>
+                <div class="settings-grid">
+                  <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" class="form-input" value="GammaHR Demo Corp">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Industry</label>
+                    <select class="form-select">
+                      <option>Technology</option>
+                      <option selected>Professional Services</option>
+                      <option>Finance</option>
+                      <option>Healthcare</option>
+                      <option>Manufacturing</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Company Size</label>
+                    <select class="form-select">
+                      <option>1-10</option>
+                      <option>11-50</option>
+                      <option selected>50-200</option>
+                      <option>200-500</option>
+                      <option>500+</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Regional -->
+              <div class="settings-section">
+                <h3 class="settings-section-title">Regional Settings</h3>
+                <div class="settings-grid">
+                  <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <select class="form-select">
+                      <option selected>France</option>
+                      <option>Germany</option>
+                      <option>United Kingdom</option>
+                      <option>Netherlands</option>
+                      <option>Belgium</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Currency</label>
+                    <select class="form-select">
+                      <option selected>EUR (&euro;)</option>
+                      <option>USD ($)</option>
+                      <option>GBP (&pound;)</option>
+                      <option>CHF</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Fiscal Year Start</label>
+                    <select class="form-select">
+                      <option selected>January</option>
+                      <option>April</option>
+                      <option>July</option>
+                      <option>October</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Timezone</label>
+                    <select class="form-select">
+                      <option selected>Europe/Paris (UTC+1)</option>
+                      <option>Europe/London (UTC+0)</option>
+                      <option>Europe/Berlin (UTC+1)</option>
+                      <option>America/New_York (UTC-5)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Work Rules -->
+              <div class="settings-section">
+                <h3 class="settings-section-title">Work Rules</h3>
+                <div class="settings-grid">
+                  <div class="form-group">
+                    <label class="form-label">Hours per Day</label>
+                    <input type="number" class="form-input" value="8" min="1" max="24">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Overtime Rules</label>
+                    <select class="form-select">
+                      <option selected>French Labour Law (35h/week)</option>
+                      <option>Standard 40h/week</option>
+                      <option>No overtime tracking</option>
+                      <option>Custom</option>
+                    </select>
+                  </div>
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Work Days</label>
+                    <div class="workdays-row">
+                      <label class="workday-check"><input type="checkbox" checked> Mon</label>
+                      <label class="workday-check"><input type="checkbox" checked> Tue</label>
+                      <label class="workday-check"><input type="checkbox" checked> Wed</label>
+                      <label class="workday-check"><input type="checkbox" checked> Thu</label>
+                      <label class="workday-check"><input type="checkbox" checked> Fri</label>
+                      <label class="workday-check"><input type="checkbox"> Sat</label>
+                      <label class="workday-check"><input type="checkbox"> Sun</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Approval Chain -->
+              <div class="settings-section" style="margin-bottom: 0;">
+                <h3 class="settings-section-title">Approval Chain</h3>
+                <div class="settings-grid">
+                  <div class="form-group">
+                    <label class="form-label">Leave Approver</label>
+                    <select class="form-select">
+                      <option selected>Direct Manager</option>
+                      <option>Department Manager</option>
+                      <option>HR Manager</option>
+                      <option>Skip-level Manager</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Expense Approver</label>
+                    <select class="form-select">
+                      <option>Direct Manager</option>
+                      <option selected>Department Manager</option>
+                      <option>Finance Manager</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Timesheet Approver</label>
+                    <select class="form-select">
+                      <option>Direct Manager</option>
+                      <option>Department Manager</option>
+                      <option selected>Project Manager</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: var(--space-6); display: flex; justify-content: flex-end;">
+                <button class="btn btn-primary btn-md" id="saveSettingsBtn">
+                  <svg data-lucide="save" width="16" height="16"></svg>
+                  Save Changes
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════ TAB 2: Users ════════════ -->
+        <div class="tab-content" id="tab-users">
+          <div class="data-table-wrapper">
+            <div class="table-toolbar">
+              <div class="search-wrapper">
+                <svg data-lucide="search" width="16" height="16"></svg>
+                <input type="text" class="search-input" placeholder="Search users...">
+              </div>
+              <div class="table-actions">
+                <button class="btn btn-secondary btn-sm" id="deactivateSelectedBtn" style="display:none;">Deactivate Selected</button>
+                <button class="btn btn-primary btn-sm" id="inviteUserBtn">
+                  <svg data-lucide="user-plus" width="14" height="14"></svg>
+                  Invite User
+                </button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th class="row-check"><input type="checkbox" id="selectAllUsers"></th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html">Sarah Chen</a></div></td>
+                    <td class="cell-secondary">sarah.chen@gammahr.io</td>
+                    <td><span class="badge badge-error"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
+                    <td>Engineering</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Today, 09:14</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">JS</div><a href="employees.html">John Smith</a></div></td>
+                    <td class="cell-secondary">john.smith@gammahr.io</td>
+                    <td><span class="badge badge-warning"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
+                    <td>Operations</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Today, 08:42</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">AW</div><a href="employees.html">Alice Wang</a></div></td>
+                    <td class="cell-secondary">alice.wang@gammahr.io</td>
+                    <td><span class="badge badge-warning"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
+                    <td>Design</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Yesterday, 17:30</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">MR</div><a href="employees.html">Marco Rossi</a></div></td>
+                    <td class="cell-secondary">marco.rossi@gammahr.io</td>
+                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td>Engineering</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Today, 10:05</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">CK</div><a href="employees.html">Carol Kim</a></div></td>
+                    <td class="cell-secondary">carol.kim@gammahr.io</td>
+                    <td><span class="badge badge-warning"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
+                    <td>Analytics</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Today, 09:58</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">BT</div><a href="employees.html">Bob Taylor</a></div></td>
+                    <td class="cell-secondary">bob.taylor@gammahr.io</td>
+                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td>Engineering</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Yesterday, 16:22</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">LO</div><a href="employees.html">Liam O'Brien</a></div></td>
+                    <td class="cell-secondary">liam.obrien@gammahr.io</td>
+                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td>Engineering</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Today, 08:15</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SD</div><a href="employees.html">Sophie Dubois</a></div></td>
+                    <td class="cell-secondary">sophie.dubois@gammahr.io</td>
+                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td>Engineering</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Today, 09:30</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">DP</div><a href="employees.html">David Park</a></div></td>
+                    <td class="cell-secondary">david.park@gammahr.io</td>
+                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td>Engineering</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td class="cell-secondary">Apr 3, 14:10</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                  </tr>
+                  <tr>
+                    <td class="row-check"><input type="checkbox" class="user-check"></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">EL</div><a href="employees.html">Emma Laurent</a></div></td>
+                    <td class="cell-secondary">emma.laurent@gammahr.io</td>
+                    <td><span class="badge badge-error"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
+                    <td>HR</td>
+                    <td><span class="badge badge-default badge-dot">Inactive</span></td>
+                    <td class="cell-secondary">Mar 28, 11:45</td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-ghost btn-xs">Activate</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-pagination">
+              <span>Showing 1-10 of 10 users</span>
+              <div class="pagination-buttons">
+                <button disabled>&laquo;</button>
+                <button class="active">1</button>
+                <button disabled>&raquo;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════ TAB 3: Departments ════════════ -->
+        <div class="tab-content" id="tab-departments">
+          <div class="data-table-wrapper">
+            <div class="table-toolbar">
+              <div class="search-wrapper">
+                <svg data-lucide="search" width="16" height="16"></svg>
+                <input type="text" class="search-input" placeholder="Search departments...">
+              </div>
+              <div class="table-actions">
+                <button class="btn btn-primary btn-sm" id="addDeptBtn">
+                  <svg data-lucide="plus" width="14" height="14"></svg>
+                  Add Department
+                </button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Department</th>
+                    <th>Manager</th>
+                    <th>Head Count</th>
+                    <th>Cost Center</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: var(--weight-semibold);">Engineering</td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html">Sarah Chen</a></div></td>
+                    <td class="cell-mono">18</td>
+                    <td class="cell-secondary">CC-ENG-100</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: var(--weight-semibold);">Operations</td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">JS</div><a href="employees.html">John Smith</a></div></td>
+                    <td class="cell-mono">8</td>
+                    <td class="cell-secondary">CC-OPS-200</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: var(--weight-semibold);">Design</td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">AW</div><a href="employees.html">Alice Wang</a></div></td>
+                    <td class="cell-mono">5</td>
+                    <td class="cell-secondary">CC-DSG-300</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: var(--weight-semibold);">Analytics</td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">CK</div><a href="employees.html">Carol Kim</a></div></td>
+                    <td class="cell-mono">4</td>
+                    <td class="cell-secondary">CC-ANA-400</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: var(--weight-semibold);">HR</td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">EL</div><a href="employees.html">Emma Laurent</a></div></td>
+                    <td class="cell-mono">3</td>
+                    <td class="cell-secondary">CC-HR-500</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: var(--weight-semibold);">Executive</td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">MD</div><a href="employees.html">Marie Dupont</a></div></td>
+                    <td class="cell-mono">2</td>
+                    <td class="cell-secondary">CC-EXE-600</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════ TAB 4: Leave Types ════════════ -->
+        <div class="tab-content" id="tab-leave-types">
+          <div class="data-table-wrapper">
+            <div class="table-toolbar">
+              <div class="search-wrapper">
+                <svg data-lucide="search" width="16" height="16"></svg>
+                <input type="text" class="search-input" placeholder="Search leave types...">
+              </div>
+              <div class="table-actions">
+                <button class="btn btn-primary btn-sm" id="addLeaveTypeBtn">
+                  <svg data-lucide="plus" width="14" height="14"></svg>
+                  Add Leave Type
+                </button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"></th>
+                    <th>Name</th>
+                    <th>Default Balance</th>
+                    <th>Requires Approval</th>
+                    <th>Max Consecutive</th>
+                    <th>Carryover Max</th>
+                    <th>Accrual Rate</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="color-dot" style="background: var(--color-primary);"></span></td>
+                    <td style="font-weight: var(--weight-semibold);">Annual Leave</td>
+                    <td class="cell-mono">25 days</td>
+                    <td>Yes</td>
+                    <td class="cell-mono">15 days</td>
+                    <td class="cell-mono">5 days</td>
+                    <td class="cell-secondary">2.08/month</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="color-dot" style="background: var(--color-error);"></span></td>
+                    <td style="font-weight: var(--weight-semibold);">Sick Leave</td>
+                    <td class="cell-mono">12 days</td>
+                    <td>No</td>
+                    <td class="cell-mono">--</td>
+                    <td class="cell-mono">0 days</td>
+                    <td class="cell-secondary">1.00/month</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="color-dot" style="background: var(--color-accent);"></span></td>
+                    <td style="font-weight: var(--weight-semibold);">Personal</td>
+                    <td class="cell-mono">3 days</td>
+                    <td>Yes</td>
+                    <td class="cell-mono">3 days</td>
+                    <td class="cell-mono">0 days</td>
+                    <td class="cell-secondary">Fixed</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="color-dot" style="background: var(--color-info);"></span></td>
+                    <td style="font-weight: var(--weight-semibold);">WFH</td>
+                    <td class="cell-mono">Unlimited</td>
+                    <td>No</td>
+                    <td class="cell-mono">--</td>
+                    <td class="cell-mono">--</td>
+                    <td class="cell-secondary">N/A</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="color-dot" style="background: var(--color-accent);"></span></td>
+                    <td style="font-weight: var(--weight-semibold);">Parental Leave</td>
+                    <td class="cell-mono">90 days</td>
+                    <td>Yes</td>
+                    <td class="cell-mono">90 days</td>
+                    <td class="cell-mono">0 days</td>
+                    <td class="cell-secondary">Fixed</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="color-dot" style="background: var(--color-warning);"></span></td>
+                    <td style="font-weight: var(--weight-semibold);">Compassionate</td>
+                    <td class="cell-mono">5 days</td>
+                    <td>Yes</td>
+                    <td class="cell-mono">5 days</td>
+                    <td class="cell-mono">0 days</td>
+                    <td class="cell-secondary">Fixed</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════ TAB 5: Expense Types ════════════ -->
+        <div class="tab-content" id="tab-expense-types">
+          <div class="data-table-wrapper">
+            <div class="table-toolbar">
+              <div class="search-wrapper">
+                <svg data-lucide="search" width="16" height="16"></svg>
+                <input type="text" class="search-input" placeholder="Search expense types...">
+              </div>
+              <div class="table-actions">
+                <button class="btn btn-primary btn-sm" id="addExpenseTypeBtn">
+                  <svg data-lucide="plus" width="14" height="14"></svg>
+                  Add Expense Type
+                </button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"></th>
+                    <th>Name</th>
+                    <th>Max Amount</th>
+                    <th>Daily Limit</th>
+                    <th>Requires Receipt</th>
+                    <th>Requires Project</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><svg data-lucide="plane" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Travel</td>
+                    <td class="cell-mono">&euro;2,000</td>
+                    <td class="cell-mono">--</td>
+                    <td>Yes</td>
+                    <td>Yes</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><svg data-lucide="bed" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Hotel</td>
+                    <td class="cell-mono">--</td>
+                    <td class="cell-mono">&euro;500/day</td>
+                    <td>Yes</td>
+                    <td>Yes</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><svg data-lucide="utensils" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Meals</td>
+                    <td class="cell-mono">--</td>
+                    <td class="cell-mono">&euro;50/day</td>
+                    <td>Yes</td>
+                    <td>Optional</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><svg data-lucide="monitor" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Software</td>
+                    <td class="cell-mono">&euro;500</td>
+                    <td class="cell-mono">--</td>
+                    <td>Yes</td>
+                    <td>No</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><svg data-lucide="hard-drive" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Equipment</td>
+                    <td class="cell-mono">&euro;1,000</td>
+                    <td class="cell-mono">--</td>
+                    <td>Yes</td>
+                    <td>No</td>
+                    <td><span class="badge badge-warning badge-dot">Pre-approval</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><svg data-lucide="train" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Transport</td>
+                    <td class="cell-mono">&euro;200</td>
+                    <td class="cell-mono">--</td>
+                    <td>Yes</td>
+                    <td>Optional</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><svg data-lucide="paperclip" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
+                    <td style="font-weight: var(--weight-semibold);">Office Supplies</td>
+                    <td class="cell-mono">&euro;100</td>
+                    <td class="cell-mono">--</td>
+                    <td>No</td>
+                    <td>No</td>
+                    <td><span class="badge badge-success badge-dot">Active</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════ TAB 6: Holidays ════════════ -->
+        <div class="tab-content" id="tab-holidays">
+          <div class="flex items-center justify-between mb-4" style="flex-wrap: wrap; gap: var(--space-3);">
+            <div class="year-selector">
+              <label class="form-label" style="margin: 0;">Year</label>
+              <select class="form-select form-input-sm" style="width: 120px;">
+                <option>2025</option>
+                <option selected>2026</option>
+                <option>2027</option>
+              </select>
+            </div>
+            <div class="flex gap-2">
+              <div class="dropdown">
+                <button class="btn btn-secondary btn-sm" id="importHolidaysBtn">
+                  <svg data-lucide="download" width="14" height="14"></svg>
+                  Import Standard: France
+                  <svg data-lucide="chevron-down" width="14" height="14"></svg>
+                </button>
+                <div class="dropdown-menu right" id="importHolidaysMenu">
+                  <button class="dropdown-item">France</button>
+                  <button class="dropdown-item">Germany</button>
+                  <button class="dropdown-item">United Kingdom</button>
+                  <button class="dropdown-item">Netherlands</button>
+                  <button class="dropdown-item">Belgium</button>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="addHolidayBtn">
+                <svg data-lucide="plus" width="14" height="14"></svg>
+                Add Holiday
+              </button>
+            </div>
+          </div>
+
+          <div class="data-table-wrapper">
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Holiday</th>
+                    <th>Type</th>
+                    <th>Recurring</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="cell-mono">Jan 1, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">New Year's Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">Apr 6, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Easter Monday</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-default badge-dot">Variable</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">May 1, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Labour Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">May 8, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Victory in Europe Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">May 14, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Ascension Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-default badge-dot">Variable</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">May 25, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Whit Monday</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-default badge-dot">Variable</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">Jul 14, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Bastille Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">Aug 15, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Assumption of Mary</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">Nov 1, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">All Saints' Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono">Dec 25, 2026</td>
+                    <td style="font-weight: var(--weight-semibold);">Christmas Day</td>
+                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td><span class="badge badge-success badge-dot">Yes</span></td>
+                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════ TAB 7: Audit Log ════════════ -->
+        <div class="tab-content" id="tab-audit">
+          <div class="audit-filters">
+            <select class="form-select form-input-sm" style="width: 150px;">
+              <option value="all">All Actions</option>
+              <option>Created</option>
+              <option>Updated</option>
+              <option>Deleted</option>
+              <option>Approved</option>
+            </select>
+            <select class="form-select form-input-sm" style="width: 150px;">
+              <option value="all">All Entities</option>
+              <option>User</option>
+              <option>Leave</option>
+              <option>Timesheet</option>
+              <option>Expense</option>
+              <option>Department</option>
+              <option>Project</option>
+            </select>
+            <select class="form-select form-input-sm" style="width: 150px;">
+              <option value="all">All Users</option>
+              <option>Sarah Chen</option>
+              <option>John Smith</option>
+              <option>Alice Wang</option>
+            </select>
+            <input type="date" class="form-input form-input-sm" style="width: 150px;" value="2026-04-01">
+            <span style="color: var(--color-text-3);">to</span>
+            <input type="date" class="form-input form-input-sm" style="width: 150px;" value="2026-04-05">
+          </div>
+
+          <div class="data-table-wrapper">
+            <div style="overflow-x: auto;">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Entity</th>
+                    <th>Changes</th>
+                    <th>IP Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 5, 09:14</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td><span class="badge action-approved"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                    <td>Timesheet #T-2026-0187</td>
+                    <td><span class="changes-preview">{"status": "approved"}</span></td>
+                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 5, 09:10</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
+                    <td>Company Settings</td>
+                    <td><span class="changes-preview">{"overtime_rules": "French..."}</span></td>
+                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 5, 08:55</td>
+                    <td><a href="employees.html">John Smith</a></td>
+                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td>Expense #E-2026-0094</td>
+                    <td><span class="changes-preview">{"amount": 340, "type": "Hotel"}</span></td>
+                    <td class="cell-mono cell-secondary">10.0.0.15</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 17:30</td>
+                    <td><a href="employees.html">Alice Wang</a></td>
+                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td>Leave Request #L-2026-0052</td>
+                    <td><span class="changes-preview">{"type": "Annual", "days": 2}</span></td>
+                    <td class="cell-mono cell-secondary">172.16.0.8</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 16:20</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td><span class="badge action-approved"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                    <td>Expense #E-2026-0092</td>
+                    <td><span class="changes-preview">{"status": "approved"}</span></td>
+                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 14:10</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td>User: Yuki Tanaka</td>
+                    <td><span class="changes-preview">{"role": "Employee", "dept": "Eng"}</span></td>
+                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 11:45</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
+                    <td>User: Emma Laurent</td>
+                    <td><span class="changes-preview">{"status": "inactive"}</span></td>
+                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 3, 16:00</td>
+                    <td><a href="employees.html">John Smith</a></td>
+                    <td><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
+                    <td>Project: Acme Corp</td>
+                    <td><span class="changes-preview">{"budget": 85000, "status": "active"}</span></td>
+                    <td class="cell-mono cell-secondary">10.0.0.15</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 3, 10:30</td>
+                    <td><a href="employees.html">Sarah Chen</a></td>
+                    <td><span class="badge action-deleted"><svg data-lucide="trash-2" width="12" height="12"></svg> Deleted</span></td>
+                    <td>Holiday: Test Holiday</td>
+                    <td><span class="changes-preview">{"name": "Test Holiday"}</span></td>
+                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                  </tr>
+                  <tr>
+                    <td class="cell-mono" style="white-space: nowrap;">Apr 2, 15:20</td>
+                    <td><a href="employees.html">Alice Wang</a></td>
+                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td>Timesheet #T-2026-0185</td>
+                    <td><span class="changes-preview">{"hours": 40, "week": "Mar 30"}</span></td>
+                    <td class="cell-mono cell-secondary">172.16.0.8</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-pagination">
+              <span>Showing 1-10 of 47 entries</span>
+              <div class="pagination-buttons">
+                <button disabled>&laquo;</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>5</button>
+                <button>&raquo;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /populated-content -->
+
+      <!-- Empty State -->
+      <div class="empty-content empty-state">
+        <svg data-lucide="settings" width="64" height="64"></svg>
+        <h3>No configuration data</h3>
+        <p>This section is empty. Start by configuring your company settings above.</p>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ════════ MODALS ════════ -->
+
+<!-- Invite User Modal -->
+<div class="modal-backdrop" id="inviteUserModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Invite User</h3>
+      <button class="modal-close" onclick="closeModal('inviteUserModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Email Address <span class="required">*</span></label>
+        <input type="email" class="form-input" placeholder="user@company.com">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Role</label>
+        <select class="form-select">
+          <option>Employee</option>
+          <option>Project Manager</option>
+          <option>Admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <select class="form-select">
+          <option>Engineering</option>
+          <option>Operations</option>
+          <option>Design</option>
+          <option>Analytics</option>
+          <option>HR</option>
+          <option>Executive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('inviteUserModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="closeModal('inviteUserModal'); showToast('success', 'Invitation Sent', 'An invitation email has been sent.')">Send Invitation</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Department Modal -->
+<div class="modal-backdrop" id="addDeptModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Add Department</h3>
+      <button class="modal-close" onclick="closeModal('addDeptModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Department Name <span class="required">*</span></label>
+        <input type="text" class="form-input" placeholder="e.g. Marketing">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Manager</label>
+        <select class="form-select">
+          <option>Select manager...</option>
+          <option>Sarah Chen</option>
+          <option>John Smith</option>
+          <option>Alice Wang</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cost Center</label>
+        <input type="text" class="form-input" placeholder="CC-XXX-000">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('addDeptModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="closeModal('addDeptModal'); showToast('success', 'Department Created', 'New department has been added.')">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Leave Type Modal -->
+<div class="modal-backdrop" id="addLeaveTypeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Add Leave Type</h3>
+      <button class="modal-close" onclick="closeModal('addLeaveTypeModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-grid">
+        <div class="form-group">
+          <label class="form-label">Name <span class="required">*</span></label>
+          <input type="text" class="form-input" placeholder="e.g. Study Leave">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Default Balance (days)</label>
+          <input type="number" class="form-input" value="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Consecutive Days</label>
+          <input type="number" class="form-input" value="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Carryover Max (days)</label>
+          <input type="number" class="form-input" value="0">
+        </div>
+      </div>
+      <div class="form-group mt-4">
+        <label class="form-check"><input type="checkbox" checked> Requires Approval</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('addLeaveTypeModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="closeModal('addLeaveTypeModal'); showToast('success', 'Leave Type Created', 'New leave type has been added.')">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Expense Type Modal -->
+<div class="modal-backdrop" id="addExpenseTypeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Add Expense Type</h3>
+      <button class="modal-close" onclick="closeModal('addExpenseTypeModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-grid">
+        <div class="form-group">
+          <label class="form-label">Name <span class="required">*</span></label>
+          <input type="text" class="form-input" placeholder="e.g. Conference">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Amount (&euro;)</label>
+          <input type="number" class="form-input" value="500">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Daily Limit (&euro;)</label>
+          <input type="number" class="form-input" placeholder="Optional">
+        </div>
+      </div>
+      <div class="flex gap-4 mt-4">
+        <label class="form-check"><input type="checkbox" checked> Requires Receipt</label>
+        <label class="form-check"><input type="checkbox"> Requires Project</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('addExpenseTypeModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="closeModal('addExpenseTypeModal'); showToast('success', 'Expense Type Created', 'New expense type has been added.')">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Holiday Modal -->
+<div class="modal-backdrop" id="addHolidayModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Add Holiday</h3>
+      <button class="modal-close" onclick="closeModal('addHolidayModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Holiday Name <span class="required">*</span></label>
+        <input type="text" class="form-input" placeholder="e.g. Company Anniversary">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" value="2026-06-01">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Type</label>
+        <select class="form-select">
+          <option>Full Day</option>
+          <option>Half Day</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-check"><input type="checkbox"> Recurring annually</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('addHolidayModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="closeModal('addHolidayModal'); showToast('success', 'Holiday Added', 'New holiday has been added to the calendar.')">Add Holiday</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" id="cmdInput" placeholder="Search anything..." autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Pages</div>
+      <a href="index.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Dashboard</div></div>
+      </a>
+      <a href="timesheets.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Timesheets</div></div>
+      </a>
+      <a href="expenses.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="receipt" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Expenses</div></div>
+      </a>
+      <a href="leaves.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="palm-tree" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Leaves</div></div>
+      </a>
+      <a href="approvals.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="check-square" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Approvals</div></div>
+      </a>
+      <a href="employees.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Team Directory</div></div>
+      </a>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&crarr;</kbd> Open</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Empty State Toggle -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── DOM refs ──
+  var sidebar = document.getElementById('sidebar');
+  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  var searchTrigger = document.getElementById('searchTrigger');
+  var cmdPalette = document.getElementById('cmdPalette');
+  var cmdInput = document.getElementById('cmdInput');
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var userMenuBtn = document.getElementById('userMenuBtn');
+  var userDropdown = document.getElementById('userDropdown');
+  var toastContainer = document.getElementById('toastContainer');
+  var stateToggle = document.getElementById('stateToggle');
+
+  // ── Sidebar Collapse ──
+  sidebarCollapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // ── Mobile Menu ──
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Command Palette ──
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    cmdInput.focus();
+  }
+  function closeCmdPalette() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  }
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      cmdPalette.classList.contains('active') ? closeCmdPalette() : openCmdPalette();
+    }
+    if (e.key === 'Escape') {
+      if (cmdPalette.classList.contains('active')) closeCmdPalette();
+      // Also close any open modals
+      document.querySelectorAll('.modal-backdrop.active').forEach(function(m) { m.classList.remove('active'); });
+    }
+  });
+
+  // ── Notification Panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User Dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
+    // Close any open dropdown menus
+    document.querySelectorAll('.dropdown-menu.active').forEach(function(menu) {
+      if (!menu.parentElement.contains(e.target)) menu.classList.remove('active');
+    });
+  });
+
+  // ── Toast Notifications ──
+  window.showToast = function(type, title, message) {
+    var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  };
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+
+  // ── Close Modal helper ──
+  window.closeModal = function(id) {
+    document.getElementById(id).classList.remove('active');
+  };
+
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+    backdrop.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('active');
+    });
+  });
+
+  // ── Tab Switching (hash-based) ──
+  var tabs = document.querySelectorAll('.admin-tabs .tab');
+  var tabContents = document.querySelectorAll('.tab-content');
+
+  function activateTab(tabId) {
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    tabContents.forEach(function(tc) { tc.classList.remove('active'); });
+    var activeTabBtn = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    var activeContent = document.getElementById(tabId);
+    if (activeTabBtn) activeTabBtn.classList.add('active');
+    if (activeContent) activeContent.classList.add('active');
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabId = this.getAttribute('data-tab');
+      activateTab(tabId);
+      window.location.hash = tabId;
+    });
+  });
+
+  // Init from hash or default
+  var hashTab = window.location.hash.replace('#', '');
+  if (hashTab && document.getElementById(hashTab)) {
+    activateTab(hashTab);
+  } else {
+    activateTab('tab-settings');
+  }
+
+  // ── Save Settings Button ──
+  document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+    this.classList.add('btn-loading');
+    var btn = this;
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      showToast('success', 'Settings Saved', 'Company settings have been updated successfully.');
+    }, 800);
+  });
+
+  // ── Invite User ──
+  document.getElementById('inviteUserBtn').addEventListener('click', function() {
+    document.getElementById('inviteUserModal').classList.add('active');
+  });
+
+  // ── Add Department ──
+  document.getElementById('addDeptBtn').addEventListener('click', function() {
+    document.getElementById('addDeptModal').classList.add('active');
+  });
+
+  // ── Add Leave Type ──
+  document.getElementById('addLeaveTypeBtn').addEventListener('click', function() {
+    document.getElementById('addLeaveTypeModal').classList.add('active');
+  });
+
+  // ── Add Expense Type ──
+  document.getElementById('addExpenseTypeBtn').addEventListener('click', function() {
+    document.getElementById('addExpenseTypeModal').classList.add('active');
+  });
+
+  // ── Add Holiday ──
+  document.getElementById('addHolidayBtn').addEventListener('click', function() {
+    document.getElementById('addHolidayModal').classList.add('active');
+  });
+
+  // ── Import Holidays Dropdown ──
+  document.getElementById('importHolidaysBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('importHolidaysMenu').classList.toggle('active');
+  });
+  document.querySelectorAll('#importHolidaysMenu .dropdown-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      showToast('success', 'Holidays Imported', 'Standard holidays for ' + this.textContent + ' have been imported.');
+      document.getElementById('importHolidaysMenu').classList.remove('active');
+    });
+  });
+
+  // ── Select All Users ──
+  var selectAllUsers = document.getElementById('selectAllUsers');
+  var deactivateBtn = document.getElementById('deactivateSelectedBtn');
+  if (selectAllUsers) {
+    selectAllUsers.addEventListener('change', function() {
+      var checks = document.querySelectorAll('.user-check');
+      var self = this;
+      checks.forEach(function(cb) { cb.checked = self.checked; });
+      deactivateBtn.style.display = this.checked ? '' : 'none';
+    });
+  }
+  document.querySelectorAll('.user-check').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var anyChecked = document.querySelectorAll('.user-check:checked').length > 0;
+      deactivateBtn.style.display = anyChecked ? '' : 'none';
+    });
+  });
+  if (deactivateBtn) {
+    deactivateBtn.addEventListener('click', function() {
+      var count = document.querySelectorAll('.user-check:checked').length;
+      showToast('warning', 'Users Deactivated', count + ' user(s) have been deactivated.');
+      document.querySelectorAll('.user-check:checked').forEach(function(cb) { cb.checked = false; });
+      selectAllUsers.checked = false;
+      this.style.display = 'none';
+    });
+  }
+
+  // ── Empty State Toggle ──
+  var isPopulated = true;
+  stateToggle.addEventListener('click', function() {
+    isPopulated = !isPopulated;
+    document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+    this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+  // ── Init Lucide Icons ──
+  lucide.createIcons();
+
+})();
+</script>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timesheets — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Timesheet-specific styles ── */
+
+    /* Status bar */
+    .ts-status-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+    }
+    .ts-status-text {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      flex-shrink: 0;
+    }
+    .ts-status-text strong {
+      color: var(--color-text-1);
+      font-weight: var(--weight-semibold);
+    }
+    .ts-progress-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 180px;
+    }
+    .ts-progress-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .ts-progress-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      transition: width var(--motion-slow) var(--ease-gentle);
+    }
+    .ts-progress-fill.warning {
+      background: var(--color-warning);
+    }
+    .ts-progress-fill.complete {
+      background: var(--color-success);
+    }
+    .ts-progress-pct {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* Week navigation */
+    .week-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .week-nav-label {
+      font-size: var(--text-heading-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin: 0 var(--space-2);
+      white-space: nowrap;
+    }
+    .week-nav .btn-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    /* Timesheet grid */
+    .ts-grid-wrapper {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-4);
+    }
+    .ts-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-body);
+      table-layout: fixed;
+    }
+    .ts-grid col.col-project { width: 200px; }
+    .ts-grid col.col-day { width: auto; }
+    .ts-grid col.col-total { width: 70px; }
+
+    .ts-grid th {
+      padding: var(--space-3) var(--space-3);
+      text-align: center;
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-0);
+      user-select: none;
+    }
+    .ts-grid th:first-child {
+      text-align: left;
+      padding-left: var(--space-4);
+    }
+    .ts-grid th.weekend {
+      color: var(--color-text-3);
+      background: var(--color-surface-1);
+    }
+    .ts-grid th.col-total {
+      color: var(--color-text-1);
+      font-weight: var(--weight-semibold);
+    }
+
+    .ts-grid td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border-subtle);
+      text-align: center;
+      vertical-align: middle;
+      font-family: var(--font-mono);
+      font-size: var(--text-mono);
+      color: var(--color-text-1);
+      cursor: pointer;
+      transition: background var(--motion-fast);
+      position: relative;
+    }
+    .ts-grid td:first-child {
+      text-align: left;
+      padding-left: var(--space-4);
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+      cursor: default;
+    }
+    .ts-grid td:hover:not(:first-child):not(.weekend):not(.ts-footer-cell):not(.ts-target-cell):not(.ts-status-cell) {
+      background: var(--color-surface-2);
+    }
+    .ts-grid td.weekend {
+      background: var(--color-surface-1);
+      color: var(--color-text-3);
+      cursor: default;
+    }
+    .ts-grid td.under-target {
+      background: var(--color-warning-muted);
+    }
+    .ts-grid td.total-cell {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      background: var(--color-surface-0);
+    }
+
+    /* Inline edit input */
+    .ts-grid td .ts-cell-input {
+      width: 100%;
+      height: 28px;
+      text-align: center;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-1);
+      font-family: var(--font-mono);
+      font-size: var(--text-mono);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+
+    .ts-grid td .ts-cell-value {
+      display: block;
+      padding: var(--space-1) 0;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Project link in grid */
+    .ts-project-link {
+      color: var(--color-primary);
+      font-weight: var(--weight-medium);
+      text-decoration: none;
+    }
+    .ts-project-link:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Add row button */
+    .ts-add-row td {
+      text-align: left !important;
+      padding: var(--space-2) var(--space-4) !important;
+      cursor: pointer !important;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .ts-add-row:hover td {
+      background: var(--color-primary-muted) !important;
+    }
+    .ts-add-row-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--color-primary);
+      font-family: var(--font-sans);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-1) 0;
+    }
+    .ts-add-row-btn:hover { color: var(--color-primary-hover); }
+    .ts-add-row-btn svg { width: 16px; height: 16px; }
+
+    /* Footer rows */
+    .ts-grid .ts-footer-row td {
+      background: var(--color-surface-1);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      border-bottom: 1px solid var(--color-border);
+      cursor: default;
+      font-family: var(--font-mono);
+    }
+    .ts-grid .ts-footer-row td:first-child {
+      font-family: var(--font-sans);
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      font-size: var(--text-caption);
+      letter-spacing: 0.5px;
+      color: var(--color-text-2);
+    }
+    .ts-grid .ts-target-row td {
+      background: var(--color-surface-0);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-3);
+      cursor: default;
+      font-family: var(--font-mono);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .ts-grid .ts-target-row td:first-child {
+      font-family: var(--font-sans);
+      font-weight: var(--weight-medium);
+      text-transform: uppercase;
+      font-size: var(--text-caption);
+      letter-spacing: 0.5px;
+    }
+    .ts-grid .ts-status-row td {
+      background: var(--color-surface-0);
+      cursor: default;
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-caption);
+    }
+    .ts-grid .ts-status-row td:first-child {
+      font-family: var(--font-sans);
+    }
+    .ts-status-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ts-status-icon.met { color: var(--color-success); }
+    .ts-status-icon.miss { color: var(--color-warning); }
+    .ts-status-icon.neutral { color: var(--color-text-3); }
+
+    /* Weekly summary */
+    .ts-summary {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .ts-summary-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .ts-summary-item strong {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+    }
+    .ts-summary-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--color-border);
+    }
+    .ts-summary-progress {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex: 1;
+      min-width: 120px;
+    }
+    .ts-summary-progress .ts-progress-bar {
+      flex: 1;
+      max-width: 200px;
+    }
+
+    /* Warning message */
+    .ts-warning {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-warning-muted);
+      border: 1px solid hsla(38, 65%, 50%, 0.25);
+      border-radius: var(--radius-md);
+      color: var(--color-warning);
+      font-size: var(--text-body-sm);
+      margin-bottom: var(--space-4);
+    }
+    .ts-warning svg { flex-shrink: 0; }
+
+    /* Action buttons row */
+    .ts-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      justify-content: flex-end;
+    }
+
+    /* Previous weeks table enhancements */
+    .prev-weeks-table .cell-hours {
+      font-family: var(--font-mono);
+      font-size: var(--text-mono);
+    }
+    .employee-link {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    .employee-link:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Approval queue */
+    .approval-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-3);
+      transition: all var(--motion-normal) var(--ease-out);
+    }
+    .approval-card:hover {
+      border-color: var(--color-border-strong);
+    }
+    .approval-card.fading {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all var(--motion-slow) var(--ease-gentle);
+    }
+    .approval-card .aq-avatar {
+      flex-shrink: 0;
+    }
+    .approval-card .aq-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .approval-card .aq-name {
+      font-weight: var(--weight-semibold);
+      font-size: var(--text-body);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-0-5);
+    }
+    .approval-card .aq-name a {
+      color: var(--color-text-1);
+    }
+    .approval-card .aq-name a:hover {
+      color: var(--color-primary);
+    }
+    .approval-card .aq-period {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-1);
+    }
+    .approval-card .aq-projects {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .approval-card .aq-projects a {
+      color: var(--color-primary);
+      font-size: var(--text-caption);
+    }
+    .approval-card .aq-hours {
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 60px;
+    }
+    .approval-card .aq-hours-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+    }
+    .approval-card .aq-hours-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .approval-card .aq-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+    .approval-card .aq-submitted {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .approval-card .aq-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    /* Copy dropdown */
+    .copy-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .copy-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 160px;
+      background: var(--color-surface-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-3);
+      z-index: 500;
+      padding: var(--space-1) 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-4px);
+      transition: all var(--motion-fast) var(--ease-out);
+    }
+    .copy-dropdown-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .copy-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-1);
+      cursor: pointer;
+      transition: background var(--motion-fast);
+    }
+    .copy-dropdown-item:hover {
+      background: var(--color-surface-2);
+    }
+    .copy-dropdown-item svg {
+      width: 16px; height: 16px;
+      color: var(--color-text-2);
+    }
+
+    /* New project row select */
+    .ts-project-select {
+      width: 180px;
+      height: 28px;
+      padding: 0 var(--space-2);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-1);
+      font-family: var(--font-sans);
+      font-size: var(--text-body-sm);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23887766' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 24px;
+      cursor: pointer;
+    }
+    .ts-project-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-6);
+      text-align: center;
+    }
+    .empty-state svg { color: var(--color-text-3); margin-bottom: var(--space-4); }
+    .empty-state h3 {
+      font-size: var(--text-heading-2);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-2);
+    }
+    .empty-state p {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      max-width: 400px;
+      margin-bottom: var(--space-4);
+    }
+
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+
+    /* ── Mobile Timesheet ── */
+    .mobile-timesheet { display: none; }
+    @media (max-width: 639px) {
+      .mobile-timesheet { display: block; }
+      .ts-grid-wrapper { display: none; }
+      .ts-summary { flex-direction: column; align-items: stretch; }
+    }
+    .day-switcher {
+      display: flex;
+      gap: var(--space-1);
+      margin-bottom: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-1);
+    }
+    .day-switcher-btn {
+      flex: 1;
+      padding: var(--space-2) var(--space-1);
+      border: none;
+      background: transparent;
+      color: var(--color-text-2);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+      min-height: 44px;
+    }
+    .day-switcher-btn.active {
+      background: var(--color-primary);
+      color: var(--color-text-inv);
+    }
+    .day-switcher-btn:hover:not(.active) {
+      background: var(--color-surface-2);
+    }
+    .mobile-daily-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+    }
+    .mobile-daily-total strong {
+      font-family: var(--font-mono);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      font-size: var(--text-heading-3);
+    }
+    .mobile-ts-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .mobile-ts-actions .btn { width: 100%; justify-content: center; }
+
+    /* ── Submitted State ── */
+    .ts-submitted-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-success-muted);
+      border: 1px solid var(--color-success);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      color: var(--color-success);
+      font-size: var(--text-body);
+      font-weight: var(--weight-medium);
+    }
+    .ts-submitted-banner svg { flex-shrink: 0; }
+    .ts-grid-wrapper.submitted-state {
+      opacity: 0.6;
+      pointer-events: none;
+      position: relative;
+    }
+  </style>
+</head>
+<body class="show-populated">
+<div class="app">
+
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item active">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder-kanban"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="calendar-range"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Timesheets</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="toggleCmdPalette()"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Timesheet reminder: 7 team members have not submitted this week</div>
+                  <div class="notif-time">2 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Bob Taylor submitted only 8h this week - needs review</div>
+                  <div class="notif-time">18 minutes ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Carol Kim's timesheet approved for Mar 23-29</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="file-text" width="16" height="16" style="color: var(--color-info);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Invoice INV-2026-0041 generated for Meridian Corp</div>
+                  <div class="notif-time">3 hours ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Timesheet Management</h1>
+          <p class="page-subtitle">Track hours, review submissions, and manage team timesheets</p>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs mb-4">
+        <button class="tab active" data-tab="week">
+          <svg data-lucide="calendar-days" width="16" height="16"></svg>
+          Week View
+        </button>
+        <button class="tab" data-tab="previous">
+          <svg data-lucide="history" width="16" height="16"></svg>
+          Previous Weeks
+        </button>
+        <button class="tab" data-tab="approval">
+          <svg data-lucide="clipboard-check" width="16" height="16"></svg>
+          Approval Queue
+          <span class="tab-count">5</span>
+        </button>
+      </div>
+
+      <!-- ════════════ TAB 1: WEEK VIEW ════════════ -->
+      <div class="tab-content active populated-content" id="tab-week">
+
+        <!-- Status Bar -->
+        <div class="ts-status-bar" id="statusBar">
+          <svg data-lucide="info" width="18" height="18" style="color: var(--color-info); flex-shrink: 0;"></svg>
+          <span class="ts-status-text" id="statusText">
+            Week of Mar 30 &#8211; Apr 5, 2026 &#8212; <strong id="statusHours">32.5h</strong> logged, <strong id="statusRemaining">7.5h</strong> remaining to reach 40h
+          </span>
+          <div class="ts-progress-wrap">
+            <div class="ts-progress-bar">
+              <div class="ts-progress-fill warning" id="statusProgressFill" style="width: 81.25%;"></div>
+            </div>
+            <span class="ts-progress-pct" id="statusProgressPct">81%</span>
+          </div>
+        </div>
+
+        <!-- Week Navigation -->
+        <div class="week-nav">
+          <button class="btn btn-secondary btn-icon btn-sm" id="weekPrev" aria-label="Previous week">
+            <svg data-lucide="chevron-left" width="16" height="16"></svg>
+          </button>
+          <span class="week-nav-label" id="weekLabel">Week of Mar 30 &#8211; Apr 5, 2026</span>
+          <button class="btn btn-secondary btn-icon btn-sm" id="weekNext" aria-label="Next week">
+            <svg data-lucide="chevron-right" width="16" height="16"></svg>
+          </button>
+          <button class="btn btn-secondary btn-sm" id="weekToday">Today</button>
+
+          <div class="copy-dropdown" style="margin-left: var(--space-2);">
+            <button class="btn btn-secondary btn-sm" id="copyBtn">
+              <svg data-lucide="copy" width="14" height="14"></svg>
+              Copy
+              <svg data-lucide="chevron-down" width="12" height="12"></svg>
+            </button>
+            <div class="copy-dropdown-menu" id="copyMenu">
+              <div class="copy-dropdown-item" data-copy="last-week">
+                <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                Last Week
+              </div>
+              <div class="copy-dropdown-item" data-copy="template">
+                <svg data-lucide="file-template" width="16" height="16"></svg>
+                Template
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submitted Banner (hidden by default) -->
+        <div class="ts-submitted-banner" id="tsSubmittedBanner" style="display:none;">
+          <svg data-lucide="check-circle" width="20" height="20"></svg>
+          <span>Submitted for Review -- Awaiting manager approval</span>
+        </div>
+
+        <!-- Week Grid -->
+        <div class="ts-grid-wrapper ts-table-wrap" id="tsGridWrapper">
+          <table class="ts-grid" id="tsGrid">
+            <colgroup>
+              <col class="col-project">
+              <col class="col-day">
+              <col class="col-day">
+              <col class="col-day">
+              <col class="col-day">
+              <col class="col-day">
+              <col class="col-day">
+              <col class="col-day">
+              <col class="col-total">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Mon 30</th>
+                <th>Tue 31</th>
+                <th>Wed 1</th>
+                <th>Thu 2</th>
+                <th>Fri 3</th>
+                <th class="weekend">Sat 4</th>
+                <th class="weekend">Sun 5</th>
+                <th class="col-total">Total</th>
+              </tr>
+            </thead>
+            <tbody id="tsBody">
+              <!-- Row 1: Acme Web Redesign -->
+              <tr class="ts-data-row" data-project="acme">
+                <td><a href="projects.html#acme-web-redesign" class="ts-project-link">Acme Web Redesign</a></td>
+                <td class="ts-cell" data-day="0"><span class="ts-cell-value">6</span></td>
+                <td class="ts-cell" data-day="1"><span class="ts-cell-value">7</span></td>
+                <td class="ts-cell" data-day="2"><span class="ts-cell-value">8</span></td>
+                <td class="ts-cell" data-day="3"><span class="ts-cell-value">6</span></td>
+                <td class="ts-cell" data-day="4"><span class="ts-cell-value">4</span></td>
+                <td class="ts-cell weekend" data-day="5"><span class="ts-cell-value">&#8212;</span></td>
+                <td class="ts-cell weekend" data-day="6"><span class="ts-cell-value">&#8212;</span></td>
+                <td class="total-cell font-mono"><span class="row-total">31</span></td>
+              </tr>
+              <!-- Row 2: Initech API -->
+              <tr class="ts-data-row" data-project="initech">
+                <td><a href="projects.html#initech-api" class="ts-project-link">Initech API</a></td>
+                <td class="ts-cell" data-day="0"><span class="ts-cell-value">2</span></td>
+                <td class="ts-cell" data-day="1"><span class="ts-cell-value">1</span></td>
+                <td class="ts-cell" data-day="2"><span class="ts-cell-value">&#8212;</span></td>
+                <td class="ts-cell" data-day="3"><span class="ts-cell-value">2</span></td>
+                <td class="ts-cell" data-day="4"><span class="ts-cell-value">4</span></td>
+                <td class="ts-cell weekend" data-day="5"><span class="ts-cell-value">&#8212;</span></td>
+                <td class="ts-cell weekend" data-day="6"><span class="ts-cell-value">&#8212;</span></td>
+                <td class="total-cell font-mono"><span class="row-total">9</span></td>
+              </tr>
+              <!-- Add row -->
+              <tr class="ts-add-row" id="addProjectRow">
+                <td colspan="9">
+                  <button class="ts-add-row-btn" id="addProjectBtn">
+                    <svg data-lucide="plus"></svg>
+                    Add Project Row
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <!-- TOTAL row -->
+              <tr class="ts-footer-row" id="totalRow">
+                <td>Total</td>
+                <td class="col-total-day" data-day="0">8</td>
+                <td class="col-total-day" data-day="1">8</td>
+                <td class="col-total-day" data-day="2">8</td>
+                <td class="col-total-day" data-day="3">8</td>
+                <td class="col-total-day" data-day="4">8</td>
+                <td class="col-total-day" data-day="5">0</td>
+                <td class="col-total-day" data-day="6">0</td>
+                <td class="col-total-day" id="grandTotal">40</td>
+              </tr>
+              <!-- Target row -->
+              <tr class="ts-target-row">
+                <td>Target</td>
+                <td>8</td>
+                <td>8</td>
+                <td>8</td>
+                <td>8</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td>40</td>
+              </tr>
+              <!-- Status row -->
+              <tr class="ts-status-row" id="statusRow">
+                <td></td>
+                <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
+                <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
+                <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
+                <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
+                <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
+                <td><span class="ts-status-icon neutral"><svg data-lucide="minus" width="14" height="14"></svg></span></td>
+                <td><span class="ts-status-icon neutral"><svg data-lucide="minus" width="14" height="14"></svg></span></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Mobile Timesheet (visible <640px) -->
+        <div class="mobile-timesheet" id="mobileTimesheet">
+          <div class="day-switcher" id="daySwitcher">
+            <button class="day-switcher-btn" data-day="0">Mon</button>
+            <button class="day-switcher-btn" data-day="1">Tue</button>
+            <button class="day-switcher-btn" data-day="2">Wed</button>
+            <button class="day-switcher-btn" data-day="3">Thu</button>
+            <button class="day-switcher-btn" data-day="4">Fri</button>
+          </div>
+          <div id="mobileDayCards">
+            <!-- Cards generated by JS -->
+          </div>
+          <div class="mobile-daily-total">
+            <span>Daily Total</span>
+            <strong id="mobileDayTotal">8h</strong>
+          </div>
+          <div class="mobile-ts-actions">
+            <button class="btn btn-primary btn-md" id="mobileSubmitBtn">
+              <svg data-lucide="send" width="16" height="16"></svg>
+              Submit for Review
+            </button>
+            <button class="btn btn-secondary btn-md" id="mobileSaveDraftBtn">
+              <svg data-lucide="save" width="16" height="16"></svg>
+              Save Draft
+            </button>
+          </div>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="ts-summary" id="tsSummary">
+          <div class="ts-summary-item">Weekly Total: <strong id="summaryTotal">40h</strong></div>
+          <div class="ts-summary-divider"></div>
+          <div class="ts-summary-item">Target: <strong>40h</strong></div>
+          <div class="ts-summary-divider"></div>
+          <div class="ts-summary-progress">
+            <div class="ts-progress-bar">
+              <div class="ts-progress-fill complete" id="summaryProgressFill" style="width: 100%;"></div>
+            </div>
+            <span class="ts-progress-pct" id="summaryProgressPct">100%</span>
+          </div>
+          <div class="ts-summary-divider"></div>
+          <div class="ts-summary-item">Billable: <strong id="summaryBillable">40h</strong> <span style="color: var(--color-text-3);">(100%)</span></div>
+          <div class="ts-summary-divider"></div>
+          <div class="ts-summary-item">Non-billable: <strong id="summaryNonBillable">0h</strong> <span style="color: var(--color-text-3);">(0%)</span></div>
+        </div>
+
+        <!-- Warning -->
+        <div class="ts-warning" id="tsWarning" style="display: none;">
+          <svg data-lucide="alert-triangle" width="16" height="16"></svg>
+          <span id="tsWarningText">You have logged 32.5h. You need 7.5h more to reach your 40h target.</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="ts-actions">
+          <button class="btn btn-secondary btn-md" id="saveDraftBtn">
+            <svg data-lucide="save" width="16" height="16"></svg>
+            Save Draft
+          </button>
+          <button class="btn btn-primary btn-md" id="submitBtn">
+            <svg data-lucide="send" width="16" height="16"></svg>
+            Submit for Review
+          </button>
+        </div>
+      </div>
+
+      <!-- ════════════ TAB 2: PREVIOUS WEEKS ════════════ -->
+      <div class="tab-content populated-content" id="tab-previous">
+        <div class="data-table-wrapper">
+          <table class="data-table mobile-cards prev-weeks-table">
+            <thead>
+              <tr>
+                <th>Week</th>
+                <th>Hours</th>
+                <th>Billable</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Approved By</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Week">Mar 23 &#8211; 29</td>
+                <td data-label="Hours" class="cell-mono">40h</td>
+                <td data-label="Billable" class="cell-mono">38h</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Submitted">Mar 29</td>
+                <td data-label="Approved By"><a href="employees.html#john-smith" class="employee-link">John Smith</a></td>
+              </tr>
+              <tr>
+                <td data-label="Week">Mar 16 &#8211; 22</td>
+                <td data-label="Hours" class="cell-mono">42h</td>
+                <td data-label="Billable" class="cell-mono">40h</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Submitted">Mar 22</td>
+                <td data-label="Approved By"><a href="employees.html#john-smith" class="employee-link">John Smith</a></td>
+              </tr>
+              <tr>
+                <td data-label="Week">Mar 9 &#8211; 15</td>
+                <td data-label="Hours" class="cell-mono">36h</td>
+                <td data-label="Billable" class="cell-mono">32h</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Submitted">Mar 15</td>
+                <td data-label="Approved By"><a href="employees.html#john-smith" class="employee-link">John Smith</a></td>
+              </tr>
+              <tr>
+                <td data-label="Week">Mar 2 &#8211; 8</td>
+                <td data-label="Hours" class="cell-mono">40h</td>
+                <td data-label="Billable" class="cell-mono">40h</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Submitted">Mar 8</td>
+                <td data-label="Approved By"><a href="employees.html#john-smith" class="employee-link">John Smith</a></td>
+              </tr>
+              <tr>
+                <td data-label="Week">Feb 23 &#8211; Mar 1</td>
+                <td data-label="Hours" class="cell-mono">38h</td>
+                <td data-label="Billable" class="cell-mono">36h</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Submitted">Mar 1</td>
+                <td data-label="Approved By"><a href="employees.html#john-smith" class="employee-link">John Smith</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════════ TAB 3: APPROVAL QUEUE ════════════ -->
+      <div class="tab-content populated-content" id="tab-approval">
+
+        <!-- Approval 1: John Smith -->
+        <div class="approval-card" id="aq-1">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md">JS</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#john-smith">John Smith</a></div>
+            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
+            <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex Phase 2</a> (32h), <a href="projects.html#internal">Internal</a> (10h)</div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value">42h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted 2h ago</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-1">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-1">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approval 2: Bob Taylor -->
+        <div class="approval-card" id="aq-2">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-warning), var(--color-accent));">BT</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
+            <div class="aq-projects"><a href="projects.html#internal">Internal</a> (8h)</div>
+            <div style="margin-top: var(--space-1);"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Only 8h logged</span></div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value" style="color: var(--color-warning);">8h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted 1d ago</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-2">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-2">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approval 3: Carol Kim -->
+        <div class="approval-card" id="aq-3">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-primary));">CK</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#carol-kim">Carol Kim</a></div>
+            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
+            <div class="aq-projects"><a href="projects.html#initech-api">Initech API</a> (36h), <a href="projects.html#internal">Internal</a> (4h)</div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value">40h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted today</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-3">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-3">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approval 4: Marco Rossi -->
+        <div class="approval-card" id="aq-4">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-accent), var(--color-error));">MR</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#marco-rossi">Marco Rossi</a></div>
+            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
+            <div class="aq-projects"><a href="projects.html#acme-web-redesign">Acme Web</a> (40h), <a href="projects.html#internal">Internal</a> (4h)</div>
+            <div style="margin-top: var(--space-1);"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Overtime</span></div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value" style="color: var(--color-warning);">44h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted today</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-4">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-4">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approval 5: David Park -->
+        <div class="approval-card" id="aq-5">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-error), var(--color-accent));">DP</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#david-park">David Park</a></div>
+            <div class="aq-period">Mar 23 &#8211; 29, 2026</div>
+            <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex</a> (30h), <a href="projects.html#internal">Internal</a> (5h)</div>
+            <div style="margin-top: var(--space-1);"><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> OVERDUE: 3 days</span></div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value" style="color: var(--color-error);">35h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted 4d ago</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-5">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-5">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════ EMPTY STATE ════════════ -->
+      <div class="empty-content" id="emptyState">
+        <div class="empty-state">
+          <svg data-lucide="clock" width="64" height="64"></svg>
+          <h3>No Timesheets Yet</h3>
+          <p>Start tracking your hours by adding a project row and logging time for each day.</p>
+          <button class="btn btn-primary btn-md">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            Start Logging Time
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search people, projects, commands..." id="cmdInput" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Quick Actions</div>
+      <div class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Log Time</div>
+          <div class="item-subtitle">Open timesheet entry</div>
+        </div>
+        <div class="item-shortcut"><kbd>T</kbd></div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="receipt" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">New Expense</div>
+          <div class="item-subtitle">Submit expense report</div>
+        </div>
+        <div class="item-shortcut"><kbd>E</kbd></div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="palm-tree" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Request Leave</div>
+          <div class="item-subtitle">Submit leave request</div>
+        </div>
+        <div class="item-shortcut"><kbd>L</kbd></div>
+      </div>
+      <div class="cmd-palette-group-label">Pages</div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Dashboard</div>
+          <div class="item-subtitle">Command center overview</div>
+        </div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div>
+        <div class="item-text">
+          <div class="item-title">Invoices</div>
+          <div class="item-subtitle">Billing and invoicing</div>
+        </div>
+      </div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&#9166;</kbd> Open</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ REJECT MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="rejectModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Reject Timesheet</h3>
+      <button class="modal-close" id="rejectModalClose">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Reason for rejection <span class="required">*</span></label>
+        <textarea class="form-textarea" id="rejectReason" placeholder="Please provide a reason for rejecting this timesheet..." rows="4"></textarea>
+        <span class="form-helper">This will be sent to the employee as a notification.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" id="rejectCancelBtn">Cancel</button>
+      <button class="btn btn-destructive btn-sm" id="rejectConfirmBtn">
+        <svg data-lucide="x" width="14" height="14"></svg>
+        Reject Timesheet
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ TOAST CONTAINER ════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════════════════════════════════════ STATE TOGGLE ════════════════════════════════════════ -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<!-- ════════════════════════════════════════ SCRIPTS ════════════════════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── Initialize Lucide icons ──
+  lucide.createIcons();
+
+  // ── DOM references ──
+  const sidebar        = document.getElementById('sidebar');
+  const collapseBtn    = document.getElementById('sidebarCollapseBtn');
+  const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const searchTrigger  = document.getElementById('searchTrigger');
+  const cmdPalette     = document.getElementById('cmdPalette');
+  const cmdInput       = document.getElementById('cmdInput');
+  const notifBtn       = document.getElementById('notifBtn');
+  const notifPanel     = document.getElementById('notifPanel');
+  const userMenuBtn    = document.getElementById('userMenuBtn');
+  const userDropdown   = document.getElementById('userDropdown');
+  const stateToggle    = document.getElementById('stateToggle');
+  const toastContainer = document.getElementById('toastContainer');
+
+  // ── Sidebar collapse ──
+  collapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Command Palette ──
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    setTimeout(function() { cmdInput.focus(); }, 100);
+  }
+  function closeCmdPalette() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  }
+  function toggleCmdPalette() {
+    if (cmdPalette.classList.contains('active')) closeCmdPalette();
+    else openCmdPalette();
+  }
+  window.toggleCmdPalette = toggleCmdPalette;
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      if (cmdPalette.classList.contains('active')) {
+        closeCmdPalette();
+      } else {
+        openCmdPalette();
+      }
+    }
+    if (e.key === 'Escape' && cmdPalette.classList.contains('active')) {
+      closeCmdPalette();
+    }
+  });
+
+  // ── Notification panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  document.addEventListener('click', function() {
+    notifPanel.classList.remove('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── State toggle ──
+  stateToggle.addEventListener('click', function() {
+    var body = document.body;
+    if (body.classList.contains('show-populated')) {
+      body.classList.remove('show-populated');
+      body.classList.add('show-empty');
+    } else {
+      body.classList.remove('show-empty');
+      body.classList.add('show-populated');
+    }
+  });
+
+  // ── Toast system ──
+  function showToast(type, title, message) {
+    var iconMap = {
+      success: 'check-circle',
+      error: 'alert-circle',
+      warning: 'alert-triangle',
+      info: 'info'
+    };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div>' +
+      (message ? '<div class="toast-message">' + message + '</div>' : '') +
+      '</div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+  function removeToast(toast) {
+    if (toast.parentNode) {
+      toast.classList.add('removing');
+      setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+    }
+  }
+
+  // ════════════════════════════════════════
+  //  TAB SWITCHING
+  // ════════════════════════════════════════
+  var tabs = document.querySelectorAll('.tab[data-tab]');
+  var tabContents = document.querySelectorAll('.tab-content');
+
+  function switchTab(tabName) {
+    tabs.forEach(function(t) { t.classList.toggle('active', t.getAttribute('data-tab') === tabName); });
+    tabContents.forEach(function(tc) {
+      tc.classList.toggle('active', tc.id === 'tab-' + tabName);
+    });
+    window.location.hash = tabName;
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() { switchTab(this.getAttribute('data-tab')); });
+  });
+
+  // Hash-based tab on load
+  var hash = window.location.hash.replace('#', '');
+  if (['week', 'previous', 'approval'].indexOf(hash) >= 0) {
+    switchTab(hash);
+  }
+
+  // ════════════════════════════════════════
+  //  WEEK NAVIGATION
+  // ════════════════════════════════════════
+  var weekOffset = 0;
+  var weekLabels = [
+    'Mar 16 \u2013 22, 2026',
+    'Mar 23 \u2013 29, 2026',
+    'Mar 30 \u2013 Apr 5, 2026',
+    'Apr 6 \u2013 12, 2026',
+    'Apr 13 \u2013 19, 2026'
+  ];
+  var currentWeekIndex = 2;
+
+  function updateWeekLabel() {
+    var idx = currentWeekIndex + weekOffset;
+    idx = Math.max(0, Math.min(idx, weekLabels.length - 1));
+    document.getElementById('weekLabel').textContent = 'Week of ' + weekLabels[idx];
+  }
+
+  document.getElementById('weekPrev').addEventListener('click', function() {
+    weekOffset--;
+    updateWeekLabel();
+  });
+  document.getElementById('weekNext').addEventListener('click', function() {
+    weekOffset++;
+    updateWeekLabel();
+  });
+  document.getElementById('weekToday').addEventListener('click', function() {
+    weekOffset = 0;
+    updateWeekLabel();
+  });
+
+  // ════════════════════════════════════════
+  //  COPY DROPDOWN
+  // ════════════════════════════════════════
+  var copyBtn = document.getElementById('copyBtn');
+  var copyMenu = document.getElementById('copyMenu');
+
+  copyBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    copyMenu.classList.toggle('active');
+  });
+  document.addEventListener('click', function() {
+    copyMenu.classList.remove('active');
+  });
+  document.querySelectorAll('.copy-dropdown-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var action = this.getAttribute('data-copy');
+      showToast('info', 'Copied', action === 'last-week' ? 'Hours from last week have been copied.' : 'Template hours have been applied.');
+      copyMenu.classList.remove('active');
+    });
+  });
+
+  // ════════════════════════════════════════
+  //  TIMESHEET GRID - INLINE EDITING
+  // ════════════════════════════════════════
+  function getCellValue(cell) {
+    var val = cell.querySelector('.ts-cell-value');
+    if (!val) return 0;
+    var text = val.textContent.trim();
+    if (text === '\u2014' || text === '' || text === '-') return 0;
+    return parseFloat(text) || 0;
+  }
+
+  function recalculate() {
+    var rows = document.querySelectorAll('.ts-data-row');
+    var dayTotals = [0, 0, 0, 0, 0, 0, 0];
+    var grandTotal = 0;
+
+    rows.forEach(function(row) {
+      var rowTotal = 0;
+      var cells = row.querySelectorAll('.ts-cell');
+      cells.forEach(function(cell, i) {
+        var v = getCellValue(cell);
+        rowTotal += v;
+        dayTotals[i] += v;
+      });
+      var rt = row.querySelector('.row-total');
+      if (rt) rt.textContent = rowTotal;
+    });
+
+    dayTotals.forEach(function(dt, i) {
+      var el = document.querySelector('#totalRow .col-total-day[data-day="' + i + '"]');
+      if (el) el.textContent = dt;
+      grandTotal += dt;
+    });
+
+    document.getElementById('grandTotal').textContent = grandTotal;
+
+    // Update status bar
+    var pct = Math.min(Math.round((grandTotal / 40) * 100), 100);
+    var remaining = Math.max(40 - grandTotal, 0);
+    document.getElementById('statusHours').textContent = grandTotal + 'h';
+    document.getElementById('statusRemaining').textContent = remaining + 'h';
+    var progressFill = document.getElementById('statusProgressFill');
+    progressFill.style.width = pct + '%';
+    progressFill.className = 'ts-progress-fill ' + (grandTotal >= 40 ? 'complete' : 'warning');
+    document.getElementById('statusProgressPct').textContent = pct + '%';
+
+    // Update summary
+    document.getElementById('summaryTotal').textContent = grandTotal + 'h';
+    var summaryFill = document.getElementById('summaryProgressFill');
+    summaryFill.style.width = pct + '%';
+    summaryFill.className = 'ts-progress-fill ' + (grandTotal >= 40 ? 'complete' : 'warning');
+    document.getElementById('summaryProgressPct').textContent = pct + '%';
+    document.getElementById('summaryBillable').textContent = grandTotal + 'h';
+    var billPct = grandTotal > 0 ? '100%' : '0%';
+    document.getElementById('summaryBillable').nextElementSibling.textContent = '(' + billPct + ')';
+    document.getElementById('summaryNonBillable').textContent = '0h';
+
+    // Update warning
+    var warning = document.getElementById('tsWarning');
+    if (grandTotal < 40) {
+      warning.style.display = 'flex';
+      document.getElementById('tsWarningText').textContent = 'You have logged ' + grandTotal + 'h. You need ' + remaining + 'h more to reach your 40h target.';
+    } else {
+      warning.style.display = 'none';
+    }
+
+    // Update status row icons
+    var targets = [8, 8, 8, 8, 8, 0, 0];
+    var statusCells = document.querySelectorAll('#statusRow td');
+    for (var i = 1; i <= 7; i++) {
+      var cell = statusCells[i];
+      if (!cell) continue;
+      var dayIdx = i - 1;
+      if (dayIdx >= 5) {
+        cell.innerHTML = '<span class="ts-status-icon neutral"><svg data-lucide="minus" width="14" height="14"></svg></span>';
+      } else if (dayTotals[dayIdx] >= targets[dayIdx]) {
+        cell.innerHTML = '<span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span>';
+      } else {
+        cell.innerHTML = '<span class="ts-status-icon miss"><svg data-lucide="alert-triangle" width="14" height="14"></svg></span>';
+      }
+    }
+    lucide.createIcons({ nodes: [document.getElementById('statusRow')] });
+
+    // Update column total styling
+    document.querySelectorAll('#totalRow .col-total-day').forEach(function(td, i) {
+      if (i < 5) {
+        td.style.color = dayTotals[i] < targets[i] ? 'var(--color-warning)' : '';
+      }
+    });
+  }
+
+  // Click to edit cells
+  document.getElementById('tsBody').addEventListener('click', function(e) {
+    var cell = e.target.closest('.ts-cell');
+    if (!cell || cell.classList.contains('weekend')) return;
+    if (cell.querySelector('.ts-cell-input')) return;
+
+    var val = getCellValue(cell);
+    var valSpan = cell.querySelector('.ts-cell-value');
+    valSpan.style.display = 'none';
+
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'ts-cell-input';
+    input.min = '0';
+    input.max = '24';
+    input.step = '0.5';
+    input.value = val || '';
+    cell.appendChild(input);
+    input.focus();
+    input.select();
+
+    function commitEdit() {
+      var newVal = parseFloat(input.value) || 0;
+      newVal = Math.max(0, Math.min(24, newVal));
+      valSpan.textContent = newVal > 0 ? newVal : '\u2014';
+      valSpan.style.display = 'block';
+      if (input.parentNode) input.parentNode.removeChild(input);
+      recalculate();
+    }
+
+    input.addEventListener('blur', commitEdit);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        commitEdit();
+        // Move to next cell
+        if (e.key === 'Tab') {
+          var allCells = Array.from(document.querySelectorAll('.ts-cell:not(.weekend)'));
+          var idx = allCells.indexOf(cell);
+          if (idx >= 0 && idx < allCells.length - 1) {
+            allCells[idx + 1].click();
+          }
+        }
+      }
+      if (e.key === 'Escape') {
+        valSpan.style.display = 'block';
+        if (input.parentNode) input.parentNode.removeChild(input);
+      }
+    });
+  });
+
+  // ════════════════════════════════════════
+  //  ADD PROJECT ROW
+  // ════════════════════════════════════════
+  var projectOptions = [
+    'Globex Phase 2',
+    'Meridian Corp',
+    'Internal',
+    'Training',
+    'Overhead',
+    'R&D Innovation'
+  ];
+
+  document.getElementById('addProjectBtn').addEventListener('click', function() {
+    var tbody = document.getElementById('tsBody');
+    var addRow = document.getElementById('addProjectRow');
+
+    var tr = document.createElement('tr');
+    tr.className = 'ts-data-row';
+    tr.setAttribute('data-project', 'new-' + Date.now());
+
+    var projectTd = document.createElement('td');
+    var select = document.createElement('select');
+    select.className = 'ts-project-select';
+    var defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = 'Select project...';
+    select.appendChild(defaultOpt);
+    projectOptions.forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      select.appendChild(opt);
+    });
+    projectTd.appendChild(select);
+    tr.appendChild(projectTd);
+
+    for (var d = 0; d < 7; d++) {
+      var td = document.createElement('td');
+      td.className = 'ts-cell' + (d >= 5 ? ' weekend' : '');
+      td.setAttribute('data-day', d);
+      td.innerHTML = '<span class="ts-cell-value">\u2014</span>';
+      tr.appendChild(td);
+    }
+    var totalTd = document.createElement('td');
+    totalTd.className = 'total-cell font-mono';
+    totalTd.innerHTML = '<span class="row-total">0</span>';
+    tr.appendChild(totalTd);
+
+    tbody.insertBefore(tr, addRow);
+
+    // Convert select to link after selection
+    select.addEventListener('change', function() {
+      if (this.value) {
+        var link = document.createElement('a');
+        link.href = 'projects.html#detail';
+        link.className = 'ts-project-link';
+        link.textContent = this.value;
+        projectTd.innerHTML = '';
+        projectTd.appendChild(link);
+      }
+    });
+    select.focus();
+
+    recalculate();
+  });
+
+  // ════════════════════════════════════════
+  //  SUBMIT / SAVE DRAFT
+  // ════════════════════════════════════════
+  document.getElementById('saveDraftBtn').addEventListener('click', function() {
+    var btn = this;
+    btn.classList.add('btn-loading');
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      showToast('success', 'Draft Saved', 'Your timesheet draft has been saved.');
+    }, 1000);
+  });
+
+  var isSubmitted = false;
+
+  function doSubmit() {
+    var total = parseInt(document.getElementById('grandTotal').textContent) || 0;
+    if (total < 40) {
+      showToast('warning', 'Under Target', 'You have only logged ' + total + 'h. Target is 40h. Please review before submitting.');
+      return;
+    }
+    var btn = document.getElementById('submitBtn');
+    btn.classList.add('btn-loading');
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      isSubmitted = true;
+      // Show submitted banner
+      document.getElementById('tsSubmittedBanner').style.display = 'flex';
+      // Disable all cell inputs
+      document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = 'none'; });
+      document.getElementById('tsGridWrapper').classList.add('submitted-state');
+      // Change button to Recall
+      btn.innerHTML = '<svg data-lucide="undo-2" width="16" height="16"></svg> Recall Submission';
+      btn.className = 'btn btn-ghost btn-md';
+      lucide.createIcons({ nodes: [btn] });
+      showToast('success', 'Submitted', 'Your timesheet has been submitted for review.');
+    }, 1000);
+  }
+
+  function doRecall() {
+    var btn = document.getElementById('submitBtn');
+    btn.classList.add('btn-loading');
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      isSubmitted = false;
+      document.getElementById('tsSubmittedBanner').style.display = 'none';
+      document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = ''; });
+      document.getElementById('tsGridWrapper').classList.remove('submitted-state');
+      btn.innerHTML = '<svg data-lucide="send" width="16" height="16"></svg> Submit for Review';
+      btn.className = 'btn btn-primary btn-md';
+      lucide.createIcons({ nodes: [btn] });
+      showToast('info', 'Recalled', 'Your submission has been recalled. You can now edit your timesheet.');
+    }, 1000);
+  }
+
+  document.getElementById('submitBtn').addEventListener('click', function() {
+    if (isSubmitted) doRecall();
+    else doSubmit();
+  });
+
+  // ════════════════════════════════════════
+  //  APPROVAL QUEUE
+  // ════════════════════════════════════════
+  var rejectModal = document.getElementById('rejectModal');
+  var rejectTargetId = null;
+
+  // Approve buttons
+  document.querySelectorAll('.aq-approve-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = this.getAttribute('data-id');
+      var card = document.getElementById(id);
+      var name = card.querySelector('.aq-name a').textContent;
+      showToast('success', 'Timesheet Approved', name + '\'s timesheet has been approved.');
+      card.classList.add('fading');
+      setTimeout(function() {
+        if (card.parentNode) card.parentNode.removeChild(card);
+        updateApprovalCount();
+      }, 400);
+    });
+  });
+
+  // Reject buttons
+  document.querySelectorAll('.aq-reject-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      rejectTargetId = this.getAttribute('data-id');
+      rejectModal.classList.add('active');
+      setTimeout(function() { document.getElementById('rejectReason').focus(); }, 100);
+    });
+  });
+
+  document.getElementById('rejectModalClose').addEventListener('click', function() {
+    rejectModal.classList.remove('active');
+    rejectTargetId = null;
+  });
+  document.getElementById('rejectCancelBtn').addEventListener('click', function() {
+    rejectModal.classList.remove('active');
+    rejectTargetId = null;
+  });
+  rejectModal.addEventListener('click', function(e) {
+    if (e.target === rejectModal) {
+      rejectModal.classList.remove('active');
+      rejectTargetId = null;
+    }
+  });
+
+  document.getElementById('rejectConfirmBtn').addEventListener('click', function() {
+    if (!rejectTargetId) return;
+    var card = document.getElementById(rejectTargetId);
+    var name = card.querySelector('.aq-name a').textContent;
+    var reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+      document.getElementById('rejectReason').classList.add('error');
+      return;
+    }
+    document.getElementById('rejectReason').classList.remove('error');
+    showToast('error', 'Timesheet Rejected', name + '\'s timesheet has been rejected.');
+    card.classList.add('fading');
+    setTimeout(function() {
+      if (card.parentNode) card.parentNode.removeChild(card);
+      updateApprovalCount();
+    }, 400);
+    rejectModal.classList.remove('active');
+    document.getElementById('rejectReason').value = '';
+    rejectTargetId = null;
+  });
+
+  function updateApprovalCount() {
+    var remaining = document.querySelectorAll('.approval-card').length;
+    var countEl = document.querySelector('.tab[data-tab="approval"] .tab-count');
+    if (countEl) countEl.textContent = remaining;
+  }
+
+  // ════════════════════════════════════════
+  //  MOBILE TIMESHEET
+  // ════════════════════════════════════════
+  var mobileProjects = [
+    { name: 'Acme Web Redesign', client: 'Acme Corp', rate: 85, hours: [6, 7, 8, 6, 4] },
+    { name: 'Initech API', client: 'Initech', rate: 75, hours: [2, 1, 0, 2, 4] }
+  ];
+  var activeMobileDay = 4; // Friday (today is Sun Apr 5, so default Fri)
+
+  function renderMobileCards() {
+    var container = document.getElementById('mobileDayCards');
+    if (!container) return;
+    container.innerHTML = '';
+    var dayTotal = 0;
+    mobileProjects.forEach(function(proj, idx) {
+      var h = proj.hours[activeMobileDay] || 0;
+      dayTotal += h;
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.style.marginBottom = 'var(--space-3)';
+      card.innerHTML =
+        '<div class="card-body">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<strong>' + proj.name + '</strong>' +
+            '<input type="number" class="form-input" style="width:80px;text-align:center;font-family:var(--font-mono);" value="' + h + '" min="0" max="24" step="0.5" data-proj="' + idx + '">' +
+          '</div>' +
+          '<div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-1);">Client: ' + proj.client + ' &bull; &euro;' + proj.rate + '/h</div>' +
+        '</div>';
+      container.appendChild(card);
+
+      // Listen for input changes
+      card.querySelector('input').addEventListener('change', function() {
+        var val = parseFloat(this.value) || 0;
+        val = Math.max(0, Math.min(24, val));
+        this.value = val;
+        mobileProjects[idx].hours[activeMobileDay] = val;
+        updateMobileDayTotal();
+        // Sync with grid
+        syncMobileToGrid();
+      });
+    });
+    updateMobileDayTotal();
+  }
+
+  function updateMobileDayTotal() {
+    var total = 0;
+    mobileProjects.forEach(function(p) { total += (p.hours[activeMobileDay] || 0); });
+    var el = document.getElementById('mobileDayTotal');
+    if (el) el.textContent = total + 'h';
+  }
+
+  function syncMobileToGrid() {
+    var rows = document.querySelectorAll('.ts-data-row');
+    rows.forEach(function(row, idx) {
+      if (idx < mobileProjects.length) {
+        var cell = row.querySelector('.ts-cell[data-day="' + activeMobileDay + '"] .ts-cell-value');
+        if (cell) {
+          var v = mobileProjects[idx].hours[activeMobileDay];
+          cell.textContent = v > 0 ? v : '\u2014';
+        }
+      }
+    });
+    recalculate();
+  }
+
+  // Day switcher
+  document.querySelectorAll('.day-switcher-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.day-switcher-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      activeMobileDay = parseInt(this.getAttribute('data-day'));
+      renderMobileCards();
+    });
+  });
+
+  // Default active day
+  var todayDow = new Date().getDay();
+  var mobileDefaultDay = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : 4;
+  activeMobileDay = mobileDefaultDay;
+  var defaultDayBtn = document.querySelector('.day-switcher-btn[data-day="' + mobileDefaultDay + '"]');
+  if (defaultDayBtn) defaultDayBtn.classList.add('active');
+  renderMobileCards();
+
+  // Mobile submit/save
+  var mobileSubmitBtn = document.getElementById('mobileSubmitBtn');
+  if (mobileSubmitBtn) {
+    mobileSubmitBtn.addEventListener('click', function() {
+      var btn = this;
+      btn.classList.add('btn-loading');
+      setTimeout(function() {
+        btn.classList.remove('btn-loading');
+        showToast('success', 'Submitted', 'Your timesheet has been submitted for review.');
+      }, 1000);
+    });
+  }
+  var mobileSaveDraftBtn = document.getElementById('mobileSaveDraftBtn');
+  if (mobileSaveDraftBtn) {
+    mobileSaveDraftBtn.addEventListener('click', function() {
+      var btn = this;
+      btn.classList.add('btn-loading');
+      setTimeout(function() {
+        btn.classList.remove('btn-loading');
+        showToast('success', 'Draft Saved', 'Your timesheet draft has been saved.');
+      }, 1000);
+    });
+  }
+
+  // ── Initial recalculate ──
+  recalculate();
+
+})();
+</script>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item active"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>

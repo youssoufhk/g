@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approvals — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Approvals-specific styles ── */
+    .approval-tabs { margin-bottom: var(--space-4); }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .filter-bar label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      font-weight: var(--weight-medium);
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) 0;
+      margin-bottom: var(--space-2);
+      font-size: var(--text-overline);
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .section-label.urgent { color: var(--color-error); }
+    .section-label.pending { color: var(--color-text-3); }
+    .section-label .section-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .section-label.urgent .section-dot { background: var(--color-error); }
+    .section-label.pending .section-dot { background: var(--color-text-3); }
+
+    .approval-list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+    .approval-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      transition: all var(--motion-fast);
+    }
+    .approval-card:hover { border-color: var(--color-border-strong); }
+    .approval-card.urgent-card { border-left: 3px solid var(--color-error); }
+    .approval-card.removing-item {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s ease-out;
+    }
+
+    .approval-card .card-check {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .approval-card .card-check input {
+      width: 16px; height: 16px;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    .card-type-icon {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      flex-shrink: 0;
+    }
+    .card-type-icon.timesheet { background: var(--color-info-muted); color: var(--color-info); }
+    .card-type-icon.leave { background: var(--color-success-muted); color: var(--color-success); }
+    .card-type-icon.expense { background: var(--color-gold-muted); color: var(--color-gold); }
+
+    .card-body { flex: 1; min-width: 0; }
+    .card-main-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-1);
+      flex-wrap: wrap;
+    }
+    .card-employee {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .card-employee a {
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      font-size: var(--text-body);
+    }
+    .card-employee a:hover { color: var(--color-primary); }
+
+    .card-details {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .card-details .detail-sep { color: var(--color-text-3); }
+
+    .card-context {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-top: var(--space-2);
+      flex-wrap: wrap;
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .card-context .context-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+      margin-top: var(--space-1);
+    }
+
+    .warning-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 1px var(--space-2);
+      background: var(--color-warning-muted);
+      color: var(--color-warning);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-full);
+    }
+    .warning-tag svg { width: 12px; height: 12px; }
+
+    .submitted-time {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+
+    /* Bulk action bar */
+    .bulk-bar {
+      position: fixed;
+      bottom: var(--space-6);
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-surface-3);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-5);
+      z-index: 800;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--motion-normal) var(--ease-out);
+    }
+    .bulk-bar.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .bulk-bar .bulk-count {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      white-space: nowrap;
+    }
+
+    /* Empty state */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+    .empty-state {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-6);
+      text-align: center;
+      color: var(--color-text-3);
+      gap: var(--space-4);
+    }
+    .empty-state svg { color: var(--color-text-3); opacity: 0.5; }
+    .empty-state h3 { font-size: var(--text-heading-2); color: var(--color-text-2); }
+    .empty-state p { max-width: 400px; }
+  </style>
+</head>
+<body class="show-populated">
+
+<div class="app">
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+        <nav class="sidebar-nav">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html#onboarding" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="bar-chart-3"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item active">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Approvals</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
+        <div style="position: relative;">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">2 overdue timesheets need your approval</div>
+                  <div class="notif-time">Just now</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon"><svg data-lucide="palm-tree" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Alice Wang submitted a leave request for Apr 28-29</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-icon"><svg data-lucide="receipt" width="16" height="16" style="color: var(--color-gold);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Bob Taylor submitted an expense claim for &euro;340</div>
+                  <div class="notif-time">3 hours ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Approvals</h1>
+          <p class="page-subtitle">Review and approve pending requests from your team</p>
+        </div>
+        <div class="page-header-actions">
+          <div class="dropdown">
+            <button class="btn btn-secondary btn-md" id="bulkDropdownBtn">
+              <svg data-lucide="layers" width="16" height="16"></svg>
+              Bulk Actions
+              <svg data-lucide="chevron-down" width="14" height="14"></svg>
+            </button>
+            <div class="dropdown-menu right" id="bulkDropdownMenu">
+              <button class="dropdown-item" onclick="approveAllVisible()"><svg data-lucide="check-circle" width="16" height="16"></svg> Approve All Visible</button>
+              <button class="dropdown-item"><svg data-lucide="download" width="16" height="16"></svg> Export to CSV</button>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item destructive"><svg data-lucide="x-circle" width="16" height="16"></svg> Reject All Selected</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Populated content -->
+      <div class="populated-content">
+
+        <!-- Tabs -->
+        <div class="tabs approval-tabs">
+          <button class="tab active" data-tab="all" data-filter="all">All <span class="tab-count">12</span></button>
+          <button class="tab" data-tab="leaves" data-filter="leave">Leaves <span class="tab-count">3</span></button>
+          <button class="tab" data-tab="timesheets" data-filter="timesheet">Timesheets <span class="tab-count">7</span></button>
+          <button class="tab" data-tab="expenses" data-filter="expense">Expenses <span class="tab-count">2</span></button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <label>Sort by</label>
+          <select class="form-select form-input-sm" style="width: 140px;" id="sortSelect">
+            <option value="urgency">Urgency</option>
+            <option value="date">Date Submitted</option>
+            <option value="name">Employee Name</option>
+            <option value="type">Request Type</option>
+          </select>
+          <label>Department</label>
+          <select class="form-select form-input-sm" style="width: 140px;" id="deptFilter">
+            <option value="all">All</option>
+            <option value="engineering">Engineering</option>
+            <option value="operations">Operations</option>
+            <option value="design">Design</option>
+            <option value="analytics">Analytics</option>
+          </select>
+          <label>Employee</label>
+          <select class="form-select form-input-sm" style="width: 160px;" id="empFilter">
+            <option value="all">All</option>
+            <option value="john-smith">John Smith</option>
+            <option value="david-park">David Park</option>
+            <option value="alice-wang">Alice Wang</option>
+            <option value="marco-rossi">Marco Rossi</option>
+            <option value="liam-obrien">Liam O'Brien</option>
+            <option value="bob-taylor">Bob Taylor</option>
+            <option value="carol-kim">Carol Kim</option>
+            <option value="sophie-dubois">Sophie Dubois</option>
+          </select>
+        </div>
+
+        <!-- URGENT Section -->
+        <div class="section-label urgent" id="urgentLabel">
+          <span class="section-dot"></span>
+          URGENT - Overdue
+          <span class="badge badge-error" style="margin-left: var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> 2</span>
+        </div>
+
+        <div class="approval-list" id="approvalList">
+
+          <!-- 1. Timesheet - John Smith (URGENT) -->
+          <div class="approval-card urgent-card" data-type="timesheet" data-id="1">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="1"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">JS</div>
+                  <a href="employees.html#profile">John Smith</a>
+                </div>
+                <span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span>
+              </div>
+              <div class="card-details">
+                <span>Mar 23 - 29, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">42h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Acme Corp (32h), Internal (10h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted 3 days ago</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 2. Timesheet - David Park (URGENT) -->
+          <div class="approval-card urgent-card" data-type="timesheet" data-id="2">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="2"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">DP</div>
+                  <a href="employees.html#profile">David Park</a>
+                </div>
+                <span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span>
+                <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Under target</span>
+              </div>
+              <div class="card-details">
+                <span>Mar 23 - 29, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">35h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Globex Corp (30h), Internal (5h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted 4 days ago</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- PENDING Section Label -->
+          <div class="section-label pending" id="pendingLabel" style="margin-top: var(--space-4);">
+            <span class="section-dot"></span>
+            PENDING
+            <span class="badge badge-default" style="margin-left: var(--space-1);"><svg data-lucide="clock" width="12" height="12"></svg> 10</span>
+          </div>
+
+          <!-- 3. Leave - Alice Wang -->
+          <div class="approval-card" data-type="leave" data-id="3">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="3"></div>
+            <div class="card-type-icon leave"><svg data-lucide="palm-tree" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-success"><svg data-lucide="palm-tree" width="12" height="12"></svg> Leave</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">AW</div>
+                  <a href="employees.html#profile">Alice Wang</a>
+                </div>
+              </div>
+              <div class="card-details">
+                <span>Apr 28 - 29, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span>2 days Annual Leave</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Balance after: 16 days</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="users" width="12" height="12"></svg> Team impact: No conflicts</span>
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 4. Leave - Marco Rossi -->
+          <div class="approval-card" data-type="leave" data-id="4">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="4"></div>
+            <div class="card-type-icon leave"><svg data-lucide="palm-tree" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-success"><svg data-lucide="palm-tree" width="12" height="12"></svg> Leave</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">MR</div>
+                  <a href="employees.html#profile">Marco Rossi</a>
+                </div>
+              </div>
+              <div class="card-details">
+                <span>May 5 - 9, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span>5 days Annual Leave</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Balance after: 12 days</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="alert-triangle" width="12" height="12" style="color: var(--color-warning);"></svg> Team impact: 1 other person off</span>
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 5. Leave - Liam O'Brien -->
+          <div class="approval-card" data-type="leave" data-id="5">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="5"></div>
+            <div class="card-type-icon leave"><svg data-lucide="palm-tree" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-success"><svg data-lucide="palm-tree" width="12" height="12"></svg> Leave</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">LO</div>
+                  <a href="employees.html#profile">Liam O'Brien</a>
+                </div>
+              </div>
+              <div class="card-details">
+                <span>Apr 14, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span>1 day Personal Leave</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted yesterday</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 6. Expense - Bob Taylor -->
+          <div class="approval-card" data-type="expense" data-id="6">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="6"></div>
+            <div class="card-type-icon expense"><svg data-lucide="receipt" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-gold"><svg data-lucide="receipt" width="12" height="12"></svg> Expense</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">BT</div>
+                  <a href="employees.html#profile">Bob Taylor</a>
+                </div>
+                <span class="badge badge-primary"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
+              </div>
+              <div class="card-details">
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">&euro;340.00</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Hotel</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Acme Corp project</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="paperclip" width="12" height="12"></svg> Receipt attached</span>
+                <span class="context-item"><svg data-lucide="shield-check" width="12" height="12" style="color: var(--color-success);"></svg> Policy: Within limits</span>
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 7. Expense - Carol Kim -->
+          <div class="approval-card" data-type="expense" data-id="7">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="7"></div>
+            <div class="card-type-icon expense"><svg data-lucide="receipt" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-gold"><svg data-lucide="receipt" width="12" height="12"></svg> Expense</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">CK</div>
+                  <a href="employees.html#profile">Carol Kim</a>
+                </div>
+                <span class="badge badge-primary"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
+              </div>
+              <div class="card-details">
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">&euro;85.50</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Meals</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Initech API project</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="paperclip" width="12" height="12"></svg> Receipt attached</span>
+                <span class="context-item"><svg data-lucide="shield-check" width="12" height="12" style="color: var(--color-success);"></svg> Policy: Within limits</span>
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 8. Timesheet - Carol Kim -->
+          <div class="approval-card" data-type="timesheet" data-id="8">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="8"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">CK</div>
+                  <a href="employees.html#profile">Carol Kim</a>
+                </div>
+              </div>
+              <div class="card-details">
+                <span>Mar 30 - Apr 5, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">40h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Initech (36h), Internal (4h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 9. Timesheet - Marco Rossi -->
+          <div class="approval-card" data-type="timesheet" data-id="9">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="9"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">MR</div>
+                  <a href="employees.html#profile">Marco Rossi</a>
+                </div>
+                <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Overtime</span>
+              </div>
+              <div class="card-details">
+                <span>Mar 30 - Apr 5, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">44h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Acme Corp (40h), Internal (4h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 10. Timesheet - Bob Taylor -->
+          <div class="approval-card" data-type="timesheet" data-id="10">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="10"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">BT</div>
+                  <a href="employees.html#profile">Bob Taylor</a>
+                </div>
+                <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Only 8h</span>
+              </div>
+              <div class="card-details">
+                <span>Mar 30 - Apr 5, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">8h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Internal (8h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted 1 day ago</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 11. Timesheet - Liam O'Brien -->
+          <div class="approval-card" data-type="timesheet" data-id="11">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="11"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">LO</div>
+                  <a href="employees.html#profile">Liam O'Brien</a>
+                </div>
+              </div>
+              <div class="card-details">
+                <span>Mar 30 - Apr 5, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">40h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Acme Corp (40h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+          <!-- 12. Timesheet - Sophie Dubois -->
+          <div class="approval-card" data-type="timesheet" data-id="12">
+            <div class="card-check"><input type="checkbox" class="item-check" data-id="12"></div>
+            <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
+            <div class="card-body">
+              <div class="card-main-row">
+                <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
+                <div class="card-employee">
+                  <div class="avatar avatar-xs">SD</div>
+                  <a href="employees.html#profile">Sophie Dubois</a>
+                </div>
+              </div>
+              <div class="card-details">
+                <span>Mar 30 - Apr 5, 2026</span>
+                <span class="detail-sep">&middot;</span>
+                <span class="font-mono" style="font-weight: var(--weight-semibold);">38h</span>
+                <span class="detail-sep">&middot;</span>
+                <span>Contoso Ltd (34h), Internal (4h)</span>
+              </div>
+              <div class="card-context">
+                <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
+              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
+            </div>
+          </div>
+
+        </div><!-- /approval-list -->
+
+      </div><!-- /populated-content -->
+
+      <!-- Empty State -->
+      <div class="empty-content empty-state">
+        <svg data-lucide="check-circle-2" width="64" height="64"></svg>
+        <h3>All caught up!</h3>
+        <p>There are no pending approvals right now. New requests will appear here.</p>
+      </div>
+
+    </main>
+  </div><!-- /main-wrapper -->
+</div><!-- /app -->
+
+<!-- Bulk Action Bar -->
+<div class="bulk-bar" id="bulkBar">
+  <span class="bulk-count" id="bulkCount">0 selected</span>
+  <button class="btn btn-primary btn-sm" id="bulkApproveBtn"><svg data-lucide="check" width="14" height="14"></svg> Approve Selected</button>
+  <button class="btn btn-destructive btn-sm" id="bulkRejectBtn"><svg data-lucide="x" width="14" height="14"></svg> Reject Selected</button>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="modal-backdrop" id="rejectModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title">Rejection Reason</h3>
+      <button class="modal-close" id="rejectModalClose"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Reason <span class="required">*</span></label>
+        <textarea class="form-textarea" id="rejectReason" rows="3" placeholder="Provide a reason for rejection..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" id="rejectCancelBtn">Cancel</button>
+      <button class="btn btn-destructive btn-md" id="rejectConfirmBtn">Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-backdrop" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="detailModalTitle">Request Details</h3>
+      <button class="modal-close" id="detailModalClose"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body" id="detailModalBody">
+      <p style="color: var(--color-text-2);">Detailed view of the request including full breakdown, history, and comments would appear here in the full application.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('detailModal')">Close</button>
+      <button class="btn btn-primary btn-md">Approve</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" id="cmdInput" placeholder="Search anything..." autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Pages</div>
+      <a href="index.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="layout-dashboard" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Dashboard</div></div>
+      </a>
+      <a href="timesheets.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Timesheets</div></div>
+      </a>
+      <a href="expenses.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="receipt" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Expenses</div></div>
+      </a>
+      <a href="leaves.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="palm-tree" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Leaves</div></div>
+      </a>
+      <a href="employees.html#profile" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Team Directory</div></div>
+      </a>
+      <a href="admin.html" class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="settings" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Configuration</div></div>
+      </a>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&crarr;</kbd> Open</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Empty State Toggle -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── DOM refs ──
+  var sidebar = document.getElementById('sidebar');
+  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  var searchTrigger = document.getElementById('searchTrigger');
+  var cmdPalette = document.getElementById('cmdPalette');
+  var cmdInput = document.getElementById('cmdInput');
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var userMenuBtn = document.getElementById('userMenuBtn');
+  var userDropdown = document.getElementById('userDropdown');
+  var toastContainer = document.getElementById('toastContainer');
+  var stateToggle = document.getElementById('stateToggle');
+  var bulkBar = document.getElementById('bulkBar');
+  var bulkCount = document.getElementById('bulkCount');
+  var bulkDropdownBtn = document.getElementById('bulkDropdownBtn');
+  var bulkDropdownMenu = document.getElementById('bulkDropdownMenu');
+
+  // ── Sidebar Collapse ──
+  sidebarCollapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // ── Mobile Menu ──
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Command Palette ──
+  function openCmdPalette() {
+    cmdPalette.classList.add('active');
+    cmdInput.focus();
+  }
+  function closeCmdPalette() {
+    cmdPalette.classList.remove('active');
+    cmdInput.value = '';
+  }
+  searchTrigger.addEventListener('click', openCmdPalette);
+  cmdPalette.addEventListener('click', function(e) {
+    if (e.target === cmdPalette) closeCmdPalette();
+  });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      cmdPalette.classList.contains('active') ? closeCmdPalette() : openCmdPalette();
+    }
+    if (e.key === 'Escape' && cmdPalette.classList.contains('active')) closeCmdPalette();
+  });
+
+  // ── Notification Panel ──
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User Dropdown ──
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  // ── Bulk Actions Dropdown ──
+  bulkDropdownBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    bulkDropdownMenu.classList.toggle('active');
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function(e) {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
+    if (!bulkDropdownMenu.contains(e.target) && !bulkDropdownBtn.contains(e.target)) bulkDropdownMenu.classList.remove('active');
+  });
+
+  // ── Toast Notifications ──
+  function showToast(type, title, message) {
+    var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  }
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+
+  // ── Tab Filtering ──
+  var filterTabs = document.querySelectorAll('.approval-tabs .tab');
+  var currentFilter = 'all';
+
+  filterTabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      filterTabs.forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+      currentFilter = this.getAttribute('data-filter');
+      applyFilter();
+    });
+  });
+
+  function applyFilter() {
+    var cards = document.querySelectorAll('.approval-card');
+    var urgentLabel = document.getElementById('urgentLabel');
+    var pendingLabel = document.getElementById('pendingLabel');
+    var hasUrgent = false;
+    var hasPending = false;
+
+    cards.forEach(function(card) {
+      var type = card.getAttribute('data-type');
+      var isUrgent = card.classList.contains('urgent-card');
+      if (currentFilter === 'all' || type === currentFilter) {
+        card.style.display = '';
+        if (isUrgent) hasUrgent = true;
+        else hasPending = true;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (urgentLabel) urgentLabel.style.display = hasUrgent ? '' : 'none';
+    if (pendingLabel) pendingLabel.style.display = hasPending ? '' : 'none';
+  }
+
+  // ── Checkbox Selection & Bulk Bar ──
+  var checkboxes = document.querySelectorAll('.item-check');
+
+  function updateBulkBar() {
+    var checked = document.querySelectorAll('.item-check:checked');
+    var count = checked.length;
+    if (count > 0) {
+      bulkBar.classList.add('visible');
+      bulkCount.textContent = count + ' selected';
+    } else {
+      bulkBar.classList.remove('visible');
+    }
+  }
+
+  checkboxes.forEach(function(cb) {
+    cb.addEventListener('change', updateBulkBar);
+  });
+
+  // ── Approve / Reject Actions ──
+  var rejectTargetCard = null;
+
+  function approveCard(card) {
+    var name = card.querySelector('.card-employee a').textContent;
+    card.classList.add('removing-item');
+    setTimeout(function() {
+      card.style.display = 'none';
+      card.classList.remove('removing-item');
+    }, 300);
+    showToast('success', 'Approved', name + "'s request has been approved.");
+    updateBulkBar();
+  }
+
+  function openRejectModal(card) {
+    rejectTargetCard = card;
+    document.getElementById('rejectModal').classList.add('active');
+    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectReason').focus();
+  }
+
+  function closeRejectModal() {
+    document.getElementById('rejectModal').classList.remove('active');
+    rejectTargetCard = null;
+  }
+
+  document.getElementById('rejectModalClose').addEventListener('click', closeRejectModal);
+  document.getElementById('rejectCancelBtn').addEventListener('click', closeRejectModal);
+  document.getElementById('rejectModal').addEventListener('click', function(e) {
+    if (e.target === this) closeRejectModal();
+  });
+
+  document.getElementById('rejectConfirmBtn').addEventListener('click', function() {
+    var reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+      document.getElementById('rejectReason').style.borderColor = 'var(--color-error)';
+      return;
+    }
+    var btn = this;
+    btn.classList.add('btn-loading');
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      if (rejectTargetCard) {
+        var name = rejectTargetCard.querySelector('.card-employee a').textContent;
+        rejectTargetCard.classList.add('removing-item');
+        var card = rejectTargetCard;
+        setTimeout(function() { card.style.display = 'none'; }, 300);
+        showToast('error', 'Rejected', name + "'s request has been rejected.");
+      }
+      closeRejectModal();
+      updateBulkBar();
+    }, 1000);
+  });
+
+  // ── Type-specific detail modal content (ISSUE-19) ──
+  function buildTimesheetDetail(card) {
+    var name = card.querySelector('.card-employee a').textContent;
+    var details = card.querySelector('.card-details').textContent.trim();
+    return '<div style="margin-bottom:var(--space-4);">' +
+      '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">' +
+        '<div class="avatar avatar-sm">' + name.split(' ').map(function(n){return n[0]}).join('') + '</div>' +
+        '<div><strong style="color:var(--color-text-1);">' + name + '</strong><div style="font-size:var(--text-caption);color:var(--color-text-3);">Timesheet Review</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="overflow-x:auto;margin-bottom:var(--space-4);">' +
+      '<table style="width:100%;border-collapse:collapse;font-size:var(--text-body-sm);">' +
+        '<thead><tr style="border-bottom:1px solid var(--color-border);">' +
+          '<th style="text-align:left;padding:var(--space-2);color:var(--color-text-2);font-weight:var(--weight-medium);">Project</th>' +
+          '<th style="text-align:center;padding:var(--space-2);color:var(--color-text-3);">Mon</th>' +
+          '<th style="text-align:center;padding:var(--space-2);color:var(--color-text-3);">Tue</th>' +
+          '<th style="text-align:center;padding:var(--space-2);color:var(--color-text-3);">Wed</th>' +
+          '<th style="text-align:center;padding:var(--space-2);color:var(--color-text-3);">Thu</th>' +
+          '<th style="text-align:center;padding:var(--space-2);color:var(--color-text-3);">Fri</th>' +
+          '<th style="text-align:center;padding:var(--space-2);color:var(--color-text-1);font-weight:var(--weight-semibold);">Total</th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+          '<tr style="border-bottom:1px solid var(--color-border-subtle);">' +
+            '<td style="padding:var(--space-2);color:var(--color-primary);">Main Project</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">8</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">8</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">8</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">8</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">8</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);font-weight:var(--weight-bold);">40</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:var(--space-2);color:var(--color-text-2);">Internal</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);color:var(--color-text-3);">\u2014</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);color:var(--color-text-3);">\u2014</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">2</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);">2</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);color:var(--color-text-3);">\u2014</td>' +
+            '<td style="text-align:center;padding:var(--space-2);font-family:var(--font-mono);font-weight:var(--weight-bold);">4</td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' +
+    '<div style="display:flex;gap:var(--space-4);flex-wrap:wrap;">' +
+      '<div style="font-size:var(--text-body-sm);color:var(--color-text-2);">Total: <strong class="font-mono" style="color:var(--color-text-1);">44h</strong></div>' +
+      '<div style="font-size:var(--text-body-sm);color:var(--color-text-2);">Target: <strong class="font-mono">40h</strong></div>' +
+      '<div style="font-size:var(--text-body-sm);color:var(--color-text-2);">Billable: <strong class="font-mono">91%</strong></div>' +
+    '</div>';
+  }
+
+  function buildLeaveDetail(card) {
+    var name = card.querySelector('.card-employee a').textContent;
+    var details = card.querySelector('.card-details').textContent.trim();
+    return '<div style="margin-bottom:var(--space-4);">' +
+      '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">' +
+        '<div class="avatar avatar-sm">' + name.split(' ').map(function(n){return n[0]}).join('') + '</div>' +
+        '<div><strong style="color:var(--color-text-1);">' + name + '</strong><div style="font-size:var(--text-caption);color:var(--color-text-3);">Leave Request Review</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Leave Type</div><div style="color:var(--color-text-1);font-weight:var(--weight-medium);">Annual Leave</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Date Range</div><div style="color:var(--color-text-1);font-weight:var(--weight-medium);">' + (card.querySelector('.card-details span') ? card.querySelector('.card-details span').textContent : '') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Balance Impact</div><div style="color:var(--color-text-1);font-weight:var(--weight-medium);font-family:var(--font-mono);">-2 days</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Remaining After</div><div style="color:var(--color-text-1);font-weight:var(--weight-medium);font-family:var(--font-mono);">16 days</div></div>' +
+    '</div>' +
+    '<div style="padding:var(--space-3);background:var(--color-surface-1);border-radius:var(--radius-md);margin-bottom:var(--space-4);">' +
+      '<div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-2);">Calendar Preview</div>' +
+      '<div style="display:flex;gap:var(--space-1);">' +
+        '<div style="flex:1;padding:var(--space-1);text-align:center;font-size:var(--text-caption);background:var(--color-surface-2);border-radius:var(--radius-sm);color:var(--color-text-3);">Mon</div>' +
+        '<div style="flex:1;padding:var(--space-1);text-align:center;font-size:var(--text-caption);background:var(--color-info-muted);border-radius:var(--radius-sm);color:var(--color-info);font-weight:var(--weight-medium);">Tue</div>' +
+        '<div style="flex:1;padding:var(--space-1);text-align:center;font-size:var(--text-caption);background:var(--color-info-muted);border-radius:var(--radius-sm);color:var(--color-info);font-weight:var(--weight-medium);">Wed</div>' +
+        '<div style="flex:1;padding:var(--space-1);text-align:center;font-size:var(--text-caption);background:var(--color-surface-2);border-radius:var(--radius-sm);color:var(--color-text-3);">Thu</div>' +
+        '<div style="flex:1;padding:var(--space-1);text-align:center;font-size:var(--text-caption);background:var(--color-surface-2);border-radius:var(--radius-sm);color:var(--color-text-3);">Fri</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);color:var(--color-success);"><svg data-lucide="check-circle" width="16" height="16"></svg> No team conflicts detected</div>';
+  }
+
+  function buildExpenseDetail(card) {
+    var name = card.querySelector('.card-employee a').textContent;
+    var amountEl = card.querySelector('.font-mono');
+    var amount = amountEl ? amountEl.textContent.trim() : '';
+    return '<div style="margin-bottom:var(--space-4);">' +
+      '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">' +
+        '<div class="avatar avatar-sm">' + name.split(' ').map(function(n){return n[0]}).join('') + '</div>' +
+        '<div><strong style="color:var(--color-text-1);">' + name + '</strong><div style="font-size:var(--text-caption);color:var(--color-text-3);">Expense Review</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Amount</div><div style="color:var(--color-text-1);font-weight:var(--weight-bold);font-family:var(--font-mono);font-size:var(--text-heading-2);">' + amount + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Category</div><div style="color:var(--color-text-1);font-weight:var(--weight-medium);">Hotel</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Project</div><div style="color:var(--color-primary);font-weight:var(--weight-medium);">Acme Corp</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Date</div><div style="color:var(--color-text-1);">Apr 2, 2026</div></div>' +
+    '</div>' +
+    '<div style="padding:var(--space-4);background:var(--color-surface-1);border:1px dashed var(--color-border);border-radius:var(--radius-md);margin-bottom:var(--space-4);text-align:center;">' +
+      '<svg data-lucide="image" width="32" height="32" style="color:var(--color-text-3);margin-bottom:var(--space-2);"></svg>' +
+      '<div style="font-size:var(--text-body-sm);color:var(--color-text-3);">Receipt preview</div>' +
+      '<div style="font-size:var(--text-caption);color:var(--color-text-3);">receipt.pdf attached</div>' +
+    '</div>' +
+    '<div style="font-size:var(--text-body-sm);">' +
+      '<div style="display:flex;align-items:center;gap:var(--space-2);color:var(--color-success);margin-bottom:var(--space-1);"><svg data-lucide="shield-check" width="16" height="16"></svg> Policy: Within daily limit</div>' +
+      '<div style="display:flex;align-items:center;gap:var(--space-2);color:var(--color-success);"><svg data-lucide="check-circle" width="16" height="16"></svg> Receipt: Attached</div>' +
+    '</div>';
+  }
+
+  // Event delegation for approve/reject/detail buttons
+  document.getElementById('approvalList').addEventListener('click', function(e) {
+    var btn = e.target.closest('.approve-btn');
+    if (btn) {
+      btn.classList.add('btn-loading');
+      var card = btn.closest('.approval-card');
+      setTimeout(function() {
+        btn.classList.remove('btn-loading');
+        approveCard(card);
+      }, 1000);
+      return;
+    }
+    btn = e.target.closest('.reject-btn');
+    if (btn) {
+      openRejectModal(btn.closest('.approval-card'));
+      return;
+    }
+    btn = e.target.closest('.detail-btn');
+    if (btn) {
+      var card = btn.closest('.approval-card');
+      var name = card.querySelector('.card-employee a').textContent;
+      var type = card.getAttribute('data-type');
+      document.getElementById('detailModalTitle').textContent = name + ' - ' + type.charAt(0).toUpperCase() + type.slice(1) + ' Details';
+
+      var bodyContent = '';
+      if (type === 'timesheet') bodyContent = buildTimesheetDetail(card);
+      else if (type === 'leave') bodyContent = buildLeaveDetail(card);
+      else if (type === 'expense') bodyContent = buildExpenseDetail(card);
+      else bodyContent = '<p style="color:var(--color-text-2);">Details not available.</p>';
+
+      document.getElementById('detailModalBody').innerHTML = bodyContent;
+      document.getElementById('detailModal').classList.add('active');
+      lucide.createIcons({ nodes: [document.getElementById('detailModalBody')] });
+      return;
+    }
+  });
+
+  // Detail modal close
+  document.getElementById('detailModalClose').addEventListener('click', function() {
+    document.getElementById('detailModal').classList.remove('active');
+  });
+  document.getElementById('detailModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+  });
+
+  // Expose closeModal globally
+  window.closeModal = function(id) {
+    document.getElementById(id).classList.remove('active');
+  };
+
+  // Bulk approve
+  document.getElementById('bulkApproveBtn').addEventListener('click', function() {
+    var checked = document.querySelectorAll('.item-check:checked');
+    checked.forEach(function(cb) {
+      var card = cb.closest('.approval-card');
+      if (card) approveCard(card);
+    });
+  });
+
+  // Bulk reject
+  document.getElementById('bulkRejectBtn').addEventListener('click', function() {
+    var checked = document.querySelectorAll('.item-check:checked');
+    var count = checked.length;
+    checked.forEach(function(cb) {
+      var card = cb.closest('.approval-card');
+      if (card) {
+        card.classList.add('removing-item');
+        setTimeout(function() { card.style.display = 'none'; }, 300);
+      }
+    });
+    showToast('error', 'Rejected', count + ' request(s) have been rejected.');
+    setTimeout(updateBulkBar, 350);
+  });
+
+  // Approve all visible
+  window.approveAllVisible = function() {
+    var cards = document.querySelectorAll('.approval-card');
+    var count = 0;
+    cards.forEach(function(card) {
+      if (card.style.display !== 'none') {
+        card.classList.add('removing-item');
+        count++;
+        setTimeout(function() { card.style.display = 'none'; }, 300);
+      }
+    });
+    if (count > 0) showToast('success', 'Bulk Approved', count + ' request(s) have been approved.');
+    bulkDropdownMenu.classList.remove('active');
+  };
+
+  // ── Empty State Toggle ──
+  var isPopulated = true;
+  stateToggle.addEventListener('click', function() {
+    isPopulated = !isPopulated;
+    document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+    this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+  // ── Init Lucide Icons ──
+  lucide.createIcons();
+
+})();
+</script>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
+  <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
+  <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+  <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
+  <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
+</nav>
+</body>
+</html>
