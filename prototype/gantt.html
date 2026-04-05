@@ -1439,7 +1439,7 @@
           </div>
           <div class="panel-detail-row">
             <span class="detail-label">Status</span>
-            <span class="badge badge-success badge-dot" id="panelStatus">Active</span>
+            <span class="badge badge-success" id="panelStatus"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
           </div>
           <div class="panel-detail-row">
             <span class="detail-label">Start Date</span>
@@ -1830,7 +1830,7 @@
       // Status badge
       const statusEl = document.getElementById('panelStatus');
       statusEl.textContent = data.status;
-      statusEl.className = 'badge badge-dot ' + (
+      statusEl.className = 'badge ' + (
         data.status === 'Active' ? 'badge-success' :
         data.status === 'Bench' ? 'badge-warning' :
         data.status === 'Approved' ? 'badge-info' :
