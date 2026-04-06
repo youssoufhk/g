@@ -25,6 +25,7 @@ Before dispatching any agent, read these files yourself so you understand the fu
 4. `prototype/_shared.js` — The GHR utilities API (hover cards, presence, toasts, skeleton, command palette)
 5. `prototype/_tokens.css` — Locked color palette (Earth & Sage — do not propose palette changes)
 6. `prototype/_components.css` — Full component library
+7. `.claude/memory/ux_philosophy.md` — **The UX vision. Read this before dispatching any critic or remediation agent.** Every issue and every fix must be evaluated against the four feelings: Ease, Calm, Completeness, Anticipation.
 
 ---
 
@@ -135,7 +136,18 @@ prototype/
 
 ## Enhancement Areas (Brief All Critics On These)
 
-The previous audit cycle found and fixed bugs. This cycle targets **elevation** — making an already-working prototype feel premium, complete, and impressive. Critics must evaluate against these dimensions:
+The previous audit cycle found and fixed bugs. This cycle targets **elevation** — making an already-working prototype feel premium, complete, and impressive. Critics must evaluate against these dimensions.
+
+### E0 — The UX Philosophy (Overrides Everything Else)
+
+> Read `.claude/memory/ux_philosophy.md` in full before evaluating anything else.
+
+The product vision: **GammaHR should feel like Revolut built an HR tool.** The enemy is Tempolia — manual, draining, punishing. The four feelings to engineer are Ease, Calm, Completeness, and Anticipation.
+
+**The single most important test for any page:**
+> "Would an employee dread doing this task weekly, or would they look forward to an app that does it for them?"
+
+Any flow that fails this test is CRITICAL regardless of what other critics say about it. A timesheet that works but feels like Tempolia is broken. Features serve feeling — not the other way around.
 
 ### E1 — Feature Completeness vs. APP_BLUEPRINT.md
 Every section of `specs/APP_BLUEPRINT.md` (§1–§21) maps to a prototype page. Are all features from the spec visible in the prototype? Anything in the blueprint but missing from the HTML is a gap.
@@ -175,7 +187,7 @@ Run this cycle in 4 sequential waves. Within each wave, all agents run in parall
 
 ---
 
-### Wave 1 — Critic Audit (run all 10 critics in parallel)
+### Wave 1 — Critic Audit (run all 11 critics in parallel)
 
 Dispatch 10 critic agents simultaneously. Each reads ALL prototype files but through one expert lens. Output: individual `CRITIC_[TAG].md` files.
 
@@ -232,22 +244,54 @@ Dispatch 10 critic agents simultaneously. Each reads ALL prototype files but thr
 >
 > Output ONLY the issue list. Minimum 15 issues.
 
+**Critic 11 — UX Feeling & Anti-Tempolia Audit [FEEL]**
+> You are a UX experience director who has deeply studied two reference products: **Revolut** (the gold standard — does more than competitors, feels simpler than all of them, daily use is invisible friction) and **Tempolia HR** (the anti-reference — manual, draining, every action costs energy instead of saving it).
+>
+> Your sole job is to audit whether GammaHR feels like Revolut or like Tempolia. You do not care about bugs, missing features, or visual polish — other critics handle those. You care exclusively about **feeling**.
+>
+> For every page, ask these four questions and flag every failure:
+>
+> **1. EASE — Does the app do the work, or does it make the user do the work?**
+> Flag any form field the app could have pre-filled but didn't. Flag any information the user has to type that the app already knows. Flag any action that requires more steps than necessary. Flag any flow where the user has to make a decision the app could have made for them. The standard: timesheets and expenses should feel like reviewing and confirming, not creating from scratch.
+>
+> **2. CALM — Does any element create anxiety, confusion, or overwhelm?**
+> Flag information overload — too many things competing for attention with no clear hierarchy. Flag any state where the user might not know where they are, what just happened, or what to do next. Flag any error message that doesn't explain what to do. Flag any destructive action without clear confirmation. Flag visual noise — competing colors, unclear badges, cluttered layouts.
+>
+> **3. COMPLETENESS — Does the AI/system demonstrate that it knows the user?**
+> Flag any place where the app could show a personalized suggestion, smart default, or learned pattern but shows a blank field instead. Flag any place where the app asks for information it already has. Flag any section labeled "AI-powered" or "Smart" that shows generic content rather than personalized content. The standard: after 1 month of use, the app should feel like a personal assistant, not a form.
+>
+> **4. ANTICIPATION — Would a user want to come back, or dread it?**
+> Flag any completion state (after submitting a timesheet, approving a request, generating an invoice) that feels flat, empty, or unsatisfying. Flag any missing positive feedback moment — places where a small animation, a "all done" message, or a visible progress state would create a sense of accomplishment. Flag any page where the primary value of the app is not immediately obvious to a new user.
+>
+> **The Anti-Tempolia Test (most important):**
+> For every data entry flow — timesheets, expense forms, leave requests, project assignments — ask: "Is there ANYTHING here that feels like manual work the app should have done?" If yes, flag it CRITICAL.
+>
+> Severity guide:
+> - CRITICAL: This flow feels like Tempolia. A user would dread doing this repeatedly.
+> - HIGH: This interaction adds friction or cognitive load that should not exist.
+> - MEDIUM: This moment is neutral when it should be positive.
+> - LOW: A small delight opportunity is being missed.
+>
+> Output ONLY the issue list. No positives. Minimum 20 issues — if you find fewer, you are not being honest about how much friction still exists.
+
 ---
 
 ### Wave 2 — Master Checklist Consolidation (1 agent, runs after all critics complete)
 
 **Instructions for the consolidation agent:**
 
-Read all 10 `CRITIC_[TAG].md` files produced in Wave 1.
+Read all 11 `CRITIC_[TAG].md` files produced in Wave 1.
 
 1. Deduplicate: if multiple critics flag the same issue, it becomes ONE item (note how many critics flagged it — more flags = higher priority)
 2. Sort strictly: CRITICAL → HIGH → MEDIUM → LOW
-3. Within each level: most pages affected first
-4. Flag systemic issues (same pattern across 3+ pages) as a single item with a note
+3. Within each level: **[FEEL] issues from the UX Feeling critic take priority over all other tags at the same severity level** — these are product-defining, not just quality issues
+4. Within each level after FEEL: most pages affected first
+5. Flag systemic issues (same pattern across 3+ pages) as a single item with a note
 
 Output: `ENHANCE_CHECKLIST.md` with:
 - **Summary table:** issue count per page, issue count per domain
-- **Top 10 highest-impact items** in plain language (for the product owner)
+- **Top 10 highest-impact items** in plain language (for the product owner) — lead with any FEEL/CRITICAL items
+- **The Anti-Tempolia List:** all [FEEL] CRITICAL items isolated in their own section — these must be fixed before anything else
 - **Systemic patterns** (cross-page issues — fix once in shared CSS/JS, propagate everywhere)
 - **Full sorted list:** `[ ] [SEVERITY] [TAG] [description] | [files affected]`
 
@@ -367,7 +411,11 @@ The enhancement cycle is complete when:
 
 - [ ] `ENHANCE_FINAL.md` exists and says "Ready for stakeholder review"
 - [ ] All CRITICAL and HIGH items from `ENHANCE_CHECKLIST.md` are resolved ✅
+- [ ] The Anti-Tempolia List is fully cleared — zero [FEEL] CRITICAL items remain
 - [ ] Every prototype page passes a visual check at 390px and 1440px
 - [ ] Every interactive element on every page has a working handler
 - [ ] All 10 canonical data points are consistent across all pages
 - [ ] The prototype feels like a €50/user/month premium product in a live browser demo
+- [ ] The timesheet and expense flows specifically feel like reviewing and confirming — not manual data entry
+- [ ] Every completion state (submit timesheet, approve request, generate invoice) has a satisfying, positive response
+- [ ] A first-time user opening any page can immediately see what the page does and what action to take next
