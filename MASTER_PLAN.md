@@ -3,6 +3,7 @@
 > **Codename:** GammaHR Quantum
 > **Philosophy:** 80% design & specification, 20% implementation. We ship the blueprint before a single line of code.
 > **Builder:** Claude Code (Rust backend, Next.js frontend, AI-powered agents)
+> **Prototype:** `/prototype/` — static HTML/CSS/JS design reference. See §3 below.
 
 ---
 
@@ -59,7 +60,44 @@ GammaHR Quantum is a **premium HR operations platform** for consulting firms, ag
 
 ---
 
-## 3. Architecture Overview
+## 3. The Prototype
+
+Before any Rust or Next.js code is written, a fully interactive **HTML/CSS/JS prototype** of the entire frontend lives in `/prototype/`. It is **not** the production codebase — it is a design validation and stakeholder communication tool.
+
+### What it is
+- Pure HTML files, one per page (`index.html`, `employees.html`, `gantt.html`, etc.)
+- Shared design tokens in `_tokens.css`, component library in `_components.css`, layout in `_layout.css`
+- Shared JavaScript utilities in `_shared.js` (hover cards, presence simulation, role switcher, keyboard shortcuts)
+- No build step, no framework — opens directly in a browser
+
+### What it proves
+- Every UX flow is validated before implementation begins
+- Every visual decision (colors, 3D effects, glassmorphism, typography) is approved on real screens
+- Stakeholders and the product owner can click through the entire product
+- The design system token set is locked — Next.js simply imports the same token values
+
+### Relationship to the real product
+| Prototype file | Next.js equivalent |
+|---|---|
+| `_tokens.css` | `tailwind.config.ts` + `globals.css` custom properties |
+| `_components.css` | `/components/ui/` component library |
+| `_shared.js` | `/hooks/` + `/lib/` utilities |
+| `index.html` | `app/[locale]/(app)/dashboard/page.tsx` |
+| `employees.html` | `app/[locale]/(app)/employees/page.tsx` + `[id]/page.tsx` |
+| `gantt.html` | `app/[locale]/(app)/gantt/page.tsx` |
+| `portal/index.html` | `app/[locale]/(portal)/page.tsx` |
+| `auth.html` | `app/[locale]/(auth)/login/page.tsx` + wizard routes |
+| `account.html` | `app/[locale]/(app)/account/page.tsx` |
+
+### Canonical prototype data
+The prototype uses a fixed dataset of 8 employees, 7 projects, 4 clients, and related entities. This exact dataset becomes the **database seed data** for the Rust backend. See `specs/DATA_ARCHITECTURE.md §Seed Data`.
+
+### Prototype quality bar
+The prototype has been audited by 9 specialized critic agents (DATA, UX-IA, UX-FLOWS, UX-INTERACTION, UI-COMPONENTS, UI-VISUAL, UI-POLISH, PM, MOBILE). All 213 identified issues were resolved. The `FINAL_CHECKLIST.md` documents every resolved item. Any future agent working on the prototype must be MORE critical than that checklist — aim to find issues the previous critics missed.
+
+---
+
+## 4. Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -109,7 +147,7 @@ Each tenant gets a fully isolated PostgreSQL schema. Middleware extracts tenant 
 
 ---
 
-## 4. The Agent Team
+## 5. The Agent Team
 
 See **[AGENT_TEAM.md](./AGENT_TEAM.md)** for full definitions.
 
@@ -132,7 +170,7 @@ See **[AGENT_TEAM.md](./AGENT_TEAM.md)** for full definitions.
 
 ---
 
-## 5. The 80/20 Process
+## 6. The 80/20 Process
 
 ### Phase 1: Design & Specification (80% of effort)
 
@@ -200,20 +238,22 @@ Sprint 9-10: Polish & Launch
 
 ---
 
-## 6. Document Map
+## 7. Document Map
 
 | Document | Purpose |
 |----------|---------|
-| **[MASTER_PLAN.md](./MASTER_PLAN.md)** | This file — project vision, strategy, timeline |
-| **[AGENT_TEAM.md](./AGENT_TEAM.md)** | All 12 agents: roles, competencies, deliverables, communication protocols |
-| **[AGENT_WORKFLOW.md](./AGENT_WORKFLOW.md)** | How agents collaborate, review cycles, quality gates, conflict resolution |
-| **[APP_BLUEPRINT.md](./specs/APP_BLUEPRINT.md)** | Complete feature map — every page, click, connection, interaction |
-| **[DESIGN_SYSTEM.md](./specs/DESIGN_SYSTEM.md)** | Visual identity, 3D approach, typography, motion, component specs |
-| **[DATA_ARCHITECTURE.md](./specs/DATA_ARCHITECTURE.md)** | All entities, relationships, API design, real-time protocol, multi-tenancy |
+| **[MASTER_PLAN.md](./MASTER_PLAN.md)** | This file — project vision, strategy, prototype overview, timeline |
+| **[AGENT_TEAM.md](./AGENT_TEAM.md)** | All 12 agents: roles, competencies, deliverables for Phase 0, 1, and 2 |
+| **[AGENT_WORKFLOW.md](./AGENT_WORKFLOW.md)** | Orchestration meta-prompt: how to run agents, parallel execution patterns, critic system, quality gates |
+| **[FINAL_CHECKLIST.md](./FINAL_CHECKLIST.md)** | All 213 prototype issues resolved — grouped ✅ checklist by domain |
+| **[specs/APP_BLUEPRINT.md](./specs/APP_BLUEPRINT.md)** | Complete feature map — every page, click, connection, interaction (cross-refs prototype) |
+| **[specs/DESIGN_SYSTEM.md](./specs/DESIGN_SYSTEM.md)** | Visual identity, 3D approach, typography, motion, component specs (refs prototype CSS) |
+| **[specs/DATA_ARCHITECTURE.md](./specs/DATA_ARCHITECTURE.md)** | All entities, relationships, API design, real-time protocol, seed data from prototype |
+| **[prototype/](./prototype/)** | Static HTML/CSS/JS design prototype — the approved visual spec for the Next.js frontend |
 
 ---
 
-## 7. Success Criteria
+## 8. Success Criteria
 
 ### Visual Quality
 - [ ] No page looks "standard" or "template-like"
@@ -248,7 +288,7 @@ Sprint 9-10: Polish & Launch
 
 ---
 
-## 8. Principles
+## 9. Principles
 
 1. **Design first, code never** — until the blueprint is perfect
 2. **Every pixel is intentional** — no default styling anywhere

@@ -11,7 +11,7 @@
     /* ── Expense page-specific styles ── */
 
     /* Filter bar */
-    .filter-bar {
+    .filter-bar-standard {
       display: flex;
       align-items: center;
       gap: var(--space-3);
@@ -22,14 +22,14 @@
       margin-bottom: var(--space-4);
       flex-wrap: wrap;
     }
-    .filter-bar .form-select,
-    .filter-bar .form-input {
+    .filter-bar-standard .form-select,
+    .filter-bar-standard .form-input {
       height: 32px;
       font-size: var(--text-body-sm);
       min-width: 140px;
       width: auto;
     }
-    .filter-bar .toggle-wrap {
+    .filter-bar-standard .toggle-wrap {
       display: flex;
       align-items: center;
       gap: var(--space-2);
@@ -476,6 +476,7 @@
   </style>
 </head>
 <body>
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 <div class="app">
 
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -485,7 +486,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -508,6 +509,14 @@
           <span class="nav-label">Leaves</span>
           <span class="nav-badge">3</span>
         </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+        <a href="insights.html#ask-ai" class="nav-item">
+          <i data-lucide="sparkles" class="nav-icon"></i>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
 
       <!-- HR -->
@@ -518,7 +527,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -532,8 +541,12 @@
       <div class="nav-section">
         <div class="nav-section-label">Work</div>
         <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder"></svg>
+          <svg data-lucide="folder-kanban"></svg>
           <span class="nav-label">Projects</span>
+        </a>
+        <a href="gantt.html" class="nav-item">
+          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
+          <span class="nav-label">Gantt Chart</span>
         </a>
         <a href="clients.html" class="nav-item">
           <svg data-lucide="building-2"></svg>
@@ -542,10 +555,6 @@
         <a href="planning.html" class="nav-item">
           <svg data-lucide="bar-chart-3"></svg>
           <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
         </a>
       </div>
 
@@ -578,6 +587,10 @@
     </nav>
 
     <div class="sidebar-footer">
+      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
+        <i data-lucide="keyboard" class="nav-icon"></i>
+        <span class="nav-label">Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -608,7 +621,7 @@
 
       <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -651,36 +664,41 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
             </div>
-            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="user-dropdown-header">
               <div class="name">Sarah Chen</div>
               <div class="email">sarah.chen@gammahr.io</div>
             </div>
-            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
           </div>
         </div>
       </div>
     </header>
 
     <!-- ── PAGE CONTENT ── -->
-    <main class="page-content">
+    <main class="page-content" id="main-content">
       <div class="page-content-narrow">
 
         <!-- Page Header -->
         <div class="page-header">
           <div class="page-header-left">
+            <nav class="breadcrumb" aria-label="Breadcrumb" style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-1);">
+              <a href="index.html" style="color:var(--color-text-3);text-decoration:none;">Dashboard</a>
+              <span style="margin:0 var(--space-1);">/</span>
+              <span style="color:var(--color-text-2);">Expenses</span>
+            </nav>
             <h1 class="page-title">Expense Management</h1>
             <p class="page-subtitle">Track, submit, and approve team expenses</p>
           </div>
@@ -697,7 +715,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="tabs" id="expenseTabs">
+        <div class="tabs" role="tablist" id="expenseTabs">
           <button class="tab active" data-tab="my-expenses">
             <svg data-lucide="wallet" width="16" height="16"></svg>
             My Expenses
@@ -711,11 +729,15 @@
             Approval Queue
             <span class="tab-count">4</span>
           </button>
+          <button class="tab" data-tab="analytics">
+            <svg data-lucide="bar-chart-2" width="16" height="16"></svg>
+            Analytics
+          </button>
         </div>
 
         <!-- ═══════════════ TAB 1: MY EXPENSES ═══════════════ -->
         <div class="tab-content active" id="tab-my-expenses">
-          <div style="padding-top: var(--space-6);">
+          <div class="pt-6">
 
             <!-- Stats -->
             <div class="stats-grid">
@@ -729,16 +751,16 @@
               </div>
               <div class="stat-card">
                 <div class="stat-label">Pending</div>
-                <div class="stat-value">&euro;340</div>
+                <div class="stat-value">&euro;67.30</div>
                 <div class="stat-trend" style="color: var(--color-warning);">
                   <svg data-lucide="clock" width="14" height="14"></svg>
-                  2 items awaiting review
+                  1 item awaiting review
                 </div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Billable</div>
                 <div class="stat-value">78%</div>
-                <div class="stat-trend" style="color: var(--color-text-2);">
+                <div class="stat-trend" class="text-2">
                   <svg data-lucide="target" width="14" height="14"></svg>
                   of total expenses
                 </div>
@@ -746,7 +768,7 @@
               <div class="stat-card">
                 <div class="stat-label">Top Category</div>
                 <div class="stat-value" style="font-family: var(--font-sans); font-size: var(--text-heading-2);">Travel</div>
-                <div class="stat-trend" style="color: var(--color-text-2);">
+                <div class="stat-trend" class="text-2">
                   <svg data-lucide="plane" width="14" height="14"></svg>
                   &euro;450 this month
                 </div>
@@ -754,7 +776,22 @@
             </div>
 
             <!-- Filter Bar -->
-            <div class="filter-bar">
+            <div class="filter-bar-standard">
+              <div style="position:relative;display:inline-block;">
+                <button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.classList.toggle('active')" style="gap:var(--space-1-5);">
+                  <svg data-lucide="bookmark" width="14" height="14"></svg>
+                  Saved Views
+                  <svg data-lucide="chevron-down" width="12" height="12"></svg>
+                </button>
+                <div style="position:absolute;top:calc(100% + 4px);left:0;min-width:180px;background:var(--color-surface-3);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-3);z-index:500;padding:var(--space-1) 0;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all var(--motion-fast) var(--ease-out);" class="saved-views-menu">
+                  <div class="saved-view-item" onclick="showToast('info','View','My Expenses view applied');this.closest('.saved-views-menu').classList.remove('active');">My Expenses</div>
+                  <div class="saved-view-item" onclick="showToast('info','View','Pending Approval view applied');this.closest('.saved-views-menu').classList.remove('active');">Pending Approval</div>
+                  <div class="saved-view-item" onclick="showToast('info','View','Billable Only view applied');this.closest('.saved-views-menu').classList.remove('active');">Billable Only</div>
+                  <div class="saved-view-item" onclick="showToast('info','View','This Month view applied');this.closest('.saved-views-menu').classList.remove('active');">This Month</div>
+                  <div class="saved-view-item" onclick="showToast('info','View','High Value view applied');this.closest('.saved-views-menu').classList.remove('active');">High Value (&gt;€500)</div>
+                </div>
+              </div>
+              <style>.saved-views-menu.active{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;}.saved-view-item{padding:var(--space-2) var(--space-3);font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;}.saved-view-item:hover{background:var(--color-surface-2);}</style>
               <select class="form-select">
                 <option>All Status</option>
                 <option>Approved</option>
@@ -817,38 +854,6 @@
                 </div>
               </div>
 
-              <!-- 2. Hotel - Pending -->
-              <div class="expense-item">
-                <div class="expense-icon" style="background: var(--color-accent-muted); color: var(--color-accent);">
-                  <svg data-lucide="bed"></svg>
-                </div>
-                <div class="expense-amount">&euro;340.00</div>
-                <div class="expense-details">
-                  <div class="expense-type">Hotel</div>
-                  <div class="expense-meta">
-                    <span>Apr 2, 2026</span>
-                    <span class="meta-sep"></span>
-                    <a href="projects.html#detail">Acme Web Redesign</a>
-                  </div>
-                  <div class="expense-desc">Marriott Hotel Lyon - 2 nights client workshop</div>
-                </div>
-                <div class="expense-right">
-                  <span class="billable-tag billable"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
-                  <div class="receipt-indicator">
-                    <svg data-lucide="paperclip"></svg>
-                    <span>receipt.jpg</span>
-                  </div>
-                  <span class="badge badge-warning">
-                    <svg data-lucide="clock" width="12" height="12"></svg>
-                    Pending
-                  </span>
-                  <div class="expense-actions">
-                    <button class="btn btn-ghost btn-xs">Edit</button>
-                    <button class="btn btn-destructive-ghost btn-xs">Cancel</button>
-                  </div>
-                </div>
-              </div>
-
               <!-- 3. Software - Approved -->
               <div class="expense-item">
                 <div class="expense-icon" style="background: hsla(270, 45%, 58%, 0.14); color: hsl(270, 45%, 58%);">
@@ -860,7 +865,7 @@
                   <div class="expense-meta">
                     <span>Jan 20, 2026</span>
                     <span class="meta-sep"></span>
-                    <span style="color: var(--color-text-3);">&mdash;</span>
+                    <span class="text-3">&mdash;</span>
                   </div>
                   <div class="expense-desc">Figma annual license renewal</div>
                 </div>
@@ -912,7 +917,7 @@
                   <div class="expense-meta">
                     <span>Mar 25, 2026</span>
                     <span class="meta-sep"></span>
-                    <span style="color: var(--color-text-3);">&mdash;</span>
+                    <span class="text-3">&mdash;</span>
                   </div>
                   <div class="expense-desc">External monitor - Dell UltraSharp 27"</div>
                   <div class="rejection-reason">
@@ -926,6 +931,10 @@
                     <svg data-lucide="x-circle" width="12" height="12"></svg>
                     Rejected
                   </span>
+                  <button class="btn btn-xs btn-primary" onclick="resubmitExpense(this)">
+                    <svg data-lucide="refresh-cw" width="12" height="12"></svg>
+                    Resubmit
+                  </button>
                 </div>
               </div>
 
@@ -970,7 +979,7 @@
 
         <!-- ═══════════════ TAB 2: SUBMIT EXPENSE ═══════════════ -->
         <div class="tab-content" id="tab-submit">
-          <div style="padding-top: var(--space-6);">
+          <div class="pt-6">
             <div class="submit-layout">
 
               <!-- Left: Upload + AI -->
@@ -1123,7 +1132,7 @@
 
         <!-- ═══════════════ TAB 3: APPROVAL QUEUE ═══════════════ -->
         <div class="tab-content" id="tab-approval">
-          <div style="padding-top: var(--space-6);">
+          <div class="pt-6">
 
             <div style="margin-bottom: var(--space-4);">
               <p style="font-size: var(--text-body); color: var(--color-text-2);">
@@ -1138,7 +1147,7 @@
               <div class="approval-item" data-approval="1">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">BT</div>
-                  <div class="emp-name"><a href="employees.html#profile">Bob Taylor</a></div>
+                  <div class="emp-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1178,7 +1187,7 @@
               <div class="approval-item" data-approval="2">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">CK</div>
-                  <div class="emp-name"><a href="employees.html#profile">Carol Kim</a></div>
+                  <div class="emp-name"><a href="employees.html#carol-kim">Carol Kim</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1218,7 +1227,7 @@
               <div class="approval-item" data-approval="3">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">DP</div>
-                  <div class="emp-name"><a href="employees.html#profile">David Park</a></div>
+                  <div class="emp-name"><a href="employees.html#david-park">David Park</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1258,7 +1267,7 @@
               <div class="approval-item" data-approval="4">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">LO</div>
-                  <div class="emp-name"><a href="employees.html#profile">Liam O'Brien</a></div>
+                  <div class="emp-name"><a href="employees.html#liam-obrien">Liam O'Brien</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1269,7 +1278,7 @@
                     <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
                   </div>
                   <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
-                    <div class="receipt-indicator" style="color: var(--color-text-3);">
+                    <div class="receipt-indicator" class="text-3">
                       <svg data-lucide="file-x"></svg>
                       <span>no receipt</span>
                     </div>
@@ -1294,6 +1303,140 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════ TAB 4: ANALYTICS ═══════════════ -->
+        <div class="tab-content" id="tab-analytics">
+          <div class="pt-6">
+            <!-- Row 1: Charts -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">
+              <!-- Expense by Category donut -->
+              <div class="card" style="padding:var(--space-5);">
+                <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-4);">Expense by Category</div>
+                <div style="display:flex;align-items:center;gap:var(--space-6);">
+                  <svg width="140" height="140" viewBox="0 0 140 140">
+                    <!-- Donut chart: Travel 35%, Accommodation 25%, Meals 20%, Equipment 12%, Other 8% -->
+                    <!-- Total circumference of r=55: 345.6 -->
+                    <circle cx="70" cy="70" r="55" fill="none" stroke="var(--color-info)" stroke-width="22" stroke-dasharray="120.9 224.7" stroke-dashoffset="0" transform="rotate(-90 70 70)"/>
+                    <circle cx="70" cy="70" r="55" fill="none" stroke="var(--color-primary)" stroke-width="22" stroke-dasharray="86.4 259.2" stroke-dashoffset="-120.9" transform="rotate(-90 70 70)"/>
+                    <circle cx="70" cy="70" r="55" fill="none" stroke="var(--color-success)" stroke-width="22" stroke-dasharray="69.1 276.5" stroke-dashoffset="-207.3" transform="rotate(-90 70 70)"/>
+                    <circle cx="70" cy="70" r="55" fill="none" stroke="var(--color-warning)" stroke-width="22" stroke-dasharray="41.5 304.1" stroke-dashoffset="-276.4" transform="rotate(-90 70 70)"/>
+                    <circle cx="70" cy="70" r="55" fill="none" stroke="var(--color-text-3)" stroke-width="22" stroke-dasharray="27.6 318" stroke-dashoffset="-317.9" transform="rotate(-90 70 70)"/>
+                    <circle cx="70" cy="70" r="44" fill="var(--color-surface-0)"/>
+                    <text x="70" y="66" text-anchor="middle" font-size="11" fill="var(--color-text-2)" font-family="var(--font-sans)">Total</text>
+                    <text x="70" y="81" text-anchor="middle" font-size="16" font-weight="600" fill="var(--color-text-1)" font-family="var(--font-mono)">€4,470</text>
+                  </svg>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-2);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-info);"></span>Travel</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">35%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-primary);"></span>Accommodation</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">25%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-success);"></span>Meals</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">20%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-warning);"></span>Equipment</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">12%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-text-3);"></span>Other</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">8%</span></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Monthly Trend bar chart -->
+              <div class="card" style="padding:var(--space-5);">
+                <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-4);">Monthly Trend</div>
+                <div style="display:flex;align-items:flex-end;gap:var(--space-3);height:100px;margin-bottom:var(--space-3);">
+                  <!-- Jan: 1200, Feb: 980, Mar: 1450, Apr: 640 -->
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€1,200</div>
+                    <div style="width:100%;background:var(--color-primary);border-radius:var(--radius-sm) var(--radius-sm) 0 0;" style="height:83px;"></div>
+                    <div style="height:83px;width:100%;background:var(--color-primary);border-radius:var(--radius-sm) var(--radius-sm) 0 0;"></div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
+                    <div style="height:67px;width:100%;background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-sm) var(--radius-sm) 0 0;"></div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
+                    <div style="height:100px;width:100%;background:var(--color-primary);border-radius:var(--radius-sm) var(--radius-sm) 0 0;"></div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
+                    <div style="height:44px;width:100%;background:var(--color-warning);border-radius:var(--radius-sm) var(--radius-sm) 0 0;"></div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:var(--space-3);">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€1,200</div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Jan</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€980</div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Feb</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€1,450</div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Mar</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€640</div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Apr</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+              <!-- Top Spenders -->
+              <div class="card" style="padding:var(--space-5);">
+                <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-4);">Top Spenders</div>
+                <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:1px solid var(--color-border);">
+                      <th style="text-align:left;padding:var(--space-2) 0;color:var(--color-text-3);font-weight:var(--weight-medium);font-size:var(--text-caption);text-transform:uppercase;letter-spacing:.5px;">Name</th>
+                      <th style="text-align:right;padding:var(--space-2) 0;color:var(--color-text-3);font-weight:var(--weight-medium);font-size:var(--text-caption);text-transform:uppercase;letter-spacing:.5px;" data-sensitive="financials">Total</th>
+                      <th style="text-align:right;padding:var(--space-2) 0;color:var(--color-text-3);font-weight:var(--weight-medium);font-size:var(--text-caption);text-transform:uppercase;letter-spacing:.5px;">#</th>
+                      <th style="text-align:right;padding:var(--space-2) 0;color:var(--color-text-3);font-weight:var(--weight-medium);font-size:var(--text-caption);text-transform:uppercase;letter-spacing:.5px;" data-sensitive="financials">Avg</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom:1px solid var(--color-border-subtle);">
+                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">BT</div><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="92" data-href="employees.html#bob-taylor" style="color:var(--color-text-1);">Bob Taylor</a></div></td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);" data-sensitive="financials">€1,240</td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-2);">7</td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-3);" data-sensitive="financials">€177</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--color-border-subtle);">
+                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">SC</div><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Admin" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="98" data-href="employees.html#sarah-chen" style="color:var(--color-text-1);">Sarah Chen</a></div></td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);" data-sensitive="financials">€890</td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-2);">5</td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-3);" data-sensitive="financials">€178</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">MR</div><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#marco-rossi" style="color:var(--color-text-1);">Marco Rossi</a></div></td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);" data-sensitive="financials">€760</td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-2);">4</td>
+                      <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-3);" data-sensitive="financials">€190</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Billable vs Non-Billable donut -->
+              <div class="card" style="padding:var(--space-5);">
+                <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-4);">Billable vs Non-Billable</div>
+                <div style="display:flex;align-items:center;gap:var(--space-6);">
+                  <svg width="120" height="120" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="var(--color-primary)" stroke-width="20" stroke-dasharray="201.5 100.5" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="var(--color-surface-2)" stroke-width="20" stroke-dasharray="100.5 201.5" stroke-dashoffset="-201.5" transform="rotate(-90 60 60)"/>
+                    <circle cx="60" cy="60" r="38" fill="var(--color-surface-0)"/>
+                    <text x="60" y="55" text-anchor="middle" font-size="18" font-weight="700" fill="var(--color-primary)" font-family="var(--font-mono)">67%</text>
+                    <text x="60" y="70" text-anchor="middle" font-size="9" fill="var(--color-text-3)" font-family="var(--font-sans)">billable</text>
+                  </svg>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-3);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                      <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);"><div style="width:12px;height:12px;border-radius:2px;background:var(--color-primary);"></div>Billable</div>
+                      <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-1);" data-sensitive="financials">67% · €2,995</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                      <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);"><div style="width:12px;height:12px;border-radius:2px;background:var(--color-surface-2);border:1px solid var(--color-border);"></div>Non-billable</div>
+                      <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);" data-sensitive="financials">33% · €1,475</div>
+                    </div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);padding-top:var(--space-2);border-top:1px solid var(--color-border-subtle);" data-sensitive="financials">Total YTD: <strong style="font-family:var(--font-mono);color:var(--color-text-2);">€4,470</strong></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1360,7 +1503,7 @@
 
 <!-- ════════════════════════════════════════ REJECTION MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="rejectModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Reject Expense</h3>
       <button class="modal-close" onclick="closeRejectModal()">
@@ -1669,7 +1812,64 @@
 
   // ── Export ──
   window.exportExpenses = function() {
-    showToast('info', 'Export started', 'Your expense report is being generated...');
+    showToast('success', 'Export', 'Expense CSV downloading...');
+  };
+
+  // ── OCR simulation functions ──
+  window.simulateOCR = function() {
+    var processing = document.getElementById('ocrProcessing');
+    var zone = document.getElementById('expenseUploadZone');
+    var submitBtn = document.querySelector('#expenseModal .btn-primary');
+    if (processing) processing.style.display = 'block';
+    if (zone) zone.style.display = 'none';
+    if (submitBtn) submitBtn.disabled = true;
+    setTimeout(function() {
+      if (processing) processing.style.display = 'none';
+      var result = document.getElementById('ocrResult');
+      if (result) result.style.display = 'block';
+      var merchant = document.getElementById('expMerchant');
+      var amount = document.getElementById('expAmount');
+      var date = document.getElementById('expDate');
+      if (merchant) merchant.value = 'Marriott Lyon';
+      if (amount) amount.value = '340';
+      if (date) date.value = '2026-04-02';
+      if (submitBtn) submitBtn.disabled = false;
+      lucide.createIcons();
+      showToast('success', 'AI Scan Complete', 'Receipt data extracted successfully');
+    }, 2000);
+  };
+
+  window.clearOCR = function() {
+    var result = document.getElementById('ocrResult');
+    var zone = document.getElementById('expenseUploadZone');
+    if (result) result.style.display = 'none';
+    if (zone) zone.style.display = 'block';
+  };
+
+  window.handleDragOver = function(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  };
+
+  window.handleDrop = function(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    var file = e.dataTransfer.files[0];
+    if (file) window.simulateOCR();
+  };
+
+  // ── Resubmit rejected expense ──
+  window.resubmitExpense = function(btn) {
+    var item = btn.closest('.expense-item');
+    if (!item) return;
+    var badge = item.querySelector('.badge-error');
+    if (badge) {
+      badge.className = 'badge badge-warning';
+      badge.innerHTML = '<svg data-lucide="clock" width="12" height="12"></svg> Pending Review';
+      lucide.createIcons({ nodes: [badge] });
+    }
+    btn.remove();
+    showToast('success', 'Resubmitted', 'Expense resubmitted for review.');
   };
 
   // ── Approval actions ──
@@ -1779,12 +1979,24 @@
 </script>
 
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item active"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
   <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+<script src="_shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.GHR) {
+    GHR.initHoverCard && GHR.initHoverCard();
+    GHR.initPresence && GHR.initPresence();
+    GHR.initRoleSwitcher && GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
+    GHR.initSkeletons && GHR.initSkeletons();
+  }
+});
+</script>
 </body>
 </html>

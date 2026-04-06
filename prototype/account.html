@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account &amp; Settings — GammaHR Quantum</title>
+  <link rel="stylesheet" href="_tokens.css">
+  <link rel="stylesheet" href="_components.css">
+  <link rel="stylesheet" href="_layout.css">
+  <style>
+    /* ── Account page specific styles ── */
+
+    /* Page header */
+    .account-page-header {
+      margin-bottom: var(--space-6);
+    }
+    .account-page-header h1 {
+      font-size: var(--text-display-lg);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      line-height: 1.2;
+    }
+    .account-page-header p {
+      font-size: var(--text-body);
+      color: var(--color-text-2);
+      margin-top: var(--space-1);
+    }
+
+    /* Tab nav for account */
+    .account-tabs {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-6);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .account-tabs::-webkit-scrollbar { display: none; }
+    .account-tab {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color var(--motion-fast), border-color var(--motion-fast);
+      margin-bottom: -1px;
+    }
+    .account-tab:hover { color: var(--color-text-1); }
+    .account-tab.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    .account-tab svg { flex-shrink: 0; }
+
+    /* Tab content panels */
+    .account-panel { display: none; }
+    .account-panel.active { display: block; }
+
+    /* Mobile: replace tabs with select */
+    .account-tab-select {
+      display: none;
+      width: 100%;
+      margin-bottom: var(--space-5);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-1);
+      border-radius: var(--radius-md);
+      font-size: var(--text-body-sm);
+      font-family: var(--font-sans);
+    }
+    @media (max-width: 639px) {
+      .account-tabs { display: none; }
+      .account-tab-select { display: block; }
+    }
+
+    /* Settings layout */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+      max-width: 720px;
+    }
+
+    /* Settings section */
+    .settings-section {
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding-bottom: var(--space-6);
+      margin-bottom: var(--space-2);
+    }
+    .settings-section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .settings-section-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-1);
+    }
+    .settings-section-desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-3);
+      margin-bottom: var(--space-4);
+    }
+
+    /* Form fields */
+    .form-group {
+      margin-bottom: var(--space-4);
+    }
+    .form-label {
+      display: block;
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-2);
+    }
+    .form-label .required {
+      color: var(--color-error);
+      margin-left: 2px;
+    }
+    .form-input {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-1);
+      font-size: var(--text-body-sm);
+      font-family: var(--font-sans);
+      transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
+      outline: none;
+      box-sizing: border-box;
+    }
+    .form-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+    .form-input:disabled,
+    .form-input[readonly] {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: var(--color-surface-1);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .form-hint {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-top: var(--space-1);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    @media (max-width: 639px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* Password input with show/hide */
+    .input-with-action {
+      position: relative;
+    }
+    .input-with-action .form-input {
+      padding-right: 44px;
+    }
+    .input-action-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--color-text-3);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      transition: color var(--motion-fast);
+    }
+    .input-action-btn:hover { color: var(--color-text-1); }
+
+    /* Password strength bar */
+    .pw-strength-wrap {
+      margin-top: var(--space-2);
+    }
+    .pw-strength-bar {
+      height: 4px;
+      background: var(--color-surface-3);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .pw-strength-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .pw-strength-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+
+    /* Profile photo section */
+    .profile-photo-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border-subtle);
+      margin-bottom: var(--space-5);
+    }
+    .profile-avatar-large {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-success));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: var(--weight-bold);
+      color: var(--color-text-on-primary);
+      flex-shrink: 0;
+    }
+    .profile-photo-info h3 {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: 4px;
+    }
+    .profile-photo-info p {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-bottom: var(--space-3);
+    }
+
+    /* 2FA section */
+    .twofa-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+    }
+    .twofa-info { flex: 1; }
+    .twofa-label {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-1);
+      margin-bottom: 4px;
+    }
+    .twofa-desc {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+
+    /* Sessions table */
+    .sessions-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .sessions-table th {
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-3);
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sessions-table td {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-1);
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .sessions-table tr:last-child td { border-bottom: none; }
+    .session-device {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info { flex: 1; padding-right: var(--space-4); }
+    .toggle-title {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-1);
+    }
+    .toggle-desc {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-top: 2px;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--color-surface-3);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background var(--motion-fast);
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: var(--color-text-2);
+      border-radius: 50%;
+      transition: transform var(--motion-fast), background var(--motion-fast);
+    }
+    .toggle-switch input:checked + .toggle-slider {
+      background: var(--color-primary);
+    }
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(20px);
+      background: var(--color-white);
+    }
+    .toggle-switch input:focus-visible + .toggle-slider {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* Theme picker */
+    .theme-options {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .theme-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      cursor: pointer;
+    }
+    .theme-option input { display: none; }
+    .theme-preview {
+      width: 80px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+      overflow: hidden;
+      transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
+      position: relative;
+    }
+    .theme-option input:checked ~ .theme-preview-wrap .theme-preview,
+    .theme-option:has(input:checked) .theme-preview {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+    .theme-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+    }
+    .theme-preview-dark {
+      background: hsl(35, 16%, 5%);
+    }
+    .theme-preview-dark::before {
+      content: '';
+      position: absolute;
+      top: 6px; left: 6px;
+      width: 20px;
+      height: 42px;
+      background: hsl(35, 11%, 11%);
+      border-radius: 3px;
+    }
+    .theme-preview-dark::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 32px; right: 6px;
+      height: 8px;
+      background: hsl(35, 9%, 15%);
+      border-radius: 3px;
+    }
+    .theme-preview-light {
+      background: hsl(40, 30%, 96%);
+    }
+    .theme-preview-light::before {
+      content: '';
+      position: absolute;
+      top: 6px; left: 6px;
+      width: 20px;
+      height: 42px;
+      background: hsl(155, 26%, 46%);
+      border-radius: 3px;
+      opacity: 0.3;
+    }
+    .theme-preview-light::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 32px; right: 6px;
+      height: 8px;
+      background: hsl(35, 10%, 85%);
+      border-radius: 3px;
+    }
+    .theme-preview-system {
+      background: linear-gradient(135deg, hsl(35, 16%, 5%) 50%, hsl(40, 30%, 96%) 50%);
+    }
+
+    /* Connected apps */
+    .connected-app {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-3);
+    }
+    .connected-app:last-child { margin-bottom: 0; }
+    .connected-app-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .app-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-bold);
+      flex-shrink: 0;
+    }
+
+    /* Delete confirmation */
+    .delete-zone {
+      background: var(--color-error-muted);
+      border: 1px solid hsla(5, 65%, 52%, 0.3);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+    }
+    .delete-zone-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-error);
+      margin-bottom: var(--space-2);
+    }
+    .delete-zone-desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-4);
+    }
+    .delete-confirm-row {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .delete-confirm-row .form-input {
+      max-width: 200px;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--motion-fast);
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-box {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-5);
+      padding: var(--space-6);
+      max-width: 480px;
+      width: 100%;
+      transform: translateY(12px);
+      transition: transform var(--motion-fast);
+    }
+    .modal-overlay.active .modal-box {
+      transform: translateY(0);
+    }
+    .modal-title {
+      font-size: var(--text-body-lg);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-1);
+      margin-bottom: var(--space-1);
+    }
+    .modal-desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-3);
+      margin-bottom: var(--space-5);
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      margin-top: var(--space-5);
+    }
+    .qr-placeholder {
+      width: 160px;
+      height: 160px;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      margin: 0 auto var(--space-4);
+      color: var(--color-text-3);
+      font-size: var(--text-caption);
+      text-align: center;
+    }
+    .qr-inner-grid {
+      display: grid;
+      grid-template-columns: repeat(7,1fr);
+      gap: 2px;
+      padding: var(--space-2);
+    }
+    .qr-cell {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 1px;
+    }
+    .manual-code {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      letter-spacing: 0.12em;
+      color: var(--color-text-1);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      text-align: center;
+      margin-bottom: var(--space-4);
+      user-select: all;
+    }
+
+    /* Digest day picker */
+    .day-picker {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      margin-top: var(--space-2);
+    }
+    .day-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+      color: var(--color-text-2);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--motion-fast);
+    }
+    .day-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .day-btn.active {
+      background: var(--color-primary-muted);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* Select input */
+    .form-select {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-1);
+      font-size: var(--text-body-sm);
+      font-family: var(--font-sans);
+      transition: border-color var(--motion-fast);
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23857568' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+    .form-select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-muted);
+    }
+
+    /* Radio group */
+    .radio-group {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-2);
+      cursor: pointer;
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      transition: all var(--motion-fast);
+    }
+    .radio-option:has(input:checked) {
+      border-color: var(--color-primary);
+      background: var(--color-primary-muted);
+      color: var(--color-primary);
+    }
+    .radio-option input { display: none; }
+
+    /* Mobile search btn */
+    .mobile-search-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      background: transparent; border: none;
+      color: var(--color-text-2); cursor: pointer;
+      border-radius: var(--radius-md);
+    }
+    .mobile-search-btn:hover { background: var(--color-surface-2); }
+    @media (max-width: 767px) { .mobile-search-btn { display: inline-flex; } }
+  </style>
+</head>
+<body>
+<a href="#main-content" class="skip-to-content">Skip to content</a>
+
+<div class="app">
+  <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <span class="logo-text">GammaHR</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <!-- MAIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+        <a href="index.html" class="nav-item">
+          <svg data-lucide="layout-dashboard"></svg>
+          <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="timesheets.html" class="nav-item">
+          <svg data-lucide="clock"></svg>
+          <span class="nav-label">Timesheets</span>
+          <span class="nav-badge">7</span>
+        </a>
+        <a href="expenses.html" class="nav-item">
+          <svg data-lucide="receipt"></svg>
+          <span class="nav-label">Expenses</span>
+          <span class="nav-badge">2</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <svg data-lucide="palm-tree"></svg>
+          <span class="nav-label">Leaves</span>
+          <span class="nav-badge">3</span>
+        </a>
+      </div>
+
+      <!-- HR -->
+      <div class="nav-section">
+        <div class="nav-section-label">HR</div>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="briefcase"></svg>
+          <span class="nav-label">Recruitment</span>
+          <span class="nav-badge">5</span>
+        </a>
+        <a href="hr.html" class="nav-item">
+          <svg data-lucide="user-plus"></svg>
+          <span class="nav-label">Onboarding</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <svg data-lucide="users"></svg>
+          <span class="nav-label">Team Directory</span>
+        </a>
+      </div>
+
+      <!-- WORK -->
+      <div class="nav-section">
+        <div class="nav-section-label">Work</div>
+        <a href="projects.html" class="nav-item">
+          <svg data-lucide="folder-kanban"></svg>
+          <span class="nav-label">Projects</span>
+        </a>
+        <a href="gantt.html" class="nav-item">
+          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
+          <span class="nav-label">Gantt Chart</span>
+        </a>
+        <a href="clients.html" class="nav-item">
+          <svg data-lucide="building-2"></svg>
+          <span class="nav-label">Clients</span>
+        </a>
+        <a href="planning.html" class="nav-item">
+          <svg data-lucide="calendar-range"></svg>
+          <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+      </div>
+
+      <!-- FINANCE -->
+      <div class="nav-section">
+        <div class="nav-section-label">Finance</div>
+        <a href="invoices.html" class="nav-item">
+          <svg data-lucide="file-text"></svg>
+          <span class="nav-label">Invoices</span>
+        </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Insights</span>
+        </a>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <a href="approvals.html" class="nav-item">
+          <svg data-lucide="check-square"></svg>
+          <span class="nav-label">Approvals</span>
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="admin.html" class="nav-item">
+          <svg data-lucide="settings"></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="account.html" class="nav-item active" style="margin-bottom:var(--space-2);">
+        <svg data-lucide="user-circle"></svg>
+        <span class="nav-label">Account</span>
+      </a>
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <svg data-lucide="panel-left-close"></svg>
+        <span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ── TOP HEADER ── -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg data-lucide="menu" width="20" height="20"></svg>
+        </button>
+        <h2 class="page-title">Account &amp; Settings</h2>
+      </div>
+
+      <div class="header-search" id="searchTrigger">
+        <svg data-lucide="search" width="16" height="16"></svg>
+        <span>Search anything...</span>
+        <kbd>&#8984;K</kbd>
+      </div>
+
+      <div class="header-right">
+        <button class="mobile-search-btn" onclick="document.getElementById('cmdPalette').classList.add('active')">
+          <svg data-lucide="search" width="20" height="20"></svg>
+        </button>
+
+        <div class="relative">
+          <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
+            <svg data-lucide="bell" width="20" height="20"></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications" style="box-shadow: var(--shadow-3);">
+            <div class="notif-panel-header">
+              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+            <div class="notif-panel-list">
+              <a href="timesheets.html" class="notif-item unread" style="text-decoration:none;color:inherit;">
+                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">Timesheet reminder: 7 team members have not submitted</div>
+                  <div class="notif-time">2 minutes ago</div>
+                </div>
+              </a>
+              <a href="approvals.html" class="notif-item" style="text-decoration:none;color:inherit;">
+                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
+                <div class="notif-text">
+                  <div class="notif-title">12 pending approvals need your attention</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="header-user" id="userMenuBtn">
+            <div class="avatar avatar-sm avatar-status online">SC</div>
+            <div>
+              <div class="user-name">Sarah Chen</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="name">Sarah Chen</div>
+              <div class="email">sarah.chen@gammahr.io</div>
+            </div>
+            <a href="account.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> My Account</a>
+            <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── PAGE CONTENT ── -->
+    <main class="page-content" id="main-content">
+
+      <div class="account-page-header">
+        <h1>Account &amp; Settings</h1>
+        <p>Manage your profile, security, preferences and privacy settings.</p>
+      </div>
+
+      <!-- Mobile tab select -->
+      <select class="account-tab-select" id="tabSelect" aria-label="Select settings section">
+        <option value="profile">Profile</option>
+        <option value="security">Security</option>
+        <option value="notifications">Notifications</option>
+        <option value="preferences">Preferences</option>
+        <option value="privacy">Data &amp; Privacy</option>
+      </select>
+
+      <!-- Tab navigation -->
+      <div class="account-tabs" role="tablist">
+        <button class="account-tab active" data-panel="profile" role="tab" aria-selected="true">
+          <svg data-lucide="user" width="15" height="15"></svg>
+          Profile
+        </button>
+        <button class="account-tab" data-panel="security" role="tab" aria-selected="false">
+          <svg data-lucide="shield" width="15" height="15"></svg>
+          Security
+        </button>
+        <button class="account-tab" data-panel="notifications" role="tab" aria-selected="false">
+          <svg data-lucide="bell" width="15" height="15"></svg>
+          Notifications
+        </button>
+        <button class="account-tab" data-panel="preferences" role="tab" aria-selected="false">
+          <svg data-lucide="sliders" width="15" height="15"></svg>
+          Preferences
+        </button>
+        <button class="account-tab" data-panel="privacy" role="tab" aria-selected="false">
+          <svg data-lucide="lock" width="15" height="15"></svg>
+          Data &amp; Privacy
+        </button>
+      </div>
+
+      <!-- ═══════════════════════════ TAB 1: PROFILE ═══════════════════════════ -->
+      <div class="account-panel active" id="panel-profile" role="tabpanel">
+        <div class="settings-layout">
+
+          <!-- Profile photo -->
+          <div class="profile-photo-section">
+            <div class="profile-avatar-large">SC</div>
+            <div class="profile-photo-info">
+              <h3>Sarah Chen</h3>
+              <p>JPG, PNG or GIF. Max 2 MB. Recommended 400×400 px.</p>
+              <div style="display:flex;gap:var(--space-2);">
+                <button class="btn btn-secondary btn-sm" onclick="window.GHR && GHR.showToast && GHR.showToast('info','Coming soon','Photo upload will be available in the production build.')">
+                  <svg data-lucide="upload" width="14" height="14"></svg>
+                  Change Photo
+                </button>
+                <button class="btn btn-ghost btn-sm">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Basic info -->
+          <div class="settings-section">
+            <div class="settings-section-title">Basic Information</div>
+            <div class="settings-section-desc">Your public display name and contact info visible to the team.</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="fullName">Full Name <span class="required">*</span></label>
+                <input type="text" id="fullName" class="form-input" value="Sarah Chen">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="jobTitle">Job Title</label>
+                <input type="text" id="jobTitle" class="form-input" value="Design Lead">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="department">Department</label>
+                <input type="text" id="department" class="form-input" value="Design">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="phone">Phone Number</label>
+                <input type="tel" id="phone" class="form-input" value="+33 6 12 34 56 78">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bio">Bio / About Me</label>
+              <textarea id="bio" class="form-input form-textarea">Design Lead at GammaHR with 8+ years of UX experience. Passionate about building systems that are both beautiful and functional. Based in Paris.</textarea>
+              <div class="form-hint">A short bio helps your teammates get to know you. Max 280 characters.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reportsTo">Reports To</label>
+              <div class="input-with-action">
+                <input type="text" id="reportsTo" class="form-input" value="Alex Morrison (CEO)" readonly>
+                <a href="employees.html#alex-morrison" class="input-action-btn" title="View profile">
+                  <svg data-lucide="external-link" width="16" height="16"></svg>
+                </a>
+              </div>
+              <div class="form-hint">Contact HR to update your reporting line.</div>
+            </div>
+          </div>
+
+          <!-- Contact & email -->
+          <div class="settings-section">
+            <div class="settings-section-title">Work Email</div>
+            <div class="settings-section-desc">Your primary email address for system notifications and login.</div>
+            <div class="form-group">
+              <label class="form-label" for="workEmail">Email Address</label>
+              <div class="input-with-action">
+                <input type="email" id="workEmail" class="form-input" value="sarah.chen@gammahr.io" readonly>
+                <button class="input-action-btn" onclick="showToast('info','Email change','Contact your admin to change your work email.')" title="Change email">
+                  <svg data-lucide="pencil" width="16" height="16"></svg>
+                </button>
+              </div>
+              <div class="form-hint">Email changes require admin approval.</div>
+            </div>
+          </div>
+
+          <div>
+            <button class="btn btn-primary btn-md" onclick="showToast('success','Profile saved','Your profile has been updated successfully.')">
+              <svg data-lucide="save" width="16" height="16"></svg>
+              Save Changes
+            </button>
+            <button class="btn btn-ghost btn-md" style="margin-left:var(--space-3);">Cancel</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ TAB 2: SECURITY ═══════════════════════════ -->
+      <div class="account-panel" id="panel-security" role="tabpanel">
+        <div class="settings-layout">
+
+          <!-- Password change -->
+          <div class="settings-section">
+            <div class="settings-section-title">Change Password</div>
+            <div class="settings-section-desc">Use a strong, unique password that you don't use elsewhere.</div>
+
+            <div class="form-group">
+              <label class="form-label" for="currentPw">Current Password</label>
+              <div class="input-with-action">
+                <input type="password" id="currentPw" class="form-input" placeholder="Enter current password" autocomplete="current-password">
+                <button class="input-action-btn show-pw-btn" data-target="currentPw" title="Show/hide password">
+                  <svg data-lucide="eye" width="16" height="16"></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newPw">New Password</label>
+              <div class="input-with-action">
+                <input type="password" id="newPw" class="form-input" placeholder="Enter new password" autocomplete="new-password">
+                <button class="input-action-btn show-pw-btn" data-target="newPw" title="Show/hide password">
+                  <svg data-lucide="eye" width="16" height="16"></svg>
+                </button>
+              </div>
+              <div class="pw-strength-wrap" id="pwStrengthWrap" style="display:none;">
+                <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwStrengthFill"></div></div>
+                <div class="pw-strength-label" id="pwStrengthLabel"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirmPw">Confirm New Password</label>
+              <div class="input-with-action">
+                <input type="password" id="confirmPw" class="form-input" placeholder="Repeat new password" autocomplete="new-password">
+                <button class="input-action-btn show-pw-btn" data-target="confirmPw" title="Show/hide password">
+                  <svg data-lucide="eye" width="16" height="16"></svg>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-md" onclick="handlePasswordChange()">
+              <svg data-lucide="key" width="16" height="16"></svg>
+              Update Password
+            </button>
+          </div>
+
+          <!-- 2FA -->
+          <div class="settings-section">
+            <div class="settings-section-title">Two-Factor Authentication</div>
+            <div class="settings-section-desc">Add an extra layer of security to your account by requiring a code from your authenticator app.</div>
+
+            <div class="twofa-status">
+              <div class="twofa-info">
+                <div class="twofa-label">Authenticator App (TOTP)</div>
+                <div class="twofa-desc">Use Google Authenticator, Authy, or any TOTP-compatible app.</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);">
+                <span class="badge badge-warning" id="twofaStatusBadge">Not enabled</span>
+                <button class="btn btn-secondary btn-sm" id="enable2faBtn" onclick="open2FAModal()">
+                  <svg data-lucide="shield-check" width="14" height="14"></svg>
+                  Enable 2FA
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active sessions -->
+          <div class="settings-section">
+            <div class="settings-section-title">Active Sessions</div>
+            <div class="settings-section-desc">These devices are currently signed into your account. Revoke any session you don't recognise.</div>
+
+            <div style="overflow-x:auto;margin-bottom:var(--space-4);">
+              <table class="sessions-table">
+                <thead>
+                  <tr>
+                    <th>Device</th>
+                    <th>Location</th>
+                    <th>Last Active</th>
+                    <th style="text-align:right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="session-device">
+                        <svg data-lucide="monitor" width="16" height="16" style="color:var(--color-primary);flex-shrink:0;"></svg>
+                        <span>MacBook Pro</span>
+                        <span class="badge badge-success" style="font-size:10px;">This device</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--color-text-2);">Paris, FR</td>
+                    <td style="color:var(--color-success);font-size:var(--text-caption);">Active now</td>
+                    <td style="text-align:right;">
+                      <button class="btn btn-ghost btn-xs" disabled style="opacity:0.4;cursor:not-allowed;">Current</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="session-device">
+                        <svg data-lucide="smartphone" width="16" height="16" style="color:var(--color-text-3);flex-shrink:0;"></svg>
+                        <span>iPhone 14</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--color-text-2);">Paris, FR</td>
+                    <td style="color:var(--color-text-3);font-size:var(--text-caption);">2 hours ago</td>
+                    <td style="text-align:right;">
+                      <button class="btn btn-destructive-ghost btn-xs" onclick="revokeSession(this,'iPhone 14')">Revoke</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="session-device">
+                        <svg data-lucide="chrome" width="16" height="16" style="color:var(--color-text-3);flex-shrink:0;"></svg>
+                        <span>Chrome on Windows</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--color-text-2);">Lyon, FR</td>
+                    <td style="color:var(--color-text-3);font-size:var(--text-caption);">Yesterday 3:42 PM</td>
+                    <td style="text-align:right;">
+                      <button class="btn btn-destructive-ghost btn-xs" onclick="revokeSession(this,'Chrome on Windows')">Revoke</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <button class="btn btn-destructive-ghost btn-sm" onclick="signOutAll()">
+              <svg data-lucide="log-out" width="14" height="14"></svg>
+              Sign out all other sessions
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ TAB 3: NOTIFICATIONS ═══════════════════════════ -->
+      <div class="account-panel" id="panel-notifications" role="tabpanel">
+        <div class="settings-layout">
+
+          <!-- Email notifications -->
+          <div class="settings-section">
+            <div class="settings-section-title">Email Notifications</div>
+            <div class="settings-section-desc">Choose which events send you an email notification.</div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Leave approvals</div>
+                <div class="toggle-desc">When a leave request is approved or rejected</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Timesheet reminders</div>
+                <div class="toggle-desc">Reminder to submit your timesheet before the deadline</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Project updates</div>
+                <div class="toggle-desc">When a project milestone is reached or status changes</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Invoice status</div>
+                <div class="toggle-desc">Invoice sent, paid, or overdue notifications</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">System announcements</div>
+                <div class="toggle-desc">Platform updates, maintenance windows, and feature releases</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <!-- In-app notifications -->
+          <div class="settings-section">
+            <div class="settings-section-title">In-App Notifications</div>
+            <div class="settings-section-desc">Show notifications in the GammaHR notification panel.</div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Leave approvals</div>
+                <div class="toggle-desc">Real-time in-app alerts for leave decisions</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Timesheet reminders</div>
+                <div class="toggle-desc">In-app banner reminders</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Project updates</div>
+                <div class="toggle-desc">Notifications when you're @mentioned or assigned</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Invoice status</div>
+                <div class="toggle-desc">Invoice workflow updates</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">System announcements</div>
+                <div class="toggle-desc">Platform-wide announcements</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <!-- Digest -->
+          <div class="settings-section">
+            <div class="settings-section-title">Weekly Digest</div>
+            <div class="settings-section-desc">Receive a weekly summary email of your team's activity and metrics.</div>
+
+            <div class="toggle-row" style="margin-bottom:var(--space-4);">
+              <div class="toggle-info">
+                <div class="toggle-title">Send weekly digest</div>
+                <div class="toggle-desc">A summary of timesheets, leaves, and project highlights</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="digestToggle" checked><span class="toggle-slider"></span></label>
+            </div>
+
+            <div id="digestDayWrap">
+              <div class="form-label">Send on day</div>
+              <div class="day-picker">
+                <button class="day-btn" onclick="toggleDay(this)">Mo</button>
+                <button class="day-btn active" onclick="toggleDay(this)">Tu</button>
+                <button class="day-btn" onclick="toggleDay(this)">We</button>
+                <button class="day-btn" onclick="toggleDay(this)">Th</button>
+                <button class="day-btn" onclick="toggleDay(this)">Fr</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button class="btn btn-primary btn-md" onclick="showToast('success','Saved','Notification preferences updated.')">
+              <svg data-lucide="save" width="16" height="16"></svg>
+              Save Preferences
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ TAB 4: PREFERENCES ═══════════════════════════ -->
+      <div class="account-panel" id="panel-preferences" role="tabpanel">
+        <div class="settings-layout">
+
+          <!-- Theme -->
+          <div class="settings-section">
+            <div class="settings-section-title">Appearance</div>
+            <div class="settings-section-desc">Choose how GammaHR looks for you. Your preference is saved locally.</div>
+
+            <div class="form-group">
+              <div class="form-label">Theme</div>
+              <div class="theme-options">
+                <label class="theme-option">
+                  <input type="radio" name="theme" value="dark" checked onchange="applyTheme('dark')">
+                  <div class="theme-preview theme-preview-dark"></div>
+                  <span class="theme-label">Dark</span>
+                </label>
+                <label class="theme-option">
+                  <input type="radio" name="theme" value="light" onchange="applyTheme('light')">
+                  <div class="theme-preview theme-preview-light"></div>
+                  <span class="theme-label">Light</span>
+                </label>
+                <label class="theme-option">
+                  <input type="radio" name="theme" value="system" onchange="applyTheme('system')">
+                  <div class="theme-preview theme-preview-system"></div>
+                  <span class="theme-label">System</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Language & locale -->
+          <div class="settings-section">
+            <div class="settings-section-title">Language &amp; Locale</div>
+            <div class="settings-section-desc">Set your language, date format, and regional preferences.</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="language">Language</label>
+                <select id="language" class="form-select">
+                  <option value="en" selected>English</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                  <option value="es">Español</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="timezone">Timezone</label>
+                <select id="timezone" class="form-select">
+                  <option value="Europe/Paris" selected>Europe/Paris (CET)</option>
+                  <option value="Europe/London">Europe/London (GMT)</option>
+                  <option value="America/New_York">America/New_York (EST)</option>
+                  <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-label">Date Format</div>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="dateformat" value="dmy" checked><span>DD/MM/YYYY</span></label>
+                <label class="radio-option"><input type="radio" name="dateformat" value="mdy"><span>MM/DD/YYYY</span></label>
+                <label class="radio-option"><input type="radio" name="dateformat" value="ymd"><span>YYYY-MM-DD</span></label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <div class="form-label">Time Format</div>
+                <div class="radio-group">
+                  <label class="radio-option"><input type="radio" name="timeformat" value="12h"><span>12-hour</span></label>
+                  <label class="radio-option"><input type="radio" name="timeformat" value="24h" checked><span>24-hour</span></label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">First Day of Week</div>
+                <div class="radio-group">
+                  <label class="radio-option"><input type="radio" name="weekstart" value="mon" checked><span>Monday</span></label>
+                  <label class="radio-option"><input type="radio" name="weekstart" value="sun"><span>Sunday</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-label">Currency Display</div>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="currency" value="eur" checked><span>EUR (€)</span></label>
+                <label class="radio-option"><input type="radio" name="currency" value="usd"><span>USD ($)</span></label>
+                <label class="radio-option"><input type="radio" name="currency" value="gbp"><span>GBP (£)</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button class="btn btn-primary btn-md" onclick="showToast('success','Saved','Preferences updated.')">
+              <svg data-lucide="save" width="16" height="16"></svg>
+              Save Preferences
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ TAB 5: DATA & PRIVACY ═══════════════════════════ -->
+      <div class="account-panel" id="panel-privacy" role="tabpanel">
+        <div class="settings-layout">
+
+          <!-- GDPR / Your data -->
+          <div class="settings-section">
+            <div class="settings-section-title">Your Data</div>
+            <div class="settings-section-desc">
+              Under GDPR and applicable data protection laws, you have the right to access, export, or delete your personal data held by GammaHR.
+              Your data includes profile information, timesheets, expense records, leave history, and activity logs associated with your account.
+              Deletion of your account is permanent and cannot be undone.
+            </div>
+
+            <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4);">
+              <button class="btn btn-secondary btn-md" onclick="requestDataExport()">
+                <svg data-lucide="download" width="16" height="16"></svg>
+                Export My Data
+              </button>
+              <button class="btn btn-ghost btn-md" onclick="showToast('info','Activity log','Your activity log is being prepared. It will download shortly.')">
+                <svg data-lucide="file-text" width="16" height="16"></svg>
+                Download Activity Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Connected apps -->
+          <div class="settings-section">
+            <div class="settings-section-title">Connected Applications</div>
+            <div class="settings-section-desc">Third-party integrations that have access to your GammaHR data.</div>
+
+            <div class="connected-app">
+              <div class="connected-app-info">
+                <div class="app-icon" style="background:var(--color-error-muted);color:var(--color-error);">G</div>
+                <div>
+                  <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">Google Calendar</div>
+                  <div style="font-size:var(--text-caption);color:var(--color-text-3);">Syncs leaves and events to your Google Calendar</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);">
+                <span class="badge badge-success">Connected</span>
+                <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('info','Disconnecting','Google Calendar disconnected.')">Disconnect</button>
+              </div>
+            </div>
+
+            <div class="connected-app">
+              <div class="connected-app-info">
+                <div class="app-icon" style="background:var(--color-info-muted);color:var(--color-info);">S</div>
+                <div>
+                  <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">Slack</div>
+                  <div style="font-size:var(--text-caption);color:var(--color-text-3);">Send approval notifications and alerts to Slack</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);">
+                <span class="badge badge-ghost">Not connected</span>
+                <button class="btn btn-secondary btn-xs" onclick="showToast('info','Slack connect','Slack OAuth flow will open in production.')">Connect</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete account -->
+          <div class="settings-section">
+            <div class="settings-section-title" style="color:var(--color-error);">Danger Zone</div>
+            <div class="settings-section-desc">Permanent actions that cannot be undone. Proceed with caution.</div>
+
+            <div class="delete-zone">
+              <div class="delete-zone-title">Delete My Account</div>
+              <div class="delete-zone-desc">
+                This will permanently delete your account, all your personal data, timesheet history, and remove you from the team directory.
+                This action is irreversible. Projects and invoices you created will be reassigned to your manager.
+              </div>
+              <div class="delete-confirm-row">
+                <input type="text" id="deleteConfirmInput" class="form-input" placeholder='Type "DELETE" to confirm' autocomplete="off">
+                <button class="btn btn-destructive btn-md" id="deleteAccountBtn" disabled onclick="confirmDeleteAccount()">
+                  <svg data-lucide="trash-2" width="16" height="16"></svg>
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ 2FA MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="twoFAModal" role="dialog" aria-modal="true" aria-labelledby="twoFAModalTitle">
+  <div class="modal-box">
+    <div class="modal-title" id="twoFAModalTitle">Enable Two-Factor Authentication</div>
+    <div class="modal-desc">Scan the QR code with your authenticator app, then enter the verification code below.</div>
+
+    <!-- QR Code placeholder -->
+    <div class="qr-placeholder">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Simplified QR placeholder pattern -->
+        <rect width="80" height="80" fill="var(--color-surface-2)"/>
+        <!-- Top-left finder pattern -->
+        <rect x="8" y="8" width="22" height="22" rx="2" fill="var(--color-text-1)"/>
+        <rect x="12" y="12" width="14" height="14" rx="1" fill="var(--color-surface-2)"/>
+        <rect x="15" y="15" width="8" height="8" fill="var(--color-text-1)"/>
+        <!-- Top-right finder pattern -->
+        <rect x="50" y="8" width="22" height="22" rx="2" fill="var(--color-text-1)"/>
+        <rect x="54" y="12" width="14" height="14" rx="1" fill="var(--color-surface-2)"/>
+        <rect x="57" y="15" width="8" height="8" fill="var(--color-text-1)"/>
+        <!-- Bottom-left finder pattern -->
+        <rect x="8" y="50" width="22" height="22" rx="2" fill="var(--color-text-1)"/>
+        <rect x="12" y="54" width="14" height="14" rx="1" fill="var(--color-surface-2)"/>
+        <rect x="15" y="57" width="8" height="8" fill="var(--color-text-1)"/>
+        <!-- Data dots (random-ish) -->
+        <rect x="36" y="8" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="36" y="16" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="44" y="36" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="36" y="36" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="52" y="36" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="60" y="44" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="36" y="44" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="44" y="52" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="52" y="60" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="44" y="60" width="5" height="5" fill="var(--color-text-1)"/>
+        <rect x="60" y="52" width="5" height="5" fill="var(--color-text-1)"/>
+      </svg>
+      <span>Scan with authenticator app</span>
+    </div>
+
+    <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;margin-bottom:var(--space-2);">Or enter the code manually:</div>
+    <div class="manual-code">JBSW Y3DP EHPK 3PXP</div>
+
+    <div class="form-group">
+      <label class="form-label" for="totpCode">Verification Code</label>
+      <input type="text" id="totpCode" class="form-input" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" pattern="[0-9]*"
+             style="text-align:center;font-family:var(--font-mono);font-size:var(--text-display-sm);letter-spacing:0.3em;">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-md" onclick="close2FAModal()">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="verify2FA()">
+        <svg data-lucide="shield-check" width="16" height="16"></svg>
+        Verify &amp; Enable
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
+<div class="cmd-palette-backdrop" id="cmdPalette">
+  <div class="cmd-palette">
+    <div class="cmd-palette-input">
+      <svg data-lucide="search" width="20" height="20"></svg>
+      <input type="text" placeholder="Search people, projects, commands..." id="cmdInput" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="cmd-palette-results">
+      <div class="cmd-palette-group-label">Quick Actions</div>
+      <div class="cmd-palette-item selected">
+        <div class="item-icon"><svg data-lucide="clock" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">Log Time</div><div class="item-subtitle">Open timesheet entry</div></div>
+      </div>
+      <div class="cmd-palette-item">
+        <div class="item-icon"><svg data-lucide="user-circle" width="16" height="16"></svg></div>
+        <div class="item-text"><div class="item-title">My Account</div><div class="item-subtitle">Profile and settings</div></div>
+      </div>
+    </div>
+    <div class="cmd-palette-footer">
+      <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+      <span><kbd>&#9166;</kbd> Open</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ TOAST CONTAINER ════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ════════════════════════════════════════ BOTTOM NAV ════════════════════════════════════════ -->
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="index.html" class="bottom-nav-item">
+    <svg data-lucide="layout-dashboard" width="22" height="22"></svg>
+    <span>Home</span>
+  </a>
+  <a href="timesheets.html" class="bottom-nav-item">
+    <svg data-lucide="clock" width="22" height="22"></svg>
+    <span>Time</span>
+  </a>
+  <a href="expenses.html" class="bottom-nav-item">
+    <svg data-lucide="receipt" width="22" height="22"></svg>
+    <span>Expenses</span>
+  </a>
+  <a href="account.html" class="bottom-nav-item active">
+    <svg data-lucide="user-circle" width="22" height="22"></svg>
+    <span>Account</span>
+  </a>
+  <a href="#" class="bottom-nav-item" id="moreNavBtn">
+    <svg data-lucide="menu" width="22" height="22"></svg>
+    <span>More</span>
+  </a>
+</nav>
+
+<!-- ════════════════════════════════════════ SCRIPTS ════════════════════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="_shared.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ── Initialize Lucide icons ──
+  lucide.createIcons();
+
+  // ── DOM references ──
+  var sidebar        = document.getElementById('sidebar');
+  var collapseBtn    = document.getElementById('sidebarCollapseBtn');
+  var mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var searchTrigger  = document.getElementById('searchTrigger');
+  var cmdPalette     = document.getElementById('cmdPalette');
+  var cmdInput       = document.getElementById('cmdInput');
+  var notifBtn       = document.getElementById('notifBtn');
+  var notifPanel     = document.getElementById('notifPanel');
+  var userMenuBtn    = document.getElementById('userMenuBtn');
+  var userDropdown   = document.getElementById('userDropdown');
+  var toastContainer = document.getElementById('toastContainer');
+
+  // ── Sidebar collapse ──
+  if (collapseBtn) collapseBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+  });
+  if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('mobile-open');
+  });
+  if (sidebarOverlay) sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('mobile-open');
+  });
+
+  // ── Command palette ──
+  function openCmd() { cmdPalette.classList.add('active'); setTimeout(function() { cmdInput.focus(); }, 100); }
+  function closeCmd() { cmdPalette.classList.remove('active'); cmdInput.value = ''; }
+  if (searchTrigger) searchTrigger.addEventListener('click', openCmd);
+  if (cmdPalette) cmdPalette.addEventListener('click', function(e) { if (e.target === cmdPalette) closeCmd(); });
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); cmdPalette.classList.contains('active') ? closeCmd() : openCmd(); }
+    if (e.key === 'Escape') { closeCmd(); close2FAModal(); }
+  });
+
+  // ── Notification panel ──
+  if (notifBtn) notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    notifPanel.classList.toggle('active');
+    userDropdown.classList.remove('active');
+  });
+
+  // ── User dropdown ──
+  if (userMenuBtn) userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    userDropdown.classList.toggle('active');
+    notifPanel.classList.remove('active');
+  });
+
+  document.addEventListener('click', function(e) {
+    if (notifPanel && !notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
+    if (userDropdown && !userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
+  });
+
+  // ── Toast ──
+  window.showToast = function(type, title, message) {
+    var iconMap = { success:'check-circle', error:'x-circle', warning:'alert-triangle', info:'info' };
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.innerHTML =
+      '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+      '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+      '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+    toastContainer.appendChild(toast);
+    lucide.createIcons({ nodes: [toast] });
+    toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+    setTimeout(function() { removeToast(toast); }, 4000);
+  };
+  function removeToast(toast) {
+    if (!toast.parentNode) return;
+    toast.classList.add('removing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+  }
+
+  // ── Tab switching ──
+  var tabs = document.querySelectorAll('.account-tab');
+  var panels = document.querySelectorAll('.account-panel');
+  var tabSelect = document.getElementById('tabSelect');
+
+  function activatePanel(panelId) {
+    tabs.forEach(function(t) { t.classList.toggle('active', t.getAttribute('data-panel') === panelId); t.setAttribute('aria-selected', t.getAttribute('data-panel') === panelId); });
+    panels.forEach(function(p) { p.classList.toggle('active', p.id === 'panel-' + panelId); });
+    if (tabSelect) tabSelect.value = panelId;
+    window.location.hash = panelId;
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() { activatePanel(this.getAttribute('data-panel')); });
+  });
+  if (tabSelect) tabSelect.addEventListener('change', function() { activatePanel(this.value); });
+
+  // Initialize from hash
+  var hash = window.location.hash.replace('#', '');
+  var validPanels = ['profile','security','notifications','preferences','privacy'];
+  activatePanel(validPanels.includes(hash) ? hash : 'profile');
+
+  // ── Show/hide password toggle ──
+  document.querySelectorAll('.show-pw-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var targetId = this.getAttribute('data-target');
+      var input = document.getElementById(targetId);
+      if (!input) return;
+      var isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      var icon = this.querySelector('svg');
+      if (icon) icon.setAttribute('data-lucide', isText ? 'eye' : 'eye-off');
+      lucide.createIcons({ nodes: [this] });
+    });
+  });
+
+  // ── Password strength meter ──
+  var newPwInput = document.getElementById('newPw');
+  var pwStrengthWrap = document.getElementById('pwStrengthWrap');
+  var pwStrengthFill = document.getElementById('pwStrengthFill');
+  var pwStrengthLabel = document.getElementById('pwStrengthLabel');
+
+  if (newPwInput) {
+    newPwInput.addEventListener('input', function() {
+      var val = this.value;
+      if (!val) { pwStrengthWrap.style.display = 'none'; return; }
+      pwStrengthWrap.style.display = 'block';
+
+      var score = 0;
+      if (val.length >= 8)  score++;
+      if (val.length >= 12) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      var levels = [
+        { label: 'Very weak', color: 'var(--color-error)',   width: '15%' },
+        { label: 'Weak',      color: 'var(--color-error)',   width: '30%' },
+        { label: 'Fair',      color: 'var(--color-warning)', width: '55%' },
+        { label: 'Strong',    color: 'var(--color-success)', width: '78%' },
+        { label: 'Very strong', color: 'var(--color-success)', width: '100%' }
+      ];
+      var lvl = levels[Math.min(score, 4)];
+      pwStrengthFill.style.width = lvl.width;
+      pwStrengthFill.style.background = lvl.color;
+      pwStrengthLabel.textContent = lvl.label;
+      pwStrengthLabel.style.color = lvl.color;
+    });
+  }
+
+  // ── Password change handler ──
+  window.handlePasswordChange = function() {
+    var current = document.getElementById('currentPw').value;
+    var newPw   = document.getElementById('newPw').value;
+    var confirm = document.getElementById('confirmPw').value;
+
+    if (!current) { showToast('error', 'Error', 'Please enter your current password.'); return; }
+    if (newPw.length < 8) { showToast('error', 'Too short', 'New password must be at least 8 characters.'); return; }
+    if (newPw !== confirm) { showToast('error', 'Mismatch', 'New passwords do not match.'); return; }
+    showToast('success', 'Password updated', 'Your password has been changed successfully.');
+    document.getElementById('currentPw').value = '';
+    document.getElementById('newPw').value = '';
+    document.getElementById('confirmPw').value = '';
+    if (pwStrengthWrap) pwStrengthWrap.style.display = 'none';
+  };
+
+  // ── 2FA Modal ──
+  var twoFAModal = document.getElementById('twoFAModal');
+
+  window.open2FAModal = function() {
+    twoFAModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+      var totpInput = document.getElementById('totpCode');
+      if (totpInput) totpInput.focus();
+    }, 150);
+  };
+  window.close2FAModal = function() {
+    twoFAModal.classList.remove('active');
+    document.body.style.overflow = '';
+    var totpInput = document.getElementById('totpCode');
+    if (totpInput) totpInput.value = '';
+  };
+  window.verify2FA = function() {
+    var code = document.getElementById('totpCode').value;
+    if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+      showToast('error', 'Invalid code', 'Please enter the 6-digit code from your authenticator app.');
+      return;
+    }
+    // Simulate successful 2FA enable
+    close2FAModal();
+    var badge = document.getElementById('twofaStatusBadge');
+    var enableBtn = document.getElementById('enable2faBtn');
+    if (badge) {
+      badge.className = 'badge badge-success';
+      badge.textContent = 'Enabled';
+    }
+    if (enableBtn) {
+      enableBtn.textContent = 'Disable 2FA';
+      enableBtn.onclick = function() { showToast('info', '2FA', 'Contact your admin to disable two-factor authentication.'); };
+    }
+    showToast('success', '2FA enabled', 'Two-factor authentication is now active on your account.');
+  };
+  if (twoFAModal) twoFAModal.addEventListener('click', function(e) {
+    if (e.target === twoFAModal) close2FAModal();
+  });
+
+  // ── TOTP code auto-format ──
+  var totpInput = document.getElementById('totpCode');
+  if (totpInput) {
+    totpInput.addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    });
+  }
+
+  // ── Session revoke ──
+  window.revokeSession = function(btn, deviceName) {
+    var row = btn.closest('tr');
+    if (row) {
+      row.style.opacity = '0.4';
+      row.style.pointerEvents = 'none';
+    }
+    showToast('success', 'Session revoked', deviceName + ' has been signed out.');
+  };
+
+  window.signOutAll = function() {
+    document.querySelectorAll('.sessions-table tbody tr:not(:first-child)').forEach(function(row) {
+      row.style.opacity = '0.4';
+      row.style.pointerEvents = 'none';
+    });
+    showToast('success', 'Signed out', 'All other sessions have been terminated.');
+  };
+
+  // ── Theme toggle ──
+  window.applyTheme = function(theme) {
+    var root = document.documentElement;
+    localStorage.setItem('ghr-theme', theme);
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+      showToast('success', 'Theme', 'Light theme applied.');
+    } else if (theme === 'system') {
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      showToast('success', 'Theme', 'System theme applied — following your OS preference.');
+    } else {
+      root.removeAttribute('data-theme');
+      showToast('success', 'Theme', 'Dark theme applied.');
+    }
+  };
+  // Restore persisted theme on load
+  (function() {
+    var saved = localStorage.getItem('ghr-theme');
+    if (saved) {
+      var radio = document.querySelector('input[name="theme"][value="' + saved + '"]');
+      if (radio) radio.checked = true;
+      if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      else if (saved === 'system') {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      }
+    }
+  })();
+
+  // ── Day picker ──
+  window.toggleDay = function(btn) {
+    btn.classList.toggle('active');
+  };
+
+  // ── Data export ──
+  window.requestDataExport = function() {
+    showToast('success', 'Export requested', 'Data export requested. You will receive an email within 24 hours.');
+  };
+
+  // ── Delete account confirmation ──
+  var deleteInput = document.getElementById('deleteConfirmInput');
+  var deleteBtn   = document.getElementById('deleteAccountBtn');
+  if (deleteInput && deleteBtn) {
+    deleteInput.addEventListener('input', function() {
+      deleteBtn.disabled = this.value !== 'DELETE';
+    });
+  }
+  window.confirmDeleteAccount = function() {
+    showToast('error', 'Request submitted', 'Your account deletion request has been submitted. You will receive a confirmation email.');
+    if (deleteInput) deleteInput.value = '';
+    if (deleteBtn) deleteBtn.disabled = true;
+  };
+
+  // ── Mobile bottom nav ──
+  var moreNavBtn = document.getElementById('moreNavBtn');
+  if (moreNavBtn) moreNavBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    sidebar.classList.toggle('mobile-open');
+  });
+
+  // ── Shared utilities ──
+  if (window.GHR) {
+    GHR.initHoverCard();
+    GHR.initPresence();
+    GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts();
+  }
+
+})();
+</script>
+</body>
+</html>

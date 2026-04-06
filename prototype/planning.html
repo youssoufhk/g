@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resource Planning &mdash; GammaHR Quantum</title>
+  <title>Resource Planning — GammaHR Quantum</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <link rel="stylesheet" href="_layout.css">
@@ -37,7 +37,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: var(--space-1) 0;
+      padding: var(--space-2) 0;
     }
     .capacity-label {
       font-size: var(--text-body-sm);
@@ -277,6 +277,7 @@
   </style>
 </head>
 <body class="show-populated">
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
   <!-- ════════════════ SIDEBAR ════════════════ -->
@@ -285,7 +286,7 @@
       <div class="logo-icon">G</div>
       <span class="logo-text">GammaHR</span>
     </div>
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -318,7 +319,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -342,6 +343,10 @@
         <a href="planning.html" class="nav-item active">
           <svg data-lucide="bar-chart-3"></svg>
           <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="gantt.html" class="nav-item">
+          <svg data-lucide="gantt-chart-square"></svg>
+          <span class="nav-label">Gantt Chart</span>
         </a>
         <a href="calendar.html" class="nav-item">
           <svg data-lucide="calendar"></svg>
@@ -374,9 +379,17 @@
           <svg data-lucide="settings"></svg>
           <span class="nav-label">Settings</span>
         </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
     </nav>
     <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);margin-bottom:var(--space-2);" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?',bubbles:true}))">
+        <svg data-lucide="keyboard" width="16" height="16"></svg>
+        <span>Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -404,7 +417,7 @@
       </div>
       <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -439,21 +452,21 @@
             </div>
           </div>
         </div>
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
             </div>
-            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="user-dropdown-header">
               <div class="name">Sarah Chen</div>
               <div class="email">sarah.chen@gammahr.io</div>
             </div>
-            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
             <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
@@ -464,6 +477,13 @@
 
     <!-- ════════════════ PAGE CONTENT ════════════════ -->
     <main class="page-content populated-content">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Breadcrumb" style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);display:flex;align-items:center;gap:var(--space-1);">
+        <a href="index.html" style="color:var(--color-text-3);text-decoration:none;">Dashboard</a>
+        <span>/</span>
+        <span style="color:var(--color-text-2);">Resource Planning</span>
+      </nav>
 
       <!-- Page Header -->
       <div class="page-header">
@@ -501,7 +521,7 @@
             <div class="capacity-card-title">April 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
-              <span class="capacity-value font-mono">2,080h</span>
+              <span class="capacity-value font-mono">2,076h</span>
             </div>
             <div class="capacity-row">
               <span class="capacity-label">Allocated</span>
@@ -525,7 +545,7 @@
             <div class="capacity-card-title">June 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
-              <span class="capacity-value font-mono">2,080h</span>
+              <span class="capacity-value font-mono">2,076h</span>
             </div>
             <div class="capacity-row">
               <span class="capacity-label">Allocated</span>
@@ -603,26 +623,29 @@
           <div class="bench-item">
             <div class="avatar avatar-sm">BT</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+              <div class="bench-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="42%" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
               <div class="bench-detail">Senior Developer &bull; Python, REST APIs, Django</div>
             </div>
             <div class="bench-days">21 days</div>
+            <button class="btn btn-primary btn-xs" onclick="assignToProject('Bob Taylor')">Assign</button>
           </div>
           <div class="bench-item">
             <div class="avatar avatar-sm">JW</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html">James Wilson</a></div>
+              <div class="bench-name"><a href="employees.html" data-hovercard data-name="James Wilson" data-role="DevOps Engineer" data-dept="Engineering" data-worktime="20%" data-href="employees.html">James Wilson</a> <span class="badge badge-default" style="font-size: var(--text-caption);">Contract</span></div>
               <div class="bench-detail">DevOps Engineer &bull; AWS, Docker, Kubernetes</div>
             </div>
             <div class="bench-days">14 days</div>
+            <button class="btn btn-primary btn-xs" onclick="assignToProject('James Wilson')">Assign</button>
           </div>
           <div class="bench-item">
             <div class="avatar avatar-sm">LM</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html">Lisa Martinez</a></div>
+              <div class="bench-name"><a href="employees.html" data-hovercard data-name="Lisa Martinez" data-role="Business Analyst" data-dept="Operations" data-worktime="15%" data-href="employees.html">Lisa Martinez</a> <span class="badge badge-default" style="font-size: var(--text-caption);">Contract</span></div>
               <div class="bench-detail">Business Analyst &bull; Data Analytics, SQL</div>
             </div>
             <div class="bench-days">7 days</div>
+            <button class="btn btn-primary btn-xs" onclick="assignToProject('Lisa Martinez')">Assign</button>
           </div>
 
           <!-- Forecast (next 30 days) -->
@@ -665,7 +688,7 @@
             <div class="ai-rec-body">
               <div class="ai-rec-text">Alice Wang has skills matching Globex Phase 3 requirements (UI/UX Design, React, Figma)</div>
               <div class="ai-rec-actions">
-                <button class="btn btn-primary btn-xs bench-assign-btn">Assign</button>
+                <button class="btn btn-primary btn-xs" onclick="assignToProject('Alice Wang')">Assign</button>
                 <button class="btn btn-ghost btn-xs">View Profile</button>
               </div>
             </div>
@@ -675,7 +698,7 @@
             <div class="ai-rec-body">
               <div class="ai-rec-text">Carol Kim could support Acme Web Redesign (data analytics needed, Python proficiency)</div>
               <div class="ai-rec-actions">
-                <button class="btn btn-primary btn-xs bench-assign-btn">Assign</button>
+                <button class="btn btn-primary btn-xs" onclick="assignToProject('Carol Kim')">Assign</button>
                 <button class="btn btn-ghost btn-xs">View Profile</button>
               </div>
             </div>
@@ -687,7 +710,7 @@
         <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Bench Recommendations</div>
         <div class="ai-body">
           <strong>Bob Taylor</strong> (Backend Developer) has been on bench for 3 weeks. 85% skill match with <a href="projects.html#globex-phase-2">Globex Phase 2</a> backend module. <strong>Recommendation:</strong> Assign immediately to reduce bench cost by EUR 4,200/week.<br><br>
-          <strong>Lisa Kim</strong> (UI/UX Designer) becomes available May 1. Pre-assign to <a href="projects.html#initech-api">Initech API</a> UX design phase starting May 5. Skill match: 92%.
+          <strong>Lisa Martinez</strong> (UI/UX Designer) becomes available May 1. Pre-assign to <a href="projects.html#initech-api">Initech API</a> UX design phase starting May 5. Skill match: 92%.
         </div>
       </div>
 
@@ -699,7 +722,7 @@
             Skills Matrix
           </span>
         </div>
-        <div style="overflow-x: auto;">
+        <div class="overflow-x-auto">
           <table class="data-table mobile-cards">
             <thead>
               <tr>
@@ -713,38 +736,38 @@
             <tbody>
               <tr>
                 <td style="font-weight: var(--weight-medium);">React</td>
-                <td class="cell-mono">4</td>
-                <td class="cell-mono">3</td>
-                <td class="cell-mono">5</td>
-                <td class="cell-mono gap-deficit">-1</td>
+                <td data-label="Available Now" class="cell-mono">4</td>
+                <td data-label="Available Next Month" class="cell-mono">3</td>
+                <td data-label="Demand" class="cell-mono">5</td>
+                <td data-label="Gap" class="cell-mono gap-deficit">-1</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">Python</td>
-                <td class="cell-mono">3</td>
-                <td class="cell-mono">3</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono gap-surplus">+1</td>
+                <td data-label="Available Now" class="cell-mono">3</td>
+                <td data-label="Available Next Month" class="cell-mono">3</td>
+                <td data-label="Demand" class="cell-mono">2</td>
+                <td data-label="Gap" class="cell-mono gap-surplus">+1</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">UI/UX Design</td>
-                <td class="cell-mono">1</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono gap-balanced">0</td>
+                <td data-label="Available Now" class="cell-mono">1</td>
+                <td data-label="Available Next Month" class="cell-mono">2</td>
+                <td data-label="Demand" class="cell-mono">2</td>
+                <td data-label="Gap" class="cell-mono gap-balanced">0</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">DevOps</td>
-                <td class="cell-mono">1</td>
-                <td class="cell-mono">1</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono gap-deficit">-1</td>
+                <td data-label="Available Now" class="cell-mono">1</td>
+                <td data-label="Available Next Month" class="cell-mono">1</td>
+                <td data-label="Demand" class="cell-mono">2</td>
+                <td data-label="Gap" class="cell-mono gap-deficit">-1</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">Project Management</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono">2</td>
-                <td class="cell-mono gap-balanced">0</td>
+                <td data-label="Available Now" class="cell-mono">2</td>
+                <td data-label="Available Next Month" class="cell-mono">2</td>
+                <td data-label="Demand" class="cell-mono">2</td>
+                <td data-label="Gap" class="cell-mono gap-balanced">0</td>
               </tr>
             </tbody>
           </table>
@@ -763,33 +786,35 @@
           <div class="form-group mb-4">
             <label class="form-label">Scenario</label>
             <select class="form-select" id="scenarioSelect">
-              <option selected>What if we win the Contoso deal?</option>
-              <option>What if we lose the Acme contract?</option>
-              <option>What if we hire 5 engineers in Q3?</option>
+              <option value="contoso">What if we win the Contoso deal?</option>
+              <option value="hire-2">What if we hire 2 engineers in Q3?</option>
+              <option value="no-overtime">What if we eliminate overtime?</option>
+              <option value="offshore">What if we offshore the DevOps role?</option>
             </select>
           </div>
 
-          <div class="scenario-details">
-            <div class="scenario-stat">
-              <div class="scenario-stat-label">Deal Size</div>
-              <div class="scenario-stat-value">&euro;180,000</div>
+          <!-- Scenario projection panel (updates dynamically) -->
+          <div id="scenarioProjectionPanel">
+            <div class="scenario-details" id="scenarioStats">
+              <!-- Populated by JS -->
             </div>
-            <div class="scenario-stat">
-              <div class="scenario-stat-label">Duration</div>
-              <div class="scenario-stat-value">6 mo</div>
-            </div>
-            <div class="scenario-stat">
-              <div class="scenario-stat-label">FTEs Needed</div>
-              <div class="scenario-stat-value">8</div>
-            </div>
-            <div class="scenario-stat">
-              <div class="scenario-stat-label">Revenue/Month</div>
-              <div class="scenario-stat-value" style="color: var(--color-gold);">+&euro;30k</div>
-            </div>
-          </div>
+            <div style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-3);" id="scenarioDesc"></div>
 
-          <div style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-3);">
-            <strong>Skills required:</strong> React (3), Python (2), UI/UX (1), PM (1), DevOps (1)
+            <!-- Before/After comparison chart -->
+            <div id="scenarioChart" style="margin-bottom:var(--space-4);">
+              <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-3);">Capacity Projection: Before vs After</div>
+              <svg id="scenarioChartSvg" viewBox="0 0 500 140" preserveAspectRatio="xMidYMid meet">
+                <!-- Rendered by JS -->
+              </svg>
+              <div style="display:flex;gap:var(--space-4);justify-content:center;margin-top:var(--space-2);">
+                <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-text-2);">
+                  <div style="width:12px;height:12px;background:var(--color-border-strong);border-radius:2px;"></div> Baseline
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-text-2);">
+                  <div style="width:12px;height:12px;background:var(--color-primary);border-radius:2px;opacity:0.85;"></div> With Scenario
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Loading state -->
@@ -909,6 +934,53 @@
   </div>
 </div>
 
+<!-- ════════════════ ASSIGN TO PROJECT MODAL ════════════════ -->
+<div class="modal-backdrop" id="assignProjectModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Assign to Project</h3>
+      <button class="modal-close" onclick="document.getElementById('assignProjectModal').classList.remove('active')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Employee</label>
+        <input type="text" class="form-input" id="assignEmployeeName" readonly style="background:var(--color-surface-1);">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Project</label>
+        <select class="form-select" id="assignProjectSelect">
+          <option value="">Select project...</option>
+          <option value="globex-phase-3">Globex Phase 3</option>
+          <option value="acme-redesign">Acme Web Redesign</option>
+          <option value="initech-api">Initech API</option>
+          <option value="contoso-portal">Contoso Portal</option>
+          <option value="infra-overhaul">Infra Overhaul</option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-input" id="assignStartDate" value="2026-04-07">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Allocation — <span id="assignAllocLabel">80%</span></label>
+        <input type="range" id="assignAllocSlider" min="10" max="100" step="10" value="80" style="width:100%;accent-color:var(--color-primary);" oninput="document.getElementById('assignAllocLabel').textContent=this.value+'%'">
+        <div style="display:flex;justify-content:space-between;font-size:var(--text-caption);color:var(--color-text-3);margin-top:4px;"><span>10%</span><span>50%</span><span>100%</span></div>
+      </div>
+      <div class="form-group mb-0">
+        <label class="form-label">Notes <span class="text-3" style="font-weight:normal;">(optional)</span></label>
+        <textarea class="form-input" id="assignNotes" rows="3" placeholder="Add context for the PM or team lead..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-md" onclick="document.getElementById('assignProjectModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-primary btn-md" id="assignProjectSubmitBtn">
+        <svg data-lucide="check" width="16" height="16"></svg>
+        Confirm Assignment
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════ COMMAND PALETTE ════════════════ -->
 <div class="cmd-palette-backdrop" id="cmdPalette">
   <div class="cmd-palette">
@@ -969,6 +1041,7 @@
 
 <!-- ════════════════ SCRIPTS ════════════════ -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="_shared.js"></script>
 <script>
 (function() {
   'use strict';
@@ -1050,6 +1123,108 @@
     setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
   }
 
+  // ── Scenario Data ──
+  var scenariosData = {
+    'contoso': {
+      label: 'Win Contoso Deal',
+      stats: [
+        { label: 'Deal Size', value: '€180,000' },
+        { label: 'Duration', value: '6 months' },
+        { label: 'FTEs Needed', value: '8' },
+        { label: 'Revenue/Month', value: '+€30k', color: 'var(--color-gold)' }
+      ],
+      desc: '<strong>Skills required:</strong> React ×3, Python ×2, UI/UX ×1, PM ×1, DevOps ×1. 5 FTEs available internally; 3 need to be hired (React ×1, DevOps ×1, Python ×1).',
+      before: [78, 76, 74], after: [92, 91, 90],
+      impact: '3 hires needed · Alice Wang & Carol Kim reallocated · Revenue +€30k/mo'
+    },
+    'hire-2': {
+      label: 'Hire 2 Engineers in Q3',
+      stats: [
+        { label: 'Hire Cost', value: '€28,000' },
+        { label: 'Onboard Time', value: '4 weeks' },
+        { label: 'New FTEs', value: '2' },
+        { label: 'Capacity Impact', value: '+17%', color: 'var(--color-success)' }
+      ],
+      desc: 'Adding 2 engineers in Q3 increases overall capacity by ~17% and eliminates the React skills deficit. Break-even point: ~2.5 months assuming average billing rate.',
+      before: [78, 76, 74], after: [82, 88, 91],
+      impact: 'React gap closed · Bench time reduced 40% · Projected break-even Sep 2026'
+    },
+    'no-overtime': {
+      label: 'Eliminate Overtime',
+      stats: [
+        { label: 'OT Cost Saved', value: '€6,200/mo' },
+        { label: 'Hours Reduced', value: '−120h/mo' },
+        { label: 'Capacity Drop', value: '−6%' },
+        { label: 'Morale Impact', value: '↑ High', color: 'var(--color-success)' }
+      ],
+      desc: 'Eliminating overtime saves €6,200/month in extra pay and reduces burnout risk. However, capacity drops by ~6% — projects with tight deadlines may need scope adjustment.',
+      before: [78, 76, 74], after: [73, 71, 70],
+      impact: '€6,200/mo saved · 2 projects need deadline review · Burnout risk reduced'
+    },
+    'offshore': {
+      label: 'Offshore DevOps Role',
+      stats: [
+        { label: 'Cost Saving', value: '€38,400/yr' },
+        { label: 'Time Zone Gap', value: '±6h' },
+        { label: 'Risk Level', value: 'Medium' },
+        { label: 'Transition', value: '8 weeks' }
+      ],
+      desc: 'Offshoring the DevOps role saves ~€38,400/year. Key risks: timezone coordination overhead (~2h/day), knowledge transfer (8 weeks), and dependency on external SLA.',
+      before: [78, 76, 74], after: [78, 77, 79],
+      impact: '€38,400/yr saved · Coordination overhead ~2h/day · 8-week transition plan needed'
+    }
+  };
+
+  function renderScenarioProjection(key) {
+    var s = scenariosData[key] || scenariosData['contoso'];
+    // Stats
+    var statsEl = document.getElementById('scenarioStats');
+    if (statsEl) {
+      statsEl.innerHTML = s.stats.map(function(st) {
+        return '<div class="scenario-stat"><div class="scenario-stat-label">' + st.label + '</div>' +
+          '<div class="scenario-stat-value"' + (st.color ? ' style="color:' + st.color + '"' : '') + '>' + st.value + '</div></div>';
+      }).join('');
+    }
+    // Description
+    var descEl = document.getElementById('scenarioDesc');
+    if (descEl) descEl.innerHTML = s.desc;
+    // Chart
+    var svg = document.getElementById('scenarioChartSvg');
+    if (svg) {
+      var months = ['April', 'May', 'June'];
+      var maxVal = 100;
+      var chartH = 100; var chartW = 460; var startX = 20; var startY = 10;
+      var groupW = 130; var barW = 44; var gap = 10;
+      var svgContent = '';
+      for (var i = 0; i < 3; i++) {
+        var gx = startX + i * groupW;
+        var bH = Math.round((s.before[i] / maxVal) * chartH);
+        var aH = Math.round((s.after[i] / maxVal) * chartH);
+        var bY = startY + chartH - bH;
+        var aY = startY + chartH - aH;
+        svgContent += '<rect x="' + gx + '" y="' + bY + '" width="' + barW + '" height="' + bH + '" rx="3" fill="var(--color-border-strong)" opacity="0.7"/>';
+        svgContent += '<text x="' + (gx + barW/2) + '" y="' + (bY - 4) + '" fill="var(--color-text-3)" font-size="9" text-anchor="middle" font-family="var(--font-mono)">' + s.before[i] + '%</text>';
+        svgContent += '<rect x="' + (gx + barW + gap) + '" y="' + aY + '" width="' + barW + '" height="' + aH + '" rx="3" fill="var(--color-primary)" opacity="0.85"/>';
+        svgContent += '<text x="' + (gx + barW + gap + barW/2) + '" y="' + (aY - 4) + '" fill="var(--color-primary)" font-size="9" text-anchor="middle" font-family="var(--font-mono)">' + s.after[i] + '%</text>';
+        svgContent += '<text x="' + (gx + barW + gap/2) + '" y="' + (startY + chartH + 14) + '" fill="var(--color-text-3)" font-size="10" text-anchor="middle">' + months[i] + '</text>';
+      }
+      svg.innerHTML = svgContent;
+    }
+    // Update impact note in results
+    var impactNote = document.querySelector('#scenarioResults .impact-note');
+    if (impactNote) impactNote.innerHTML = '<svg data-lucide="info" width="14" height="14" style="display:inline-block;vertical-align:-2px;margin-right:4px;"></svg>' + s.impact;
+  }
+
+  // Initialize projection on load
+  renderScenarioProjection('contoso');
+
+  var scenarioSelect = document.getElementById('scenarioSelect');
+  if (scenarioSelect) {
+    scenarioSelect.addEventListener('change', function() {
+      renderScenarioProjection(this.value);
+    });
+  }
+
   // ── Scenario Runner ──
   var runBtn = document.getElementById('runScenarioBtn');
   var saveBtn = document.getElementById('saveScenarioBtn');
@@ -1067,11 +1242,12 @@
       runBtn.classList.remove('btn-loading');
       lucide.createIcons({ nodes: [scenarioResults] });
       showToast('success', 'Scenario Complete', 'Impact analysis has been generated.');
-    }, 2000);
+    }, 1500);
   });
 
   saveBtn.addEventListener('click', function() {
-    showToast('success', 'Scenario Saved', 'Contoso deal scenario has been saved.');
+    var scenarioName = scenarioSelect ? scenarioSelect.options[scenarioSelect.selectedIndex].text : 'Scenario';
+    showToast('success', 'Scenario Saved', scenarioName + ' has been saved.');
   });
 
   resetBtn.addEventListener('click', function() {
@@ -1081,23 +1257,51 @@
     showToast('info', 'Reset', 'Scenario has been reset to defaults.');
   });
 
-  // ── Bench Assign Buttons ──
-  document.querySelectorAll('.bench-assign-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var rec = this.closest('.ai-rec');
-      showToast('success', 'Assignment Initiated', 'Employee has been queued for assignment. PM will be notified.');
-      if (rec) {
-        rec.style.opacity = '0.5';
-        rec.style.pointerEvents = 'none';
-      }
+  // ── Assign to Project ──
+  window.assignToProject = function(employeeName) {
+    document.getElementById('assignEmployeeName').value = employeeName;
+    document.getElementById('assignProjectSelect').value = '';
+    document.getElementById('assignStartDate').value = '2026-04-07';
+    document.getElementById('assignAllocSlider').value = 80;
+    document.getElementById('assignAllocLabel').textContent = '80%';
+    document.getElementById('assignNotes').value = '';
+    document.getElementById('assignProjectModal').classList.add('active');
+    lucide.createIcons({ nodes: [document.getElementById('assignProjectModal')] });
+  };
+
+  var assignSubmitBtn = document.getElementById('assignProjectSubmitBtn');
+  if (assignSubmitBtn) {
+    assignSubmitBtn.addEventListener('click', function() {
+      var emp = document.getElementById('assignEmployeeName').value;
+      var proj = document.getElementById('assignProjectSelect');
+      var projLabel = proj.options[proj.selectedIndex] ? proj.options[proj.selectedIndex].text : '';
+      if (!proj.value) { showToast('error', 'Required', 'Please select a project.'); return; }
+      document.getElementById('assignProjectModal').classList.remove('active');
+      showToast('success', 'Assigned', emp + ' has been assigned to ' + projLabel + '. PM will be notified.');
     });
+  }
+
+  document.getElementById('assignProjectModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
   });
 
   // ── Add Position Button ──
   var addPositionBtn = document.getElementById('addPositionBtn');
   addPositionBtn.addEventListener('click', function() {
-    showToast('info', 'Coming Soon', 'Position creation form will open here.');
+    document.getElementById('addPositionModal').classList.add('active');
   });
+  document.getElementById('addPositionModal') && document.getElementById('addPositionModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+  });
+  window.closeAddPositionModal = function() {
+    document.getElementById('addPositionModal').classList.remove('active');
+  };
+  window.submitAddPosition = function() {
+    var title = document.getElementById('positionTitle').value;
+    if (!title) { showToast('error', 'Validation', 'Position title is required.'); return; }
+    document.getElementById('addPositionModal').classList.remove('active');
+    showToast('success', 'Position Created', title + ' has been added to the hiring pipeline.');
+  };
 
   // ── Scenario Dropdown Items ──
   document.querySelectorAll('#scenarioDropdownMenu .dropdown-item').forEach(function(item) {
@@ -1118,7 +1322,80 @@
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<!-- ══════════════════════ ADD POSITION MODAL ══════════════════════ -->
+<div class="modal-backdrop" id="addPositionModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Add Open Position</div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="closeAddPositionModal()">
+        <svg data-lucide="x" style="width:18px;height:18px;"></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
+      <div class="form-group">
+        <label class="form-label">Position Title <span style="color:var(--color-error);">*</span></label>
+        <input type="text" class="form-input" id="positionTitle" placeholder="e.g. Senior Backend Engineer">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <select class="form-select">
+            <option>Engineering</option>
+            <option>Design</option>
+            <option>Operations</option>
+            <option>Finance</option>
+            <option>HR</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select">
+            <option>High — needed immediately</option>
+            <option>Medium — needed within 3 months</option>
+            <option>Low — planning ahead</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+        <div class="form-group">
+          <label class="form-label">Target Start Date</label>
+          <input type="date" class="form-input" value="2026-06-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Budget (Annual Cost €)</label>
+          <input type="number" class="form-input" placeholder="75000" step="5000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Required Skills</label>
+        <input type="text" class="form-input" placeholder="e.g. Rust, PostgreSQL, AWS (comma-separated)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason for Hire</label>
+        <select class="form-select">
+          <option>Backfill — replacing departing employee</option>
+          <option>New headcount — business growth</option>
+          <option>Project-specific — temporary need</option>
+          <option>Ahead-of-curve — strategic investment</option>
+        </select>
+      </div>
+      <!-- Revenue impact preview -->
+      <div style="background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-md);padding:var(--space-3);">
+        <div style="font-size:var(--text-body-sm);color:var(--color-primary);font-weight:var(--weight-medium);">Revenue impact estimate</div>
+        <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:4px;">At standard rate €85/h × 160h/month = <strong style="color:var(--color-text-1);">€13,600/month</strong> billable capacity added once onboarded.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAddPositionModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddPosition()">
+        <svg data-lucide="plus" style="width:14px;height:14px;"></svg>
+        Add to Pipeline
+      </button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

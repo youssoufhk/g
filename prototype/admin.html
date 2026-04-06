@@ -123,6 +123,7 @@
   </style>
 </head>
 <body class="show-populated">
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -132,7 +133,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -165,7 +166,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -189,6 +190,10 @@
         <a href="planning.html" class="nav-item">
           <svg data-lucide="calendar-range"></svg>
           <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="gantt.html" class="nav-item">
+          <svg data-lucide="gantt-chart-square"></svg>
+          <span class="nav-label">Gantt Chart</span>
         </a>
         <a href="calendar.html" class="nav-item">
           <svg data-lucide="calendar"></svg>
@@ -221,10 +226,18 @@
           <svg data-lucide="settings"></svg>
           <span class="nav-label">Settings</span>
         </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
     </nav>
 
     <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);margin-bottom:var(--space-2);" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?',bubbles:true}))">
+        <svg data-lucide="keyboard" width="14" height="14"></svg>
+        <span>Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -254,7 +267,7 @@
 
       <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -283,21 +296,21 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
             </div>
-            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="user-dropdown-header">
               <div class="name">Sarah Chen</div>
               <div class="email">sarah.chen@gammahr.io</div>
             </div>
-            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
             <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
@@ -307,11 +320,16 @@
     </header>
 
     <!-- ── PAGE CONTENT ── -->
-    <main class="page-content">
+    <main class="page-content" id="main-content">
 
       <!-- Page Header -->
       <div class="page-header">
         <div class="page-header-left">
+          <nav class="breadcrumb" aria-label="Breadcrumb" style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);display:flex;align-items:center;gap:var(--space-1);">
+            <a href="index.html" style="color:var(--color-text-3);text-decoration:none;">Dashboard</a>
+            <span>/</span>
+            <span style="color:var(--color-text-2);">Administration</span>
+          </nav>
           <h1 class="page-title">Administration</h1>
           <p class="page-subtitle">Manage company settings, users, and system settings</p>
         </div>
@@ -319,6 +337,30 @@
 
       <!-- Populated content -->
       <div class="populated-content">
+
+        <!-- KPI Stat Cards -->
+        <div class="stats-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6)" data-min-role="admin">
+          <div class="stat-card card-interactive">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">12</div>
+            <div class="stat-meta"><span class="badge badge-success">10 Active</span><span class="text-3" style="margin-left:var(--space-2);">2 Inactive</span></div>
+          </div>
+          <div class="stat-card card-interactive">
+            <div class="stat-label">Departments</div>
+            <div class="stat-value">6</div>
+            <div class="stat-meta"><span class="text-3">Across 12 employees</span></div>
+          </div>
+          <div class="stat-card card-interactive">
+            <div class="stat-label">Pending Invites</div>
+            <div class="stat-value">3</div>
+            <div class="stat-meta"><span class="badge badge-warning">Awaiting acceptance</span></div>
+          </div>
+          <div class="stat-card card-interactive">
+            <div class="stat-label">System Health</div>
+            <div class="stat-value text-success">All OK</div>
+            <div class="stat-meta"><span class="text-3">Last checked 5 min ago</span></div>
+          </div>
+        </div>
 
         <!-- Tabs -->
         <div class="tabs admin-tabs">
@@ -495,7 +537,7 @@
                 </button>
               </div>
             </div>
-            <div style="overflow-x: auto;">
+            <div class="overflow-x-auto">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -512,109 +554,109 @@
                 <tbody>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html">Sarah Chen</a></div></td>
-                    <td class="cell-secondary">sarah.chen@gammahr.io</td>
-                    <td><span class="badge badge-error"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
-                    <td>Engineering</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Today, 09:14</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Admin" data-dept="Engineering" data-worktime="95">Sarah Chen</a></div></td>
+                    <td data-label="Email" class="cell-secondary">sarah.chen@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-primary"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
+                    <td data-label="Department">Engineering</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Today, 09:14</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('SC','Sarah Chen','Admin','Engineering','Active')">Edit</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">JS</div><a href="employees.html">John Smith</a></div></td>
-                    <td class="cell-secondary">john.smith@gammahr.io</td>
-                    <td><span class="badge badge-warning"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
-                    <td>Operations</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Today, 08:42</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">JS</div><a href="employees.html" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Operations" data-worktime="82">John Smith</a></div></td>
+                    <td data-label="Email" class="cell-secondary">john.smith@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
+                    <td data-label="Department">Operations</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Today, 08:42</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('JS','John Smith','PM','Operations','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">AW</div><a href="employees.html">Alice Wang</a></div></td>
-                    <td class="cell-secondary">alice.wang@gammahr.io</td>
-                    <td><span class="badge badge-warning"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
-                    <td>Design</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Yesterday, 17:30</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">AW</div><a href="employees.html" data-hovercard data-name="Alice Wang" data-role="Project Manager" data-dept="Design" data-worktime="78">Alice Wang</a></div></td>
+                    <td data-label="Email" class="cell-secondary">alice.wang@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
+                    <td data-label="Department">Design</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Yesterday, 17:30</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('AW','Alice Wang','PM','Design','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">MR</div><a href="employees.html">Marco Rossi</a></div></td>
-                    <td class="cell-secondary">marco.rossi@gammahr.io</td>
-                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
-                    <td>Engineering</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Today, 10:05</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">MR</div><a href="employees.html" data-hovercard data-name="Marco Rossi" data-role="Employee" data-dept="Operations" data-worktime="88">Marco Rossi</a></div></td>
+                    <td data-label="Email" class="cell-secondary">marco.rossi@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td data-label="Department">Operations</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Today, 10:05</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('MR','Marco Rossi','Employee','Operations','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">CK</div><a href="employees.html">Carol Kim</a></div></td>
-                    <td class="cell-secondary">carol.kim@gammahr.io</td>
-                    <td><span class="badge badge-warning"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
-                    <td>Analytics</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Today, 09:58</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">CK</div><a href="employees.html" data-hovercard data-name="Carol Kim" data-role="Project Manager" data-dept="Analytics" data-worktime="90">Carol Kim</a></div></td>
+                    <td data-label="Email" class="cell-secondary">carol.kim@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="briefcase" width="12" height="12"></svg> PM</span></td>
+                    <td data-label="Department">Analytics</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Today, 09:58</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('CK','Carol Kim','PM','Analytics','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">BT</div><a href="employees.html">Bob Taylor</a></div></td>
-                    <td class="cell-secondary">bob.taylor@gammahr.io</td>
-                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
-                    <td>Engineering</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Yesterday, 16:22</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">BT</div><a href="employees.html" data-hovercard data-name="Bob Taylor" data-role="Employee" data-dept="Engineering" data-worktime="55">Bob Taylor</a></div></td>
+                    <td data-label="Email" class="cell-secondary">bob.taylor@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td data-label="Department">Engineering</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Yesterday, 16:22</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('BT','Bob Taylor','Employee','Engineering','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">LO</div><a href="employees.html">Liam O'Brien</a></div></td>
-                    <td class="cell-secondary">liam.obrien@gammahr.io</td>
-                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
-                    <td>Engineering</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Today, 08:15</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">LO</div><a href="employees.html" data-hovercard data-name="Liam O'Brien" data-role="Employee" data-dept="Engineering" data-worktime="76">Liam O'Brien</a></div></td>
+                    <td data-label="Email" class="cell-secondary">liam.obrien@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td data-label="Department">Engineering</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Today, 08:15</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('LO','Liam O\'Brien','Employee','Engineering','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SD</div><a href="employees.html">Sophie Dubois</a></div></td>
-                    <td class="cell-secondary">sophie.dubois@gammahr.io</td>
-                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
-                    <td>Engineering</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Today, 09:30</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SD</div><a href="employees.html" data-hovercard data-name="Sophie Dubois" data-role="Employee" data-dept="Engineering" data-worktime="84">Sophie Dubois</a></div></td>
+                    <td data-label="Email" class="cell-secondary">sophie.dubois@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td data-label="Department">Engineering</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Today, 09:30</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('SD','Sophie Dubois','Employee','Engineering','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">DP</div><a href="employees.html">David Park</a></div></td>
-                    <td class="cell-secondary">david.park@gammahr.io</td>
-                    <td><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
-                    <td>Engineering</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td class="cell-secondary">Apr 3, 14:10</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">DP</div><a href="employees.html" data-hovercard data-name="David Park" data-role="Employee" data-dept="Finance" data-worktime="72">David Park</a></div></td>
+                    <td data-label="Email" class="cell-secondary">david.park@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-default"><svg data-lucide="user" width="12" height="12"></svg> Employee</span></td>
+                    <td data-label="Department">Finance</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Apr 3, 14:10</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('DP','David Park','Employee','Finance','Active')">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Deactivate</button></td>
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">EL</div><a href="employees.html">Emma Laurent</a></div></td>
-                    <td class="cell-secondary">emma.laurent@gammahr.io</td>
-                    <td><span class="badge badge-error"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
-                    <td>HR</td>
-                    <td><span class="badge badge-default "><svg data-lucide="x-circle" width="12" height="12"></svg> Inactive</span></td>
-                    <td class="cell-secondary">Mar 28, 11:45</td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-ghost btn-xs">Activate</button></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">EL</div><a href="employees.html" data-hovercard data-name="Emma Laurent" data-role="Admin" data-dept="HR" data-worktime="78">Emma Laurent</a></div></td>
+                    <td data-label="Email" class="cell-secondary">emma.laurent@gammahr.io</td>
+                    <td data-label="Role"><span class="badge badge-primary"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
+                    <td data-label="Department">HR</td>
+                    <td data-label="Status"><span class="badge badge-default "><svg data-lucide="x-circle" width="12" height="12"></svg> Inactive</span></td>
+                    <td data-label="Last Login" class="cell-secondary">Mar 28, 11:45</td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="editUser('EL','Emma Laurent','Admin','HR','Inactive')">Edit</button> <button class="btn btn-ghost btn-xs">Activate</button></td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div class="table-pagination">
-              <span>Showing 1-10 of 10 users</span>
+              <span>Showing 1-10 of 12 users</span>
               <div class="pagination-buttons">
                 <button disabled>&laquo;</button>
                 <button class="active">1</button>
@@ -639,7 +681,7 @@
                 </button>
               </div>
             </div>
-            <div style="overflow-x: auto;">
+            <div class="overflow-x-auto">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -653,52 +695,52 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td style="font-weight: var(--weight-semibold);">Engineering</td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html">Sarah Chen</a></div></td>
-                    <td class="cell-mono">18</td>
-                    <td class="cell-secondary">CC-ENG-100</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td class="font-semibold">Engineering</td>
+                    <td data-label="Manager"><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html">Sarah Chen</a></div></td>
+                    <td data-label="Head Count" class="cell-mono">4</td>
+                    <td data-label="Cost Center" class="cell-secondary">CC-ENG-100</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Department',{name:'Engineering',manager:'Sarah Chen',costCenter:'CC-ENG-100'})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','Are you sure? This cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
-                    <td style="font-weight: var(--weight-semibold);">Operations</td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">JS</div><a href="employees.html">John Smith</a></div></td>
-                    <td class="cell-mono">8</td>
-                    <td class="cell-secondary">CC-OPS-200</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td class="font-semibold">Operations</td>
+                    <td data-label="Manager"><div class="flex items-center gap-2"><div class="avatar avatar-xs">JS</div><a href="employees.html">John Smith</a></div></td>
+                    <td data-label="Head Count" class="cell-mono">2</td>
+                    <td data-label="Cost Center" class="cell-secondary">CC-OPS-200</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Department',{name:'Operations',manager:'John Smith',costCenter:'CC-OPS-200'})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','Are you sure? This cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
-                    <td style="font-weight: var(--weight-semibold);">Design</td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">AW</div><a href="employees.html">Alice Wang</a></div></td>
-                    <td class="cell-mono">5</td>
-                    <td class="cell-secondary">CC-DSG-300</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td class="font-semibold">Design</td>
+                    <td data-label="Manager"><div class="flex items-center gap-2"><div class="avatar avatar-xs">AW</div><a href="employees.html">Alice Wang</a></div></td>
+                    <td data-label="Head Count" class="cell-mono">2</td>
+                    <td data-label="Cost Center" class="cell-secondary">CC-DSG-300</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Department',{name:'Design',manager:'Alice Wang',costCenter:'CC-DSG-300'})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','Are you sure? This cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
-                    <td style="font-weight: var(--weight-semibold);">Analytics</td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">CK</div><a href="employees.html">Carol Kim</a></div></td>
-                    <td class="cell-mono">4</td>
-                    <td class="cell-secondary">CC-ANA-400</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td class="font-semibold">Finance</td>
+                    <td data-label="Manager"><div class="flex items-center gap-2"><div class="avatar avatar-xs">DP</div><a href="employees.html">David Park</a></div></td>
+                    <td data-label="Head Count" class="cell-mono">1</td>
+                    <td data-label="Cost Center" class="cell-secondary">CC-ANA-400</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Department',{name:'Finance',manager:'David Park',costCenter:'CC-ANA-400'})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','Are you sure? This cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
-                    <td style="font-weight: var(--weight-semibold);">HR</td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">EL</div><a href="employees.html">Emma Laurent</a></div></td>
-                    <td class="cell-mono">3</td>
-                    <td class="cell-secondary">CC-HR-500</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td class="font-semibold">HR</td>
+                    <td data-label="Manager"><div class="flex items-center gap-2"><div class="avatar avatar-xs">EL</div><a href="employees.html">Emma Laurent</a></div></td>
+                    <td data-label="Head Count" class="cell-mono">2</td>
+                    <td data-label="Cost Center" class="cell-secondary">CC-HR-500</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Department',{name:'HR',manager:'Emma Laurent',costCenter:'CC-HR-500'})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','Are you sure? This cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
-                    <td style="font-weight: var(--weight-semibold);">Executive</td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">MD</div><a href="employees.html">Marie Dupont</a></div></td>
-                    <td class="cell-mono">2</td>
-                    <td class="cell-secondary">CC-EXE-600</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td class="font-semibold">Executive</td>
+                    <td data-label="Manager"><div class="flex items-center gap-2"><div class="avatar avatar-xs">MD</div><a href="employees.html">Marie Dupont</a></div></td>
+                    <td data-label="Head Count" class="cell-mono">1</td>
+                    <td data-label="Cost Center" class="cell-secondary">CC-EXE-600</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Department',{name:'Executive',manager:'Marie Dupont',costCenter:'CC-EXE-600'})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','Are you sure? This cannot be undone.')">Delete</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -721,7 +763,7 @@
                 </button>
               </div>
             </div>
-            <div style="overflow-x: auto;">
+            <div class="overflow-x-auto">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -739,69 +781,69 @@
                 <tbody>
                   <tr>
                     <td><span class="color-dot" style="background: var(--color-primary);"></span></td>
-                    <td style="font-weight: var(--weight-semibold);">Annual Leave</td>
-                    <td class="cell-mono">25 days</td>
-                    <td>Yes</td>
-                    <td class="cell-mono">15 days</td>
-                    <td class="cell-mono">5 days</td>
-                    <td class="cell-secondary">2.08/month</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td class="font-semibold">Annual Leave</td>
+                    <td data-label="Default Balance" class="cell-mono">25 days</td>
+                    <td data-label="Requires Approval">Yes</td>
+                    <td data-label="Max Consecutive" class="cell-mono">15 days</td>
+                    <td data-label="Carryover Max" class="cell-mono">5 days</td>
+                    <td data-label="Accrual Rate" class="cell-secondary">2.08/month</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
                     <td><span class="color-dot" style="background: var(--color-error);"></span></td>
-                    <td style="font-weight: var(--weight-semibold);">Sick Leave</td>
-                    <td class="cell-mono">12 days</td>
-                    <td>No</td>
-                    <td class="cell-mono">--</td>
-                    <td class="cell-mono">0 days</td>
-                    <td class="cell-secondary">1.00/month</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td class="font-semibold">Sick Leave</td>
+                    <td data-label="Default Balance" class="cell-mono">12 days</td>
+                    <td data-label="Requires Approval">No</td>
+                    <td data-label="Max Consecutive" class="cell-mono">--</td>
+                    <td data-label="Carryover Max" class="cell-mono">0 days</td>
+                    <td data-label="Accrual Rate" class="cell-secondary">1.00/month</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
                     <td><span class="color-dot" style="background: var(--color-accent);"></span></td>
-                    <td style="font-weight: var(--weight-semibold);">Personal</td>
-                    <td class="cell-mono">3 days</td>
-                    <td>Yes</td>
-                    <td class="cell-mono">3 days</td>
-                    <td class="cell-mono">0 days</td>
-                    <td class="cell-secondary">Fixed</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td class="font-semibold">Personal</td>
+                    <td data-label="Default Balance" class="cell-mono">3 days</td>
+                    <td data-label="Requires Approval">Yes</td>
+                    <td data-label="Max Consecutive" class="cell-mono">3 days</td>
+                    <td data-label="Carryover Max" class="cell-mono">0 days</td>
+                    <td data-label="Accrual Rate" class="cell-secondary">Fixed</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
                     <td><span class="color-dot" style="background: var(--color-info);"></span></td>
-                    <td style="font-weight: var(--weight-semibold);">WFH</td>
-                    <td class="cell-mono">Unlimited</td>
-                    <td>No</td>
-                    <td class="cell-mono">--</td>
-                    <td class="cell-mono">--</td>
-                    <td class="cell-secondary">N/A</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td class="font-semibold">WFH</td>
+                    <td data-label="Default Balance" class="cell-mono">Unlimited</td>
+                    <td data-label="Requires Approval">No</td>
+                    <td data-label="Max Consecutive" class="cell-mono">--</td>
+                    <td data-label="Carryover Max" class="cell-mono">--</td>
+                    <td data-label="Accrual Rate" class="cell-secondary">N/A</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
                     <td><span class="color-dot" style="background: var(--color-accent);"></span></td>
-                    <td style="font-weight: var(--weight-semibold);">Parental Leave</td>
-                    <td class="cell-mono">90 days</td>
-                    <td>Yes</td>
-                    <td class="cell-mono">90 days</td>
-                    <td class="cell-mono">0 days</td>
-                    <td class="cell-secondary">Fixed</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td class="font-semibold">Parental Leave</td>
+                    <td data-label="Default Balance" class="cell-mono">90 days</td>
+                    <td data-label="Requires Approval">Yes</td>
+                    <td data-label="Max Consecutive" class="cell-mono">90 days</td>
+                    <td data-label="Carryover Max" class="cell-mono">0 days</td>
+                    <td data-label="Accrual Rate" class="cell-secondary">Fixed</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
                     <td><span class="color-dot" style="background: var(--color-warning);"></span></td>
-                    <td style="font-weight: var(--weight-semibold);">Compassionate</td>
-                    <td class="cell-mono">5 days</td>
-                    <td>Yes</td>
-                    <td class="cell-mono">5 days</td>
-                    <td class="cell-mono">0 days</td>
-                    <td class="cell-secondary">Fixed</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td class="font-semibold">Compassionate</td>
+                    <td data-label="Default Balance" class="cell-mono">5 days</td>
+                    <td data-label="Requires Approval">Yes</td>
+                    <td data-label="Max Consecutive" class="cell-mono">5 days</td>
+                    <td data-label="Carryover Max" class="cell-mono">0 days</td>
+                    <td data-label="Accrual Rate" class="cell-secondary">Fixed</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -824,7 +866,7 @@
                 </button>
               </div>
             </div>
-            <div style="overflow-x: auto;">
+            <div class="overflow-x-auto">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -840,74 +882,74 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><svg data-lucide="plane" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Travel</td>
-                    <td class="cell-mono">&euro;2,000</td>
-                    <td class="cell-mono">--</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="plane" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Travel</td>
+                    <td data-label="Max Amount" class="cell-mono">&euro;2,000</td>
+                    <td data-label="Daily Limit" class="cell-mono">--</td>
+                    <td data-label="Requires Receipt">Yes</td>
+                    <td data-label="Requires Project">Yes</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
-                    <td><svg data-lucide="bed" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Hotel</td>
-                    <td class="cell-mono">--</td>
-                    <td class="cell-mono">&euro;500/day</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="bed" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Hotel</td>
+                    <td data-label="Max Amount" class="cell-mono">--</td>
+                    <td data-label="Daily Limit" class="cell-mono">&euro;500/day</td>
+                    <td data-label="Requires Receipt">Yes</td>
+                    <td data-label="Requires Project">Yes</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
-                    <td><svg data-lucide="utensils" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Meals</td>
-                    <td class="cell-mono">--</td>
-                    <td class="cell-mono">&euro;50/day</td>
-                    <td>Yes</td>
-                    <td>Optional</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="utensils" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Meals</td>
+                    <td data-label="Max Amount" class="cell-mono">--</td>
+                    <td data-label="Daily Limit" class="cell-mono">&euro;50/day</td>
+                    <td data-label="Requires Receipt">Yes</td>
+                    <td data-label="Requires Project">Optional</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
-                    <td><svg data-lucide="monitor" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Software</td>
-                    <td class="cell-mono">&euro;500</td>
-                    <td class="cell-mono">--</td>
-                    <td>Yes</td>
-                    <td>No</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="monitor" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Software</td>
+                    <td data-label="Max Amount" class="cell-mono">&euro;500</td>
+                    <td data-label="Daily Limit" class="cell-mono">--</td>
+                    <td data-label="Requires Receipt">Yes</td>
+                    <td data-label="Requires Project">No</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
-                    <td><svg data-lucide="hard-drive" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Equipment</td>
-                    <td class="cell-mono">&euro;1,000</td>
-                    <td class="cell-mono">--</td>
-                    <td>Yes</td>
-                    <td>No</td>
-                    <td><span class="badge badge-warning "><svg data-lucide="circle" width="12" height="12"></svg> Pre-approval</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="hard-drive" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Equipment</td>
+                    <td data-label="Max Amount" class="cell-mono">&euro;1,000</td>
+                    <td data-label="Daily Limit" class="cell-mono">--</td>
+                    <td data-label="Requires Receipt">Yes</td>
+                    <td data-label="Requires Project">No</td>
+                    <td data-label="Status"><span class="badge badge-warning "><svg data-lucide="circle" width="12" height="12"></svg> Pre-approval</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
-                    <td><svg data-lucide="train" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Transport</td>
-                    <td class="cell-mono">&euro;200</td>
-                    <td class="cell-mono">--</td>
-                    <td>Yes</td>
-                    <td>Optional</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="train" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Transport</td>
+                    <td data-label="Max Amount" class="cell-mono">&euro;200</td>
+                    <td data-label="Daily Limit" class="cell-mono">--</td>
+                    <td data-label="Requires Receipt">Yes</td>
+                    <td data-label="Requires Project">Optional</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                   <tr>
-                    <td><svg data-lucide="paperclip" width="16" height="16" style="color: var(--color-text-2);"></svg></td>
-                    <td style="font-weight: var(--weight-semibold);">Office Supplies</td>
-                    <td class="cell-mono">&euro;100</td>
-                    <td class="cell-mono">--</td>
-                    <td>No</td>
-                    <td>No</td>
-                    <td><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button></td>
+                    <td><svg data-lucide="paperclip" width="16" height="16" class="text-2"></svg></td>
+                    <td class="font-semibold">Office Supplies</td>
+                    <td data-label="Max Amount" class="cell-mono">&euro;100</td>
+                    <td data-label="Daily Limit" class="cell-mono">--</td>
+                    <td data-label="Requires Receipt">No</td>
+                    <td data-label="Requires Project">No</td>
+                    <td data-label="Status"><span class="badge badge-success "><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Leave Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,balance:25,carryOver:5})">Edit</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -949,7 +991,7 @@
           </div>
 
           <div class="data-table-wrapper">
-            <div style="overflow-x: auto;">
+            <div class="overflow-x-auto">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -963,73 +1005,73 @@
                 <tbody>
                   <tr>
                     <td class="cell-mono">Jan 1, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">New Year's Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">New Year's Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">Apr 6, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Easter Monday</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Variable</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Easter Monday</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Variable</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">May 1, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Labour Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Labour Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">May 8, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Victory in Europe Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Victory in Europe Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">May 14, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Ascension Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Variable</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Ascension Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Variable</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">May 25, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Whit Monday</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Variable</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Whit Monday</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Variable</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">Jul 14, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Bastille Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Bastille Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">Aug 15, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Assumption of Mary</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Assumption of Mary</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">Nov 1, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">All Saints' Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">All Saints' Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                   <tr>
                     <td class="cell-mono">Dec 25, 2026</td>
-                    <td style="font-weight: var(--weight-semibold);">Christmas Day</td>
-                    <td><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
-                    <td><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
-                    <td><button class="btn btn-ghost btn-xs">Edit</button> <button class="btn btn-destructive-ghost btn-xs">Delete</button></td>
+                    <td data-label="Holiday" class="font-semibold">Christmas Day</td>
+                    <td data-label="Type"><span class="badge badge-primary"><svg data-lucide="sun" width="12" height="12"></svg> Full Day</span></td>
+                    <td data-label="Recurring"><span class="badge badge-success "><svg data-lucide="circle" width="12" height="12"></svg> Yes</span></td>
+                    <td data-label="Actions"><button class="btn btn-ghost btn-xs" onclick="openConfigEdit('Expense Type',{name:this.closest('tr').querySelector('.font-semibold').textContent,limit:500,cap:2000})">Edit</button> <button class="btn btn-destructive-ghost btn-xs" onclick="showToast('error','Confirm Delete','This action cannot be undone.')">Delete</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -1047,7 +1089,7 @@
           </div>
 
           <div class="data-table-wrapper">
-            <div style="overflow-x: auto;">
+            <div class="overflow-x-auto">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -1061,84 +1103,84 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 5, 09:14</td>
-                    <td><a href="employees.html">Sarah Chen</a></td>
-                    <td><span class="badge action-approved"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
-                    <td>Timesheet #T-2026-0187</td>
-                    <td><span class="changes-preview">{"status": "approved"}</span></td>
-                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                    <td class="cell-mono" class="nowrap">Apr 5, 09:14</td>
+                    <td data-label="User"><a href="employees.html">Sarah Chen</a></td>
+                    <td data-label="Action"><span class="badge action-approved"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                    <td data-label="Entity">Timesheet #T-2026-0187</td>
+                    <td data-label="Changes"><span class="changes-preview">{"status": "approved"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">192.168.1.42</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 5, 09:10</td>
-                    <td><a href="employees.html">Sarah Chen</a></td>
-                    <td><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
-                    <td>Company Settings</td>
-                    <td><span class="changes-preview">{"overtime_rules": "French..."}</span></td>
-                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                    <td class="cell-mono" class="nowrap">Apr 5, 09:10</td>
+                    <td data-label="User"><a href="employees.html">Sarah Chen</a></td>
+                    <td data-label="Action"><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
+                    <td data-label="Entity">Company Settings</td>
+                    <td data-label="Changes"><span class="changes-preview">{"overtime_rules": "French..."}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">192.168.1.42</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 5, 08:55</td>
-                    <td><a href="employees.html">John Smith</a></td>
-                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
-                    <td>Expense #E-2026-0094</td>
-                    <td><span class="changes-preview">{"amount": 340, "type": "Hotel"}</span></td>
-                    <td class="cell-mono cell-secondary">10.0.0.15</td>
+                    <td class="cell-mono" class="nowrap">Apr 5, 08:55</td>
+                    <td data-label="User"><a href="employees.html">John Smith</a></td>
+                    <td data-label="Action"><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td data-label="Entity">Expense #E-2026-0094</td>
+                    <td data-label="Changes"><span class="changes-preview">{"amount": 340, "type": "Hotel"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">10.0.0.15</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 17:30</td>
-                    <td><a href="employees.html">Alice Wang</a></td>
-                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
-                    <td>Leave Request #L-2026-0052</td>
-                    <td><span class="changes-preview">{"type": "Annual", "days": 2}</span></td>
-                    <td class="cell-mono cell-secondary">172.16.0.8</td>
+                    <td class="cell-mono" class="nowrap">Apr 4, 17:30</td>
+                    <td data-label="User"><a href="employees.html">Alice Wang</a></td>
+                    <td data-label="Action"><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td data-label="Entity">Leave Request #L-2026-0052</td>
+                    <td data-label="Changes"><span class="changes-preview">{"type": "Annual", "days": 2}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">172.16.0.8</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 16:20</td>
-                    <td><a href="employees.html">Sarah Chen</a></td>
-                    <td><span class="badge action-approved"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
-                    <td>Expense #E-2026-0092</td>
-                    <td><span class="changes-preview">{"status": "approved"}</span></td>
-                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                    <td class="cell-mono" class="nowrap">Apr 4, 16:20</td>
+                    <td data-label="User"><a href="employees.html">Sarah Chen</a></td>
+                    <td data-label="Action"><span class="badge action-approved"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                    <td data-label="Entity">Expense #E-2026-0092</td>
+                    <td data-label="Changes"><span class="changes-preview">{"status": "approved"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">192.168.1.42</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 14:10</td>
-                    <td><a href="employees.html">Sarah Chen</a></td>
-                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
-                    <td>User: Yuki Tanaka</td>
-                    <td><span class="changes-preview">{"role": "Employee", "dept": "Eng"}</span></td>
-                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                    <td class="cell-mono" class="nowrap">Apr 4, 14:10</td>
+                    <td data-label="User"><a href="employees.html">Sarah Chen</a></td>
+                    <td data-label="Action"><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td data-label="Entity">User: Yuki Tanaka</td>
+                    <td data-label="Changes"><span class="changes-preview">{"role": "Employee", "dept": "Eng"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">192.168.1.42</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 4, 11:45</td>
-                    <td><a href="employees.html">Sarah Chen</a></td>
-                    <td><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
-                    <td>User: Emma Laurent</td>
-                    <td><span class="changes-preview">{"status": "inactive"}</span></td>
-                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                    <td class="cell-mono" class="nowrap">Apr 4, 11:45</td>
+                    <td data-label="User"><a href="employees.html">Sarah Chen</a></td>
+                    <td data-label="Action"><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
+                    <td data-label="Entity">User: Emma Laurent</td>
+                    <td data-label="Changes"><span class="changes-preview">{"status": "inactive"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">192.168.1.42</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 3, 16:00</td>
-                    <td><a href="employees.html">John Smith</a></td>
-                    <td><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
-                    <td>Project: Acme Corp</td>
-                    <td><span class="changes-preview">{"budget": 85000, "status": "active"}</span></td>
-                    <td class="cell-mono cell-secondary">10.0.0.15</td>
+                    <td class="cell-mono" class="nowrap">Apr 3, 16:00</td>
+                    <td data-label="User"><a href="employees.html">John Smith</a></td>
+                    <td data-label="Action"><span class="badge action-updated"><svg data-lucide="pencil" width="12" height="12"></svg> Updated</span></td>
+                    <td data-label="Entity">Project: Acme Corp</td>
+                    <td data-label="Changes"><span class="changes-preview">{"budget": 85000, "status": "active"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">10.0.0.15</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 3, 10:30</td>
-                    <td><a href="employees.html">Sarah Chen</a></td>
-                    <td><span class="badge action-deleted"><svg data-lucide="trash-2" width="12" height="12"></svg> Deleted</span></td>
-                    <td>Holiday: Test Holiday</td>
-                    <td><span class="changes-preview">{"name": "Test Holiday"}</span></td>
-                    <td class="cell-mono cell-secondary">192.168.1.42</td>
+                    <td class="cell-mono" class="nowrap">Apr 3, 10:30</td>
+                    <td data-label="User"><a href="employees.html">Sarah Chen</a></td>
+                    <td data-label="Action"><span class="badge action-deleted"><svg data-lucide="trash-2" width="12" height="12"></svg> Deleted</span></td>
+                    <td data-label="Entity">Holiday: Test Holiday</td>
+                    <td data-label="Changes"><span class="changes-preview">{"name": "Test Holiday"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">192.168.1.42</td>
                   </tr>
                   <tr>
-                    <td class="cell-mono" style="white-space: nowrap;">Apr 2, 15:20</td>
-                    <td><a href="employees.html">Alice Wang</a></td>
-                    <td><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
-                    <td>Timesheet #T-2026-0185</td>
-                    <td><span class="changes-preview">{"hours": 40, "week": "Mar 30"}</span></td>
-                    <td class="cell-mono cell-secondary">172.16.0.8</td>
+                    <td class="cell-mono" class="nowrap">Apr 2, 15:20</td>
+                    <td data-label="User"><a href="employees.html">Alice Wang</a></td>
+                    <td data-label="Action"><span class="badge action-created"><svg data-lucide="plus" width="12" height="12"></svg> Created</span></td>
+                    <td data-label="Entity">Timesheet #T-2026-0185</td>
+                    <td data-label="Changes"><span class="changes-preview">{"hours": 40, "week": "Mar 30"}</span></td>
+                    <td data-label="IP Address" class="cell-mono cell-secondary">172.16.0.8</td>
                   </tr>
                 </tbody>
               </table>
@@ -1176,7 +1218,7 @@
 
 <!-- Invite User Modal -->
 <div class="modal-backdrop" id="inviteUserModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Invite User</h3>
       <button class="modal-close" onclick="closeModal('inviteUserModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -1184,19 +1226,19 @@
     <div class="modal-body">
       <div class="form-group mb-4">
         <label class="form-label">Email Address <span class="required">*</span></label>
-        <input type="email" class="form-input" placeholder="user@company.com">
+        <input type="email" class="form-input" id="inviteEmail" placeholder="user@company.com">
       </div>
       <div class="form-group mb-4">
         <label class="form-label">Role</label>
-        <select class="form-select">
+        <select class="form-select" id="inviteRole">
           <option>Employee</option>
           <option>Project Manager</option>
           <option>Admin</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group mb-4">
         <label class="form-label">Department</label>
-        <select class="form-select">
+        <select class="form-select" id="inviteDept">
           <option>Engineering</option>
           <option>Operations</option>
           <option>Design</option>
@@ -1205,17 +1247,77 @@
           <option>Executive</option>
         </select>
       </div>
+      <div class="form-group">
+        <label class="form-label">Personal Message <span style="color:var(--color-text-3);font-weight:normal;">(optional)</span></label>
+        <textarea class="form-textarea" id="inviteMessage" rows="2" placeholder="Add a personal note to the invitation..."></textarea>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-md" onclick="closeModal('inviteUserModal')">Cancel</button>
-      <button class="btn btn-primary btn-md" onclick="closeModal('inviteUserModal'); showToast('success', 'Invitation Sent', 'An invitation email has been sent.')">Send Invitation</button>
+      <button class="btn btn-primary btn-md" id="sendInviteBtn">
+        <svg data-lucide="send" width="14" height="14"></svg>
+        Send Invitation
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal-backdrop" id="editUserModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit User — <span id="editUserName"></span></h3>
+      <button class="modal-close" onclick="closeModal('editUserModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Role</label>
+        <select class="form-select" id="editUserRole">
+          <option value="Admin">Admin</option>
+          <option value="PM">Project Manager</option>
+          <option value="Employee">Employee</option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Department</label>
+        <select class="form-select" id="editUserDept">
+          <option>Engineering</option>
+          <option>Operations</option>
+          <option>Design</option>
+          <option>Analytics</option>
+          <option>HR</option>
+          <option>Finance</option>
+          <option>Executive</option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="editUserStatus">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="flex gap-2" style="margin-top:var(--space-4);">
+        <button class="btn btn-secondary btn-sm" onclick="showToast('info','Password Reset','A password reset email has been sent.')">
+          <svg data-lucide="key" width="14" height="14"></svg>
+          Reset Password
+        </button>
+        <button class="btn btn-destructive-ghost btn-sm" onclick="closeModal('editUserModal');showToast('warning','Account Deactivated','User account has been deactivated.')">
+          <svg data-lucide="user-x" width="14" height="14"></svg>
+          Deactivate Account
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('editUserModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="closeModal('editUserModal');showToast('success','User Updated','User settings have been saved.')">Save Changes</button>
     </div>
   </div>
 </div>
 
 <!-- Add Department Modal -->
 <div class="modal-backdrop" id="addDeptModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Add Department</h3>
       <button class="modal-close" onclick="closeModal('addDeptModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -1248,7 +1350,7 @@
 
 <!-- Add Leave Type Modal -->
 <div class="modal-backdrop" id="addLeaveTypeModal">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Add Leave Type</h3>
       <button class="modal-close" onclick="closeModal('addLeaveTypeModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -1285,7 +1387,7 @@
 
 <!-- Add Expense Type Modal -->
 <div class="modal-backdrop" id="addExpenseTypeModal">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Add Expense Type</h3>
       <button class="modal-close" onclick="closeModal('addExpenseTypeModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -1319,7 +1421,7 @@
 
 <!-- Add Holiday Modal -->
 <div class="modal-backdrop" id="addHolidayModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Add Holiday</h3>
       <button class="modal-close" onclick="closeModal('addHolidayModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -1404,9 +1506,38 @@
 </button>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="_shared.js"></script>
 <script>
 (function() {
   'use strict';
+
+  // ── editUser modal ──
+  window.editUser = function(userId, userName, role, dept, status) {
+    document.getElementById('editUserName').textContent = userName;
+    var roleEl = document.getElementById('editUserRole');
+    var deptEl = document.getElementById('editUserDept');
+    var statusEl = document.getElementById('editUserStatus');
+    // Set role
+    for (var i = 0; i < roleEl.options.length; i++) {
+      if (roleEl.options[i].value === role || roleEl.options[i].text.indexOf(role) !== -1) {
+        roleEl.selectedIndex = i; break;
+      }
+    }
+    // Set dept
+    for (var i = 0; i < deptEl.options.length; i++) {
+      if (deptEl.options[i].value === dept || deptEl.options[i].text === dept) {
+        deptEl.selectedIndex = i; break;
+      }
+    }
+    // Set status
+    for (var i = 0; i < statusEl.options.length; i++) {
+      if (statusEl.options[i].value === status) {
+        statusEl.selectedIndex = i; break;
+      }
+    }
+    document.getElementById('editUserModal').classList.add('active');
+    lucide.createIcons({ nodes: [document.getElementById('editUserModal')] });
+  };
 
   // ── DOM refs ──
   var sidebar = document.getElementById('sidebar');
@@ -1561,6 +1692,19 @@
     document.getElementById('inviteUserModal').classList.add('active');
   });
 
+  // Send Invite
+  document.getElementById('sendInviteBtn').addEventListener('click', function() {
+    var email = document.getElementById('inviteEmail').value.trim();
+    if (!email) {
+      document.getElementById('inviteEmail').style.borderColor = 'var(--color-error)';
+      return;
+    }
+    closeModal('inviteUserModal');
+    showToast('success', 'Invitation Sent', 'Invitation sent to ' + email + '.');
+    document.getElementById('inviteEmail').value = '';
+    document.getElementById('inviteEmail').style.borderColor = '';
+  });
+
   // ── Add Department ──
   document.getElementById('addDeptBtn').addEventListener('click', function() {
     document.getElementById('addDeptModal').classList.add('active');
@@ -1634,7 +1778,70 @@
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<!-- ══════════════════════ GENERIC CONFIG EDIT MODAL ══════════════════════ -->
+<div class="modal-backdrop" id="configEditModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title" id="configEditTitle">Edit Configuration</div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="document.getElementById('configEditModal').classList.remove('active')">
+        <svg data-lucide="x" style="width:18px;height:18px;"></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="configEditBody" style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
+      <!-- Dynamically populated -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('configEditModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveConfigEdit()">
+        <svg data-lucide="save" style="width:14px;height:14px;"></svg>
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Generic Config Edit Modal ──
+  window.openConfigEdit = function(type, data) {
+    var modal = document.getElementById('configEditModal');
+    var title = document.getElementById('configEditTitle');
+    var body = document.getElementById('configEditBody');
+    title.textContent = 'Edit ' + type;
+
+    if (type === 'Department') {
+      body.innerHTML = '<div class="form-group"><label class="form-label">Department Name</label><input class="form-input" value="' + (data.name||'') + '"></div>' +
+        '<div class="form-group"><label class="form-label">Manager</label><select class="form-select"><option>' + (data.manager||'') + '</option><option>Sarah Chen</option><option>John Smith</option><option>Alice Wang</option><option>David Park</option><option>Emma Laurent</option></select></div>' +
+        '<div class="form-group"><label class="form-label">Cost Center</label><input class="form-input" value="' + (data.costCenter||'') + '"></div>' +
+        '<div class="form-group"><label class="form-label">Status</label><select class="form-select"><option value="active" selected>Active</option><option value="inactive">Inactive</option></select></div>';
+    } else if (type === 'Leave Type') {
+      body.innerHTML = '<div class="form-group"><label class="form-label">Leave Type Name</label><input class="form-input" value="' + (data.name||'') + '"></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);"><div class="form-group"><label class="form-label">Annual Balance (days)</label><input type="number" class="form-input" value="' + (data.balance||25) + '"></div><div class="form-group"><label class="form-label">Carry-Over (days)</label><input type="number" class="form-input" value="' + (data.carryOver||5) + '"></div></div>' +
+        '<div class="form-group"><label class="form-label">Accrual Method</label><select class="form-select"><option>Yearly (upfront)</option><option>Monthly (1/12 per month)</option><option>Accrued per day worked</option></select></div>' +
+        '<div class="form-group"><label class="form-label">Requires Approval</label><select class="form-select"><option>Yes — manager approval required</option><option>No — auto-approved</option></select></div>' +
+        '<div class="form-group"><label class="form-label">Requires Medical Certificate</label><select class="form-select"><option>No</option><option>After 3 consecutive days</option><option>Always</option></select></div>';
+    } else if (type === 'Expense Type') {
+      body.innerHTML = '<div class="form-group"><label class="form-label">Category Name</label><input class="form-input" value="' + (data.name||'') + '"></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);"><div class="form-group"><label class="form-label">Daily Limit (€)</label><input type="number" class="form-input" value="' + (data.limit||500) + '"></div><div class="form-group"><label class="form-label">Monthly Cap (€)</label><input type="number" class="form-input" value="' + (data.cap||2000) + '"></div></div>' +
+        '<div class="form-group"><label class="form-label">Receipt Required</label><select class="form-select"><option>Always</option><option>Over €50</option><option>Never</option></select></div>' +
+        '<div class="form-group"><label class="form-label">Billable by Default</label><select class="form-select"><option>Yes</option><option>No</option></select></div>';
+    } else {
+      body.innerHTML = '<div class="form-group"><label class="form-label">Name</label><input class="form-input" value="' + (data.name||'') + '"></div>';
+    }
+    modal.classList.add('active');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  };
+
+  window.saveConfigEdit = function() {
+    document.getElementById('configEditModal').classList.remove('active');
+    if (typeof showToast === 'function') showToast('success', 'Saved', 'Configuration changes saved successfully.');
+  };
+
+  document.getElementById('configEditModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+  });
+</script>
+
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

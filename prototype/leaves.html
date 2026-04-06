@@ -112,21 +112,21 @@
     .type-wfh .balance-bar-fill     { background: var(--color-wfh); }
 
     /* Filter bar */
-    .filter-bar {
+    .filter-bar-standard {
       display: flex;
       align-items: center;
       gap: var(--space-3);
       margin-bottom: var(--space-4);
       flex-wrap: wrap;
     }
-    .filter-bar .form-select {
+    .filter-bar-standard .form-select {
       width: auto;
       min-width: 140px;
       height: 32px;
       font-size: var(--text-body-sm);
       background: var(--color-surface-1);
     }
-    .filter-bar .form-input {
+    .filter-bar-standard .form-input {
       width: auto;
       min-width: 140px;
       height: 32px;
@@ -275,6 +275,9 @@
 
     /* Heatmap mobile responsiveness */
     .heatmap-mobile-summary { display: none; }
+    .year-cal-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-3); }
+    @media (max-width: 1023px) { .year-cal-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 639px)  { .year-cal-grid { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 639px) {
       .heatmap-grid { display: none; }
       .heatmap-mobile-summary {
@@ -557,6 +560,7 @@
   </style>
 </head>
 <body class="show-populated">
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -566,7 +570,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -589,6 +593,14 @@
           <span class="nav-label">Leaves</span>
           <span class="nav-badge">3</span>
         </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+        <a href="insights.html#ask-ai" class="nav-item">
+          <i data-lucide="sparkles" class="nav-icon"></i>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
 
       <!-- HR -->
@@ -599,7 +611,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -616,6 +628,10 @@
           <svg data-lucide="folder-kanban"></svg>
           <span class="nav-label">Projects</span>
         </a>
+        <a href="gantt.html" class="nav-item">
+          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
+          <span class="nav-label">Gantt Chart</span>
+        </a>
         <a href="clients.html" class="nav-item">
           <svg data-lucide="building-2"></svg>
           <span class="nav-label">Clients</span>
@@ -623,10 +639,6 @@
         <a href="planning.html" class="nav-item">
           <svg data-lucide="calendar-range"></svg>
           <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
         </a>
       </div>
 
@@ -659,6 +671,10 @@
     </nav>
 
     <div class="sidebar-footer">
+      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
+        <i data-lucide="keyboard" class="nav-icon"></i>
+        <span class="nav-label">Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -689,7 +705,7 @@
 
       <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -725,35 +741,40 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
             </div>
-            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="user-dropdown-header">
               <div class="name">Sarah Chen</div>
               <div class="email">sarah.chen@gammahr.io</div>
             </div>
-            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
           </div>
         </div>
       </div>
     </header>
 
     <!-- ── PAGE CONTENT ── -->
-    <main class="page-content">
+    <main class="page-content" id="main-content">
 
       <!-- Page Header -->
       <div class="page-header">
         <div class="page-header-left">
+          <nav class="breadcrumb" aria-label="Breadcrumb" style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-1);">
+            <a href="index.html" style="color:var(--color-text-3);text-decoration:none;">Dashboard</a>
+            <span style="margin:0 var(--space-1);">/</span>
+            <span style="color:var(--color-text-2);">Leaves</span>
+          </nav>
           <h1 class="page-title">Leaves</h1>
           <p class="page-subtitle">Manage leave requests, balances, and team availability</p>
         </div>
@@ -862,7 +883,7 @@
           </div>
 
           <!-- Filters -->
-          <div class="filter-bar">
+          <div class="filter-bar-standard">
             <select class="form-select form-input-sm">
               <option value="">All Statuses</option>
               <option>Approved</option>
@@ -1015,7 +1036,7 @@
         <div class="populated-content">
 
           <!-- Filters -->
-          <div class="filter-bar">
+          <div class="filter-bar-standard">
             <select class="form-select form-input-sm">
               <option value="">All Departments</option>
               <option>Engineering</option>
@@ -1071,16 +1092,16 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">AW</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
+                      <a href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
                     </div>
                   </td>
-                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td>Apr 1 &ndash; 11</td>
-                  <td class="cell-mono">9</td>
-                  <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
-                  <td style="color: var(--color-text-2);">Sarah Chen</td>
-                  <td><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
-                  <td>
+                  <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td data-label="Dates">Apr 1 &ndash; 11</td>
+                  <td data-label="Days" class="cell-mono">9</td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  <td data-label="Approver" class="text-2">Sarah Chen</td>
+                  <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
+                  <td data-label="Actions">
                     <div class="flex gap-1">
                       <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
                       <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
@@ -1092,48 +1113,48 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">BT</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Bob Taylor</a>
+                      <a href="employees.html#bob-taylor" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Bob Taylor</a>
                     </div>
                   </td>
-                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td>Apr 14 &ndash; 18</td>
-                  <td class="cell-mono">5</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  <td style="color: var(--color-text-2);">Sarah Chen</td>
-                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
-                  <td></td>
+                  <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td data-label="Dates">Apr 14 &ndash; 18</td>
+                  <td data-label="Days" class="cell-mono">5</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td data-label="Approver" class="text-2">Sarah Chen</td>
+                  <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td data-label="Actions"></td>
                 </tr>
                 <tr class="team-leave-row">
                   <td class="row-check"><input type="checkbox" class="team-check"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">EL</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
+                      <a href="employees.html#emma-laurent" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
                     </div>
                   </td>
-                  <td><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
-                  <td>Apr 7 &ndash; 8</td>
-                  <td class="cell-mono">2</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  <td style="color: var(--color-text-2);">Sarah Chen</td>
-                  <td><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> Alice also off</span></td>
-                  <td></td>
+                  <td data-label="Type"><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
+                  <td data-label="Dates">Apr 7 &ndash; 8</td>
+                  <td data-label="Days" class="cell-mono">2</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td data-label="Approver" class="text-2">Sarah Chen</td>
+                  <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> Alice also off</span></td>
+                  <td data-label="Actions"></td>
                 </tr>
                 <tr class="team-leave-row">
                   <td class="row-check"><input type="checkbox" class="team-check"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">JK</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">James Kim</a>
+                      <a href="employees.html#james-kim" style="color: var(--color-text-1); font-weight: var(--weight-medium);">James Kim</a>
                     </div>
                   </td>
-                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td>Apr 21 &ndash; 25</td>
-                  <td class="cell-mono">5</td>
-                  <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
-                  <td style="color: var(--color-text-2);">Sarah Chen</td>
-                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
-                  <td>
+                  <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td data-label="Dates">Apr 21 &ndash; 25</td>
+                  <td data-label="Days" class="cell-mono">5</td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  <td data-label="Approver" class="text-2">Sarah Chen</td>
+                  <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td data-label="Actions">
                     <div class="flex gap-1">
                       <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
                       <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
@@ -1145,48 +1166,48 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">YT</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Yuki Tanaka</a>
+                      <a href="employees.html#yuki-tanaka" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Yuki Tanaka</a>
                     </div>
                   </td>
-                  <td><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
-                  <td>Apr 10</td>
-                  <td class="cell-mono">1</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  <td style="color: var(--color-text-2);">John Smith</td>
-                  <td><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
-                  <td></td>
+                  <td data-label="Type"><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
+                  <td data-label="Dates">Apr 10</td>
+                  <td data-label="Days" class="cell-mono">1</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td data-label="Approver" class="text-2">John Smith</td>
+                  <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
+                  <td data-label="Actions"></td>
                 </tr>
                 <tr class="team-leave-row">
                   <td class="row-check"><input type="checkbox" class="team-check"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">MR</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Maria Rodriguez</a>
+                      <a href="employees.html#maria-rodriguez" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Maria Rodriguez</a>
                     </div>
                   </td>
-                  <td><span class="badge" style="background: var(--color-wfh-muted); color: var(--color-wfh);"><svg data-lucide="home" width="12" height="12"></svg> Remote Work</span></td>
-                  <td>Apr 15</td>
-                  <td class="cell-mono">1</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  <td style="color: var(--color-text-2);">Sarah Chen</td>
-                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
-                  <td></td>
+                  <td data-label="Type"><span class="badge" style="background: var(--color-wfh-muted); color: var(--color-wfh);"><svg data-lucide="home" width="12" height="12"></svg> Remote Work</span></td>
+                  <td data-label="Dates">Apr 15</td>
+                  <td data-label="Days" class="cell-mono">1</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td data-label="Approver" class="text-2">Sarah Chen</td>
+                  <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td data-label="Actions"></td>
                 </tr>
                 <tr class="team-leave-row">
                   <td class="row-check"><input type="checkbox" class="team-check"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">DP</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">David Park</a>
+                      <a href="employees.html#david-park" style="color: var(--color-text-1); font-weight: var(--weight-medium);">David Park</a>
                     </div>
                   </td>
-                  <td><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td>May 5 &ndash; 9</td>
-                  <td class="cell-mono">5</td>
-                  <td><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
-                  <td style="color: var(--color-text-2);">Sarah Chen</td>
-                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
-                  <td>
+                  <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                  <td data-label="Dates">May 5 &ndash; 9</td>
+                  <td data-label="Days" class="cell-mono">5</td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  <td data-label="Approver" class="text-2">Sarah Chen</td>
+                  <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td data-label="Actions">
                     <div class="flex gap-1">
                       <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
                       <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
@@ -1198,16 +1219,16 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">LN</div>
-                      <a href="employees.html#profile" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Lisa Nguyen</a>
+                      <a href="employees.html#lisa-nguyen" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Lisa Nguyen</a>
                     </div>
                   </td>
-                  <td><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
-                  <td>Apr 3</td>
-                  <td class="cell-mono">1</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  <td style="color: var(--color-text-2);">John Smith</td>
-                  <td style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
-                  <td></td>
+                  <td data-label="Type"><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
+                  <td data-label="Dates">Apr 3</td>
+                  <td data-label="Days" class="cell-mono">1</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  <td data-label="Approver" class="text-2">John Smith</td>
+                  <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
+                  <td data-label="Actions"></td>
                 </tr>
               </tbody>
             </table>
@@ -1239,12 +1260,13 @@
             </div>
             <div class="calendar-view-toggle">
               <button class="active" data-view="month">Month</button>
-              <button data-view="quarter">Quarter</button>
-              <button data-view="year">Year</button>
+              <button data-view="quarter" onclick="showLeaveCalView('quarter',this)">Quarter</button>
+              <button data-view="year" onclick="showLeaveCalView('year',this)">Year</button>
             </div>
           </div>
 
-          <!-- Calendar Grid -->
+          <!-- Calendar Grid (month view) -->
+          <div id="leaveCalMonth">
           <div class="calendar-grid">
             <div class="calendar-weekdays">
               <div class="calendar-weekday">Mon</div>
@@ -1257,6 +1279,148 @@
             </div>
             <div class="calendar-days" id="calendarDays">
               <!-- Generated by JS -->
+            </div>
+          </div>
+          </div>
+
+          <!-- Quarter View -->
+          <div id="leaveCalQuarter" class="hidden">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-2);">
+              <!-- Month mini-cal helper: each shows Apr, May, Jun 2026 -->
+              <!-- April -->
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);color:var(--color-primary);margin-bottom:var(--space-2);font-size:var(--text-body-sm);">April 2026</div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;">
+                  <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
+                  <span></span><span></span><span>1</span><span>2</span><span style="background:var(--color-primary);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;">3</span><span>4</span><span>5</span>
+                  <span style="background:var(--color-primary);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;">6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+                  <span>13</span><span style="background:var(--color-warning);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">14</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">15</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">16</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">17</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">18</span><span>19</span>
+                  <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
+                  <span>27</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">28</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">29</span><span>30</span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <!-- May -->
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);font-size:var(--text-body-sm);">May 2026</div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;">
+                  <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
+                  <span></span><span></span><span></span><span></span><span>1</span><span>2</span><span>3</span>
+                  <span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                  <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
+                  <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span>
+                  <span>25</span><span>26</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">27</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">28</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">29</span><span>30</span><span>31</span>
+                </div>
+              </div>
+              <!-- June -->
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);font-size:var(--text-body-sm);">June 2026</div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;">
+                  <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
+                  <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                  <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+                  <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span>
+                  <span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span>
+                  <span>29</span><span>30</span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+            <!-- Quarter legend -->
+            <div style="display:flex;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-primary);display:inline-block;"></span> Today
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-warning);display:inline-block;"></span> Alice Wang — On Leave
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-chart-1);display:inline-block;opacity:0.7;"></span> Your Annual Leave (pending)
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-chart-4);display:inline-block;opacity:0.7;"></span> Bob Taylor — Bank Holiday
+              </div>
+            </div>
+          </div>
+
+          <!-- Year View (12 mini-months heatmap) -->
+          <div id="leaveCalYear" class="hidden">
+            <div style="margin-top:var(--space-2);" class="year-cal-grid">
+              <!-- Jan–Dec 2026, each a compact mini-calendar showing color-coded leave days -->
+              <!-- We'll render simplified month blocks -->
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">January 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;">
+                  <!-- 31 days, placeholder boxes -->
+                  <script>
+                    // Jan 2026 leave: none
+                    var jan = '';
+                    for(var i=1;i<=31;i++){jan+='<span style="width:12px;height:12px;border-radius:2px;background:var(--color-surface-2);display:inline-block;" title="Jan '+i+'"></span>';}
+                    document.write(jan);
+                  </script>
+                </div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">February 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-feb"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">March 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-mar">
+                  <!-- Sarah Mar 22-26 annual leave (approved) -->
+                </div>
+              </div>
+              <div class="card" style="padding:var(--space-3);border:1px solid var(--color-primary);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-primary);margin-bottom:var(--space-2);">April 2026 ← Today</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-apr">
+                  <!-- Alice Apr 14-18 on leave -->
+                </div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">May 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-may"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">June 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-jun"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">July 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-jul"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">August 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-aug"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">September 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-sep"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">October 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-oct"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">November 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-nov"></div>
+              </div>
+              <div class="card" style="padding:var(--space-3);">
+                <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">December 2026</div>
+                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-dec"></div>
+              </div>
+            </div>
+            <!-- Legend -->
+            <div style="display:flex;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-1);display:inline-block;"></span> Annual Leave (approved)
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-1);display:inline-block;opacity:0.5;"></span> Annual Leave (pending)
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-6);display:inline-block;"></span> Sick Leave
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-success);display:inline-block;"></span> Public Holiday
+              </div>
             </div>
           </div>
 
@@ -1274,7 +1438,7 @@
 
 <!-- ════════════════════════════════════════ LEAVE REQUEST MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="leaveModal">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Request Leave</h3>
       <button class="modal-close" id="leaveModalClose">
@@ -1285,23 +1449,33 @@
       <div class="flex-col gap-4">
         <div class="form-group">
           <label class="form-label">Leave Type <span class="required">*</span></label>
-          <select class="form-select" id="modalLeaveType">
+          <select class="form-select" id="modalLeaveType" id="leaveType">
             <option value="annual">Annual Leave</option>
             <option value="sick">Sick Leave</option>
             <option value="personal">Personal</option>
             <option value="wfh">Remote Work</option>
           </select>
         </div>
+        <!-- Medical Certificate (shown for sick leave) -->
+        <div id="medCertSection" style="display:none;margin-top:var(--space-3);">
+          <label class="form-label">Medical Certificate <span style="font-size:var(--text-caption);color:var(--color-text-3);">(required for sick leave)</span></label>
+          <div class="upload-zone" onclick="showToast('info','Upload','Select a file to upload')" style="min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:var(--space-4);cursor:pointer;background:var(--color-surface-1);">
+            <svg data-lucide="file-plus" width="24" height="24" style="color:var(--color-text-3);"></svg>
+            <span style="font-size:var(--text-body-sm);color:var(--color-text-3);">Upload medical certificate (PDF, JPG)</span>
+          </div>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Start Date <span class="required">*</span></label>
-            <input type="date" class="form-input" id="modalStartDate">
+            <input type="date" class="form-input" id="modalStartDate" onchange="checkLeaveConflicts(this.value, document.getElementById('modalEndDate').value)">
           </div>
           <div class="form-group">
             <label class="form-label">End Date <span class="required">*</span></label>
-            <input type="date" class="form-input" id="modalEndDate">
+            <input type="date" class="form-input" id="modalEndDate" onchange="checkLeaveConflicts(document.getElementById('modalStartDate').value, this.value)">
           </div>
         </div>
+        <!-- Conflict warning -->
+        <div id="leaveConflictWarning" style="display:none;background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-md);padding:var(--space-3);margin-top:var(--space-2);font-size:var(--text-body-sm);color:var(--color-warning);"></div>
         <div class="form-group">
           <label class="form-label">Duration</label>
           <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
@@ -1336,7 +1510,7 @@
 
 <!-- ════════════════════════════════════════ CONFIRMATION MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="confirmModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Cancel Leave Request</h3>
       <button class="modal-close" id="confirmModalClose">
@@ -1379,7 +1553,7 @@
         <div class="item-icon"><svg data-lucide="palm-tree" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Leaves</div></div>
       </a>
-      <a href="employees.html#profile" class="cmd-palette-item">
+      <a href="employees.html#sarah-chen" class="cmd-palette-item">
         <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Team Directory</div></div>
       </a>
@@ -1407,7 +1581,7 @@
 
 <!-- ════════════════════════════════════════ REJECTION REASON MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="rejectReasonModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Reject Leave Request</h3>
       <button class="modal-close" id="rejectReasonModalClose">
@@ -1587,6 +1761,20 @@
     toast.classList.add('removing');
     setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
   }
+  window.showToast = showToast;
+
+  // ── Leave modal focus trap ──
+  leaveModal.addEventListener('keydown', function(e) {
+    if (e.key !== 'Tab') return;
+    var focusable = leaveModal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  });
 
   // ── Leave Request Modal ──
   function openLeaveModal(prefillDate) {
@@ -1681,6 +1869,69 @@
   modalEndDate.addEventListener('change', updateModalCalc);
   modalLeaveType.addEventListener('change', updateModalCalc);
 
+  // ── Leave Conflict Detection ──
+  window.checkLeaveConflicts = function(startDate, endDate) {
+    var conflictDiv = document.getElementById('leaveConflictWarning');
+    if (!conflictDiv || !startDate || !endDate) return;
+    var conflicts = [
+      { name: 'Alice Wang', dates: 'Apr 14-18', type: 'Annual Leave', start: '2026-04-14', end: '2026-04-18' },
+      { name: 'Marco Rossi', dates: 'Apr 20-21', type: 'Personal', start: '2026-04-20', end: '2026-04-21' }
+    ];
+    var s = new Date(startDate);
+    var e = new Date(endDate);
+    var found = [];
+    conflicts.forEach(function(c) {
+      var cs = new Date(c.start);
+      var ce = new Date(c.end);
+      if (s <= ce && e >= cs) found.push(c);
+    });
+    if (found.length > 0) {
+      conflictDiv.style.display = 'block';
+      conflictDiv.innerHTML = '<strong>&#9888; Team coverage:</strong> ' + found.map(function(c) { return c.name + ' is also on leave during this period (' + c.dates + ')'; }).join('; ') + '.';
+    } else {
+      conflictDiv.style.display = 'none';
+    }
+  };
+
+  // ── Medical Certificate for sick leave ──
+  document.getElementById('modalLeaveType').addEventListener('change', function() {
+    var certSection = document.getElementById('medCertSection');
+    if (certSection) certSection.style.display = this.value === 'sick' ? 'block' : 'none';
+  });
+
+  // ── Confirm Cancel Leave (for approved items) ──
+  window.confirmCancelLeave = function(btn, leaveId) {
+    var modal = document.createElement('div');
+    modal.className = 'modal-backdrop active';
+    modal.style.zIndex = '9999';
+    modal.innerHTML =
+      '<div class="modal modal-sm" role="dialog" aria-modal="true">' +
+        '<div class="modal-header"><h3 class="modal-title">Cancel Leave?</h3></div>' +
+        '<div class="modal-body"><p style="color:var(--color-text-2);">Are you sure you want to cancel this approved leave? Your team will be notified.</p></div>' +
+        '<div class="modal-footer" style="display:flex;gap:var(--space-3);justify-content:flex-end;">' +
+          '<button class="btn btn-ghost btn-md" onclick="this.closest(\'.modal-backdrop\').remove()">Keep Leave</button>' +
+          '<button class="btn btn-destructive btn-md" onclick="this.closest(\'.modal-backdrop\').remove();showToast(\'success\',\'Leave Cancelled\',\'Your leave has been cancelled and the team notified.\')">Yes, Cancel</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(modal);
+  };
+
+  // ── Leave Balance Update ──
+  window.updateLeaveBalance = function(days) {
+    var balanceEl = document.querySelector('.balance-card.type-annual .balance-remaining');
+    if (balanceEl) {
+      var current = parseInt(balanceEl.textContent);
+      if (!isNaN(current)) {
+        balanceEl.textContent = (current - days) + ' ';
+        var small = document.createElement('small');
+        small.textContent = 'of 25 days';
+        balanceEl.appendChild(small);
+        balanceEl.style.animation = 'none';
+        requestAnimationFrame(function() { balanceEl.style.animation = 'fadeIn 0.5s'; });
+      }
+    }
+  };
+
   // Submit leave request
   leaveModalSubmit.addEventListener('click', function() {
     var fullDays = getWorkingDays(modalStartDate.value, modalEndDate.value);
@@ -1737,6 +1988,13 @@
 
       closeLeaveModal();
       showToast('success', 'Leave Requested', days + ' day' + (days !== 1 ? 's' : '') + ' of ' + typeLabel + halfLabel + ' submitted for approval.');
+      setTimeout(function() {
+        showToast('info', 'Calendar Sync', 'Leave request submitted. Once approved, it will appear in the team calendar and your profile.');
+        // Update leave balance immediately
+        if (modalLeaveType.value === 'annual') {
+          updateLeaveBalance(days);
+        }
+      }, 500);
     }, 1000);
   });
 
@@ -2032,11 +2290,61 @@
   });
 
   // Calendar view toggles
+  window.showLeaveCalView = function(view, btn) {
+    document.querySelectorAll('.calendar-view-toggle button').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    var month = document.getElementById('leaveCalMonth');
+    var quarter = document.getElementById('leaveCalQuarter');
+    var year = document.getElementById('leaveCalYear');
+    month.classList.add('hidden');
+    quarter.classList.add('hidden');
+    year.classList.add('hidden');
+    if (view === 'month') {
+      month.classList.remove('hidden');
+    } else if (view === 'quarter') {
+      quarter.classList.remove('hidden');
+    } else if (view === 'year') {
+      year.classList.remove('hidden');
+      renderYearView();
+    }
+  };
+
+  function renderYearView() {
+    // Build month day grids for year view
+    var months = [
+      {id:'year-feb', days:28, leaveDays:[], holidayDays:[]},
+      {id:'year-mar', days:31, leaveDays:[22,23,24,25,26], holidayDays:[]},
+      {id:'year-apr', days:30, leaveDays:[], holidayDays:[], teamLeaveDays:[14,15,16,17,18], pendingDays:[28,29]},
+      {id:'year-may', days:31, leaveDays:[], holidayDays:[1]},
+      {id:'year-jun', days:30, leaveDays:[], holidayDays:[]},
+      {id:'year-jul', days:31, leaveDays:[], holidayDays:[14]},
+      {id:'year-aug', days:31, leaveDays:[], holidayDays:[]},
+      {id:'year-sep', days:30, leaveDays:[], holidayDays:[]},
+      {id:'year-oct', days:31, leaveDays:[], holidayDays:[]},
+      {id:'year-nov', days:30, leaveDays:[], holidayDays:[11]},
+      {id:'year-dec', days:31, leaveDays:[], holidayDays:[25,26]}
+    ];
+    months.forEach(function(m) {
+      var el = document.getElementById(m.id);
+      if (!el) return;
+      var html = '';
+      for (var d = 1; d <= m.days; d++) {
+        var bg = 'var(--color-surface-2)';
+        var opacity = '1';
+        if (m.leaveDays && m.leaveDays.indexOf(d) >= 0) bg = 'var(--color-chart-1)';
+        else if (m.teamLeaveDays && m.teamLeaveDays.indexOf(d) >= 0) bg = 'var(--color-warning)';
+        else if (m.pendingDays && m.pendingDays.indexOf(d) >= 0) { bg = 'var(--color-chart-1)'; opacity = '0.5'; }
+        else if (m.holidayDays && m.holidayDays.indexOf(d) >= 0) bg = 'var(--color-success)';
+        html += '<span style="width:12px;height:12px;border-radius:2px;background:' + bg + ';display:inline-block;opacity:' + opacity + ';cursor:pointer;" title="' + d + '"></span>';
+      }
+      el.innerHTML = html;
+    });
+  }
+
   document.querySelectorAll('.calendar-view-toggle button').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      document.querySelectorAll('.calendar-view-toggle button').forEach(function(b) { b.classList.remove('active'); });
-      this.classList.add('active');
-      showToast('info', 'View Changed', this.getAttribute('data-view').charAt(0).toUpperCase() + this.getAttribute('data-view').slice(1) + ' view selected');
+      var view = this.getAttribute('data-view') || this.textContent.trim().toLowerCase();
+      if (view === 'month') showLeaveCalView('month', this);
     });
   });
 
@@ -2111,12 +2419,24 @@
 </script>
 
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
   <a href="leaves.html" class="bottom-nav-item active"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+<script src="_shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.GHR) {
+    GHR.initHoverCard && GHR.initHoverCard();
+    GHR.initPresence && GHR.initPresence();
+    GHR.initRoleSwitcher && GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
+    GHR.initSkeletons && GHR.initSkeletons();
+  }
+});
+</script>
 </body>
 </html>

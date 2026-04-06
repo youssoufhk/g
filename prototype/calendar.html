@@ -107,6 +107,7 @@
     }
     .cal-day {
       min-height: 110px;
+      min-width: 44px;
       border-right: 1px solid var(--color-border-subtle);
       border-bottom: 1px solid var(--color-border-subtle);
       padding: var(--space-1-5);
@@ -405,6 +406,16 @@
     .leave-popup-person .lpp-name { color: var(--color-text-1); font-weight: var(--weight-medium); }
     .leave-popup-person .lpp-type { font-size: var(--text-caption); color: var(--color-text-3); }
 
+    /* Week view mobile single-column fallback */
+    @media (max-width: 639px) {
+      .week-header, .week-body {
+        grid-template-columns: repeat(1, 1fr);
+        min-height: auto;
+      }
+      .week-header-cell { border-right: none; border-bottom: 1px solid var(--color-border-subtle); }
+      .week-day-col { border-right: none; border-bottom: 1px solid var(--color-border-subtle); }
+    }
+
     /* Responsive: smaller cells on mobile */
     @media (max-width: 1023px) {
       .cal-day { min-height: 80px; }
@@ -432,6 +443,7 @@
   </style>
 </head>
 <body>
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -441,7 +453,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -464,17 +476,25 @@
           <span class="nav-label">Leaves</span>
           <span class="nav-badge">3</span>
         </a>
+        <a href="calendar.html" class="nav-item active">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+        <a href="insights.html#ask-ai" class="nav-item">
+          <i data-lucide="sparkles" class="nav-icon"></i>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
 
       <!-- HR -->
       <div class="nav-section">
         <div class="nav-section-label">HR</div>
-        <a href="#" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="rocket"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -491,6 +511,10 @@
           <svg data-lucide="folder-kanban"></svg>
           <span class="nav-label">Projects</span>
         </a>
+        <a href="gantt.html" class="nav-item">
+          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
+          <span class="nav-label">Gantt Chart</span>
+        </a>
         <a href="clients.html" class="nav-item">
           <svg data-lucide="building-2"></svg>
           <span class="nav-label">Clients</span>
@@ -498,10 +522,6 @@
         <a href="planning.html" class="nav-item">
           <svg data-lucide="calendar-range"></svg>
           <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item active">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
         </a>
       </div>
 
@@ -534,6 +554,10 @@
     </nav>
 
     <div class="sidebar-footer">
+      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
+        <i data-lucide="keyboard" class="nav-icon"></i>
+        <span class="nav-label">Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -564,7 +588,7 @@
 
       <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -600,35 +624,40 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
             </div>
-            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="user-dropdown-header">
               <div class="name">Sarah Chen</div>
               <div class="email">sarah.chen@gammahr.io</div>
             </div>
-            <a href="employees.html#profile" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
           </div>
         </div>
       </div>
     </header>
 
     <!-- ── PAGE CONTENT ── -->
-    <main class="page-content">
+    <main class="page-content" id="main-content">
 
       <!-- Page Header -->
       <div class="page-header">
         <div class="page-header-left">
+          <nav class="breadcrumb" aria-label="Breadcrumb" style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-1);">
+            <a href="index.html" style="color:var(--color-text-3);text-decoration:none;">Dashboard</a>
+            <span style="margin:0 var(--space-1);">/</span>
+            <span style="color:var(--color-text-2);">Calendar</span>
+          </nav>
           <h1 class="page-title">Calendar</h1>
           <p class="page-subtitle">Company-wide schedule and events</p>
         </div>
@@ -636,6 +665,8 @@
           <div class="cal-view-toggle" id="viewToggle">
             <button class="active" data-view="month">Month</button>
             <button data-view="week">Week</button>
+            <button data-view="quarter">Quarter</button>
+            <button data-view="year">Year</button>
           </div>
           <button class="btn btn-primary btn-md" id="addEventBtn">
             <svg data-lucide="plus" width="16" height="16"></svg>
@@ -732,6 +763,20 @@
           <div class="week-body" id="weekBody">
             <!-- JS will populate this -->
           </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════ QUARTER VIEW ═══════════════ -->
+      <div class="quarter-view" id="quarterView" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);" id="quarterGrid">
+          <!-- JS populates -->
+        </div>
+      </div>
+
+      <!-- ═══════════════ YEAR VIEW ═══════════════ -->
+      <div class="year-view" id="yearView" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);" id="yearGrid">
+          <!-- JS populates -->
         </div>
       </div>
 
@@ -844,7 +889,7 @@
 <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
 <!-- ════════════════════════════════════════ BOTTOM NAV BAR ════════════════════════════════════════ -->
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item">
     <svg data-lucide="layout-dashboard" width="22" height="22"></svg>
     <span>Home</span>
@@ -869,6 +914,18 @@
 
 
 <!-- ════════════════════════════════════════ SCRIPTS ════════════════════════════════════════ -->
+<script src="_shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.GHR) {
+    GHR.initHoverCard && GHR.initHoverCard();
+    GHR.initPresence && GHR.initPresence();
+    GHR.initRoleSwitcher && GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
+    GHR.initSkeletons && GHR.initSkeletons();
+  }
+});
+</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
 (function() {
@@ -926,7 +983,8 @@
     { id: 1,  type: 'holiday',   title: 'Easter Monday',                      person: null,           start: '2026-04-01', end: '2026-04-01', desc: 'Public holiday' },
     { id: 2,  type: 'leave',     title: 'Annual Leave',                       person: 'Emma Laurent', start: '2026-04-07', end: '2026-04-11', desc: 'Annual Leave', initials: 'EL' },
     { id: 3,  type: 'milestone', title: 'End of Probation',                   person: 'David Park',   start: '2026-04-10', end: '2026-04-10', desc: 'Probation review complete', initials: 'DP' },
-    { id: 4,  type: 'leave',     title: 'Annual Leave',                       person: 'Alice Wang',   start: '2026-04-14', end: '2026-04-18', desc: 'Annual Leave', initials: 'AW' },
+    { id: 4,  type: 'leave',     title: 'Annual Leave',                       person: 'Alice Wang',   start: '2026-04-14', end: '2026-04-18', desc: 'Annual Leave (approved)', initials: 'AW' },
+    { id: 9,  type: 'leave',     title: 'Sick Leave',                         person: "Liam O'Brien", start: '2026-04-06', end: '2026-04-07', desc: 'Sick Leave (approved)', initials: 'LO' },
     { id: 5,  type: 'deadline',  title: 'Sprint 3 Deadline',                  person: 'Acme Web Redesign', start: '2026-04-15', end: '2026-04-15', desc: 'Acme Web Redesign — Sprint 3 Deadline' },
     { id: 6,  type: 'leave',     title: 'Personal Leave',                     person: 'Bob Taylor',   start: '2026-04-21', end: '2026-04-25', desc: 'Personal Leave', initials: 'BT' },
     { id: 7,  type: 'milestone', title: 'Milestone: API Complete',            person: 'Globex Phase 2', start: '2026-04-22', end: '2026-04-22', desc: 'Globex Phase 2 — API Complete' },
@@ -1228,22 +1286,142 @@
   }
 
 
+  // ── Quarter View ──
+  function renderQuarterView() {
+    var quarterGrid = document.getElementById('quarterGrid');
+    if (!quarterGrid) return;
+    quarterGrid.innerHTML = '';
+    var quarterMonths = [1, 2, 3]; // Feb, Mar, Apr (0-indexed)
+    quarterMonths.forEach(function(m) {
+      var monthName = MONTH_NAMES[m];
+      var daysInMonth = new Date(currentYear, m + 1, 0).getDate();
+      var firstDow = getDayOfWeekMon(new Date(currentYear, m, 1));
+
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'padding:var(--space-3) var(--space-4);font-weight:var(--weight-semibold);font-size:var(--text-body);color:var(--color-text-1);border-bottom:1px solid var(--color-border);';
+      header.textContent = monthName + ' ' + currentYear;
+      wrap.appendChild(header);
+
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:1px;padding:var(--space-2);';
+
+      var dayLabels = ['M','T','W','T','F','S','S'];
+      dayLabels.forEach(function(l) {
+        var d = document.createElement('div');
+        d.style.cssText = 'text-align:center;font-size:9px;font-weight:600;color:var(--color-text-3);padding-bottom:var(--space-1);';
+        d.textContent = l;
+        grid.appendChild(d);
+      });
+
+      for (var blank = 0; blank < firstDow; blank++) {
+        var empty = document.createElement('div');
+        grid.appendChild(empty);
+      }
+
+      for (var day = 1; day <= daysInMonth; day++) {
+        var ds = dateStr(currentYear, m, day);
+        var dayEvents = getEventsForDate(ds);
+        var isT = isToday(currentYear, m, day);
+        var dow = getDayOfWeekMon(new Date(currentYear, m, day));
+        var cell = document.createElement('div');
+        cell.style.cssText = 'text-align:center;padding:2px;border-radius:3px;cursor:pointer;position:relative;' + (isWeekend(dow) ? 'opacity:.4;' : '');
+        if (isT) cell.style.cssText += 'background:var(--color-primary);';
+
+        var numEl = document.createElement('div');
+        numEl.style.cssText = 'font-size:10px;' + (isT ? 'color:white;font-weight:bold;' : 'color:var(--color-text-2);');
+        numEl.textContent = day;
+        cell.appendChild(numEl);
+
+        if (dayEvents.length > 0) {
+          var dotsRow = document.createElement('div');
+          dotsRow.style.cssText = 'display:flex;justify-content:center;gap:1px;margin-top:1px;';
+          dayEvents.slice(0, 3).forEach(function(ev) {
+            var dot = document.createElement('div');
+            dot.style.cssText = 'width:4px;height:4px;border-radius:50%;' +
+              (ev.type === 'leave' ? 'background:var(--color-primary);' :
+               ev.type === 'holiday' ? 'background:var(--color-gold);' :
+               ev.type === 'milestone' ? 'background:var(--color-accent);' :
+               'background:var(--color-error);');
+            dotsRow.appendChild(dot);
+          });
+          cell.appendChild(dotsRow);
+        }
+        grid.appendChild(cell);
+      }
+      wrap.appendChild(grid);
+      quarterGrid.appendChild(wrap);
+    });
+  }
+
+  // ── Year View ──
+  function renderYearView() {
+    var yearGrid = document.getElementById('yearGrid');
+    if (!yearGrid) return;
+    yearGrid.innerHTML = '';
+    for (var m = 0; m < 12; m++) {
+      var monthName = MONTH_NAMES[m];
+      var daysInMonth = new Date(currentYear, m + 1, 0).getDate();
+      var firstDow = getDayOfWeekMon(new Date(currentYear, m, 1));
+
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'padding:var(--space-2) var(--space-3);font-weight:var(--weight-semibold);font-size:var(--text-body-sm);color:var(--color-text-1);border-bottom:1px solid var(--color-border-subtle);background:var(--color-surface-1);';
+      header.textContent = monthName;
+      wrap.appendChild(header);
+
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:1px;padding:var(--space-1);';
+
+      for (var blank = 0; blank < firstDow; blank++) {
+        var empty = document.createElement('div');
+        grid.appendChild(empty);
+      }
+
+      for (var day = 1; day <= daysInMonth; day++) {
+        var ds = dateStr(currentYear, m, day);
+        var dayEvs = getEventsForDate(ds);
+        var isT = isToday(currentYear, m, day);
+        var cell = document.createElement('div');
+        var bgColor = isT ? 'background:var(--color-primary);color:white;' : (dayEvs.length > 0 ? 'background:var(--color-primary-muted);' : '');
+        cell.style.cssText = 'text-align:center;font-size:9px;padding:2px;border-radius:2px;cursor:pointer;color:var(--color-text-3);' + bgColor;
+        cell.textContent = day;
+        grid.appendChild(cell);
+      }
+      wrap.appendChild(grid);
+      yearGrid.appendChild(wrap);
+    }
+  }
+
   // ── View Toggle ──
   viewToggle.querySelectorAll('button').forEach(function(btn) {
     btn.addEventListener('click', function() {
       viewToggle.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       currentView = btn.getAttribute('data-view');
+      var quarterView = document.getElementById('quarterView');
+      var yearView = document.getElementById('yearView');
+
+      monthView.style.display = 'none';
+      weekView.style.display = 'none';
+      if (quarterView) quarterView.style.display = 'none';
+      if (yearView) yearView.style.display = 'none';
 
       if (currentView === 'month') {
         monthView.style.display = 'block';
-        weekView.style.display = 'none';
         renderMonth();
-      } else {
-        monthView.style.display = 'none';
+      } else if (currentView === 'week') {
         weekView.style.display = 'block';
         weekStart = getMonday(new Date(currentYear, currentMonth, 1));
         renderWeek();
+      } else if (currentView === 'quarter') {
+        if (quarterView) { quarterView.style.display = 'block'; renderQuarterView(); }
+      } else if (currentView === 'year') {
+        if (yearView) { yearView.style.display = 'block'; renderYearView(); }
       }
     });
   });

@@ -30,15 +30,15 @@
     .back-btn svg { width: 18px; height: 18px; }
 
     /* Filter bar */
-    .filter-bar {
+    .filter-bar-standard {
       display: flex;
       align-items: center;
       gap: var(--space-3);
       margin-bottom: var(--space-4);
       flex-wrap: wrap;
     }
-    .filter-bar .form-select,
-    .filter-bar .form-input {
+    .filter-bar-standard .form-select,
+    .filter-bar-standard .form-input {
       height: 36px;
       min-width: 160px;
       background: var(--color-surface-0);
@@ -283,6 +283,7 @@
   </style>
 </head>
 <body class="show-populated">
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -292,7 +293,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -325,7 +326,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -349,6 +350,10 @@
         <a href="planning.html" class="nav-item">
           <svg data-lucide="calendar-range"></svg>
           <span class="nav-label">Resource Planning</span>
+        </a>
+        <a href="gantt.html" class="nav-item">
+          <svg data-lucide="gantt-chart-square"></svg>
+          <span class="nav-label">Gantt Chart</span>
         </a>
         <a href="calendar.html" class="nav-item">
           <svg data-lucide="calendar"></svg>
@@ -381,10 +386,18 @@
           <svg data-lucide="settings"></svg>
           <span class="nav-label">Settings</span>
         </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
     </nav>
 
     <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);color:var(--color-text-2);margin-bottom:var(--space-2);" onclick="showToast('info','Shortcuts','Press Cmd+K to open command palette.')">
+        <svg data-lucide="keyboard" width="14" height="14"></svg>
+        <span style="font-size:var(--text-body-sm);">Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -417,7 +430,7 @@
           <svg data-lucide="search" width="20" height="20"></svg>
         </button>
 
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -453,7 +466,7 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm">SC</div>
             <div>
@@ -469,7 +482,7 @@
             <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign Out</a>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
           </div>
         </div>
       </div>
@@ -481,6 +494,13 @@
       <!-- ═══════ LIST VIEW ═══════ -->
       <div class="view" id="listView">
         <div class="populated-content">
+          <!-- Breadcrumb -->
+          <nav class="breadcrumbs mb-4">
+            <a href="index.html">Home</a>
+            <span class="separator">&rsaquo;</span>
+            <span class="current">Invoices</span>
+          </nav>
+
           <!-- Page header -->
           <div class="page-header">
             <div class="page-header-left">
@@ -502,7 +522,7 @@
             <div class="stat-card">
               <div class="stat-label">Total Outstanding</div>
               <div class="stat-value">&euro;33,400</div>
-              <div class="stat-trend" style="color: var(--color-text-2);">4 invoices pending</div>
+              <div class="stat-trend" class="text-2">4 invoices pending</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Paid This Month</div>
@@ -522,7 +542,15 @@
           </div>
 
           <!-- Filter bar -->
-          <div class="filter-bar">
+          <div class="filter-bar-standard">
+            <!-- Saved Views -->
+            <select class="form-select form-input-sm" id="savedViewsSelect" onchange="applyInvoiceSavedView(this.value)">
+              <option value="">Saved Views</option>
+              <option value="all">All Invoices</option>
+              <option value="overdue">Overdue</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="month">This Month</option>
+            </select>
             <select class="form-select form-input-sm">
               <option>All Statuses</option>
               <option>Draft</option>
@@ -563,12 +591,13 @@
                   <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-048</a></td>
                   <td data-label="Client"><a href="clients.html#acme-corp">Acme Corp</a></td>
                   <td data-label="Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
-                  <td class="cell-mono" data-label="Amount">&euro;12,400</td>
-                  <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;12,400</td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                   <td data-label="Issue Date">Apr 1</td>
                   <td data-label="Due Date">Apr 30</td>
                   <td data-label="">
                     <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-accent btn-xs" onclick="recordPayment(this)"><svg data-lucide="check" width="12" height="12"></svg> Pay</button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
@@ -577,12 +606,13 @@
                   <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-047</a></td>
                   <td data-label="Client"><a href="clients.html#globex-corp">Globex Corp</a></td>
                   <td data-label="Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
-                  <td class="cell-mono" data-label="Amount">&euro;8,200</td>
-                  <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;8,200</td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                   <td data-label="Issue Date">Mar 28</td>
                   <td data-label="Due Date">Apr 28</td>
                   <td data-label="">
                     <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-accent btn-xs" onclick="recordPayment(this)"><svg data-lucide="check" width="12" height="12"></svg> Pay</button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
@@ -737,7 +767,7 @@
           Invoices
         </button>
 
-        <div style="margin-top: var(--space-4);">
+        <div class="mt-4">
           <!-- AI Insight Card -->
           <div class="ai-insight-card mb-4">
             <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Invoice Intelligence</div>
@@ -758,10 +788,12 @@
               </div>
             </div>
             <div class="flex items-center gap-3" style="flex-wrap: wrap;">
-              <span class="badge badge-info badge-lg"><svg data-lucide="send" width="14" height="14"></svg> Sent</span>
+              <span class="badge badge-warning badge-lg"><svg data-lucide="send" width="14" height="14"></svg> Sent</span>
               <button class="btn btn-secondary btn-sm" id="downloadPdfBtn"><svg data-lucide="download" width="14" height="14"></svg> Download PDF</button>
               <button class="btn btn-primary btn-sm" id="sendToClientBtn"><svg data-lucide="send" width="14" height="14"></svg> Send to Client</button>
               <button class="btn btn-accent btn-sm" id="markPaidBtn"><svg data-lucide="check" width="14" height="14"></svg> Mark as Paid</button>
+              <button class="btn btn-secondary btn-sm" id="editLineItemsBtn" onclick="toggleInvoiceEdit()"><svg data-lucide="pencil" width="14" height="14"></svg> Edit Line Items</button>
+              <a href="portal/index.html" target="_blank" class="btn btn-ghost btn-sm"><svg data-lucide="external-link" width="14" height="14"></svg> Share with Client &rarr;</a>
               <button class="btn btn-ghost btn-sm" id="creditNoteBtn"><svg data-lucide="file-minus" width="14" height="14"></svg> Issue Credit Note</button>
             </div>
           </div>
@@ -796,53 +828,53 @@
                 <tr>
                   <th>Description</th>
                   <th>Employee</th>
-                  <th style="text-align: right;">Qty</th>
-                  <th style="text-align: right;">Rate</th>
-                  <th style="text-align: right;">Amount</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Rate</th>
+                  <th class="text-right">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Lead Developer &mdash; 48h @ &euro;85/h</td>
-                  <td><a href="employees.html">Sarah Chen</a></td>
-                  <td class="font-mono" style="text-align: right;">48h</td>
-                  <td class="font-mono" style="text-align: right;">&euro;85.00</td>
-                  <td class="font-mono" style="text-align: right;">&euro;4,080.00</td>
+                  <td class="line-item-editable">Lead Developer &mdash; 48h @ &euro;85/h</td>
+                  <td><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Lead Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                  <td class="font-mono line-item-editable text-right">48h</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;85.00</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;4,080.00</td>
                 </tr>
                 <tr>
-                  <td>Project Manager &mdash; 22h @ &euro;95/h</td>
-                  <td><a href="employees.html">John Smith</a></td>
-                  <td class="font-mono" style="text-align: right;">22h</td>
-                  <td class="font-mono" style="text-align: right;">&euro;95.00</td>
-                  <td class="font-mono" style="text-align: right;">&euro;2,090.00</td>
+                  <td class="line-item-editable">Project Manager &mdash; 22h @ &euro;95/h</td>
+                  <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                  <td class="font-mono line-item-editable text-right">22h</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;95.00</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;2,090.00</td>
                 </tr>
                 <tr>
-                  <td>UI Designer &mdash; 30h @ &euro;75/h</td>
-                  <td><a href="employees.html">Alice Wang</a></td>
-                  <td class="font-mono" style="text-align: right;">30h</td>
-                  <td class="font-mono" style="text-align: right;">&euro;75.00</td>
-                  <td class="font-mono" style="text-align: right;">&euro;2,250.00</td>
+                  <td class="line-item-editable">UI Designer &mdash; 30h @ &euro;75/h</td>
+                  <td><a href="employees.html" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></td>
+                  <td class="font-mono line-item-editable text-right">30h</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;75.00</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;2,250.00</td>
                 </tr>
                 <tr>
-                  <td>Frontend Developer &mdash; 32h @ &euro;85/h</td>
-                  <td><a href="employees.html">Marco Rossi</a></td>
-                  <td class="font-mono" style="text-align: right;">32h</td>
-                  <td class="font-mono" style="text-align: right;">&euro;85.00</td>
-                  <td class="font-mono" style="text-align: right;">&euro;2,720.00</td>
+                  <td class="line-item-editable">Frontend Developer &mdash; 32h @ &euro;85/h</td>
+                  <td><a href="employees.html" data-hovercard data-name="Marco Rossi" data-role="Frontend Developer" data-dept="Engineering" data-worktime="78">Marco Rossi</a></td>
+                  <td class="font-mono line-item-editable text-right">32h</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;85.00</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;2,720.00</td>
                 </tr>
                 <tr>
-                  <td>Junior Developer &mdash; 12h @ &euro;65/h</td>
-                  <td><a href="employees.html">Liam O&rsquo;Brien</a></td>
-                  <td class="font-mono" style="text-align: right;">12h</td>
-                  <td class="font-mono" style="text-align: right;">&euro;65.00</td>
-                  <td class="font-mono" style="text-align: right;">&euro;780.00</td>
+                  <td class="line-item-editable">Junior Developer &mdash; 12h @ &euro;65/h</td>
+                  <td><a href="employees.html" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="95">Liam O&rsquo;Brien</a></td>
+                  <td class="font-mono line-item-editable text-right">12h</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;65.00</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;780.00</td>
                 </tr>
                 <tr>
-                  <td>Travel expense &mdash; client site visit</td>
-                  <td><a href="employees.html">John Smith</a></td>
-                  <td class="font-mono" style="text-align: right;">1</td>
-                  <td class="font-mono" style="text-align: right;">&euro;480.00</td>
-                  <td class="font-mono" style="text-align: right;">&euro;480.00</td>
+                  <td class="line-item-editable">Travel expense &mdash; client site visit</td>
+                  <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                  <td class="font-mono line-item-editable text-right">1</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;480.00</td>
+                  <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;480.00</td>
                 </tr>
               </tbody>
             </table>
@@ -913,7 +945,7 @@
 
 <!-- ════════════════════════════════════════ GENERATE INVOICE MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="generateModal">
-  <div class="modal modal-lg">
+  <div class="modal modal-lg" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Generate Invoice</h3>
       <button class="modal-close" id="closeGenerate"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -961,6 +993,16 @@
           </div>
         </div>
 
+        <!-- Approved source data -->
+        <div class="invoice-source-data" style="background:var(--color-surface-2);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-4);">
+          <div style="font-weight:var(--weight-semibold);margin-bottom:var(--space-2);">Approved data to invoice:</div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+            <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);"><span>Approved timesheets (40h &times; &euro;85/h)</span><span style="font-weight:var(--weight-semibold);">&euro;3,400</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);"><span>Approved expenses</span><span style="font-weight:var(--weight-semibold);">&euro;429</span></div>
+            <div style="display:flex;justify-content:space-between;border-top:1px solid var(--color-border);padding-top:var(--space-2);font-size:var(--text-body-sm);"><span><strong>Total billable</strong></span><span style="font-weight:var(--weight-semibold);color:var(--color-primary);">&euro;3,829</span></div>
+          </div>
+        </div>
+
         <!-- Preview section -->
         <div class="preview-section" id="previewSection">
           <div class="preview-title">Preview Summary</div>
@@ -985,7 +1027,7 @@
             <span class="value" id="prevTax">&euro;0.00</span>
           </div>
           <div class="preview-row" style="font-weight: var(--weight-bold); border-top: 2px solid var(--color-border); padding-top: var(--space-3);">
-            <span class="label" style="color: var(--color-text-1);">Estimated Total</span>
+            <span class="label" class="text-1">Estimated Total</span>
             <span class="value" id="prevTotal" style="color: var(--color-gold); font-size: var(--text-heading-3);">&euro;12,400.00</span>
           </div>
         </div>
@@ -1299,12 +1341,84 @@
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
   <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+<script>
+// ── Invoice-specific functions ──
+window.recordPayment = function(btn) {
+  var row = btn.closest('tr, .invoice-row');
+  var invoiceNum = row ? (row.getAttribute('data-invoice') || row.querySelector('[data-label="Invoice"] a, td:first-child').textContent) : 'Invoice';
+  showToast('success', 'Payment Recorded', invoiceNum + ' marked as paid');
+  var badge = row ? row.querySelector('.badge') : null;
+  if (badge) { badge.className = 'badge badge-success'; badge.innerHTML = '<svg data-lucide="check-circle" width="12" height="12"></svg> Paid'; lucide.createIcons({ nodes: [badge] }); }
+  btn.disabled = true; btn.innerHTML = '<svg data-lucide="check" width="12" height="12"></svg> Paid'; lucide.createIcons({ nodes: [btn] });
+};
+
+window.toggleInvoiceEdit = function() {
+  var detailEl = document.getElementById('detailView');
+  var editBtn = document.getElementById('editLineItemsBtn');
+  if (!detailEl || !editBtn) return;
+  var editMode = detailEl.classList.toggle('editing');
+  detailEl.querySelectorAll('.line-item-editable').forEach(function(el) {
+    el.contentEditable = editMode ? 'true' : 'false';
+    el.style.background = editMode ? 'var(--color-surface-1)' : '';
+    el.style.borderRadius = editMode ? 'var(--radius-sm)' : '';
+    el.style.padding = editMode ? '2px 4px' : '';
+  });
+  editBtn.innerHTML = editMode
+    ? '<svg data-lucide="save" width="14" height="14"></svg> Save'
+    : '<svg data-lucide="pencil" width="14" height="14"></svg> Edit Line Items';
+  lucide.createIcons({ nodes: [editBtn] });
+  if (!editMode) {
+    showToast('success', 'Invoice Updated', 'Line items have been saved.');
+  }
+};
+
+window.applyInvoiceSavedView = function(view) {
+  var messages = {
+    'all': 'Showing all invoices',
+    'overdue': 'Showing overdue invoices only',
+    'unpaid': 'Showing unpaid invoices (Sent + Overdue)',
+    'month': 'Showing invoices from this month'
+  };
+  if (view && messages[view]) {
+    showToast('info', 'View Applied', messages[view]);
+  }
+};
+
+// ── showToast global alias for HTML onclick handlers ──
+window.showToast = function(type, title, message) {
+  // Delegate to the inner showToast defined in the IIFE
+  var container = document.getElementById('toastContainer');
+  if (!container) return;
+  var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  toast.innerHTML =
+    '<div class="toast-icon"><svg data-lucide="' + (iconMap[type]||'info') + '" width="18" height="18"></svg></div>' +
+    '<div class="toast-content"><div class="toast-title">' + title + '</div><div class="toast-message">' + message + '</div></div>' +
+    '<button class="toast-close" onclick="this.parentElement.remove()"><svg data-lucide="x" width="14" height="14"></svg></button>';
+  container.appendChild(toast);
+  if (window.lucide) lucide.createIcons({ nodes: [toast] });
+  setTimeout(function() { toast.classList.add('removing'); setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200); }, 4000);
+};
+</script>
+<script src="_shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.GHR) {
+    GHR.initHoverCard();
+    GHR.initPresence();
+    GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts();
+    GHR.initSkeletons();
+  }
+});
+</script>
 </body>
 </html>

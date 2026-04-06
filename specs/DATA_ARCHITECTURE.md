@@ -2,6 +2,8 @@
 
 > Every entity. Every relationship. Every endpoint. Every real-time channel.
 
+> **Prototype:** The canonical seed data below maps exactly to the data shown in `/prototype/` HTML files.
+
 ---
 
 ## 1. Multi-Tenancy: Schema-Per-Tenant
@@ -1191,3 +1193,96 @@ Index: expenses   — id, description, type, user_name, project_name
 ```
 
 Sync: After every create/update/delete, background job pushes to Meilisearch.
+
+---
+
+## 9. Seed Data
+
+This section defines the canonical prototype dataset. All development and staging environments must be seeded with exactly this data so the UI matches the approved prototype design. These values are sourced directly from the `/prototype/` HTML files.
+
+> This seed data is referenced in `/prototype/` HTML files. When developing or testing, these exact values must appear in the UI to match the approved prototype design.
+
+> A migration file at `migrations/seed_data.sql` should insert this data into the development tenant schema using `tenant_gamma_demo` as the schema name.
+
+### 9.1 Company (Tenant)
+
+| Field | Value |
+|-------|-------|
+| Name | GammaHR Demo Company |
+| Subdomain / Slug | gamma-demo |
+| Plan | Enterprise |
+| Country | France (FRA) |
+| Locale | en-FR |
+| Fiscal Year | January – December |
+| Schema Name | `tenant_gamma_demo` |
+
+### 9.2 Employees (8 total)
+
+All 8 employees report to Alex Morrison (CEO/Owner). Alex Morrison is the tenant admin user and is not counted in the 8-person team list below.
+
+| ID | Name | Role | Department | Work Time | Status |
+|----|------|------|------------|-----------|--------|
+| 1 | Sarah Chen | Senior Developer | Engineering | 87% | Active |
+| 2 | John Smith | Project Manager | Management | 82% | Active |
+| 3 | Marco Rossi | Operations Lead | Operations | 88% | Active |
+| 4 | Carol White | Senior Designer | Design | 90% | Active |
+| 5 | Alice Wang | Business Analyst | Analysis | On Leave (Apr 14–18) | On Leave |
+| 6 | David Park | Finance Lead | Finance | 45% | Active |
+| 7 | Emma Laurent | HR Specialist | HR | 78% | Active |
+| 8 | Bob Taylor | Developer | Engineering | 0% | Bench |
+
+**Notes:**
+- "Work Time" maps to `allocation_pct` across active project assignments (replaces "Utilisation" — banned term).
+- Alice Wang's leave dates are 2026-04-14 to 2026-04-18.
+- Bob Taylor is on the bench (no active assignments, `allocation_pct` = 0).
+
+### 9.3 Clients (4 total)
+
+| ID | Name | Primary Contact | Contact Role | Active Projects |
+|----|------|-----------------|--------------|-----------------|
+| 1 | Acme Corp | James Wilson | CFO | 3 |
+| 2 | Globex Corp | Maria Santos | PM | 2 |
+| 3 | Initech | Robert Chen | CTO | 1 |
+| 4 | Umbrella Inc | Diana Prince | VP | 1 |
+
+### 9.4 Projects (7 total)
+
+| ID | Name | Client | Status | Budget (EUR) | Budget Burn |
+|----|------|--------|--------|-------------|-------------|
+| 1 | E-Commerce Platform | Acme Corp | Active | 120,000 | 68% |
+| 2 | Mobile App Redesign | Globex Corp | Active | 85,000 | 45% |
+| 3 | ERP Integration | Initech | Active | 200,000 | 69% |
+| 4 | API Gateway Build | Acme Corp | Active | 60,000 | 30% |
+| 5 | Data Analytics Dashboard | Umbrella Inc | Active | 95,000 | 55% |
+| 6 | Legacy Migration | Acme Corp | Completed | 150,000 | 100% |
+| 7 | Cloud Infrastructure | Globex Corp | On Hold | 75,000 | 22% |
+
+**Budget burn** maps to `(budget_consumed / budget_amount) * 100` rounded to the nearest integer.
+
+### 9.5 Invoices (key invoices)
+
+| Invoice Number | Client | Amount (EUR) | Status |
+|----------------|--------|-------------|--------|
+| INV-2026-041 | Acme Corp | 24,500 | Sent |
+| INV-2026-043 | Initech | 5,000 | Overdue |
+| INV-2026-048 | Umbrella Inc | 12,400 | Overdue |
+| INV-2026-049 | Globex Corp | 18,200 | Draft |
+
+**Outstanding total (client portal):** €17,400 — sum of overdue invoices INV-2026-043 (€5,000) and INV-2026-048 (€12,400).
+
+### 9.6 Leave Balances (example: Sarah Chen, year 2026)
+
+| Leave Type | Remaining | Total |
+|------------|-----------|-------|
+| Annual | 18 days | 25 days |
+| Sick | 8 days | 10 days |
+| Parental | 90 days | 90 days |
+| Training | 3 days | 5 days |
+
+`used = total - remaining` (e.g. Annual: 7 days used).
+
+### 9.7 Expenses (key expense)
+
+| Employee | Description | Vendor | Amount (EUR) | Category |
+|----------|-------------|--------|-------------|----------|
+| Bob Taylor | Hotel stay | Marriott Lyon | 340 | Business Travel |

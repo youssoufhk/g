@@ -3,16 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Portal — GammaHR Quantum</title>
+  <title>Client Portal — GammaHR</title>
   <link rel="stylesheet" href="../_tokens.css">
   <link rel="stylesheet" href="../_components.css">
   <link rel="stylesheet" href="../_layout.css">
   <style>
-    /* ── Portal Shell (lighter, client-facing) ── */
+    /* ── Portal visual differentiation ── */
+    .portal-body {
+      --color-bg: hsl(35, 20%, 7%);
+      --color-surface-0: hsl(40, 15%, 10%);
+      --color-surface-1: hsl(40, 12%, 13%);
+    }
+
     .portal-app {
       min-height: 100vh;
       background: var(--color-bg);
     }
+
+    /* ── Portal notice banner ── */
+    .portal-notice {
+      background: var(--color-primary-muted, rgba(99,102,241,0.1));
+      border-bottom: 1px solid var(--color-primary);
+      padding: var(--space-2) var(--space-6);
+      font-size: var(--text-body-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .portal-notice a { color: var(--color-primary); text-decoration: none; }
+    .portal-notice a:hover { text-decoration: underline; }
+
+    /* ── Hero gradient strip ── */
+    .portal-hero-strip {
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-success), var(--color-accent), transparent);
+    }
+
+    /* ── Portal Header ── */
     .portal-header {
       height: 56px;
       display: flex;
@@ -30,6 +57,24 @@
       align-items: center;
       gap: var(--space-3);
     }
+    .portal-logo-badge {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-white);
+      font-weight: var(--weight-bold);
+      font-size: 13px;
+    }
+    .portal-brand {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
+    }
+    .portal-sep {
+      width: 1px; height: 20px;
+      background: var(--color-border);
+    }
     .portal-client-logo {
       width: 32px; height: 32px;
       background: linear-gradient(135deg, var(--color-accent), var(--color-gold));
@@ -43,11 +88,6 @@
       font-size: var(--text-heading-3);
       font-weight: var(--weight-semibold);
       color: var(--color-text-1);
-    }
-    .portal-powered {
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
-      margin-left: var(--space-2);
     }
     .portal-header-right {
       display: flex;
@@ -64,7 +104,7 @@
     }
     .portal-user:hover { background: var(--color-surface-1); }
 
-    /* Portal Nav */
+    /* ── Portal Nav ── */
     .portal-nav {
       display: flex;
       align-items: center;
@@ -95,9 +135,13 @@
     @media (max-width: 639px) {
       .portal-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
       .portal-nav-item { white-space: nowrap; min-height: 44px; }
+      .portal-header { flex-wrap: wrap; gap: var(--space-2); height: auto; min-height: 56px; padding: var(--space-3) var(--space-4); }
+      .portal-notice { flex-direction: column; gap: var(--space-1); text-align: center; }
+      .portal-brand { display: none; }
+      .portal-sep { display: none; }
     }
 
-    /* Portal Content */
+    /* ── Portal Content ── */
     .portal-content {
       padding: var(--space-6);
       max-width: 1200px;
@@ -106,7 +150,7 @@
     .portal-section { display: none; }
     .portal-section.active { display: block; }
 
-    /* Project cards */
+    /* ── Project cards ── */
     .project-card-portal {
       background: var(--color-surface-0);
       border: 1px solid var(--color-border);
@@ -114,9 +158,7 @@
       padding: var(--space-5);
       margin-bottom: var(--space-4);
     }
-    .project-card-portal:hover {
-      border-color: var(--color-border-strong);
-    }
+    .project-card-portal:hover { border-color: var(--color-border-strong); }
     .project-header-row {
       display: flex;
       align-items: center;
@@ -130,7 +172,8 @@
     }
     .project-meta {
       display: flex;
-      gap: var(--space-6);
+      flex-wrap: wrap;
+      gap: var(--space-4);
       margin-bottom: var(--space-4);
       font-size: var(--text-body-sm);
       color: var(--color-text-2);
@@ -142,7 +185,7 @@
     }
     .project-meta-item svg { width: 14px; height: 14px; }
 
-    /* Milestone tracker */
+    /* ── Milestone tracker ── */
     .milestone-track {
       display: flex;
       align-items: center;
@@ -187,15 +230,18 @@
     }
     .milestone-step.done::after { background: var(--color-success); }
 
-    /* Invoice table in portal */
-    .invoice-status-paid { color: var(--color-success); }
-    .invoice-status-sent { color: var(--color-info); }
-    .invoice-status-overdue { color: var(--color-error); }
+    /* ── Avatar color classes ── */
+    .avatar-sage { background: linear-gradient(135deg, var(--color-success), var(--color-info)); }
+    .avatar-amber { background: linear-gradient(135deg, var(--color-gold), var(--color-warning)); }
+    .avatar-violet { background: linear-gradient(135deg, var(--color-accent), var(--color-info)); }
+    .avatar-sage-gold { background: linear-gradient(135deg, var(--color-success), var(--color-gold)); }
+    .avatar-coral { background: linear-gradient(135deg, var(--color-error), var(--color-gold)); }
+    .avatar-ghr { background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); }
 
-    /* Team members grid */
+    /* ── Team members grid ── */
     .team-grid-portal {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: var(--space-4);
     }
     .team-member-portal {
@@ -209,16 +255,10 @@
       border-radius: var(--radius-lg);
       text-align: center;
     }
-    .team-member-portal .member-name {
-      font-weight: var(--weight-semibold);
-      color: var(--color-text-1);
-    }
-    .team-member-portal .member-role {
-      font-size: var(--text-body-sm);
-      color: var(--color-text-2);
-    }
+    .team-member-portal .member-name { font-weight: var(--weight-semibold); color: var(--color-text-1); }
+    .team-member-portal .member-role { font-size: var(--text-body-sm); color: var(--color-text-2); }
 
-    /* Document list */
+    /* ── Document list ── */
     .doc-item {
       display: flex;
       align-items: center;
@@ -229,33 +269,183 @@
     .doc-item:last-child { border-bottom: none; }
     .doc-item svg { color: var(--color-text-3); flex-shrink: 0; }
     .doc-item .doc-name { flex: 1; color: var(--color-text-1); font-size: var(--text-body); }
-    .doc-item .doc-date { font-size: var(--text-caption); color: var(--color-text-3); }
+    .doc-item .doc-meta { font-size: var(--text-caption); color: var(--color-text-3); text-align: right; white-space: nowrap; }
 
-    /* Avatar color classes */
-    .avatar-sage { background: linear-gradient(135deg, var(--color-success), var(--color-info)); }
-    .avatar-amber { background: linear-gradient(135deg, var(--color-gold), var(--color-warning)); }
-    .avatar-violet { background: linear-gradient(135deg, var(--color-accent), var(--color-info)); }
-    .avatar-sage-gold { background: linear-gradient(135deg, var(--color-success), var(--color-gold)); }
-    .avatar-coral { background: linear-gradient(135deg, var(--color-error), var(--color-gold)); }
+    /* ── Messages ── */
+    .messages-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      padding: var(--space-4);
+    }
+    .message-item {
+      display: flex;
+      gap: var(--space-3);
+    }
+    .message-item.from-client { flex-direction: row-reverse; }
+    .message-bubble {
+      max-width: 70%;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+    }
+    .message-item.from-client .message-bubble {
+      background: var(--color-accent-muted, rgba(99,102,241,0.1));
+      border-color: var(--color-accent);
+    }
+    .message-text { font-size: var(--text-body-sm); color: var(--color-text-1); line-height: 1.5; }
+    .message-time { font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-1); }
+    .message-sender { font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-text-2); margin-bottom: var(--space-1); }
+    .messages-reply {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-top: 1px solid var(--color-border);
+      align-items: flex-end;
+    }
+
+    /* ── Invoice modal / slide panel ── */
+    .slide-panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      display: none;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+    .slide-panel-overlay.open { display: flex; }
+    .slide-panel {
+      width: 520px;
+      max-width: 100vw;
+      height: 100vh;
+      background: var(--color-surface-0);
+      border-left: 1px solid var(--color-border);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .slide-panel-overlay.open .slide-panel { transform: translateX(0); }
+    .slide-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      background: var(--color-surface-0);
+      z-index: 1;
+    }
+    .slide-panel-body { padding: var(--space-6); }
+    .invoice-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+      font-size: var(--text-body-sm);
+    }
+    .invoice-detail-row:last-child { border-bottom: none; }
+    .invoice-detail-row .label { color: var(--color-text-2); }
+    .invoice-detail-row .value { color: var(--color-text-1); font-weight: var(--weight-medium); }
+
+    /* ── Portal footer ── */
+    .portal-footer {
+      text-align: center;
+      padding: var(--space-8) var(--space-4) var(--space-6);
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      border-top: 1px solid var(--color-border);
+      margin-top: var(--space-8);
+    }
+    .portal-footer a { color: var(--color-text-2); text-decoration: none; }
+    .portal-footer a:hover { color: var(--color-primary); }
+
+    /* ── Inline flag form ── */
+    .flag-form {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+      padding: var(--space-3);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+    .flag-form.open { display: flex; }
+    .flag-form-actions { display: flex; gap: var(--space-2); }
+
+    /* ── AI Query response ── */
+    .ai-response-panel {
+      display: none;
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+    .ai-response-panel.open { display: block; }
+    .ai-response-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-accent);
+    }
+
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* ── Extra button variants not yet in _components.css ── */
+    .btn-success {
+      background: var(--color-success);
+      color: var(--color-white);
+      border-color: var(--color-success);
+    }
+    .btn-success:hover { filter: brightness(1.1); }
+    .btn-error {
+      background: var(--color-error);
+      color: var(--color-white);
+      border-color: var(--color-error);
+    }
+    .btn-error:hover { filter: brightness(1.1); }
+
+    /* ── Hidden on mobile helper ── */
+    @media (max-width: 639px) {
+      .hidden-mobile { display: none !important; }
+    }
   </style>
 </head>
-<body>
+<body class="portal-body">
+  <!-- ── Portal notice banner ── -->
+  <div class="portal-notice">
+    <span><strong>Client Portal</strong> — You are viewing as <strong>Acme Corp</strong></span>
+    <a href="../clients.html">← Back to GammaHR Admin</a>
+  </div>
+
+  <!-- ── Hero gradient strip ── -->
+  <div class="portal-hero-strip"></div>
+
   <div class="portal-app">
-    <!-- Portal Header -->
+    <!-- ── Portal Header ── -->
     <header class="portal-header">
       <div class="portal-header-left">
+        <div class="portal-logo-badge">G</div>
+        <span class="portal-brand">GammaHR</span>
+        <div class="portal-sep"></div>
         <div class="portal-client-logo">AC</div>
         <span class="portal-client-name">Acme Corp</span>
-        <span class="portal-powered">Powered by GammaHR</span>
       </div>
       <div class="portal-header-right">
-        <button class="header-icon-btn" style="position:relative;">
+        <button class="header-icon-btn" style="position:relative;" onclick="showToast('info', 'Notifications', 'No new notifications')">
           <svg data-lucide="bell" width="20" height="20"></svg>
           <span class="notif-dot"></span>
         </button>
         <div class="portal-user">
           <div class="avatar avatar-sm avatar-violet">JD</div>
-          <div>
+          <div class="hidden-mobile" style="line-height:1.2;">
             <div style="font-size: var(--text-body-sm); font-weight: var(--weight-medium); color: var(--color-text-1);">Jane Doe</div>
             <div style="font-size: var(--text-caption); color: var(--color-text-3);">CTO</div>
           </div>
@@ -263,39 +453,46 @@
         </div>
         <a href="../auth.html" class="btn btn-ghost btn-sm">
           <svg data-lucide="log-out" width="16" height="16"></svg>
-          Sign out
+          <span class="hidden-mobile">Sign out</span>
         </a>
       </div>
     </header>
 
-    <!-- Portal Navigation -->
+    <!-- ── Portal Navigation ── -->
     <nav class="portal-nav">
-      <a class="portal-nav-item active" data-tab="dashboard">
+      <a class="portal-nav-item active" href="#" data-tab="dashboard">
         <svg data-lucide="layout-dashboard"></svg>
         Dashboard
       </a>
-      <a class="portal-nav-item" data-tab="projects">
+      <a class="portal-nav-item" href="#" data-tab="projects">
         <svg data-lucide="folder"></svg>
         Projects
       </a>
-      <a class="portal-nav-item" data-tab="timesheets">
+      <a class="portal-nav-item" href="#" data-tab="timesheets">
         <svg data-lucide="clock"></svg>
         Timesheets
       </a>
-      <a class="portal-nav-item" data-tab="invoices">
+      <a class="portal-nav-item" href="#" data-tab="invoices">
         <svg data-lucide="file-text"></svg>
         Invoices
       </a>
-      <a class="portal-nav-item" data-tab="documents">
+      <a class="portal-nav-item" href="#" data-tab="messages">
+        <svg data-lucide="message-square"></svg>
+        Messages
+        <span class="badge badge-error" style="font-size:10px; padding: 1px 6px;">2</span>
+      </a>
+      <a class="portal-nav-item" href="#" data-tab="documents">
         <svg data-lucide="paperclip"></svg>
         Documents
       </a>
     </nav>
 
-    <!-- Portal Content -->
+    <!-- ── Portal Content ── -->
     <main class="portal-content">
 
-      <!-- DASHBOARD -->
+      <!-- ════════════════════════════════════
+           DASHBOARD
+      ════════════════════════════════════ -->
       <section class="portal-section active" id="sec-dashboard">
         <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Welcome, Jane</h2>
 
@@ -313,7 +510,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-label">Outstanding Invoices</div>
-            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€20,600</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€17,400</div>
             <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">2 invoices pending</div>
           </div>
           <div class="stat-card">
@@ -323,14 +520,14 @@
           </div>
         </div>
 
-        <!-- Active Projects -->
+        <!-- Active Projects summary -->
         <div class="card mb-6">
           <div class="card-header">
             <span class="card-title">Active Projects</span>
+            <button class="btn btn-ghost btn-sm" onclick="switchTab('projects')">View all</button>
           </div>
           <div class="card-body" style="padding: 0;">
             <div style="padding: var(--space-4);">
-              <!-- Project 1 -->
               <div class="project-card-portal">
                 <div class="project-header-row">
                   <span class="project-name-portal">Website Redesign</span>
@@ -338,7 +535,7 @@
                 </div>
                 <div class="project-meta">
                   <span class="project-meta-item"><svg data-lucide="calendar"></svg> Feb 1 — Jul 31, 2026</span>
-                  <span class="project-meta-item"><svg data-lucide="users"></svg> 5 team members</span>
+                  <span class="project-meta-item"><svg data-lucide="users"></svg> 5 members</span>
                   <span class="project-meta-item"><svg data-lucide="clock"></svg> 288h logged</span>
                 </div>
                 <div class="progress-bar" style="margin-bottom: var(--space-2);">
@@ -348,7 +545,6 @@
                   <span>55% complete</span>
                   <span>Budget: <span class="font-mono">€24,500</span> / <span class="font-mono">€50,000</span></span>
                 </div>
-                <!-- Milestones -->
                 <div class="milestone-track" style="margin-top: var(--space-5);">
                   <div class="milestone-step done">
                     <div class="milestone-dot completed"><svg data-lucide="check" width="12" height="12"></svg></div>
@@ -376,8 +572,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Project 2 -->
               <div class="project-card-portal">
                 <div class="project-header-row">
                   <span class="project-name-portal">Mobile App</span>
@@ -385,7 +579,6 @@
                 </div>
                 <div class="project-meta">
                   <span class="project-meta-item"><svg data-lucide="calendar"></svg> Mar 1 — Sep 30, 2026</span>
-                  <span class="project-meta-item"><svg data-lucide="users"></svg> 2 team members</span>
                   <span class="project-meta-item"><svg data-lucide="clock"></svg> 64h logged</span>
                 </div>
                 <div class="progress-bar" style="margin-bottom: var(--space-2);">
@@ -396,8 +589,6 @@
                   <span>Budget: <span class="font-mono">€5,440</span> / <span class="font-mono">€35,000</span></span>
                 </div>
               </div>
-
-              <!-- Project 3 -->
               <div class="project-card-portal">
                 <div class="project-header-row">
                   <span class="project-name-portal">CRM Integration</span>
@@ -405,7 +596,6 @@
                 </div>
                 <div class="project-meta">
                   <span class="project-meta-item"><svg data-lucide="calendar"></svg> Mar 15 — Jun 30, 2026</span>
-                  <span class="project-meta-item"><svg data-lucide="users"></svg> 3 team members</span>
                   <span class="project-meta-item"><svg data-lucide="clock"></svg> 42h logged</span>
                 </div>
                 <div class="progress-bar" style="margin-bottom: var(--space-2);">
@@ -421,7 +611,7 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="card">
+        <div class="card mb-6">
           <div class="card-header">
             <span class="card-title">Recent Activity</span>
           </div>
@@ -456,9 +646,37 @@
             </div>
           </div>
         </div>
+
+        <!-- Ask AI -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" style="display:flex; align-items:center; gap: var(--space-2);">
+              <svg data-lucide="sparkles" width="18" height="18" style="color: var(--color-accent);"></svg>
+              Questions? Ask AI
+            </span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex; gap: var(--space-3);">
+              <input class="form-input" id="aiQueryInput" style="flex:1;" placeholder="Ask about your invoices, timesheets, or project status..." onkeydown="if(event.key==='Enter') portalAIQuery(this.value)">
+              <button class="btn btn-primary" onclick="portalAIQuery(document.getElementById('aiQueryInput').value)">
+                <svg data-lucide="send" width="16" height="16"></svg>
+                Ask
+              </button>
+            </div>
+            <div class="ai-response-panel" id="aiResponsePanel">
+              <div class="ai-response-header">
+                <svg data-lucide="bot" width="16" height="16"></svg>
+                GammaHR AI
+              </div>
+              <p id="aiResponseText" style="font-size: var(--text-body-sm); color: var(--color-text-1); line-height: 1.7;"></p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- PROJECTS -->
+      <!-- ════════════════════════════════════
+           PROJECTS
+      ════════════════════════════════════ -->
       <section class="portal-section" id="sec-projects">
         <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Projects</h2>
         <div class="project-card-portal">
@@ -510,34 +728,34 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>Discovery & Requirements</td>
-                  <td>Feb 14, 2026</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Complete</span></td>
+                  <td>Discovery &amp; Requirements</td>
+                  <td data-label="Due Date">Feb 14, 2026</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Complete</span></td>
                 </tr>
                 <tr>
                   <td>Design Phase</td>
-                  <td>Mar 15, 2026</td>
-                  <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Complete</span></td>
+                  <td data-label="Due Date">Mar 15, 2026</td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Complete</span></td>
                 </tr>
                 <tr>
                   <td>Development Sprint 1</td>
-                  <td>Apr 15, 2026</td>
-                  <td><span class="badge badge-primary"><svg data-lucide="loader" width="12" height="12"></svg> In Progress</span></td>
+                  <td data-label="Due Date">Apr 15, 2026</td>
+                  <td data-label="Status"><span class="badge badge-primary"><svg data-lucide="loader" width="12" height="12"></svg> In Progress</span></td>
                 </tr>
                 <tr>
                   <td>Development Sprint 2</td>
-                  <td>May 15, 2026</td>
-                  <td><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
+                  <td data-label="Due Date">May 15, 2026</td>
+                  <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
                 </tr>
                 <tr>
-                  <td>Testing & QA</td>
-                  <td>Jun 15, 2026</td>
-                  <td><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
+                  <td>Testing &amp; QA</td>
+                  <td data-label="Due Date">Jun 15, 2026</td>
+                  <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
                 </tr>
                 <tr>
                   <td>Launch</td>
-                  <td>Jul 1, 2026</td>
-                  <td><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
+                  <td data-label="Due Date">Jul 1, 2026</td>
+                  <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span></td>
                 </tr>
               </tbody>
             </table>
@@ -545,96 +763,162 @@
         </div>
       </section>
 
-      <!-- TIMESHEETS -->
+      <!-- ════════════════════════════════════
+           TIMESHEETS
+      ════════════════════════════════════ -->
       <section class="portal-section" id="sec-timesheets">
-        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Approved Timesheets</h2>
-        <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">Hours logged by your assigned team members, approved and verified.</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-6); flex-wrap:wrap; gap: var(--space-3);">
+          <div>
+            <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold);">Timesheets</h2>
+            <p style="color: var(--color-text-2); margin-top: var(--space-1);">Review, approve or flag timesheets submitted by your team.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm"><svg data-lucide="download" width="14" height="14"></svg> Export Report</button>
+        </div>
         <div class="data-table-wrapper">
-          <table class="data-table mobile-cards">
+          <table class="data-table mobile-cards" id="timesheetTable">
             <thead>
               <tr>
+                <th>Employee</th>
                 <th>Week</th>
                 <th>Project</th>
-                <th>Team Member</th>
                 <th>Hours</th>
-                <th>Rate</th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Mar 30 - Apr 5</td>
-                <td>Website Redesign</td>
-                <td>Sarah Chen</td>
-                <td class="font-mono">31h</td>
-                <td class="font-mono">€85/h</td>
-                <td class="font-mono">€2,635</td>
-                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-sage">SC</div> Sarah Chen</div></td>
+                <td data-label="Week">Mar 30 – Apr 5</td>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Hours" class="font-mono">31h</td>
+                <td data-label="Amount" class="font-mono">€2,635</td>
+                <td data-label="Status" class="ts-status-cell"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                <td data-label="Actions">
+                  <div style="display:flex; flex-direction:column; gap: var(--space-2);">
+                    <div style="display:flex; gap: var(--space-1);">
+                      <button class="btn btn-xs btn-success" onclick="approveTimesheetRow(this)">Approve</button>
+                      <button class="btn btn-xs btn-ghost" onclick="flagTimesheetRow(this)">Flag</button>
+                    </div>
+                    <div class="flag-form">
+                      <input type="text" class="form-input" placeholder="Reason for flagging..." style="font-size: var(--text-body-sm);">
+                      <div class="flag-form-actions">
+                        <button class="btn btn-xs btn-error" onclick="confirmFlag(this)">Confirm Flag</button>
+                        <button class="btn btn-xs btn-ghost" onclick="cancelFlag(this)">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
               </tr>
               <tr>
-                <td>Mar 30 - Apr 5</td>
-                <td>Website Redesign</td>
-                <td>Marco Rossi</td>
-                <td class="font-mono">40h</td>
-                <td class="font-mono">€85/h</td>
-                <td class="font-mono">€3,400</td>
-                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-amber">MR</div> Marco Rossi</div></td>
+                <td data-label="Week">Mar 30 – Apr 5</td>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Hours" class="font-mono">40h</td>
+                <td data-label="Amount" class="font-mono">€3,400</td>
+                <td data-label="Status" class="ts-status-cell"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                <td data-label="Actions">
+                  <div style="display:flex; flex-direction:column; gap: var(--space-2);">
+                    <div style="display:flex; gap: var(--space-1);">
+                      <button class="btn btn-xs btn-success" onclick="approveTimesheetRow(this)">Approve</button>
+                      <button class="btn btn-xs btn-ghost" onclick="flagTimesheetRow(this)">Flag</button>
+                    </div>
+                    <div class="flag-form">
+                      <input type="text" class="form-input" placeholder="Reason for flagging..." style="font-size: var(--text-body-sm);">
+                      <div class="flag-form-actions">
+                        <button class="btn btn-xs btn-error" onclick="confirmFlag(this)">Confirm Flag</button>
+                        <button class="btn btn-xs btn-ghost" onclick="cancelFlag(this)">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
               </tr>
               <tr>
-                <td>Mar 30 - Apr 5</td>
-                <td>Website Redesign</td>
-                <td>Alice Wang</td>
-                <td class="font-mono">24h</td>
-                <td class="font-mono">€75/h</td>
-                <td class="font-mono">€1,800</td>
-                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-sage-gold">AW</div> Alice Wang</div></td>
+                <td data-label="Week">Mar 30 – Apr 5</td>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Hours" class="font-mono">24h</td>
+                <td data-label="Amount" class="font-mono">€1,800</td>
+                <td data-label="Status" class="ts-status-cell"><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Actions">
+                  <span style="font-size: var(--text-caption); color: var(--color-text-3);">Approved</span>
+                </td>
               </tr>
               <tr>
-                <td>Mar 30 - Apr 5</td>
-                <td>Website Redesign</td>
-                <td>John Smith</td>
-                <td class="font-mono">15h</td>
-                <td class="font-mono">€95/h</td>
-                <td class="font-mono">€1,425</td>
-                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-violet">JS</div> John Smith</div></td>
+                <td data-label="Week">Mar 30 – Apr 5</td>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Hours" class="font-mono">15h</td>
+                <td data-label="Amount" class="font-mono">€1,425</td>
+                <td data-label="Status" class="ts-status-cell"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                <td data-label="Actions">
+                  <div style="display:flex; flex-direction:column; gap: var(--space-2);">
+                    <div style="display:flex; gap: var(--space-1);">
+                      <button class="btn btn-xs btn-success" onclick="approveTimesheetRow(this)">Approve</button>
+                      <button class="btn btn-xs btn-ghost" onclick="flagTimesheetRow(this)">Flag</button>
+                    </div>
+                    <div class="flag-form">
+                      <input type="text" class="form-input" placeholder="Reason for flagging..." style="font-size: var(--text-body-sm);">
+                      <div class="flag-form-actions">
+                        <button class="btn btn-xs btn-error" onclick="confirmFlag(this)">Confirm Flag</button>
+                        <button class="btn btn-xs btn-ghost" onclick="cancelFlag(this)">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
               </tr>
               <tr>
-                <td>Mar 30 - Apr 5</td>
-                <td>Website Redesign</td>
-                <td>Liam O'Brien</td>
-                <td class="font-mono">32h</td>
-                <td class="font-mono">€65/h</td>
-                <td class="font-mono">€2,080</td>
-                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-coral">LO</div> Liam O'Brien</div></td>
+                <td data-label="Week">Mar 30 – Apr 5</td>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Hours" class="font-mono">32h</td>
+                <td data-label="Amount" class="font-mono">€2,080</td>
+                <td data-label="Status" class="ts-status-cell"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                <td data-label="Actions">
+                  <div style="display:flex; flex-direction:column; gap: var(--space-2);">
+                    <div style="display:flex; gap: var(--space-1);">
+                      <button class="btn btn-xs btn-success" onclick="approveTimesheetRow(this)">Approve</button>
+                      <button class="btn btn-xs btn-ghost" onclick="flagTimesheetRow(this)">Flag</button>
+                    </div>
+                    <div class="flag-form">
+                      <input type="text" class="form-input" placeholder="Reason for flagging..." style="font-size: var(--text-body-sm);">
+                      <div class="flag-form-actions">
+                        <button class="btn btn-xs btn-error" onclick="confirmFlag(this)">Confirm Flag</button>
+                        <button class="btn btn-xs btn-ghost" onclick="cancelFlag(this)">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
               </tr>
               <tr>
-                <td>Mar 23 - 29</td>
-                <td>Website Redesign</td>
-                <td>Sarah Chen</td>
-                <td class="font-mono">40h</td>
-                <td class="font-mono">€85/h</td>
-                <td class="font-mono">€3,400</td>
-                <td><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-sage">SC</div> Sarah Chen</div></td>
+                <td data-label="Week">Mar 23 – 29</td>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Hours" class="font-mono">40h</td>
+                <td data-label="Amount" class="font-mono">€3,400</td>
+                <td data-label="Status" class="ts-status-cell"><span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span></td>
+                <td data-label="Actions">
+                  <span style="font-size: var(--text-caption); color: var(--color-text-3);">Approved</span>
+                </td>
               </tr>
             </tbody>
           </table>
           <div class="table-pagination">
             <span>Showing 6 of 24 entries</span>
             <div class="pagination-buttons">
-              <button>1</button>
+              <button class="active">1</button>
               <button>2</button>
               <button>3</button>
               <button>4</button>
             </div>
           </div>
         </div>
-        <div style="margin-top: var(--space-4); display: flex; justify-content: flex-end;">
-          <button class="btn btn-secondary btn-sm"><svg data-lucide="download" width="14" height="14"></svg> Export Report</button>
-        </div>
       </section>
 
-      <!-- INVOICES -->
+      <!-- ════════════════════════════════════
+           INVOICES
+      ════════════════════════════════════ -->
       <section class="portal-section" id="sec-invoices">
         <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Invoices</h2>
         <div class="data-table-wrapper">
@@ -653,124 +937,312 @@
             <tbody>
               <tr>
                 <td style="font-weight: var(--weight-semibold);">INV-2026-048</td>
-                <td>Website Redesign</td>
-                <td>Apr 1, 2026</td>
-                <td>Apr 30, 2026</td>
-                <td class="font-mono" style="font-weight: var(--weight-semibold);">€12,400.00</td>
-                <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
-                <td>
-                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
-                  <button class="btn btn-primary btn-xs" onclick="markPaid(this)"><svg data-lucide="check" width="14" height="14"></svg> Mark Paid</button>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Issue Date">Apr 1, 2026</td>
+                <td data-label="Due Date">Apr 30, 2026</td>
+                <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€12,400.00</td>
+                <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                <td data-label="Actions" style="white-space:nowrap;">
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-048','Website Redesign','Apr 1, 2026','Apr 30, 2026','Sent')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-semibold);">INV-2026-045</td>
-                <td>Website Redesign</td>
-                <td>Mar 1, 2026</td>
-                <td>Mar 31, 2026</td>
-                <td class="font-mono" style="font-weight: var(--weight-semibold);">€11,200.00</td>
-                <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                <td>
-                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                <td data-label="Project">Website Redesign</td>
+                <td data-label="Issue Date">Mar 1, 2026</td>
+                <td data-label="Due Date">Mar 31, 2026</td>
+                <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€11,200.00</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                <td data-label="Actions" style="white-space:nowrap;">
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-045','Website Redesign','Mar 1, 2026','Mar 31, 2026','Paid')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-semibold);">INV-2026-043</td>
-                <td>Mobile App</td>
-                <td>Feb 15, 2026</td>
-                <td>Mar 15, 2026</td>
-                <td class="font-mono" style="font-weight: var(--weight-semibold);">€5,000.00</td>
-                <td><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> Overdue</span></td>
-                <td>
-                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
-                  <button class="btn btn-primary btn-xs" onclick="markPaid(this)"><svg data-lucide="check" width="14" height="14"></svg> Mark Paid</button>
+                <td data-label="Project">Mobile App</td>
+                <td data-label="Issue Date">Feb 15, 2026</td>
+                <td data-label="Due Date">Mar 15, 2026</td>
+                <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€5,000.00</td>
+                <td data-label="Status"><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> Overdue</span></td>
+                <td data-label="Actions" style="white-space:nowrap;">
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-043','Mobile App','Feb 15, 2026','Mar 15, 2026','Overdue')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-semibold);">INV-2026-041</td>
-                <td>CRM Integration</td>
-                <td>Jan 15, 2026</td>
-                <td>Feb 14, 2026</td>
-                <td class="font-mono" style="font-weight: var(--weight-semibold);">€8,200.00</td>
-                <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                <td>
-                  <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                <td data-label="Project">CRM Integration</td>
+                <td data-label="Issue Date">Jan 15, 2026</td>
+                <td data-label="Due Date">Feb 14, 2026</td>
+                <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€8,200.00</td>
+                <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                <td data-label="Actions" style="white-space:nowrap;">
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-041','CRM Integration','Jan 15, 2026','Feb 14, 2026','Paid')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-6);">
-          <div class="stat-card" style="flex:1;">
+        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-4); flex-wrap:wrap;">
+          <div class="stat-card" style="flex:1; min-width:140px;">
             <div class="stat-label">Total Paid (YTD)</div>
             <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-success);">€19,400</div>
           </div>
-          <div class="stat-card" style="flex:1;">
+          <div class="stat-card" style="flex:1; min-width:140px;">
             <div class="stat-label">Outstanding</div>
             <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€12,400</div>
           </div>
-          <div class="stat-card" style="flex:1;">
+          <div class="stat-card" style="flex:1; min-width:140px;">
             <div class="stat-label">Overdue</div>
             <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-error);">€5,000</div>
           </div>
         </div>
       </section>
 
-      <!-- DOCUMENTS -->
+      <!-- ════════════════════════════════════
+           MESSAGES
+      ════════════════════════════════════ -->
+      <section class="portal-section" id="sec-messages">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Messages</h2>
+        <div class="card" style="display:flex; flex-direction:column;">
+          <div class="messages-list" id="messagesList">
+            <!-- Company message 1: urgent -->
+            <div class="message-item">
+              <div class="avatar avatar-sm avatar-ghr">G</div>
+              <div>
+                <div class="message-sender">GammaHR (on behalf of Acme Team)</div>
+                <div class="message-bubble">
+                  <div class="message-text">Your invoice <strong>INV-2026-043</strong> is currently overdue. The due date was Mar 15, 2026. Please arrange payment by <strong>Apr 15, 2026</strong> to avoid service interruption. Contact us if you need assistance.</div>
+                  <div class="message-time">2 days ago · Apr 4, 2026</div>
+                </div>
+              </div>
+            </div>
+            <!-- Company message 2 -->
+            <div class="message-item">
+              <div class="avatar avatar-sm avatar-ghr">G</div>
+              <div>
+                <div class="message-sender">GammaHR (on behalf of Acme Team)</div>
+                <div class="message-bubble">
+                  <div class="message-text">The timesheet for <strong>March W4</strong> (Mar 23–29) has been submitted by Sarah Chen for your review. Total: <strong>40h — €3,400</strong>. Please approve or flag in the Timesheets tab.</div>
+                  <div class="message-time">5 days ago · Apr 1, 2026</div>
+                </div>
+              </div>
+            </div>
+            <!-- Company message 3: welcome -->
+            <div class="message-item">
+              <div class="avatar avatar-sm avatar-ghr">G</div>
+              <div>
+                <div class="message-sender">GammaHR</div>
+                <div class="message-bubble">
+                  <div class="message-text">👋 Welcome to <strong>GammaHR Portal</strong>! Your client account is now active. You can view your projects, review timesheets, manage invoices, and communicate with your team — all in one place. Don't hesitate to reach out if you have questions.</div>
+                  <div class="message-time">Mar 1, 2026</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="messages-reply">
+            <div class="avatar avatar-sm avatar-violet">JD</div>
+            <input class="form-input" id="messageInput" style="flex:1;" placeholder="Reply to your account manager..." onkeydown="if(event.key==='Enter') sendPortalMessage()">
+            <button class="btn btn-primary" onclick="sendPortalMessage()">
+              <svg data-lucide="send" width="16" height="16"></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════
+           DOCUMENTS
+      ════════════════════════════════════ -->
       <section class="portal-section" id="sec-documents">
-        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Shared Documents</h2>
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Documents</h2>
         <div class="card">
           <div class="card-body" style="padding: 0;">
+            <!-- Service Agreement -->
             <div class="doc-item">
-              <svg data-lucide="file-text" width="20" height="20"></svg>
-              <span class="doc-name">Master Services Agreement — Acme Corp.pdf</span>
-              <span class="doc-date">Jan 15, 2024</span>
-              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+              <svg data-lucide="file-text" width="22" height="22" style="color: var(--color-info);"></svg>
+              <div style="flex:1;">
+                <div class="doc-name">Service Agreement 2026</div>
+                <div style="font-size: var(--text-caption); color: var(--color-text-3);">Jan 15, 2026</div>
+              </div>
+              <div class="doc-meta">PDF · 245 KB</div>
+              <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')">
+                <svg data-lucide="download" width="14" height="14"></svg> Download
+              </button>
             </div>
+            <!-- NDA -->
             <div class="doc-item">
-              <svg data-lucide="file-text" width="20" height="20"></svg>
-              <span class="doc-name">Statement of Work — Website Redesign.pdf</span>
-              <span class="doc-date">Feb 1, 2026</span>
-              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+              <svg data-lucide="file-text" width="22" height="22" style="color: var(--color-info);"></svg>
+              <div style="flex:1;">
+                <div class="doc-name">NDA — Acme Corp</div>
+                <div style="font-size: var(--text-caption); color: var(--color-text-3);">Jan 15, 2026</div>
+              </div>
+              <div class="doc-meta">PDF · 118 KB</div>
+              <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')">
+                <svg data-lucide="download" width="14" height="14"></svg> Download
+              </button>
             </div>
+            <!-- Project Spec -->
             <div class="doc-item">
-              <svg data-lucide="file-text" width="20" height="20"></svg>
-              <span class="doc-name">Statement of Work — Mobile App.pdf</span>
-              <span class="doc-date">Mar 1, 2026</span>
-              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+              <svg data-lucide="file" width="22" height="22" style="color: var(--color-accent);"></svg>
+              <div style="flex:1;">
+                <div class="doc-name">Project Specification v2</div>
+                <div style="font-size: var(--text-caption); color: var(--color-text-3);">Mar 10, 2026</div>
+              </div>
+              <div class="doc-meta">DOCX · 87 KB</div>
+              <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'DOCX download started')">
+                <svg data-lucide="download" width="14" height="14"></svg> Download
+              </button>
             </div>
+            <!-- Statement of Work -->
             <div class="doc-item">
-              <svg data-lucide="image" width="20" height="20"></svg>
-              <span class="doc-name">Website Redesign — Approved Mockups.zip</span>
-              <span class="doc-date">Mar 15, 2026</span>
-              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+              <svg data-lucide="file-text" width="22" height="22" style="color: var(--color-info);"></svg>
+              <div style="flex:1;">
+                <div class="doc-name">Statement of Work — Website Redesign</div>
+                <div style="font-size: var(--text-caption); color: var(--color-text-3);">Feb 1, 2026</div>
+              </div>
+              <div class="doc-meta">PDF · 312 KB</div>
+              <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')">
+                <svg data-lucide="download" width="14" height="14"></svg> Download
+              </button>
             </div>
+            <!-- Hours report -->
             <div class="doc-item">
-              <svg data-lucide="file-spreadsheet" width="20" height="20"></svg>
-              <span class="doc-name">Q1 2026 Hours Report — Acme.xlsx</span>
-              <span class="doc-date">Apr 1, 2026</span>
-              <button class="btn btn-ghost btn-xs"><svg data-lucide="download" width="14" height="14"></svg></button>
+              <svg data-lucide="file-spreadsheet" width="22" height="22" style="color: var(--color-success);"></svg>
+              <div style="flex:1;">
+                <div class="doc-name">Q1 2026 Hours Report — Acme</div>
+                <div style="font-size: var(--text-caption); color: var(--color-text-3);">Apr 1, 2026</div>
+              </div>
+              <div class="doc-meta">XLSX · 54 KB</div>
+              <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'Excel download started')">
+                <svg data-lucide="download" width="14" height="14"></svg> Download
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- EMPTY STATE -->
-      <section class="portal-section" id="sec-empty" style="display: none;">
-        <div class="empty-state">
-          <svg data-lucide="folder-open" width="64" height="64" class="empty-icon"></svg>
-          <div class="empty-title">No data yet</div>
-          <div class="empty-desc">Your project team hasn't shared any information yet. Check back soon.</div>
-        </div>
-      </section>
     </main>
+
+    <!-- ── Portal Footer ── -->
+    <footer class="portal-footer">
+      Powered by <a href="#">GammaHR</a> &nbsp;·&nbsp; <a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms</a><br>
+      <span style="margin-top: var(--space-1); display:inline-block;">© 2026 GammaHR. All rights reserved.</span>
+    </footer>
+  </div>
+
+  <!-- ════════════════════════════════════
+       INVOICE DETAIL SLIDE PANEL
+  ════════════════════════════════════ -->
+  <div class="slide-panel-overlay" id="invoiceDetailOverlay" onclick="closeInvoiceDetail(event)">
+    <div class="slide-panel" id="invoiceDetailPanel">
+      <div class="slide-panel-header">
+        <div>
+          <h3 id="invoicePanelTitle" style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); color: var(--color-text-1);">Invoice</h3>
+          <div id="invoicePanelStatus" style="margin-top: var(--space-1);"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="closeInvoiceDetail()">
+          <svg data-lucide="x" width="18" height="18"></svg>
+        </button>
+      </div>
+      <div class="slide-panel-body">
+        <!-- Meta details -->
+        <div class="card mb-4">
+          <div class="card-header"><span class="card-title">Invoice Details</span></div>
+          <div class="card-body" style="padding: var(--space-4);">
+            <div class="invoice-detail-row">
+              <span class="label">Invoice Number</span>
+              <span class="value" id="detailInvoiceNum">—</span>
+            </div>
+            <div class="invoice-detail-row">
+              <span class="label">Project</span>
+              <span class="value" id="detailProject">—</span>
+            </div>
+            <div class="invoice-detail-row">
+              <span class="label">Issue Date</span>
+              <span class="value" id="detailIssueDate">—</span>
+            </div>
+            <div class="invoice-detail-row">
+              <span class="label">Due Date</span>
+              <span class="value" id="detailDueDate">—</span>
+            </div>
+          </div>
+        </div>
+        <!-- Line items -->
+        <div class="card mb-4">
+          <div class="card-header"><span class="card-title">Line Items</span></div>
+          <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrapper">
+              <table class="data-table" id="invoiceLineItems">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Hours</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Totals -->
+        <div class="card mb-4">
+          <div class="card-body" style="padding: var(--space-4);">
+            <div class="invoice-detail-row">
+              <span class="label">Subtotal</span>
+              <span class="value font-mono" id="detailSubtotal">—</span>
+            </div>
+            <div class="invoice-detail-row">
+              <span class="label">Tax (20% VAT)</span>
+              <span class="value font-mono" id="detailTax">—</span>
+            </div>
+            <div class="invoice-detail-row" style="border-top: 2px solid var(--color-border); padding-top: var(--space-3); margin-top: var(--space-1);">
+              <span class="label" style="font-weight: var(--weight-semibold); color: var(--color-text-1);">Grand Total</span>
+              <span class="value font-mono" id="detailTotal" style="font-size: var(--text-heading-3); color: var(--color-text-1);">—</span>
+            </div>
+          </div>
+        </div>
+        <!-- Payment history (shown when paid) -->
+        <div class="card mb-4" id="paymentHistoryCard" style="display:none;">
+          <div class="card-header"><span class="card-title">Payment History</span></div>
+          <div class="card-body" style="padding: var(--space-4);">
+            <div class="invoice-detail-row">
+              <span class="label">Payment received</span>
+              <span class="value" id="detailPaymentDate">—</span>
+            </div>
+            <div class="invoice-detail-row">
+              <span class="label">Method</span>
+              <span class="value">Bank Transfer</span>
+            </div>
+            <div class="invoice-detail-row">
+              <span class="label">Reference</span>
+              <span class="value font-mono" id="detailPaymentRef">—</span>
+            </div>
+          </div>
+        </div>
+        <!-- Actions -->
+        <div style="display:flex; gap: var(--space-3);">
+          <button class="btn btn-primary" onclick="showToast('info', 'PDF download started', 'Your invoice PDF is being prepared')">
+            <svg data-lucide="download" width="16" height="16"></svg>
+            Download PDF
+          </button>
+          <button class="btn btn-ghost" onclick="closeInvoiceDetail()">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- Empty State Toggle -->
-  <button class="state-toggle" onclick="toggleEmptyState()">
+  <!-- Dev toggle -->
+  <button class="state-toggle" onclick="toggleEmptyState()" style="display:none;">
     <svg data-lucide="eye" width="14" height="14"></svg>
     Toggle Empty State
   </button>
@@ -779,70 +1251,241 @@
   <script>
     lucide.createIcons();
 
-    // Tab switching
-    let currentTab = 'dashboard';
-    document.querySelectorAll('.portal-nav-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const tab = item.dataset.tab;
-        document.querySelectorAll('.portal-nav-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
-        document.getElementById('sec-' + tab).classList.add('active');
-        currentTab = tab;
+    // ── Tab switching ────────────────────────────
+    var currentTab = 'dashboard';
+    document.querySelectorAll('.portal-nav-item').forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        var tab = item.dataset.tab;
+        switchTab(tab);
         window.location.hash = tab;
       });
     });
+    function switchTab(tab) {
+      document.querySelectorAll('.portal-nav-item').forEach(function(i) {
+        i.classList.toggle('active', i.dataset.tab === tab);
+      });
+      document.querySelectorAll('.portal-section').forEach(function(s) { s.classList.remove('active'); });
+      var sec = document.getElementById('sec-' + tab);
+      if (sec) sec.classList.add('active');
+      currentTab = tab;
+    }
 
     // Handle hash on load
-    const hash = window.location.hash.slice(1);
+    var hash = window.location.hash.slice(1);
     if (hash && document.getElementById('sec-' + hash)) {
-      document.querySelectorAll('.portal-nav-item').forEach(i => {
-        i.classList.toggle('active', i.dataset.tab === hash);
-      });
-      document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
-      document.getElementById('sec-' + hash).classList.add('active');
-      currentTab = hash;
+      switchTab(hash);
     }
 
-    // Mark as paid
-    function markPaid(btn) {
-      const row = btn.closest('tr');
-      const statusCell = row.querySelector('td:nth-child(6)');
-      statusCell.innerHTML = '<span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span>';
-      btn.remove();
-      lucide.createIcons();
-      showToast('Payment confirmed', 'Invoice marked as paid. Thank you!', 'success');
-    }
-
-    // Toast
-    function showToast(title, message, type) {
-      const container = document.getElementById('toast-container');
-      const iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
-      const toast = document.createElement('div');
+    // ── Toast ────────────────────────────────────
+    function showToast(type, title, message) {
+      var container = document.getElementById('toast-container');
+      var iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+      var toast = document.createElement('div');
       toast.className = 'toast toast-' + type;
-      toast.innerHTML = `
-        <div class="toast-icon"><svg data-lucide="${iconMap[type]}" width="20" height="20"></svg></div>
-        <div class="toast-content">
-          <div class="toast-title">${title}</div>
-          <div class="toast-message">${message}</div>
-        </div>
-        <button class="toast-close" onclick="this.parentElement.remove()"><svg data-lucide="x" width="16" height="16"></svg></button>
-      `;
+      toast.innerHTML =
+        '<div class="toast-icon"><svg data-lucide="' + (iconMap[type] || 'info') + '" width="20" height="20"></svg></div>' +
+        '<div class="toast-content"><div class="toast-title">' + title + '</div>' +
+        (message ? '<div class="toast-message">' + message + '</div>' : '') + '</div>' +
+        '<button class="toast-close" onclick="this.parentElement.remove()"><svg data-lucide="x" width="16" height="16"></svg></button>';
       container.appendChild(toast);
-      lucide.createIcons();
-      setTimeout(() => { toast.classList.add('removing'); setTimeout(() => toast.remove(), 200); }, 5000);
+      lucide.createIcons({ nodes: [toast] });
+      setTimeout(function() { toast.classList.add('removing'); setTimeout(function() { if (toast.parentNode) toast.remove(); }, 200); }, 5000);
     }
 
-    // Empty state toggle
-    let isEmpty = false;
+    // ── Timesheet approve / flag ─────────────────
+    function approveTimesheetRow(btn) {
+      var row = btn.closest('tr');
+      var statusCell = row.querySelector('.ts-status-cell');
+      statusCell.innerHTML = '<span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span>';
+      var actionsCell = btn.closest('td');
+      actionsCell.innerHTML = '<span style="font-size: var(--text-caption); color: var(--color-text-3);">Approved</span>';
+      lucide.createIcons({ nodes: [row] });
+      showToast('success', 'Timesheet approved', 'The timesheet has been approved successfully');
+    }
+
+    function flagTimesheetRow(btn) {
+      var actionsCell = btn.closest('td');
+      var flagForm = actionsCell.querySelector('.flag-form');
+      if (flagForm) {
+        flagForm.classList.toggle('open');
+        if (flagForm.classList.contains('open')) {
+          flagForm.querySelector('input').focus();
+        }
+      }
+    }
+
+    function confirmFlag(btn) {
+      var flagForm = btn.closest('.flag-form');
+      var reason = flagForm.querySelector('input').value;
+      var row = btn.closest('tr');
+      var statusCell = row.querySelector('.ts-status-cell');
+      statusCell.innerHTML = '<span class="badge badge-error"><svg data-lucide="flag" width="12" height="12"></svg> Flagged</span>';
+      var actionsCell = btn.closest('td');
+      actionsCell.innerHTML = '<span style="font-size: var(--text-caption); color: var(--color-error);">Flagged: ' + (reason || 'No reason given') + '</span>';
+      lucide.createIcons({ nodes: [row] });
+      showToast('warning', 'Timesheet flagged', reason ? 'Reason: ' + reason : 'Timesheet has been flagged for review');
+    }
+
+    function cancelFlag(btn) {
+      btn.closest('.flag-form').classList.remove('open');
+    }
+
+    // ── Invoice detail panel ─────────────────────
+    var invoiceData = {
+      'INV-2026-048': {
+        project: 'Website Redesign',
+        issueDate: 'Apr 1, 2026',
+        dueDate: 'Apr 30, 2026',
+        status: 'Sent',
+        lines: [
+          { desc: 'Development (Sarah Chen)', hours: '31h', rate: '€85/h', amount: '€2,635' },
+          { desc: 'Development (Marco Rossi)', hours: '40h', rate: '€85/h', amount: '€3,400' },
+          { desc: 'Design (Alice Wang)', hours: '24h', rate: '€75/h', amount: '€1,800' },
+          { desc: 'PM (John Smith)', hours: '15h', rate: '€95/h', amount: '€1,425' },
+          { desc: 'Development (Liam O\'Brien)', hours: '32h', rate: '€65/h', amount: '€2,080' }
+        ],
+        subtotal: '€11,340', tax: '€1,060', total: '€12,400', paid: false
+      },
+      'INV-2026-045': {
+        project: 'Website Redesign',
+        issueDate: 'Mar 1, 2026',
+        dueDate: 'Mar 31, 2026',
+        status: 'Paid',
+        lines: [
+          { desc: 'Development Sprint 1', hours: '88h', rate: '€85/h', amount: '€7,480' },
+          { desc: 'Design — UI Kit', hours: '32h', rate: '€75/h', amount: '€2,400' }
+        ],
+        subtotal: '€9,880', tax: '€1,320', total: '€11,200', paid: true, paymentDate: 'Mar 28, 2026', paymentRef: 'TXN-20260328-0041'
+      },
+      'INV-2026-043': {
+        project: 'Mobile App',
+        issueDate: 'Feb 15, 2026',
+        dueDate: 'Mar 15, 2026',
+        status: 'Overdue',
+        lines: [
+          { desc: 'Mobile App Discovery', hours: '24h', rate: '€85/h', amount: '€2,040' },
+          { desc: 'Architecture & Setup', hours: '40h', rate: '€72.50/h', amount: '€2,960' }
+        ],
+        subtotal: '€4,167', tax: '€833', total: '€5,000', paid: false
+      },
+      'INV-2026-041': {
+        project: 'CRM Integration',
+        issueDate: 'Jan 15, 2026',
+        dueDate: 'Feb 14, 2026',
+        status: 'Paid',
+        lines: [
+          { desc: 'CRM Integration — Phase 1', hours: '64h', rate: '€85/h', amount: '€5,440' },
+          { desc: 'CRM Integration — Phase 2', hours: '32h', rate: '€85/h', amount: '€2,720' }
+        ],
+        subtotal: '€6,833', tax: '€1,367', total: '€8,200', paid: true, paymentDate: 'Feb 10, 2026', paymentRef: 'TXN-20260210-0017'
+      }
+    };
+
+    function openInvoiceDetail(invNum, project, issueDate, dueDate, status) {
+      var data = invoiceData[invNum];
+      document.getElementById('invoicePanelTitle').textContent = invNum;
+      var statusBadgeClass = { 'Sent': 'badge-info', 'Paid': 'badge-success', 'Overdue': 'badge-error' }[status] || 'badge-default';
+      document.getElementById('invoicePanelStatus').innerHTML = '<span class="badge ' + statusBadgeClass + '">' + status + '</span>';
+      document.getElementById('detailInvoiceNum').textContent = invNum;
+      document.getElementById('detailProject').textContent = project;
+      document.getElementById('detailIssueDate').textContent = issueDate;
+      document.getElementById('detailDueDate').textContent = dueDate;
+
+      // Line items
+      var tbody = document.querySelector('#invoiceLineItems tbody');
+      tbody.innerHTML = '';
+      if (data && data.lines) {
+        data.lines.forEach(function(line) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + line.desc + '</td><td class="font-mono">' + line.hours + '</td><td class="font-mono">' + line.rate + '</td><td class="font-mono">' + line.amount + '</td>';
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Totals
+      if (data) {
+        document.getElementById('detailSubtotal').textContent = data.subtotal;
+        document.getElementById('detailTax').textContent = data.tax;
+        document.getElementById('detailTotal').textContent = data.total;
+        var payCard = document.getElementById('paymentHistoryCard');
+        if (data.paid) {
+          payCard.style.display = 'block';
+          document.getElementById('detailPaymentDate').textContent = data.paymentDate || '—';
+          document.getElementById('detailPaymentRef').textContent = data.paymentRef || '—';
+        } else {
+          payCard.style.display = 'none';
+        }
+      }
+
+      // Open panel
+      var overlay = document.getElementById('invoiceDetailOverlay');
+      overlay.classList.add('open');
+      lucide.createIcons({ nodes: [overlay] });
+    }
+
+    function closeInvoiceDetail(event) {
+      if (event && event.target !== document.getElementById('invoiceDetailOverlay')) return;
+      document.getElementById('invoiceDetailOverlay').classList.remove('open');
+    }
+
+    // ── Messages ─────────────────────────────────
+    function sendPortalMessage() {
+      var input = document.getElementById('messageInput');
+      var text = input.value.trim();
+      if (!text) return;
+      var list = document.getElementById('messagesList');
+      var item = document.createElement('div');
+      item.className = 'message-item from-client';
+      item.innerHTML =
+        '<div class="avatar avatar-sm avatar-violet">JD</div>' +
+        '<div>' +
+          '<div class="message-sender" style="text-align:right;">Jane Doe (You)</div>' +
+          '<div class="message-bubble">' +
+            '<div class="message-text">' + escapeHtml(text) + '</div>' +
+            '<div class="message-time">Just now</div>' +
+          '</div>' +
+        '</div>';
+      list.appendChild(item);
+      input.value = '';
+      list.scrollTop = list.scrollHeight;
+    }
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── AI Query ─────────────────────────────────
+    function portalAIQuery(question) {
+      if (!question || !question.trim()) { showToast('warning', 'Ask a question', 'Please type a question first'); return; }
+      var panel = document.getElementById('aiResponsePanel');
+      var textEl = document.getElementById('aiResponseText');
+      var q = question.toLowerCase();
+      var answer;
+      if (q.includes('invoice') || q.includes('payment') || q.includes('overdue')) {
+        answer = 'You currently have <strong>4 invoices</strong> on file. INV-2026-043 (€5,000, Mobile App) is overdue since Mar 15 — please arrange payment by Apr 15 to avoid disruption. INV-2026-048 (€12,400) is due Apr 30. Total outstanding: <strong>€17,400</strong>. Paid YTD: €19,400.';
+      } else if (q.includes('timesheet') || q.includes('hours') || q.includes('time')) {
+        answer = 'Your team logged <strong>342 hours</strong> this month across all projects. The most recent timesheets from Mar 30 – Apr 5 are pending your approval. Sarah Chen (31h), Marco Rossi (40h), John Smith (15h), and Liam O\'Brien (32h) are awaiting your review in the Timesheets tab.';
+      } else if (q.includes('project') || q.includes('status') || q.includes('progress')) {
+        answer = 'You have <strong>3 active projects</strong>: Website Redesign (55% complete, on track — Sprint 1 in progress), Mobile App (15% complete, early stage), and CRM Integration (20% complete). All projects are currently on track with their milestones.';
+      } else if (q.includes('team') || q.includes('member') || q.includes('who')) {
+        answer = 'Your team consists of <strong>12 members across 3 projects</strong>. The Website Redesign team includes Sarah Chen (Lead Dev), John Smith (PM), Alice Wang (Designer), Marco Rossi (Frontend), and Liam O\'Brien (Junior Dev).';
+      } else {
+        answer = 'I can help you with information about your <strong>invoices</strong>, <strong>timesheets</strong>, <strong>project status</strong>, and <strong>team members</strong>. Try asking something like "What invoices are overdue?" or "How many hours were logged this month?"';
+      }
+      textEl.innerHTML = answer;
+      panel.classList.add('open');
+      lucide.createIcons({ nodes: [panel] });
+    }
+
+    // ── Empty state (dev util) ───────────────────
+    var isEmpty = false;
     function toggleEmptyState() {
       isEmpty = !isEmpty;
-      document.querySelectorAll('.portal-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.portal-section').forEach(function(s) { s.classList.remove('active'); });
       if (isEmpty) {
-        document.getElementById('sec-empty').style.display = 'block';
-        document.getElementById('sec-empty').classList.add('active');
+        var emptyEl = document.getElementById('sec-empty');
+        if (emptyEl) { emptyEl.style.display = 'block'; emptyEl.classList.add('active'); }
       } else {
-        document.getElementById('sec-empty').style.display = 'none';
         document.getElementById('sec-' + currentTab).classList.add('active');
       }
     }

@@ -6,6 +6,8 @@
 > **Design System:** Earth & Sage palette — locked. See `specs/DESIGN_SYSTEM.md §2` for all color tokens.
 > Primary: soft sage `hsl(155,26%,46%)` · Accent: terracotta `hsl(30,58%,50%)` · Gold: aged gold `hsl(38,60%,48%)` · Text: parchment cream `hsl(40,28%,90%)` · Base: warm charcoal `hsl(35,16%,5%)`
 
+> **Prototype Reference:** Every section below maps to an approved HTML prototype in `/prototype/`. Before implementing any feature, open the corresponding prototype file in a browser to see the approved visual design, data, and interactions. The prototype is the source of truth for the frontend — Next.js simply re-implements what is already validated there.
+
 ---
 
 ## Table of Contents
@@ -30,10 +32,173 @@
 18. [Search & Command Palette](#18-search--command-palette)
 19. [Account & Settings](#19-account--settings)
 20. [Navigation & Information Architecture](#20-navigation--information-architecture)
+21. [Human Resources Module](#21-human-resources-module)
+
+---
+
+## 0. Architecture Overview
+
+> **Quick Reference:** A full codebase map (file purposes, page index, tech stack, design tokens, patterns) is saved in `.claude/memory/project_architecture.md`. Every new Claude session should read that file first.
+
+### 0.1 System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        CLIENTS                               │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────────┐ │
+│  │ Web App  │  │ Mobile   │  │ Client   │  │ Slack/Teams  │ │
+│  │ (Next.js)│  │  (PWA)   │  │ Portal   │  │ Integration  │ │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └──────┬──────┘ │
+│       └──────────────┴──────────────┴───────────────┘        │
+│                          │                                    │
+│                    ┌─────┴──────┐                             │
+│                    │  API GW /  │                             │
+│                    │  Load Bal  │                             │
+│                    └─────┬──────┘                             │
+│                          │                                    │
+│  ┌───────────────────────┴────────────────────────────┐      │
+│  │              RUST BACKEND (Axum)                    │      │
+│  │  ┌──────────┐ ┌───────────┐ ┌──────────────────┐  │      │
+│  │  │ REST API │ │ WebSocket │ │ Background Jobs  │  │      │
+│  │  │ Handlers │ │  Server   │ │ (Tokio + Redis)  │  │      │
+│  │  └────┬─────┘ └─────┬─────┘ └────────┬─────────┘  │      │
+│  │       └──────────────┴────────────────┘            │      │
+│  │  ┌──────────────────────────────────────────────┐  │      │
+│  │  │  Domain Services │ Auth │ RBAC │ Audit Trail  │  │      │
+│  │  └──────────────────────────────────────────────┘  │      │
+│  └───────────────────────┬────────────────────────────┘      │
+│                          │                                    │
+│  ┌───────┐  ┌───────┐  ┌┴──────┐  ┌──────────┐  ┌───────┐  │
+│  │Postgres│  │ Redis │  │ Meili │  │ S3/MinIO │  │Claude │  │
+│  │  (DB)  │  │(Cache)│  │Search │  │ (Files)  │  │ (AI)  │  │
+│  └───────┘  └───────┘  └───────┘  └──────────┘  └───────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 0.2 Tech Stack
+
+| Layer | Technology | Notes |
+|-------|-----------|-------|
+| **Backend API** | Rust (Axum) | Memory-safe, blazing fast |
+| **Database** | PostgreSQL 16 | Schema-per-tenant isolation |
+| **Cache / Real-time** | Redis 7 | Pub/sub, sessions, rate limiting |
+| **Search** | Meilisearch | Typo-tolerant instant search |
+| **Frontend** | Next.js 15 (App Router, React 19) | Server components, streaming |
+| **3D / Visuals** | Three.js + React Three Fiber | 3D icons, data viz, depth effects |
+| **Styling** | Tailwind CSS 4 + custom tokens | Tokens from `_tokens.css` |
+| **State** | Zustand + TanStack Query | Client + server state |
+| **Forms** | React Hook Form + Zod | Type-safe end-to-end validation |
+| **Charts** | D3.js | Custom premium visualizations |
+| **Auth** | JWT + refresh tokens + WebAuthn | Passkey / passwordless support |
+| **File Storage** | S3-compatible (MinIO / AWS) | Receipts, documents, photos |
+| **PDF** | Typst (via Rust) | Native Rust PDF generation |
+| **Email** | Resend or SMTP | Transactional emails |
+| **AI** | Claude API | Expense OCR, insights, NL queries |
+| **i18n** | next-intl + Rust fluent | English and French |
+
+### 0.3 Multi-Tenancy Model
+
+```
+PostgreSQL Instance
+├── public schema           → shared (tenants, billing, system_config)
+├── tenant_acme schema      → Acme Corp's complete isolated data
+├── tenant_globex schema    → Globex Corp's complete isolated data
+└── tenant_initech schema   → Initech's complete isolated data
+```
+
+JWT carries `tenant_id` → middleware sets `search_path` → all queries auto-scoped. Full schema isolation; no row-level security needed.
+
+### 0.4 File Map
+
+#### Specs & Planning
+| File | Purpose |
+|------|---------|
+| `MASTER_PLAN.md` | Project vision, tech stack decisions, agent team, phase plan |
+| `AGENT_TEAM.md` | 12 specialized agent roles and their deliverables |
+| `AGENT_WORKFLOW.md` | Orchestration, critic system, quality gates |
+| `FINAL_CHECKLIST.md` | 213 prototype issues resolved — full audit trail |
+| `specs/APP_BLUEPRINT.md` | This file — every page, click, connection, state |
+| `specs/DATA_ARCHITECTURE.md` | Entity models (SQL), API design, seed data |
+| `specs/DESIGN_SYSTEM.md` | Colors, typography, spacing, components, motion |
+
+#### Prototype (Source of Truth for Visual Design)
+| File | Purpose |
+|------|---------|
+| `prototype/_tokens.css` | All CSS custom properties — colors, spacing, typography, shadows |
+| `prototype/_components.css` | Full component CSS library — copy styles directly into Next.js |
+| `prototype/_layout.css` | App shell — sidebar, top bar, mobile nav, filter bars |
+| `prototype/_shared.js` | Shared JS — hover cards, presence, role switcher, keyboard nav, toasts |
+
+### 0.5 Page Index
+
+| Prototype File | Page | Next.js Route (planned) |
+|---------------|------|------------------------|
+| `prototype/index.html` | Dashboard | `/[locale]/(app)/dashboard` |
+| `prototype/employees.html` | Team Directory | `/[locale]/(app)/employees/[id]` |
+| `prototype/timesheets.html` | Timesheet Management | `/[locale]/(app)/timesheets` |
+| `prototype/leaves.html` | Leave Management | `/[locale]/(app)/leaves` |
+| `prototype/expenses.html` | Expense Management | `/[locale]/(app)/expenses` |
+| `prototype/projects.html` | Projects | `/[locale]/(app)/projects/[id]` |
+| `prototype/clients.html` | Clients | `/[locale]/(app)/clients/[id]` |
+| `prototype/invoices.html` | Invoices | `/[locale]/(app)/invoices` |
+| `prototype/calendar.html` | Calendar | `/[locale]/(app)/calendar` |
+| `prototype/gantt.html` | Gantt Chart | `/[locale]/(app)/gantt` |
+| `prototype/planning.html` | Resource Planning | `/[locale]/(app)/planning` |
+| `prototype/approvals.html` | Approvals Hub | `/[locale]/(app)/approvals` |
+| `prototype/insights.html` | AI Insights & Analytics | `/[locale]/(app)/insights` |
+| `prototype/hr.html` | Human Resources | `/[locale]/(app)/hr` |
+| `prototype/admin.html` | Administration | `/[locale]/(app)/admin` |
+| `prototype/account.html` | Account & Settings | `/[locale]/(app)/account` |
+| `prototype/auth.html` | Auth (login, register, MFA) | `/[locale]/(auth)/login` |
+| `prototype/portal/index.html` | Client Portal | `/[locale]/(portal)` |
+| `prototype/portal/auth.html` | Client Portal Auth | `/[locale]/(portal)/login` |
+
+### 0.6 Sidebar Navigation Structure
+
+```
+MAIN
+  Dashboard         (index.html)
+  Calendar          (calendar.html)
+  Timesheets        (timesheets.html)
+  Leaves            (leaves.html)
+
+WORK
+  Expenses          (expenses.html)
+  Projects          (projects.html)
+  Gantt Chart       (gantt.html)
+  Resource Planning (planning.html)
+  Clients           (clients.html)
+  Invoices          (invoices.html)
+
+HR
+  Team Directory    (employees.html)
+  Human Resources   (hr.html)
+
+AI
+  AI Insights       (insights.html)
+
+ADMIN (admin-only)
+  Administration    (admin.html)
+
+FOOTER
+  Approvals         (approvals.html)  ← live pending count badge
+  Account           (account.html)
+  Help & Shortcuts
+```
+
+### 0.7 Prototype Seed Data
+
+**8 employees:** Sarah Chen (PM/Engineering, 87%), John Smith (Full-Stack/Engineering, 82%), Marco Rossi (Operations Lead/Operations, 88%), Carol Williams (Design Lead/Design, 90%), Alice Wang (On Leave Apr 14–18, 45%), David Park (Finance Lead/Finance, 45%), Emma Laurent (HR/HR, 78%), Bob Taylor (bench/Engineering, 0%)
+
+**4 clients:** Acme Corp, Globex Corp, Initech, Umbrella Corp
+
+**7 active projects** | **12 total employees in admin counts** | **Dashboard KPIs: 12 employees, 394h/week, 7 open projects, 82% team work time**
 
 ---
 
 ## 1. Global Patterns
+
+> **Design System Files:** `prototype/_tokens.css` defines all design tokens (colors, spacing, typography, shadows). `prototype/_components.css` is the live implementation of every reusable component (buttons, badges, cards, tables, modals). `prototype/_shared.js` contains shared JS utilities for notifications, dropdowns, and real-time patterns. Consult these files for component specs before building any UI element.
 
 ### 1.1 Universal Clickable Identity
 
@@ -125,6 +290,8 @@ Every view has a purposeful empty state with:
 ---
 
 ## 2. Authentication & Onboarding
+
+> **Prototype:** `prototype/auth.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 2.1 Login Page
 
@@ -223,6 +390,8 @@ Step 3: Quick Tour
 ---
 
 ## 3. Dashboard (Command Center)
+
+> **Prototype:** `prototype/index.html` — see this file for the approved visual design and all implemented interactions.
 
 The dashboard is NOT a boring set of cards. It's a **command center** — information-dense, visually stunning, and immediately actionable.
 
@@ -349,6 +518,8 @@ The dashboard is NOT a boring set of cards. It's a **command center** — inform
 ---
 
 ## 4. Employee Directory & Profiles
+
+> **Prototype:** `prototype/employees.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 4.1 Employee Directory Page (`/team`)
 
@@ -601,6 +772,8 @@ Appears on hover with 200ms delay. Stays visible while mouse is over it. Dismiss
 
 ## 5. Resource Gantt Chart
 
+> **Prototype:** `prototype/gantt.html` — see this file for the approved visual design and all implemented interactions.
+
 The Gantt chart is the CENTERPIECE of GammaHR v2. It should be the most powerful, filterable, and visually stunning resource planning tool on the market.
 
 ### 5.1 Layout
@@ -723,6 +896,8 @@ Saved views are shareable with other team members.
 
 ## 6. Leave Management
 
+> **Prototype:** `prototype/leaves.html` — see this file for the approved visual design and all implemented interactions.
+
 ### 6.1 Leave Dashboard (`/leaves`)
 
 ```
@@ -812,6 +987,8 @@ Shows all team leave requests with:
 ---
 
 ## 7. Expense Management
+
+> **Prototype:** `prototype/expenses.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 7.1 Expense Dashboard (`/expenses`)
 
@@ -905,6 +1082,8 @@ Shows all team leave requests with:
 
 ## 8. Timesheet Management
 
+> **Prototype:** `prototype/timesheets.html` — see this file for the approved visual design and all implemented interactions.
+
 ### 8.1 Timesheet Page (`/timesheets`)
 
 ```
@@ -982,6 +1161,8 @@ Shows all team leave requests with:
 ---
 
 ## 9. Project Management
+
+> **Prototype:** `prototype/projects.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 9.1 Projects List (`/projects`)
 
@@ -1074,6 +1255,8 @@ Shows all team leave requests with:
 
 ## 10. Client Management & Portal
 
+> **Prototype:** `prototype/clients.html` (client management) and `prototype/portal/index.html` (client-facing portal) — see these files for the approved visual design and all implemented interactions.
+
 ### 10.1 Client List (`/clients`)
 
 ```
@@ -1148,6 +1331,8 @@ Clients get their own login to a simplified view:
 
 ## 11. Invoicing
 
+> **Prototype:** `prototype/invoices.html` — see this file for the approved visual design and all implemented interactions.
+
 ### 11.1 Invoice List (`/invoices`)
 
 Filter by: Status, Client, Project, Date Range, Amount Range
@@ -1180,6 +1365,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 ---
 
 ## 12. Calendar
+
+> **Prototype:** `prototype/calendar.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 12.1 Team Calendar (`/calendar`)
 
@@ -1217,6 +1404,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 ---
 
 ## 13. Approvals Hub
+
+> **Prototype:** `prototype/approvals.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 13.1 Unified Approval Dashboard (`/admin/approvals`)
 
@@ -1265,6 +1454,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 
 ## 14. Admin & Configuration
 
+> **Prototype:** `prototype/admin.html` — see this file for the approved visual design and all implemented interactions.
+
 ### 14.1 Admin Dashboard
 
 - User management (CRUD, invite, deactivate, role assignment)
@@ -1299,6 +1490,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 ---
 
 ## 15. AI Insights & Analytics
+
+> **Prototype:** `prototype/insights.html` — see this file for the approved visual design and all implemented interactions.
 
 ### 15.1 AI Insights Dashboard (`/insights`)
 
@@ -1361,6 +1554,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 
 ## 16. Resource Planning & Forecasting
 
+> **Prototype:** `prototype/planning.html` — see this file for the approved visual design and all implemented interactions.
+
 ### 16.1 Capacity Planning (`/planning`)
 
 ```
@@ -1404,6 +1599,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 
 ## 17. Notifications & Real-time
 
+> **Prototype:** `prototype/_shared.js` implements the notification and real-time patterns used across all pages — see this file for the approved interaction model.
+
 ### 17.1 Notification Center
 
 ```
@@ -1444,6 +1641,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 ---
 
 ## 18. Search & Command Palette
+
+> **Prototype:** The command palette and search interactions are implemented across all prototype pages via `prototype/_shared.js` — see that file for the approved behavior.
 
 ### 18.1 Command Palette (`Cmd/Ctrl + K`)
 
@@ -1488,6 +1687,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 
 ## 19. Account & Settings
 
+> **Prototype:** `prototype/account.html` — see this file for the approved visual design and all implemented interactions.
+
 ### 19.1 User Account (`/account`)
 
 - Profile editing (name, photo, phone, bio)
@@ -1502,6 +1703,8 @@ Filter by: Status, Client, Project, Date Range, Amount Range
 ---
 
 ## 20. Navigation & Information Architecture
+
+> **Prototype:** The navigation and information architecture is implemented consistently across all prototype pages — see any prototype HTML file for the approved sidebar, topbar, and mobile nav patterns. `prototype/_layout.css` defines the layout system.
 
 ### 20.1 Complete Sidebar
 
@@ -1596,6 +1799,11 @@ Admin > Configuration > Leave Types
 /[locale]/account/security
 /[locale]/account/notifications
 /[locale]/account/sessions
+/[locale]/hr
+/[locale]/hr?tab=recruitment
+/[locale]/hr?tab=onboarding
+/[locale]/hr?tab=offboarding
+/[locale]/hr?tab=records
 
 CLIENT PORTAL (separate app):
 /portal/dashboard
@@ -1606,3 +1814,160 @@ CLIENT PORTAL (separate app):
 /portal/invoices/:id
 /portal/messages
 ```
+
+---
+
+## 21. Human Resources Module
+
+> **Prototype:** `prototype/hr.html` — This page was added after the initial blueprint was written and covers the full employee lifecycle beyond the directory. It must NOT be skipped in any future implementation sprint.
+
+### 21.1 Overview
+
+**Route:** `/[locale]/hr`
+**Access:** Admin, HR role
+**Primary CTA:** "New Job Posting"
+**Subtitle:** "Manage recruitment, onboarding, offboarding, and employee lifecycle"
+
+The HR module is a 4-tab page covering every stage of an employee's lifecycle from candidate to alumni.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Human Resources                          [New Job Posting]   │
+├──────────────────────────────────────────────────────────────┤
+│ [Briefcase Recruitment 47] [UserPlus Onboarding 3]           │
+│ [UserMinus Offboarding 2]  [FileText Employee Records]       │
+├──────────────────────────────────────────────────────────────┤
+│  (tab content below)                                         │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 21.2 Tab 1 — Recruitment
+
+**KPI row (3 stat cards):**
+| Stat | Value | Trend |
+|------|-------|-------|
+| Open Positions | 8 | +2 this month |
+| Active Candidates | 47 | 12 in interview stage |
+| Avg. Time to Hire | 28 days | -3 days vs last quarter |
+
+**Recruitment Pipeline — Kanban board (5 columns):**
+
+```
+Applied (15) → Screening (8) → Interview (12) → Offer (4) → Hired (8)
+```
+
+Each candidate card shows:
+- Avatar (initials) + name
+- Position applied for
+- Application date
+- Source tag: `LinkedIn` / `Referral: [name]` / `Website`
+- In Screening/Interview: AI score badge (e.g. `★ 85/100`)
+- In Interview: next interview date + interviewer name + round badge (1st Round / 2nd Round / Final Round)
+- In Offer: salary offered + status badge (Pending / Accepted)
+- In Hired: start date + department
+
+**Toolbar:** Filter button + Export button above the Kanban.
+
+**Candidate sources:** LinkedIn (blue), Referral (green with referrer name), Website (gray)
+
+**Seed data candidates:**
+- Applied: Maria Santos (Senior Frontend Dev, LinkedIn, Apr 1), James Wilson (DevOps, Referral: Sarah Chen, Mar 28), Aisha Patel (UX Designer, Website, Mar 25)
+- Screening: Thomas Mueller (Backend Dev, LinkedIn, ★85/100), Lucia Sanchez (Marketing Mgr, Referral, ★72/100)
+- Interview: Elena Kowalski (PM, 2nd Round, Apr 7 with John Smith), Nina Karlsson (Sr Backend Dev, 1st Round, Apr 8 with David Park), Pierre Martin (Data Engineer, Final Round, Apr 9 with Sarah Chen)
+- Offer: Raj Krishnan (Data Analyst, €55k/yr, Pending), Sofia Oliveira (Product Designer, €62k/yr, Accepted)
+- Hired: Yuki Tanaka (QA Engineer, starts May 5, Engineering), Ahmed Hassan (Sales Executive, starts Apr 14, Sales)
+
+---
+
+### 21.3 Tab 2 — Onboarding
+
+**Active onboardings — 3-column card grid:**
+
+Each onboarding card shows:
+- Avatar + name + role + department
+- Start date
+- Progress bar with "X of 8 tasks complete" + percentage
+- Checklist of 8 standard tasks (checkable):
+  1. Contract signed
+  2. Equipment ordered
+  3. IT access created
+  4. Welcome email sent
+  5. Buddy assigned: [buddy name]
+  6. First day orientation scheduled
+  7. Week 1 check-in scheduled
+  8. 30-day review scheduled
+
+Progress bar color: green (>50%), warning/amber (<50%)
+
+**Seed data — 3 active onboardings:**
+| Person | Role | Start | Progress |
+|--------|------|-------|---------|
+| Yuki Tanaka | QA Engineer — Engineering | Apr 1, 2026 | 5/8 (62%) — buddy: Sophie Dubois |
+| Ahmed Hassan | Sales Executive — Sales | Apr 14, 2026 | 2/8 (25%) |
+| Clara Bergmann | Junior Developer — Engineering | Apr 21, 2026 | 0/8 (0%) |
+
+**Onboarding Templates section** (below active onboardings):
+- Engineering Onboarding — 12 tasks, used 23 times
+- Sales Onboarding — 10 tasks, used 15 times
+- General Onboarding — 8 tasks, used 45 times
+- "New Template" ghost button
+
+---
+
+### 21.4 Tab 3 — Offboarding
+
+**Active offboardings** — card list, each with:
+- Employee name, role, last working day
+- Status badge: "In Progress" (warning)
+- Checklist grouped into 3 categories:
+  - **IT & Access:** Revoke system access, Return company laptop, Archive email & transfer contacts
+  - **HR & Payroll:** Process final payroll, Issue reference letter, Exit interview completed
+  - **Knowledge Transfer:** Document ongoing projects, Handover to replacement
+- Live progress bar (updates as checkboxes ticked)
+
+**Seed data — 2 active offboardings:**
+| Person | Role | Last Day | Progress |
+|--------|------|---------|---------|
+| James Wilson | DevOps Engineer | Apr 30, 2026 | 4/8 tasks (50%) |
+| Marc Lefevre | Senior Consultant | Apr 15, 2026 | 3/5 tasks (60%) |
+
+**Completed Offboardings table** (below active):
+| Employee | Department | Last Day | Reason | Status |
+|----------|-----------|---------|--------|--------|
+| Karl Nielsen | Engineering | Mar 15, 2026 | Resignation | Complete |
+| Irene Li | Design | Feb 28, 2026 | Contract End | Complete |
+| Pavel Volkov | Sales | Jan 31, 2026 | Relocation | Complete |
+
+**Start Offboarding** primary button — opens wizard.
+
+---
+
+### 21.5 Tab 4 — Employee Records
+
+**KPI row (4 stat cards):**
+| Stat | Value | Detail |
+|------|-------|--------|
+| Total Employees | 48 | +3 this quarter |
+| Active Contracts | 45 | 93.8% of total |
+| On Probation | 3 | 1 ending this month |
+| Upcoming Renewals | 2 | Within 30 days |
+
+**Recent Lifecycle Events table:**
+Columns: Employee | Event | Details | Date | Status
+
+Event types (with icons/badges): Promotion, Contract Renewal, Department Transfer, Probation End, Work Anniversary, Role Change
+
+Table is filterable. Mobile: collapses to `mobile-cards` pattern.
+
+---
+
+### 21.6 Implementation Notes
+
+- Tab state persists in URL query param: `?tab=recruitment`
+- Deep-link `hr.html#tab-onboarding` anchors work (validated in prototype)
+- The sidebar "Human Resources" nav item links here (active state on `hr.html`)
+- From `employees.html`, "Onboarding" and "Recruitment" links go to `hr.html?tab=onboarding` and `hr.html?tab=recruitment`
+- All candidate names are NOT employees yet — they do not appear in the employee directory
+- Once Hired + Onboarding complete, employee moves to `employees.html` directory

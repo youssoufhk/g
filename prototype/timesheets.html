@@ -591,7 +591,16 @@
     }
     .mobile-ts-actions .btn { width: 100%; justify-content: center; }
 
-    /* ── Submitted State ── */
+    /* ── Approval detail modal overflow ── */
+  .ts-table-wrap {
+    overflow-x: auto;
+  }
+  .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  /* ── Submitted State ── */
     .ts-submitted-banner {
       display: flex;
       align-items: center;
@@ -614,6 +623,7 @@
   </style>
 </head>
 <body class="show-populated">
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 <div class="app">
 
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -623,7 +633,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -646,6 +656,14 @@
           <span class="nav-label">Leaves</span>
           <span class="nav-badge">3</span>
         </a>
+        <a href="calendar.html" class="nav-item">
+          <svg data-lucide="calendar"></svg>
+          <span class="nav-label">Calendar</span>
+        </a>
+        <a href="insights.html#ask-ai" class="nav-item">
+          <i data-lucide="sparkles" class="nav-icon"></i>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
 
       <!-- HR -->
@@ -656,7 +674,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -673,6 +691,10 @@
           <svg data-lucide="folder-kanban"></svg>
           <span class="nav-label">Projects</span>
         </a>
+        <a href="gantt.html" class="nav-item">
+          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
+          <span class="nav-label">Gantt Chart</span>
+        </a>
         <a href="clients.html" class="nav-item">
           <svg data-lucide="building-2"></svg>
           <span class="nav-label">Clients</span>
@@ -680,10 +702,6 @@
         <a href="planning.html" class="nav-item">
           <svg data-lucide="calendar-range"></svg>
           <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
         </a>
       </div>
 
@@ -706,7 +724,7 @@
         <a href="approvals.html" class="nav-item">
           <svg data-lucide="check-square"></svg>
           <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
+          <span class="nav-badge" id="approvalsBadge">12</span>
         </a>
         <a href="admin.html" class="nav-item">
           <svg data-lucide="settings"></svg>
@@ -716,6 +734,10 @@
     </nav>
 
     <div class="sidebar-footer">
+      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
+        <i data-lucide="keyboard" class="nav-icon"></i>
+        <span class="nav-label">Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -746,7 +768,7 @@
 
       <div class="header-right">
         <button class="mobile-search-btn" onclick="toggleCmdPalette()"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -781,7 +803,7 @@
               <div class="notif-item">
                 <div class="notif-icon"><svg data-lucide="file-text" width="16" height="16" style="color: var(--color-info);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">Invoice INV-2026-0041 generated for Meridian Corp</div>
+                  <div class="notif-title">Invoice INV-2026-0041 generated for Contoso Ltd</div>
                   <div class="notif-time">3 hours ago</div>
                 </div>
               </div>
@@ -789,14 +811,14 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
             </div>
-            <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
+            <svg data-lucide="chevron-down" width="14" height="14" class="text-3"></svg>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="user-dropdown-header">
@@ -806,18 +828,23 @@
             <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
           </div>
         </div>
       </div>
     </header>
 
     <!-- ── PAGE CONTENT ── -->
-    <main class="page-content">
+    <main class="page-content" id="main-content">
 
       <!-- Page Header -->
       <div class="page-header">
         <div class="page-header-left">
+          <nav class="breadcrumb" aria-label="Breadcrumb" style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-1);">
+            <a href="index.html" style="color:var(--color-text-3);text-decoration:none;">Dashboard</a>
+            <span style="margin:0 var(--space-1);">/</span>
+            <span style="color:var(--color-text-2);">Timesheets</span>
+          </nav>
           <h1 class="page-title">Timesheet Management</h1>
           <p class="page-subtitle">Track hours, review submissions, and manage team timesheets</p>
         </div>
@@ -829,6 +856,10 @@
           <svg data-lucide="calendar-days" width="16" height="16"></svg>
           Week View
         </button>
+        <button class="tab" data-tab="month">
+          <svg data-lucide="calendar" width="16" height="16"></svg>
+          Month View
+        </button>
         <button class="tab" data-tab="previous">
           <svg data-lucide="history" width="16" height="16"></svg>
           Previous Weeks
@@ -836,7 +867,7 @@
         <button class="tab" data-tab="approval">
           <svg data-lucide="clipboard-check" width="16" height="16"></svg>
           Approval Queue
-          <span class="tab-count">5</span>
+          <span class="tab-count">7</span>
         </button>
       </div>
 
@@ -885,6 +916,14 @@
               </div>
             </div>
           </div>
+          <button class="btn btn-secondary btn-sm" style="margin-left: var(--space-2);" onclick="showToast('info', 'Copied', 'Entries copied from previous week')">
+            <svg data-lucide="clipboard-copy" width="14" height="14"></svg>
+            Copy Last Week
+          </button>
+          <button class="btn btn-secondary btn-sm" style="margin-left: var(--space-2);" onclick="exportTimesheets()">
+            <svg data-lucide="download" width="14" height="14"></svg>
+            Export
+          </button>
         </div>
 
         <!-- Submitted Banner (hidden by default) -->
@@ -996,6 +1035,12 @@
           </table>
         </div>
 
+        <!-- Quick-entry tip -->
+        <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-text-3);">
+          <svg data-lucide="info" width="14" height="14" style="flex-shrink:0;color:var(--color-primary);"></svg>
+          <span>Tip: Type <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:3px;padding:0 4px;font-family:var(--font-mono);">8</kbd> to fill a full day, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:3px;padding:0 4px;font-family:var(--font-mono);">4/4</kbd> to split between projects, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:3px;padding:0 4px;font-family:var(--font-mono);">0</kbd> to clear.</span>
+        </div>
+
         <!-- Mobile Timesheet (visible <640px) -->
         <div class="mobile-timesheet" id="mobileTimesheet">
           <div class="day-switcher" id="daySwitcher">
@@ -1037,9 +1082,9 @@
             <span class="ts-progress-pct" id="summaryProgressPct">100%</span>
           </div>
           <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item">Billable: <strong id="summaryBillable">40h</strong> <span style="color: var(--color-text-3);">(100%)</span></div>
+          <div class="ts-summary-item">Billable: <strong id="summaryBillable">40h</strong> <span class="text-3">(100%)</span></div>
           <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item">Non-billable: <strong id="summaryNonBillable">0h</strong> <span style="color: var(--color-text-3);">(0%)</span></div>
+          <div class="ts-summary-item">Non-billable: <strong id="summaryNonBillable">0h</strong> <span class="text-3">(0%)</span></div>
         </div>
 
         <!-- Warning -->
@@ -1058,6 +1103,47 @@
             <svg data-lucide="send" width="16" height="16"></svg>
             Submit for Review
           </button>
+        </div>
+      </div>
+
+      <!-- ════════════ TAB: MONTH VIEW ════════════ -->
+      <div class="tab-content populated-content" id="tab-month">
+        <div class="timesheet-month-grid">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">
+            <div class="month-header" style="font-size:var(--text-heading-2);font-weight:var(--weight-semibold);color:var(--color-text-1);">April 2026</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);">Click any day to view that week</div>
+          </div>
+          <div style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;">
+            <div class="month-day-headers" style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--color-border);">
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;">Mon</div>
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;">Tue</div>
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;">Wed</div>
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;">Thu</div>
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;">Fri</div>
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;opacity:.5;">Sat</div>
+              <div style="padding:var(--space-2);text-align:center;font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.5px;opacity:.5;">Sun</div>
+            </div>
+            <div class="month-days" id="monthDaysGrid" style="display:grid;grid-template-columns:repeat(7,1fr);">
+              <!-- JS renders day cells -->
+            </div>
+          </div>
+        </div>
+        <div class="month-summary" style="margin-top:var(--space-4);background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
+            <div style="font-size:var(--text-body);color:var(--color-text-2);">Monthly Total: <strong style="font-family:var(--font-mono);color:var(--color-text-1);">127h</strong> / <strong style="font-family:var(--font-mono);">160h expected</strong></div>
+            <div style="flex:1;min-width:120px;">
+              <div style="height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
+                <div style="height:100%;width:79.4%;background:var(--color-warning);border-radius:var(--radius-full);transition:width .4s;"></div>
+              </div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);">79%</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);">33h remaining to meet target</div>
+          </div>
+          <div style="display:flex;gap:var(--space-3);margin-top:var(--space-3);flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:3px;background:var(--color-success);"></div> &gt;6h — Full day</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:3px;background:var(--color-warning);"></div> 3–6h — Partial</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:3px;background:var(--color-error);"></div> &lt;3h — Low</div>
+          </div>
         </div>
       </div>
 
@@ -1130,7 +1216,7 @@
             <div class="avatar avatar-md">JS</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#john-smith">John Smith</a></div>
+            <div class="aq-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Engineering Manager" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="95" data-href="employees.html#john-smith">John Smith</a></div>
             <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex Phase 2</a> (32h), <a href="projects.html#internal">Internal</a> (10h)</div>
           </div>
@@ -1242,7 +1328,65 @@
           </div>
         </div>
 
-        <!-- Approval 5: David Park -->
+        <!-- Approval 5: Emma Laurent -->
+        <div class="approval-card" id="aq-5b">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-success));">EL</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#emma-laurent">Emma Laurent</a></div>
+            <div class="aq-period">Mar 30 &ndash; Apr 5, 2026</div>
+            <div class="aq-projects"><a href="projects.html#internal">Internal</a> (16h), <a href="projects.html#hr-project">HR Operations</a> (24h)</div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value">40h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted today</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-5b">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-5b">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approval 6: Alice Wang -->
+        <div class="approval-card" id="aq-6">
+          <div class="aq-avatar">
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-accent), var(--color-info));">AW</div>
+          </div>
+          <div class="aq-info">
+            <div class="aq-name"><a href="employees.html#alice-wang">Alice Wang</a></div>
+            <div class="aq-period">Mar 30 &ndash; Apr 5, 2026</div>
+            <div class="aq-projects"><a href="projects.html#acme-web-redesign">Acme Web</a> (38h), <a href="projects.html#internal">Internal</a> (2h)</div>
+          </div>
+          <div class="aq-hours">
+            <div class="aq-hours-value">40h</div>
+            <div class="aq-hours-label">logged</div>
+          </div>
+          <div class="aq-meta">
+            <div class="aq-submitted">Submitted 6h ago</div>
+            <div class="aq-actions">
+              <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-6">
+                <svg data-lucide="check" width="14" height="14"></svg>
+                Approve
+              </button>
+              <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-6">
+                <svg data-lucide="x" width="14" height="14"></svg>
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approval 7: David Park -->
         <div class="approval-card" id="aq-5">
           <div class="aq-avatar">
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-error), var(--color-accent));">DP</div>
@@ -1350,7 +1494,7 @@
 
 <!-- ════════════════════════════════════════ REJECT MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="rejectModal">
-  <div class="modal modal-sm">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">Reject Timesheet</h3>
       <button class="modal-close" id="rejectModalClose">
@@ -1529,7 +1673,7 @@
 
   // Hash-based tab on load
   var hash = window.location.hash.replace('#', '');
-  if (['week', 'previous', 'approval'].indexOf(hash) >= 0) {
+  if (['week', 'month', 'previous', 'approval'].indexOf(hash) >= 0) {
     switchTab(hash);
   }
 
@@ -1537,19 +1681,26 @@
   //  WEEK NAVIGATION
   // ════════════════════════════════════════
   var weekOffset = 0;
-  var weekLabels = [
-    'Mar 16 \u2013 22, 2026',
-    'Mar 23 \u2013 29, 2026',
-    'Mar 30 \u2013 Apr 5, 2026',
-    'Apr 6 \u2013 12, 2026',
-    'Apr 13 \u2013 19, 2026'
+  var weekData = [
+    { label: 'Mar 16 \u2013 22, 2026', cols: ['Mon 16','Tue 17','Wed 18','Thu 19','Fri 20','Sat 21','Sun 22'] },
+    { label: 'Mar 23 \u2013 29, 2026', cols: ['Mon 23','Tue 24','Wed 25','Thu 26','Fri 27','Sat 28','Sun 29'] },
+    { label: 'Mar 30 \u2013 Apr 5, 2026', cols: ['Mon 30','Tue 31','Wed 1','Thu 2','Fri 3','Sat 4','Sun 5'] },
+    { label: 'Apr 6 \u2013 12, 2026', cols: ['Mon 6','Tue 7','Wed 8','Thu 9','Fri 10','Sat 11','Sun 12'] },
+    { label: 'Apr 13 \u2013 19, 2026', cols: ['Mon 13','Tue 14','Wed 15','Thu 16','Fri 17','Sat 18','Sun 19'] }
   ];
   var currentWeekIndex = 2;
 
   function updateWeekLabel() {
     var idx = currentWeekIndex + weekOffset;
-    idx = Math.max(0, Math.min(idx, weekLabels.length - 1));
-    document.getElementById('weekLabel').textContent = 'Week of ' + weekLabels[idx];
+    idx = Math.max(0, Math.min(idx, weekData.length - 1));
+    var week = weekData[idx];
+    document.getElementById('weekLabel').textContent = 'Week of ' + week.label;
+    // Update column headers
+    var ths = document.querySelectorAll('#tsGrid thead th');
+    // ths[0] is "Project", ths[1..7] are days, ths[8] is Total
+    for (var i = 0; i < 7; i++) {
+      if (ths[i + 1]) ths[i + 1].textContent = week.cols[i];
+    }
   }
 
   document.getElementById('weekPrev').addEventListener('click', function() {
@@ -1712,11 +1863,23 @@
       if (e.key === 'Enter' || e.key === 'Tab') {
         e.preventDefault();
         commitEdit();
-        // Move to next cell
+        // Move to next cell (wraps to first cell of next row at row boundary)
         if (e.key === 'Tab') {
           var allCells = Array.from(document.querySelectorAll('.ts-cell:not(.weekend)'));
           var idx = allCells.indexOf(cell);
-          if (idx >= 0 && idx < allCells.length - 1) {
+          // Find the row's last non-weekend cell
+          var row = cell.closest('tr');
+          var rowCells = Array.from(row.querySelectorAll('.ts-cell:not(.weekend)'));
+          var lastRowCell = rowCells[rowCells.length - 1];
+          if (cell === lastRowCell) {
+            // Move to first cell of next data row
+            var rows = Array.from(document.querySelectorAll('.ts-data-row'));
+            var rowIdx = rows.indexOf(row);
+            if (rowIdx >= 0 && rowIdx < rows.length - 1) {
+              var nextRowFirstCell = rows[rowIdx + 1].querySelector('.ts-cell:not(.weekend)');
+              if (nextRowFirstCell) nextRowFirstCell.click();
+            }
+          } else if (idx >= 0 && idx < allCells.length - 1) {
             allCells[idx + 1].click();
           }
         }
@@ -1733,7 +1896,7 @@
   // ════════════════════════════════════════
   var projectOptions = [
     'Globex Phase 2',
-    'Meridian Corp',
+    'Contoso Ltd',
     'Internal',
     'Training',
     'Overhead',
@@ -1828,7 +1991,15 @@
       btn.innerHTML = '<svg data-lucide="undo-2" width="16" height="16"></svg> Recall Submission';
       btn.className = 'btn btn-ghost btn-md';
       lucide.createIcons({ nodes: [btn] });
-      showToast('success', 'Submitted', 'Your timesheet has been submitted for review.');
+      // Update approvals badge
+      var approvalsBadge = document.getElementById('approvalsBadge');
+      if (approvalsBadge) {
+        approvalsBadge.textContent = parseInt(approvalsBadge.textContent || 0) + 1;
+      }
+      // Also update tab count
+      var tabCount = document.querySelector('.tab[data-tab="approval"] .tab-count');
+      if (tabCount) tabCount.textContent = parseInt(tabCount.textContent || 0) + 1;
+      showToast('success', 'Timesheet submitted', 'Timesheet submitted — awaiting approval');
     }, 1000);
   }
 
@@ -1859,11 +2030,14 @@
   var rejectModal = document.getElementById('rejectModal');
   var rejectTargetId = null;
 
-  // Approve buttons
-  document.querySelectorAll('.aq-approve-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var id = this.getAttribute('data-id');
+  // Approve / Reject buttons — use event delegation for dynamically added cards
+  document.getElementById('tab-approval').addEventListener('click', function(e) {
+    var approveBtn = e.target.closest('.aq-approve-btn');
+    var rejectBtn = e.target.closest('.aq-reject-btn');
+    if (approveBtn) {
+      var id = approveBtn.getAttribute('data-id');
       var card = document.getElementById(id);
+      if (!card) return;
       var name = card.querySelector('.aq-name a').textContent;
       showToast('success', 'Timesheet Approved', name + '\'s timesheet has been approved.');
       card.classList.add('fading');
@@ -1871,16 +2045,12 @@
         if (card.parentNode) card.parentNode.removeChild(card);
         updateApprovalCount();
       }, 400);
-    });
-  });
-
-  // Reject buttons
-  document.querySelectorAll('.aq-reject-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      rejectTargetId = this.getAttribute('data-id');
+    }
+    if (rejectBtn) {
+      rejectTargetId = rejectBtn.getAttribute('data-id');
       rejectModal.classList.add('active');
       setTimeout(function() { document.getElementById('rejectReason').focus(); }, 100);
-    });
+    }
   });
 
   document.getElementById('rejectModalClose').addEventListener('click', function() {
@@ -1951,7 +2121,7 @@
             '<strong>' + proj.name + '</strong>' +
             '<input type="number" class="form-input" style="width:80px;text-align:center;font-family:var(--font-mono);" value="' + h + '" min="0" max="24" step="0.5" data-proj="' + idx + '">' +
           '</div>' +
-          '<div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-1);">Client: ' + proj.client + ' &bull; &euro;' + proj.rate + '/h</div>' +
+          '<div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-1);">Client: ' + proj.client + ' &bull; <span data-min-role="pm">&euro;' + proj.rate + '/h</span></div>' +
         '</div>';
       container.appendChild(card);
 
@@ -2032,6 +2202,185 @@
     });
   }
 
+  // ── Export function ──
+  function exportTimesheets() { showToast('success', 'Export', 'Timesheet CSV downloading...'); }
+  window.exportTimesheets = exportTimesheets;
+
+  // ════════════════════════════════════════
+  //  MONTH VIEW RENDERING
+  // ════════════════════════════════════════
+  var monthHours = {
+    1:0, 2:0, 3:8, 4:0, 5:0, 6:8,
+    7:8, 8:7, 9:8, 10:5, 11:0, 12:0,
+    13:8, 14:8, 15:8, 16:7, 17:8, 18:0, 19:0,
+    20:8, 21:8, 22:7, 23:8, 24:5, 25:0, 26:0,
+    27:8, 28:8, 29:8, 30:7
+  };
+
+  function renderMonthView() {
+    var grid = document.getElementById('monthDaysGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    // April 2026 starts on Wednesday (index 2 from Mon=0)
+    var startDow = 2; // Wednesday
+    var daysInMonth = 30;
+
+    // Fill previous month days (Mar 30, 31)
+    var prevDays = ['30','31'];
+    prevDays.slice(2 - startDow).forEach(function(d) {
+      var cell = document.createElement('div');
+      cell.style.cssText = 'min-height:80px;border-right:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);padding:var(--space-1-5);opacity:.3;background:var(--color-surface-1);';
+      cell.innerHTML = '<div style="font-size:var(--text-body-sm);color:var(--color-text-3);">' + d + '</div>';
+      grid.appendChild(cell);
+    });
+
+    for (var day = 1; day <= daysInMonth; day++) {
+      // April 2026: day=1 is Wednesday
+      var dayOfWeek = (startDow + day - 1) % 7; // 0=Mon...6=Sun
+      var isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+      var isToday = day === 6;
+      var hours = monthHours[day] || 0;
+
+      var cell = document.createElement('div');
+      var cellStyle = 'min-height:80px;border-right:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);padding:var(--space-1-5);cursor:pointer;transition:background var(--motion-fast);position:relative;';
+      if (isWeekend) cellStyle += 'background:var(--color-surface-1);opacity:.55;cursor:default;';
+      if (isToday) cellStyle += 'box-shadow:inset 0 0 0 2px var(--color-primary);';
+      cell.style.cssText = cellStyle;
+
+      var dayNumHtml;
+      if (isToday) {
+        dayNumHtml = '<div style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:var(--color-primary);color:var(--color-text-inv);border-radius:50%;font-size:var(--text-body-sm);font-weight:var(--weight-bold);margin-bottom:var(--space-1);">' + day + '</div>';
+      } else {
+        dayNumHtml = '<div style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-2);margin-bottom:var(--space-1);">' + day + '</div>';
+      }
+
+      var hoursHtml = '';
+      if (!isWeekend && hours > 0) {
+        var bgColor = hours > 6 ? 'var(--color-success)' : (hours >= 3 ? 'var(--color-warning)' : 'var(--color-error)');
+        var textColor = hours > 6 ? 'white' : 'white';
+        // Mobile: dot; Desktop: number
+        hoursHtml = '<div class="month-hours-number" style="display:inline-block;background:' + bgColor + ';color:' + textColor + ';border-radius:var(--radius-sm);padding:1px 6px;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);">' + hours + 'h</div>';
+        hoursHtml += '<div class="month-hours-dot" style="display:none;width:8px;height:8px;border-radius:50%;background:' + bgColor + ';margin-top:2px;"></div>';
+      }
+
+      cell.innerHTML = dayNumHtml + hoursHtml;
+
+      if (!isWeekend) {
+        (function(d) {
+          cell.addEventListener('click', function() {
+            switchTab('week');
+            showToast('info', 'Week View', 'Showing week containing Apr ' + d);
+          });
+          cell.addEventListener('mouseenter', function() {
+            if (!this.style.cssText.includes('opacity:.55')) this.style.background = 'var(--color-surface-1)';
+          });
+          cell.addEventListener('mouseleave', function() {
+            if (!this.style.cssText.includes('opacity:.55') && d !== 6) this.style.background = '';
+          });
+        })(day);
+      }
+
+      grid.appendChild(cell);
+    }
+
+    // Fill remaining cells
+    var totalCells = grid.children.length;
+    var remaining = (7 - (totalCells % 7)) % 7;
+    for (var n = 1; n <= remaining; n++) {
+      var cell = document.createElement('div');
+      cell.style.cssText = 'min-height:80px;border-right:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle);padding:var(--space-1-5);opacity:.3;background:var(--color-surface-1);';
+      cell.innerHTML = '<div style="font-size:var(--text-body-sm);color:var(--color-text-3);">' + n + '</div>';
+      grid.appendChild(cell);
+    }
+
+    // Apply mobile styles
+    var style = document.createElement('style');
+    style.textContent = '@media (max-width:639px) { .month-hours-number { display:none !important; } .month-hours-dot { display:block !important; } }';
+    if (!document.getElementById('monthViewStyle')) {
+      style.id = 'monthViewStyle';
+      document.head.appendChild(style);
+    }
+  }
+
+  // Render month view when tab activated
+  var origSwitchTab = switchTab;
+  switchTab = function(tabName) {
+    origSwitchTab(tabName);
+    if (tabName === 'month') {
+      renderMonthView();
+    }
+  };
+  window.switchTab = switchTab;
+
+  // ════════════════════════════════════════
+  //  QUICK-ENTRY SHORTCUT: "4/4" split dialog
+  // ════════════════════════════════════════
+  // Override the inline edit input to intercept "4/4" pattern
+  var origBodyClickHandler = document.getElementById('tsBody').onclick;
+  document.getElementById('tsBody').addEventListener('keydown', function(e) {
+    var input = e.target;
+    if (input.classList && input.classList.contains('ts-cell-input')) {
+      // Handled in the existing input keydown
+    }
+  }, true);
+
+  // Intercept input creation to add 4/4 support
+  var bodyEl = document.getElementById('tsBody');
+  var origClickListener = null;
+  bodyEl.addEventListener('input', function(e) {
+    var input = e.target;
+    if (!input.classList.contains('ts-cell-input')) return;
+    if (input.value === '4/4' || input.value.indexOf('/') !== -1) {
+      input.value = '';
+      // Show split dialog
+      var cell = input.closest('.ts-cell');
+      var existing = document.getElementById('splitDropdown');
+      if (existing) existing.remove();
+      var dropdown = document.createElement('div');
+      dropdown.id = 'splitDropdown';
+      dropdown.style.cssText = 'position:absolute;z-index:999;background:var(--color-surface-3);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-3);padding:var(--space-3);min-width:200px;top:100%;left:0;';
+      dropdown.innerHTML =
+        '<div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">Split 4h / 4h between:</div>' +
+        '<select id="splitProject1" class="form-select" style="margin-bottom:var(--space-2);font-size:var(--text-body-sm);height:32px;">' +
+          '<option>Acme Web Redesign</option><option>Initech API</option><option>Internal</option><option>Globex Phase 2</option>' +
+        '</select>' +
+        '<select id="splitProject2" class="form-select" style="margin-bottom:var(--space-2);font-size:var(--text-body-sm);height:32px;">' +
+          '<option>Initech API</option><option>Acme Web Redesign</option><option>Internal</option><option>Globex Phase 2</option>' +
+        '</select>' +
+        '<div style="display:flex;gap:var(--space-2);"><button onclick="document.getElementById(\'splitDropdown\').remove();" class="btn btn-primary btn-xs" style="flex:1;">Apply Split</button><button onclick="document.getElementById(\'splitDropdown\').remove();" class="btn btn-ghost btn-xs">Cancel</button></div>';
+      cell.style.position = 'relative';
+      cell.appendChild(dropdown);
+      input.value = '4';
+    }
+  }, true);
+
+  // ════════════════════════════════════════
+  //  COPY LAST WEEK (explicit function)
+  // ════════════════════════════════════════
+  function copyLastWeek() {
+    var lastWeek = [8,8,7,8,5, 8,8,8,7,8, 0,0,0,0,0];
+    document.querySelectorAll('.ts-cell').forEach(function(cell, i) {
+      if (cell.classList.contains('weekend')) return;
+      var valSpan = cell.querySelector('.ts-cell-value');
+      if (!valSpan) return;
+      var idx = Array.from(document.querySelectorAll('.ts-cell:not(.weekend)')).indexOf(cell);
+      if (idx >= 0 && lastWeek[idx] !== undefined) {
+        valSpan.textContent = lastWeek[idx] > 0 ? lastWeek[idx] : '\u2014';
+      }
+    });
+    recalculate();
+    showToast('success', 'Copied', 'Last week entries applied \u2014 review before submitting');
+  }
+  window.copyLastWeek = copyLastWeek;
+
+  // ── Escape key closes modals ──
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      rejectModal.classList.remove('active');
+    }
+  });
+
   // ── Initial recalculate ──
   recalculate();
 
@@ -2039,12 +2388,24 @@
 </script>
 
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item active"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
   <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+<script src="_shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.GHR) {
+    GHR.initHoverCard && GHR.initHoverCard();
+    GHR.initPresence && GHR.initPresence();
+    GHR.initRoleSwitcher && GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
+    GHR.initSkeletons && GHR.initSkeletons();
+  }
+});
+</script>
 </body>
 </html>

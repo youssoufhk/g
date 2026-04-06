@@ -1,782 +1,560 @@
-# GammaHR v2 — Agent Workflow & Communication Protocol
+# GammaHR v2 — Agent Orchestration Meta-Prompt
 
-> How the 12 agents collaborate, review each other's work, resolve conflicts, and deliver.
+> This file is the **master orchestration guide** for building GammaHR with Claude Code agents.
+> It captures the full three-phase model plus the exact patterns that produced the best results on this project.
+> Anyone (human or agent) reading this file should be able to run the entire project correctly from scratch.
 
 ---
 
-## 1. The 80/20 Execution Model
+## The Three-Phase Model
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║                     PHASE 1: DESIGN (80%)                    ║
-║                                                              ║
-║  Round 1: Draft                                              ║
-║  ├── Each agent produces first draft of their deliverables   ║
-║  ├── Orchestrator collects and cross-checks for conflicts    ║
-║  └── Duration: ~2 agent cycles                               ║
-║                                                              ║
-║  Round 2: Cross-Review                                       ║
-║  ├── Every deliverable reviewed by 2+ other agents           ║
-║  ├── Feedback collected, conflicts identified                ║
-║  └── Duration: ~1 agent cycle                                ║
-║                                                              ║
-║  Round 3: Refinement                                         ║
-║  ├── Authors incorporate feedback                            ║
-║  ├── Orchestrator verifies consistency                       ║
-║  └── Duration: ~1 agent cycle                                ║
-║                                                              ║
-║  Round 4: User Review                                        ║
-║  ├── Consolidated blueprint presented to user                ║
-║  ├── User feedback incorporated                              ║
-║  ├── Design samples presented for selection (palettes, etc.) ║
-║  └── Duration: User-dependent                                ║
-║                                                              ║
-║  Round 5: Final Lock                                         ║
-║  ├── All specs frozen                                        ║
-║  ├── Quality gates verified                                  ║
-║  ├── Proof-of-concept for risky items                        ║
-║  └── Proceed to Phase 2 only when ALL gates pass             ║
-║                                                              ║
+║  PHASE 0: PROTOTYPE (HTML/CSS/JS)                            ║
+║  Purpose: Validate every UX decision before writing          ║
+║  production code. Stakeholder approval on real screens.      ║
+║  Output: /prototype/ directory, FINAL_CHECKLIST.md           ║
 ╠══════════════════════════════════════════════════════════════╣
-║                   PHASE 2: BUILD (20%)                       ║
-║                                                              ║
-║  Sprint-based execution with continuous integration          ║
-║  ├── Backend + Frontend agents work in parallel              ║
-║  ├── QA agent validates continuously                         ║
-║  ├── Security agent audits at each milestone                 ║
-║  ├── UI Designer does visual QA on every component           ║
-║  └── Orchestrator manages dependencies and integration       ║
-║                                                              ║
+║  PHASE 1: DESIGN & SPECIFICATION (80% of total effort)       ║
+║  Purpose: Lock every architectural decision in writing.      ║
+║  Code review passes for any code that contradicts the spec.  ║
+║  Output: specs/ directory, complete API contract             ║
+╠══════════════════════════════════════════════════════════════╣
+║  PHASE 2: IMPLEMENTATION (20% of total effort)               ║
+║  Purpose: Execute the locked blueprint. Fast because all     ║
+║  decisions were made in Phase 0 and Phase 1.                 ║
+║  Output: src/backend/ (Rust), src/frontend/ (Next.js)        ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
 
 ---
 
-## 2. Agent Invocation Protocol
+## Phase 0: Prototype Orchestration
 
-### How to Spawn an Agent
+### Why prototype first
 
-Each agent is a Claude Code sub-agent invoked with a structured prompt. The Orchestrator (or the user) spawns agents as needed.
+The prototype is not a throwaway — it is the most important artifact in the project. It:
+- Catches UX dead-ends before they are coded in React
+- Forces every feature to be visualized before it is specified
+- Lets the product owner review the full product in a browser, not in a doc
+- Produces the canonical data set that seeds the real database
+- Locks the design token set so Next.js can import identical values
 
-```markdown
-## Agent Invocation Template
+### Phase 0 execution model
 
-Agent: [Agent Name]
-Role: [Role from AGENT_TEAM.md]
-Task: [Specific deliverable to produce]
-Context Files:
-  - Read: [list of files this agent must read first]
-  - Write: [list of files this agent will produce/update]
-Dependencies:
-  - [List of deliverables from other agents that must exist first]
-Quality Criteria:
-  - [Specific checklist for this deliverable]
-Output Format:
-  - [Markdown / Code / JSON / etc.]
 ```
+Step 1 — Foundation (CSS + shared JS first, always)
+  One agent writes: _tokens.css, _layout.css, _components.css, _shared.js
+  No other agents start until this is done.
 
-### Agent Naming Convention
+Step 2 — Parallel page build (non-overlapping file groups)
+  Split all HTML files into groups with zero overlap.
+  Each agent owns its files exclusively — never share a file between agents.
+  All groups run in parallel.
 
-When spawning sub-agents via Claude Code's Agent tool:
+Step 3 — Multi-domain critic audit
+  9 specialized critics run in parallel, each reading ALL prototype files
+  from a single expert perspective. They produce CRITIC_*.md files.
 
-| Agent | Name Pattern | Example |
-|-------|-------------|---------|
-| Product Owner | `po-{task}` | `po-feature-specs` |
-| UX Architect | `ux-{task}` | `ux-wireframes-dashboard` |
-| UI Designer | `ui-{task}` | `ui-color-palettes` |
-| Frontend Architect | `fe-arch-{task}` | `fe-arch-component-tree` |
-| Frontend Developer | `fe-dev-{task}` | `fe-dev-design-system` |
-| Backend Architect | `be-arch-{task}` | `be-arch-api-spec` |
-| Backend Developer | `be-dev-{task}` | `be-dev-auth-service` |
-| Security Engineer | `sec-{task}` | `sec-threat-model` |
-| Real-time Engineer | `rt-{task}` | `rt-websocket-protocol` |
-| QA Engineer | `qa-{task}` | `qa-test-strategy` |
-| DevOps Engineer | `devops-{task}` | `devops-docker-setup` |
-| Orchestrator | `orch-{task}` | `orch-dependency-check` |
+Step 4 — Master checklist consolidation
+  One agent reads all CRITIC_*.md files, deduplicates, prioritizes,
+  produces MASTER_CHECKLIST.md (CRITICAL > HIGH > MEDIUM > LOW).
+
+Step 5 — Remediation waves
+  Wave 1: Fix all CRITICAL items (parallel agents by file group)
+  Wave 2: Fix all HIGH items (parallel agents by file group)
+  Wave 3: Fix MEDIUM + LOW (parallel agents by file group)
+
+Step 6 — Final audit + cleanup
+  One agent reads all CRITIC_*.md files, verifies all items addressed,
+  deletes audit files, writes FINAL_CHECKLIST.md with grouped ✅ items.
+```
 
 ---
 
-## 3. Phase 1 Detailed Workflow
+## The Golden Rules of Parallel Agent Orchestration
 
-### Round 1: Draft (Parallel Agent Execution)
+These rules were learned from running 30+ parallel agents on this project. Violating them causes silent file corruption, conflicting edits, or wasted work.
+
+### Rule 1: Strict file ownership — one file, one agent, always
+
+Every file is owned by exactly one agent at a time. Before dispatching agents, list every file and assign it. If two agents need the same file, split them into sequential waves, not parallel.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ BATCH 1 (No dependencies — can run in parallel):            │
-│                                                             │
-│ ┌─────────────────┐  ┌─────────────────┐                   │
-│ │ Product Owner   │  │ Security Eng.   │                   │
-│ │                 │  │                 │                   │
-│ │ Read:           │  │ Read:           │                   │
-│ │ - MASTER_PLAN   │  │ - MASTER_PLAN   │                   │
-│ │ - APP_BLUEPRINT │  │ - DATA_ARCH     │                   │
-│ │ - v1 codebase   │  │ - v1 auth code  │                   │
-│ │                 │  │                 │                   │
-│ │ Write:          │  │ Write:          │                   │
-│ │ - specs/        │  │ - specs/        │                   │
-│ │   FEATURES.md   │  │   SECURITY.md   │                   │
-│ │ - specs/        │  │ - specs/        │                   │
-│ │   USER_STORIES  │  │   THREAT_MODEL  │                   │
-│ │   .md           │  │   .md           │                   │
-│ └─────────────────┘  └─────────────────┘                   │
-│                                                             │
-│ ┌─────────────────┐  ┌─────────────────┐                   │
-│ │ Backend Arch.   │  │ DevOps Eng.     │                   │
-│ │                 │  │                 │                   │
-│ │ Read:           │  │ Read:           │                   │
-│ │ - DATA_ARCH     │  │ - MASTER_PLAN   │                   │
-│ │ - APP_BLUEPRINT │  │ - DATA_ARCH     │                   │
-│ │ - v1 models     │  │ - v1 docker     │                   │
-│ │                 │  │                 │                   │
-│ │ Write:          │  │ Write:          │                   │
-│ │ - specs/        │  │ - specs/        │                   │
-│ │   API_SPEC.md   │  │   INFRA.md      │                   │
-│ │ - specs/        │  │ - specs/        │                   │
-│ │   DOMAIN_EVENTS │  │   CI_CD.md      │                   │
-│ │   .md           │  │                 │                   │
-│ └─────────────────┘  └─────────────────┘                   │
-│                                                             │
-│ ┌─────────────────┐                                        │
-│ │ QA Engineer     │                                        │
-│ │                 │                                        │
-│ │ Read:           │                                        │
-│ │ - APP_BLUEPRINT │                                        │
-│ │ - DATA_ARCH     │                                        │
-│ │                 │                                        │
-│ │ Write:          │                                        │
-│ │ - specs/        │                                        │
-│ │   TEST_STRATEGY │                                        │
-│ │   .md           │                                        │
-│ └─────────────────┘                                        │
-└─────────────────────────────────────────────────────────────┘
+WRONG:
+  Agent A: index.html, admin.html
+  Agent B: index.html, employees.html   ← CONFLICT: index.html in both
 
-┌─────────────────────────────────────────────────────────────┐
-│ BATCH 2 (Depends on Batch 1 outputs):                       │
-│                                                             │
-│ ┌─────────────────┐  ┌─────────────────┐                   │
-│ │ UX Architect    │  │ Frontend Arch.  │                   │
-│ │                 │  │                 │                   │
-│ │ Read:           │  │ Read:           │                   │
-│ │ - APP_BLUEPRINT │  │ - APP_BLUEPRINT │                   │
-│ │ - FEATURES.md   │  │ - API_SPEC.md   │                   │
-│ │ - USER_STORIES  │  │ - DESIGN_SYSTEM │                   │
-│ │                 │  │                 │                   │
-│ │ Write:          │  │ Write:          │                   │
-│ │ - specs/        │  │ - specs/        │                   │
-│ │   WIREFRAMES.md │  │   FE_ARCH.md    │                   │
-│ │ - specs/        │  │ - specs/        │                   │
-│ │   USER_FLOWS.md │  │   COMPONENT_    │                   │
-│ │ - specs/        │  │   TREE.md       │                   │
-│ │   INTERACTIONS  │  │ - specs/        │                   │
-│ │   .md           │  │   STATE_MGMT.md │                   │
-│ └─────────────────┘  └─────────────────┘                   │
-│                                                             │
-│ ┌─────────────────┐                                        │
-│ │ Real-time Eng.  │                                        │
-│ │                 │                                        │
-│ │ Read:           │                                        │
-│ │ - DATA_ARCH     │                                        │
-│ │ - API_SPEC.md   │                                        │
-│ │ - SECURITY.md   │                                        │
-│ │                 │                                        │
-│ │ Write:          │                                        │
-│ │ - specs/        │                                        │
-│ │   REALTIME.md   │                                        │
-│ │ - specs/        │                                        │
-│ │   WS_PROTOCOL   │                                        │
-│ │   .md           │                                        │
-│ └─────────────────┘                                        │
-└─────────────────────────────────────────────────────────────┘
+CORRECT:
+  Agent A: index.html, admin.html
+  Agent B: employees.html, clients.html
+```
 
-┌─────────────────────────────────────────────────────────────┐
-│ BATCH 3 (Depends on Batch 2 outputs):                       │
-│                                                             │
-│ ┌─────────────────┐                                        │
-│ │ UI Designer     │                                        │
-│ │                 │                                        │
-│ │ Read:           │                                        │
-│ │ - DESIGN_SYSTEM │                                        │
-│ │ - WIREFRAMES.md │                                        │
-│ │ - APP_BLUEPRINT │                                        │
-│ │ - COMPONENT_    │                                        │
-│ │   TREE.md       │                                        │
-│ │                 │                                        │
-│ │ Write:          │                                        │
-│ │ - designs/      │                                        │
-│ │   PALETTE_A.md  │                                        │
-│ │ - designs/      │                                        │
-│ │   PALETTE_B.md  │                                        │
-│ │ - designs/      │                                        │
-│ │   PALETTE_C.md  │                                        │
-│ │ - designs/      │                                        │
-│ │   COMPONENT_    │                                        │
-│ │   SPECS.md      │                                        │
-│ │ - designs/      │                                        │
-│ │   MOCKUPS.md    │                                        │
-│ └─────────────────┘                                        │
-└─────────────────────────────────────────────────────────────┘
+### Rule 2: Foundation before features
+
+CSS/shared JS files must be complete before any page agent starts. CSS changes affect every page; if an agent builds a page while the CSS is still being written, the page will be wrong.
+
+```
+Wave 1 (alone): _tokens.css, _layout.css, _components.css, _shared.js
+Wave 2 (parallel): all HTML page files
+```
+
+### Rule 3: Canonical data contract defined before any agent writes data
+
+Before dispatching ANY agent that touches data, define the canonical dataset in the prompt. Every agent gets the same table. No exceptions.
+
+```markdown
+## CANONICAL DATA (copy this into every agent prompt that touches HTML)
+
+EMPLOYEES:
+- Sarah Chen | 87% | Design Lead | Design dept
+- John Smith | 82% | Senior Developer | Engineering dept
+- Alice Wang | 75% | On Leave Apr 14-18 | Engineering dept
+- Carol Kim | 78% | HR Manager | HR dept
+- David Park | 65% | Finance Lead | Finance dept
+- Marco Rossi | 88% | Operations Lead | Operations dept
+- Emma Laurent | 78% | HR Specialist | HR dept
+- Bob Taylor | 72% | Senior Developer | Engineering dept
+
+KPIs: 12 employees · 394h/week · 7 open projects · 82% work time
+INV-2026-041 → Acme Corp
+Bob Taylor hotel expense (€340) → Bob Taylor only
+```
+
+### Rule 4: Read before every edit
+
+Every agent prompt must explicitly say: "Read the file fully before editing." Agents that edit without reading produce broken HTML (unclosed tags, wrong context, duplicate sections).
+
+### Rule 5: The prompt structure that works
+
+Every well-performing agent prompt follows this exact structure:
+
+```markdown
+## CONTEXT
+[What this agent is doing and why]
+
+## FILES — STRICT ASSIGNMENT
+Only touch these files: [list]. Do not touch any other file.
+
+## CANONICAL DATA
+[The data table — same for every agent]
+
+## SHARED UTILITIES API
+[If _shared.js exists: describe its API so agents know what's available]
+Include <script src="_shared.js"></script> before </body> in all files.
+Call in DOMContentLoaded: GHR.initHoverCard(); GHR.initPresence(); etc.
+
+## CROSS-CUTTING (apply to every file in this assignment)
+[Things that go on every page: breadcrumbs, Ask AI nav item, etc.]
+
+## [FILE 1.html] — SPECIFIC BUILDS
+[Numbered list of exactly what to build, with code examples for complex items]
+
+## [FILE 2.html] — SPECIFIC BUILDS
+[Same pattern]
+
+## QUALITY CHECK
+After editing, read back modified sections to verify HTML is valid.
+Report every item completed and every item skipped (with reason).
+```
+
+### Rule 6: Self-contained prompts — no inter-agent dependencies
+
+Agents run in parallel and cannot communicate. If Agent B needs something from Agent A, either:
+- Make A sequential before B (add to an earlier wave), OR
+- Include A's output directly in B's prompt (copy the relevant parts)
+
+Never write "see Agent A's output" in a prompt — Agent B has no access to it.
+
+### Rule 7: Critics must be brutal
+
+The value of a critic agent is proportional to how harsh it is. A critic that writes "looks great overall with a few minor issues" has failed. Brief the critic to assume everything is broken and prove it isn't.
+
+```
+BAD critic briefing: "Review the prototype and note any issues you find."
+
+GOOD critic briefing:
+"You are a [ROLE] who has seen dozens of failed SaaS products. You are
+reviewing this prototype with extreme skepticism. Your job is to find every
+single thing that would embarrass us in a live demo, confuse a user, or
+contradict a spec. Do not mention anything positive. Every issue gets:
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- File + location
+- Exact description of the problem
+- Why it matters
+Be exhaustive. A short list means you didn't look hard enough."
+```
+
+### Rule 8: Grouped checklist, not per-page checklist
+
+When consolidating issues into a master checklist or final checklist, group by domain and pattern — not by page. "Employee names link to directory root instead of profile" is ONE item covering all pages, not 12 items (one per page). This keeps the list actionable and prevents duplication fatigue.
+
+---
+
+## Phase 0: Critic Agent Roster
+
+Run all 9 critics in parallel. Each reads ALL prototype files but through one expert lens.
+
+| Agent | Domain | Tag | Focus |
+|-------|--------|-----|-------|
+| Critic — Data Integrity | Data | [DATA] | Numbers that contradict, names that differ, counts that don't reconcile, dates that conflict |
+| Critic — UX Flows | User Flows | [UX-FLOW] | Dead ends, missing confirmation states, flows that can't complete, missing error paths |
+| Critic — UX IA & Nav | Information Architecture | [UX-IA] | Sidebar structure, breadcrumbs, URL patterns, nav consistency across pages, missing links |
+| Critic — UX Interaction | Interaction | [UX-INT] | Broken JS, missing handlers, keyboard nav, focus management, modal behaviour, tab state |
+| Critic — UI Components | Components | [UI-COMP] | Component classes used incorrectly, variants defined but never used, badge colors wrong |
+| Critic — UI Visual | Visual Design | [UI-VIS] | Chart quality, typography hierarchy, spacing issues, color usage errors, missing labels |
+| Critic — UI Polish | Polish | [UI-POL] | Missing animations, hover states, glassmorphism absent, skeleton states missing |
+| Critic — Product/PM | Product | [PM] | Missing features from spec, self-service gaps, role security, spec §N violations |
+| Critic — Mobile | Mobile | [MOB] | Touch targets <44px, overflow issues, no mobile fallbacks, bottom nav gaps |
+
+### Critic prompt template
+
+```markdown
+You are a [ROLE] conducting a brutal quality audit of the GammaHR v2 prototype.
+
+Your exclusive focus: [DOMAIN]. Ignore everything outside your domain.
+
+Files to audit (read ALL of them):
+[list all HTML files, CSS files, _shared.js]
+
+For every issue you find, output exactly:
+- [ ] [SEVERITY] [TAG] Description of the problem — what it is, where it is, why it matters. | affected files
+
+Severity levels:
+- CRITICAL: Would destroy a live demo or is completely broken
+- HIGH: Significant user experience or spec compliance failure
+- MEDIUM: Noticeable quality issue
+- LOW: Minor polish or code quality issue
+
+Do not group issues. One bullet = one specific, actionable problem.
+Do not mention anything that is working correctly.
+Be exhaustive. If you find fewer than 15 issues you are not looking hard enough.
+Output ONLY the issue list — no preamble, no summary.
+```
+
+---
+
+## Phase 0: Master Checklist Agent
+
+After all 9 critics complete, one consolidation agent produces MASTER_CHECKLIST.md.
+
+```markdown
+You are reading 9 critic reports for the GammaHR v2 prototype.
+
+Files to read: [all CRITIC_*.md files]
+
+Your job:
+1. Read every issue from every critic file
+2. Deduplicate: if 3 critics flag "employee names link to root", that is ONE item
+   (note how many critics flagged it — more flags = higher priority)
+3. Sort by severity: CRITICAL first, then HIGH, MEDIUM, LOW
+4. Within each severity: sort by impact (most pages affected first)
+5. For items flagged by multiple critics: add "(flagged by X agents)" note
+
+Output format: MASTER_CHECKLIST.md with:
+- Summary table: issues per page, issues per domain
+- Top 5 most critical issues in plain language (for the product owner)
+- Systemic problems (same issue appearing on 3+ pages)
+- Full list: [ ] [SEVERITY] [TAG] [description] | [affected files]
+
+Total item count: typically 150-250 items for a 15-page prototype.
+If you have fewer than 100 items, the critics were not harsh enough.
+```
+
+---
+
+## Phase 0: Remediation Agent Pattern
+
+When fixing issues in waves, always use this pattern:
+
+```markdown
+## Wave [N] Remediation — [CRITICAL/HIGH/MEDIUM/LOW] items
+
+You are fixing [SEVERITY] issues in the GammaHR v2 prototype.
+
+STRICT FILE ASSIGNMENT — only touch these files:
+[list]
+
+CANONICAL DATA:
+[data table]
+
+SHARED UTILITIES:
+_shared.js is already built. Include <script src="_shared.js"></script>
+before </body> in all files. Available API:
+- GHR.showToast(type, title, message)
+- GHR.initHoverCard() — call in DOMContentLoaded
+- GHR.initPresence() — call in DOMContentLoaded
+- GHR.initRoleSwitcher() — call in DOMContentLoaded
+- GHR.initKeyboardShortcuts() — call in DOMContentLoaded
+- GHR.initSkeletons() — call in DOMContentLoaded
+Employee links need: data-hovercard data-name="" data-role="" data-dept=""
+  data-project="" data-worktime="87" data-href="employees.html#profile-slug"
+
+ISSUES TO FIX (from MASTER_CHECKLIST.md — your file group only):
+[paste all checklist items for your files]
+
+Read each file fully before editing.
+After editing, verify by reading back modified sections.
+Report every item: DONE, SKIPPED (reason), or PARTIAL (what remains).
+```
+
+---
+
+## Phase 1: Design & Specification Workflow
+
+### Round 1: Draft (Parallel — 5 agents)
+
+```
+Batch 1 (no dependencies — run in parallel):
+  Agent po  → specs/FEATURES.md + specs/USER_STORIES.md
+  Agent sec → specs/SECURITY.md + specs/THREAT_MODEL.md
+  Agent be  → specs/API_SPEC.md + specs/DOMAIN_EVENTS.md
+  Agent ops → specs/INFRA.md + specs/CI_CD.md
+  Agent qa  → specs/TEST_STRATEGY.md
+
+Batch 2 (depends on Batch 1):
+  Agent ux  → specs/WIREFRAMES.md + specs/USER_FLOWS.md + specs/INTERACTIONS.md
+  Agent fa  → specs/FE_ARCH.md + specs/COMPONENT_TREE.md + specs/STATE_MGMT.md
+  Agent rt  → specs/REALTIME.md + specs/WS_PROTOCOL.md
+
+Batch 3 (depends on Batch 2):
+  Agent ui  → designs/PALETTE_A.md + PALETTE_B.md + COMPONENT_SPECS.md + MOCKUPS.md
 ```
 
 ### Round 2: Cross-Review Matrix
 
-Each deliverable gets reviewed by 2 designated agents:
-
 | Deliverable | Author | Reviewer 1 | Reviewer 2 |
-|------------|--------|------------|------------|
-| `FEATURES.md` | Product Owner | UX Architect | QA Engineer |
-| `USER_STORIES.md` | Product Owner | Backend Architect | Frontend Architect |
-| `SECURITY.md` | Security Engineer | Backend Architect | DevOps Engineer |
-| `THREAT_MODEL.md` | Security Engineer | Backend Architect | QA Engineer |
-| `API_SPEC.md` | Backend Architect | Frontend Architect | Security Engineer |
-| `DOMAIN_EVENTS.md` | Backend Architect | Real-time Engineer | QA Engineer |
-| `INFRA.md` | DevOps Engineer | Security Engineer | Backend Architect |
-| `TEST_STRATEGY.md` | QA Engineer | Product Owner | Frontend Architect |
-| `WIREFRAMES.md` | UX Architect | UI Designer | Product Owner |
-| `USER_FLOWS.md` | UX Architect | Frontend Architect | QA Engineer |
-| `INTERACTIONS.md` | UX Architect | Frontend Developer | UI Designer |
-| `FE_ARCH.md` | Frontend Architect | Backend Architect | UI Designer |
-| `COMPONENT_TREE.md` | Frontend Architect | Frontend Developer | UX Architect |
-| `STATE_MGMT.md` | Frontend Architect | Real-time Engineer | Backend Architect |
-| `REALTIME.md` | Real-time Engineer | Frontend Architect | Security Engineer |
-| `WS_PROTOCOL.md` | Real-time Engineer | Backend Architect | Frontend Architect |
-| `PALETTE_*.md` | UI Designer | UX Architect | Product Owner |
-| `COMPONENT_SPECS.md` | UI Designer | Frontend Developer | UX Architect |
-| `MOCKUPS.md` | UI Designer | UX Architect | Product Owner |
+|---|---|---|---|
+| FEATURES.md | Product Owner | UX Architect | QA Engineer |
+| USER_STORIES.md | Product Owner | Backend Architect | Frontend Architect |
+| SECURITY.md | Security Engineer | Backend Architect | DevOps Engineer |
+| API_SPEC.md | Backend Architect | Frontend Architect | Security Engineer |
+| WIREFRAMES.md | UX Architect | UI Designer | Product Owner |
+| USER_FLOWS.md | UX Architect | Frontend Architect | QA Engineer |
+| FE_ARCH.md | Frontend Architect | Backend Architect | UI Designer |
+| REALTIME.md | Real-time Engineer | Frontend Architect | Security Engineer |
+| COMPONENT_SPECS.md | UI Designer | Frontend Developer | UX Architect |
 
-### Review Protocol
-
-Each reviewer provides structured feedback:
+### Review output format
 
 ```markdown
-## Review: [Deliverable Name]
-Reviewer: [Agent Name]
+## Review: [Deliverable]
+Reviewer: [Agent]
 Status: APPROVED / NEEDS_CHANGES / BLOCKED
 
-### Strengths
-- [What works well]
-
-### Issues (must fix before Phase 2)
-- [ ] Issue 1: [description] — Severity: HIGH/MEDIUM/LOW
-- [ ] Issue 2: [description]
-
-### Suggestions (nice to have)
-- [ ] Suggestion 1: [description]
+### Issues (must fix)
+- [ ] [HIGH/MEDIUM/LOW] Description | reason it matters
 
 ### Conflicts with my domain
 - [Any contradiction with the reviewer's own deliverables]
 ```
 
-### Round 3: Refinement
+### Round 3: Refinement + Orchestrator sign-off
 
-Authors address all HIGH and MEDIUM issues. The Orchestrator:
+Authors address all HIGH and MEDIUM issues. Orchestrator:
 1. Collects all reviews
-2. Identifies conflicting feedback (Reviewer A says X, Reviewer B says not-X)
-3. Makes a ruling on conflicts (or escalates to user)
-4. Verifies all HIGH issues are resolved
+2. Identifies conflicting feedback (A says X, B says not-X)
+3. Logs resolution in `specs/DECISIONS.md`
+4. Verifies all HIGH issues resolved
 5. Signs off on each deliverable
 
-### Round 4: User Review Checkpoint
+### Round 4: User Approval Checkpoint
 
-The user is presented with:
-
-```markdown
-## Phase 1 Review Package
-
-### Design Decisions for Your Approval:
-
-1. **Color Palette** — 3 options with sample mockups
-   → User picks one (or requests modifications)
-
-2. **Key Screen Mockups** — Dashboard, Employee Profile, Gantt Chart
-   → User provides feedback on layout, density, feel
-
-3. **Feature Prioritization** — P0/P1/P2 classification
-   → User confirms or reorders
-
-4. **Technical Decisions** — Rust + Axum, schema-per-tenant, Meilisearch
-   → User confirms comfort level
-
-5. **Navigation Structure** — Sidebar hierarchy, URL patterns
-   → User confirms or adjusts
-
-6. **Real-time Scope** — What gets live updates, what doesn't
-   → User confirms expectations
-
-### Questions for User:
-- [Any unresolved decisions that need user input]
-```
+Present to user:
+- 3 color palette options → user picks one
+- Key screen mockups (Dashboard, Employee Profile, Gantt) → user approves
+- Feature P0/P1/P2 priorities → user confirms
+- Navigation structure → user approves
+- Real-time feature scope → user confirms
 
 ### Round 5: Final Lock
 
-Quality gates that must ALL pass before Phase 2:
+All gates must pass before Phase 2:
 
 ```
 □ All deliverables reviewed by 2+ agents
 □ All HIGH issues resolved
-□ No unresolved conflicts between agents
-□ User has approved: palette, mockups, feature priorities, navigation
-□ API spec is complete (every endpoint documented)
-□ Data model is complete (every entity, every field)
-□ Wireframes exist for every page
-□ Test cases exist for every feature
-□ Security threat model covers every endpoint
-□ Real-time protocol handles every live update scenario
-□ Proof-of-concept validated for:
-    □ Multi-tenant schema switching in Rust
-    □ WebSocket broadcast with 100+ connections
-    □ 3D card component rendering at 60fps
-    □ Gantt chart with 500+ virtualized rows
-    □ AI receipt OCR pipeline
-```
-
----
-
-## 4. Phase 2 Sprint Workflow
-
-### Sprint Structure
-
-```
-Sprint Duration: ~1 agent execution cycle per sprint
-Sprint Goal: Deliver a vertical slice (BE + FE + tests for a feature)
-
-Sprint Planning:
-  Orchestrator assigns tasks based on:
-  1. Dependency order (auth before anything, shell before pages)
-  2. Risk reduction (hardest parts first)
-  3. Vertical slices (BE + FE for same feature in same sprint)
-
-Sprint Execution:
-  ┌────────────────────────────────────┐
-  │ Backend Developer                   │
-  │ ├── Implements API endpoints        │
-  │ ├── Writes unit tests               │
-  │ └── Pushes to integration branch    │
-  ├────────────────────────────────────┤
-  │ Frontend Developer (parallel)       │
-  │ ├── Implements UI components        │
-  │ ├── Integrates with API             │
-  │ └── Pushes to integration branch    │
-  ├────────────────────────────────────┤
-  │ QA Engineer (as features land)      │
-  │ ├── Runs test suite                 │
-  │ ├── Writes E2E tests               │
-  │ └── Reports bugs                   │
-  ├────────────────────────────────────┤
-  │ UI Designer (as pages land)         │
-  │ ├── Visual QA against specs         │
-  │ ├── Reports visual discrepancies    │
-  │ └── Approves or requests changes    │
-  ├────────────────────────────────────┤
-  │ Security Engineer (at milestones)   │
-  │ ├── Reviews auth implementation     │
-  │ ├── Checks for OWASP issues        │
-  │ └── Verifies tenant isolation       │
-  └────────────────────────────────────┘
-
-Sprint Review:
-  Orchestrator verifies:
-  □ All planned features implemented
-  □ Tests passing
-  □ Visual QA approved
-  □ No security issues
-  □ API matches spec
-```
-
-### Sprint Plan (10 Sprints)
-
-```
-Sprint 1: Foundation
-├── BE: Project scaffolding, Axum setup, DB migrations, health endpoint
-├── BE: Multi-tenant middleware (schema-per-tenant)
-├── FE: Next.js setup, Tailwind config, design tokens, app shell
-├── FE: Layout (sidebar, header, bottom nav), routing structure
-├── DevOps: Docker Compose, Postgres, Redis, Meilisearch setup
-└── Gate: App boots, shows empty shell, tenant isolation works
-
-Sprint 2: Authentication
-├── BE: User model, login, JWT, refresh tokens, password reset
-├── BE: WebAuthn registration + authentication
-├── BE: MFA (TOTP) setup + verification
-├── FE: Login page (3D logo, email/password, passkey, SSO placeholder)
-├── FE: Forgot password, reset password, change password
-├── FE: Auth guards, token refresh, session management
-├── SEC: Auth review — JWT claims, cookie settings, rate limiting
-└── Gate: Full auth flow works, tokens rotate, MFA works
-
-Sprint 3: Users & Departments
-├── BE: User CRUD, department CRUD, department managers
-├── BE: User invitation + onboarding flow
-├── BE: Skills system (CRUD, user-skill associations)
-├── FE: Employee directory (grid/list/org-chart views)
-├── FE: Employee profile page (ALL tabs: timeline, projects, leaves, etc.)
-├── FE: Mini profile hover card
-├── FE: <EmployeeLink> universal component
-├── FE: Admin user management (list, create, edit, deactivate)
-├── FE: Department management
-└── Gate: Employee profiles tell a complete story, names clickable everywhere
-
-Sprint 4: Leave Management
-├── BE: Leave types, balances, requests, approval workflow
-├── BE: Conflict detection (team availability check)
-├── BE: Leave balance accrual + carryover logic
-├── FE: Leave dashboard (balance cards, request list, mini calendar)
-├── FE: Leave request modal (type, dates, working days calc, conflict warning)
-├── FE: Leave approval flow (approve/reject with reason)
-├── FE: Team leaves view (PM/Admin)
-└── Gate: Full leave lifecycle works, conflicts detected, balances accurate
-
-Sprint 5: Expenses & AI
-├── BE: Expense types, expenses, approval workflow
-├── BE: S3 presigned upload for receipts
-├── BE: AI receipt OCR pipeline (Claude Haiku)
-├── BE: AI categorization + anomaly detection
-├── BE: Duplicate detection
-├── FE: Expense dashboard (summary cards, list, analytics tab)
-├── FE: Expense form (receipt upload/camera, AI auto-fill, policy checks)
-├── FE: Expense approval flow
-└── Gate: Receipt OCR works, AI suggestions accurate, policy enforcement works
-
-Sprint 6: Timesheets & Projects
-├── BE: Timesheet batches, entries, approval workflow
-├── BE: Copy-from-previous logic
-├── BE: Project CRUD, assignments, milestones
-├── BE: Project budget tracking
-├── FE: Timesheet week view (interactive grid, keyboard nav, auto-save)
-├── FE: Timesheet month view (heatmap)
-├── FE: Project list (board/list/timeline views)
-├── FE: Project detail (overview, team, milestones, budget burndown)
-├── FE: Project assignment management
-└── Gate: Timesheets filled in < 2min, project budget burns down correctly
-
-Sprint 7: Clients, Invoices & Portal
-├── BE: Client CRUD, contacts, portal users
-├── BE: Invoice generation (timesheets × rates + expenses)
-├── BE: PDF generation (Typst)
-├── BE: Client portal API (separate auth, read-only + approve)
-├── FE: Client list + detail pages
-├── FE: Invoice generation wizard
-├── FE: Invoice detail + PDF preview
-├── FE: Client portal (separate Next.js route group)
-└── Gate: Invoices generate correctly, PDF looks premium, portal works
-
-Sprint 8: Gantt, Calendar & Planning
-├── BE: Gantt data endpoint (optimized for large datasets)
-├── BE: Capacity planning + forecasting endpoints
-├── BE: Calendar unified endpoint
-├── FE: Resource Gantt chart (virtualized, all filters, saved views)
-├── FE: Gantt interactions (drag, click, right-click, zoom)
-├── FE: Team calendar (day/week/month/year views)
-├── FE: Resource planning dashboard (capacity, bench, forecast)
-├── FE: What-if scenario tool
-└── Gate: Gantt handles 500+ rows at 60fps, all 10+ filter dimensions work
-
-Sprint 9: Real-time, Notifications & AI Insights
-├── BE: WebSocket server (tokio-tungstenite)
-├── BE: Presence system (heartbeat, status tracking)
-├── BE: Live entity update broadcasting
-├── BE: Notification system (in-app + email)
-├── BE: AI insights batch jobs (budget forecast, bench alerts, anomalies)
-├── FE: WebSocket client (hooks, reconnection, fallback)
-├── FE: Presence indicators (online dots, "viewing this page")
-├── FE: Notification center (dropdown, preferences)
-├── FE: AI insights dashboard + NL query interface
-├── FE: Live counter badges on sidebar
-├── RT: Channel architecture + subscription management
-└── Gate: Presence works, notifications real-time, AI insights actionable
-
-Sprint 10: Polish, 3D & Launch
-├── FE: 3D logo animation
-├── FE: 3D empty state illustrations
-├── FE: 3D dashboard hero scene
-├── FE: 3D data visualizations
-├── FE: Animation polish (all transitions, micro-interactions)
-├── FE: Dark mode + light mode final audit
-├── FE: Responsive audit (mobile, tablet, desktop, wide)
-├── FE: Command palette (Meilisearch-powered search)
-├── FE: Keyboard shortcuts (full implementation)
-├── FE: i18n audit (EN + FR complete)
-├── QA: Full E2E test suite (Playwright)
-├── QA: Visual regression baseline
-├── QA: Performance benchmarks (Core Web Vitals, API latency)
-├── QA: Accessibility audit (axe-core + manual)
-├── SEC: Penetration test
-├── SEC: Multi-tenant isolation verification
-├── SEC: Dependency vulnerability scan
-├── DevOps: Production Docker images (multi-stage, optimized)
-├── DevOps: CI/CD pipeline (build → lint → test → security → deploy)
-├── DevOps: Monitoring dashboards
-└── Gate: Everything works, looks premium, performs well, is secure
-```
-
----
-
-## 5. Conflict Resolution Protocol
-
-### Types of Conflicts
-
-| Conflict Type | Example | Resolution |
-|--------------|---------|------------|
-| **Design vs. Technical** | UI wants animation that causes jank | Frontend Architect proposes alternative achieving same feel |
-| **UX vs. Security** | UX wants auto-login; Security wants MFA always | Orchestrator weighs risk; compromise: remember device for 30 days |
-| **Feature vs. Timeline** | Product wants feature X; QA says it needs 2 more sprints | Orchestrator proposes P1 → P2 demotion or scope reduction |
-| **Spec Contradiction** | API spec says field is required; wireframe shows it optional | Backend Architect and UX Architect align; update both docs |
-| **Performance vs. Richness** | 3D scene causes 200ms LCP regression | UI Designer provides fallback; Frontend Architect lazy-loads |
-
-### Resolution Steps
-
-```
-1. Identifying Agent reports conflict to Orchestrator
-   Format: "CONFLICT: [Agent A deliverable] contradicts [Agent B deliverable]"
-   Details: What the contradiction is, impact if unresolved
-
-2. Orchestrator evaluates:
-   a. Can it be resolved by clarifying ambiguity? → Clarify, update both docs
-   b. Is there a clear winner based on project principles? → Apply principle
-   c. Is this a trade-off requiring user input? → Escalate to user
-
-3. Resolution logged in specs/DECISIONS.md:
-   ## Decision: [Title]
-   Date: [Date]
-   Conflict: [What conflicted]
-   Resolution: [What was decided]
-   Reason: [Why]
-   Affected deliverables: [List of files updated]
-
-4. Both affected deliverables updated to reflect resolution
-```
-
-### Project Principles (Priority Order for Conflict Resolution)
-
-1. **Security** — Never compromise on security for any other concern
-2. **Usability** — User experience trumps technical elegance
-3. **Performance** — Speed is a feature; don't ship jank
-4. **Maintainability** — Code that Claude can modify easily in the future
-5. **Aesthetics** — Premium look matters, but not at the expense of 1-4
-6. **Feature completeness** — Better to ship fewer features done well
-
----
-
-## 6. Communication Artifacts
-
-### Shared File System
-
-All agents communicate through files in the `gammahr_v2/` directory:
-
-```
-gammahr_v2/
-├── MASTER_PLAN.md              — Project vision (read by all)
-├── AGENT_TEAM.md               — Agent definitions (read by all)
-├── AGENT_WORKFLOW.md           — This file (read by all)
-├── specs/
-│   ├── APP_BLUEPRINT.md        — Complete app blueprint (read by all)
-│   ├── DESIGN_SYSTEM.md        — Design system (read by UI, FE agents)
-│   ├── DATA_ARCHITECTURE.md    — Data + API design (read by BE, FE agents)
-│   ├── FEATURES.md             — Detailed feature specs (PO → all)
-│   ├── USER_STORIES.md         — User stories + acceptance criteria (PO → QA)
-│   ├── SECURITY.md             — Security requirements (SEC → BE, FE, DevOps)
-│   ├── THREAT_MODEL.md         — STRIDE threat model (SEC → all)
-│   ├── API_SPEC.md             — Full API specification (BE-Arch → FE, QA)
-│   ├── DOMAIN_EVENTS.md        — Event catalog (BE-Arch → RT, BE-Dev)
-│   ├── WIREFRAMES.md           — Page wireframes (UX → UI, FE)
-│   ├── USER_FLOWS.md           — User journey flows (UX → FE, QA)
-│   ├── INTERACTIONS.md         — Interaction specs (UX → FE-Dev)
-│   ├── FE_ARCH.md              — Frontend architecture (FE-Arch → FE-Dev)
-│   ├── COMPONENT_TREE.md       — Component hierarchy (FE-Arch → FE-Dev, UI)
-│   ├── STATE_MGMT.md           — State management plan (FE-Arch → FE-Dev, RT)
-│   ├── REALTIME.md             — Real-time architecture (RT → BE, FE)
-│   ├── WS_PROTOCOL.md          — WebSocket protocol spec (RT → BE-Dev, FE-Dev)
-│   ├── INFRA.md                — Infrastructure design (DevOps → all)
-│   ├── CI_CD.md                — CI/CD pipeline design (DevOps → all)
-│   ├── TEST_STRATEGY.md        — Test strategy (QA → all)
-│   └── DECISIONS.md            — Conflict resolutions log (Orchestrator)
-├── designs/
-│   ├── PALETTE_A.md            — Deep Ocean palette (UI → user choice)
-│   ├── PALETTE_B.md            — Neon Mint palette (UI → user choice)
-│   ├── PALETTE_C.md            — Earth & Emerald palette (UI → user choice)
-│   ├── COMPONENT_SPECS.md      — Detailed component designs (UI → FE-Dev)
-│   └── MOCKUPS.md              — Key screen mockups (UI → user approval)
-├── samples/
-│   ├── [proof-of-concept files for risky items]
-│   └── [design sample outputs]
-├── reviews/
-│   ├── [review feedback files organized by deliverable]
-│   └── REVIEW_STATUS.md        — Tracking which reviews are complete
-└── src/                        — Phase 2: actual code lives here
-    ├── backend/                — Rust backend code
-    └── frontend/               — Next.js frontend code
-```
-
-### Review Tracking
-
-`reviews/REVIEW_STATUS.md`:
-
-```markdown
-| Deliverable | Author | Reviewer 1 | R1 Status | Reviewer 2 | R2 Status | Final |
-|------------|--------|------------|-----------|------------|-----------|-------|
-| FEATURES.md | PO | UX | ✅ APPROVED | QA | ⚠️ NEEDS_CHANGES | ⏳ |
-| API_SPEC.md | BE-Arch | FE-Arch | ✅ APPROVED | SEC | ✅ APPROVED | ✅ |
-| WIREFRAMES.md | UX | UI | ⏳ IN_REVIEW | PO | ⏳ IN_REVIEW | ⏳ |
-```
-
----
-
-## 7. Quality Gates
-
-### Gate 1: Pre-Design (Before Phase 1 starts)
-
-```
-□ MASTER_PLAN.md reviewed by user and approved
-□ AGENT_TEAM.md defined with all 12 agents
-□ APP_BLUEPRINT.md covers all v1 features + new features
-□ DESIGN_SYSTEM.md has 3 palette options ready
-□ DATA_ARCHITECTURE.md has complete entity model
-□ AGENT_WORKFLOW.md (this file) is complete
-```
-
-### Gate 2: Post-Draft (After Round 1)
-
-```
-□ Every spec file listed in Communication Artifacts exists
-□ No spec file is empty or placeholder
-□ Cross-references between specs are consistent
-□ API endpoint count matches feature requirements
-□ Entity count covers all data needs
-□ Wireframes exist for every page in APP_BLUEPRINT
-□ User stories exist for every feature in FEATURES
-□ Test cases reference every user story
-```
-
-### Gate 3: Post-Review (After Rounds 2-3)
-
-```
-□ All HIGH issues from reviews are resolved
-□ All conflicts logged in DECISIONS.md with resolution
-□ REVIEW_STATUS.md shows all deliverables at ✅
-□ No unresolved cross-references
-□ Security review complete for auth + RBAC + multi-tenancy
-```
-
-### Gate 4: User Approval (After Round 4)
-
-```
-□ User selected color palette
-□ User approved key screen mockups
-□ User approved feature priorities (P0/P1/P2)
-□ User approved navigation structure
-□ User approved real-time scope
-□ Any user-requested changes incorporated
-```
-
-### Gate 5: Pre-Build (After Round 5)
-
-```
-□ All Gate 1-4 requirements met
+□ No unresolved conflicts (all logged in DECISIONS.md)
+□ User approved: palette, mockups, priorities, navigation
+□ API spec complete — every endpoint documented
+□ Data model complete — every entity, every field
 □ Proof-of-concept validated:
-    □ Rust + Axum + multi-tenant middleware works
-    □ WebSocket broadcast scales to 100+ connections
-    □ React Three Fiber 3D card renders at 60fps
-    □ Virtual Gantt handles 500+ rows without jank
+    □ Rust + Axum + multi-tenant middleware
+    □ WebSocket broadcast at 100+ connections
+    □ React Three Fiber 3D at 60fps
+    □ Virtual Gantt with 500+ rows
     □ Claude API receipt OCR returns structured data
-□ All specs frozen (no more changes without formal change request)
-□ Development environment boots (Docker Compose stack)
 ```
 
-### Gate 6: Sprint Gates (During Phase 2)
+---
 
-Each sprint must pass before the next starts:
+## Phase 2: Sprint Execution
+
+### Sprint structure (10 sprints)
+
+```
+Sprint 1:  Foundation — Rust scaffolding, auth skeleton, Next.js shell, Docker
+Sprint 2:  Authentication — JWT, WebAuthn, MFA, auth flows
+Sprint 3:  Users & Departments — CRUD, profiles, <EmployeeLink>, hover card
+Sprint 4:  Leave Management — types, balances, approval workflow, conflict detection
+Sprint 5:  Expenses & AI — OCR pipeline, categorization, approval workflow
+Sprint 6:  Timesheets & Projects — week grid, month view, project lifecycle
+Sprint 7:  Clients, Invoices & Portal — PDF generation, portal auth
+Sprint 8:  Gantt, Calendar & Planning — virtualized chart, drag, forecasting
+Sprint 9:  Real-time, Notifications & AI — WebSocket, presence, NL insights
+Sprint 10: Polish, 3D & Launch — Three.js, animations, QA, security audit
+```
+
+### Sprint agent pattern
+
+```
+Each sprint: Backend agent + Frontend agent run in parallel
+  BE agent → Rust handlers + migrations + unit tests
+  FE agent → React components + page + API integration
+  (never share src/ files between BE and FE agent)
+
+After each sprint: QA agent + UI designer agent review
+  QA → run test suite, write E2E tests, report bugs
+  UI → visual QA against prototype (prototype is the spec)
+```
+
+### Sprint gate (must pass before next sprint)
 
 ```
 □ All planned features implemented
 □ Unit tests passing (>90% coverage on new code)
-□ Integration tests passing
-□ Visual QA approved by UI Designer
-□ Security review passed (for auth/RBAC sprints)
-□ API matches spec (no undocumented changes)
+□ Visual QA: implementation matches prototype exactly
+□ Security review passed (auth/RBAC sprints)
+□ API matches spec (no undocumented deviations)
 □ No P0 bugs open
 ```
 
-### Gate 7: Launch Gate (After Sprint 10)
+---
+
+## Conflict Resolution Protocol
+
+| Conflict Type | Resolution |
+|---|---|
+| Design vs. Technical | Frontend Architect proposes alternative achieving same feel |
+| UX vs. Security | Orchestrator weighs risk; log decision in DECISIONS.md |
+| Feature vs. Timeline | Orchestrator proposes P1→P2 demotion or scope reduction |
+| Spec Contradiction | Both agents align; update both docs; log in DECISIONS.md |
+| Performance vs. Richness | UI provides fallback; Frontend lazy-loads the rich version |
+
+Principle priority order for tie-breaking:
+1. Security — never compromise
+2. Usability — user experience trumps technical elegance
+3. Performance — no jank ships
+4. Maintainability — code Claude can modify
+5. Aesthetics — premium look matters, but never at cost of 1-4
+6. Feature completeness — fewer features done perfectly > many done poorly
+
+---
+
+## Quality Gates Summary
+
+| Gate | When | Key checks |
+|---|---|---|
+| Gate 0 | Before Phase 0 | MASTER_PLAN approved, design system tokens locked |
+| Gate 1 | Before Phase 1 | Prototype fully audited, FINAL_CHECKLIST.md complete, all CRITICAL items resolved |
+| Gate 2 | After Round 1 | Every spec file exists and is non-empty |
+| Gate 3 | After Rounds 2-3 | All HIGH review issues resolved, no open conflicts |
+| Gate 4 | User approval | Palette, mockups, priorities, nav approved |
+| Gate 5 | Before Phase 2 | Proof-of-concepts validated, specs frozen |
+| Gate 6 | Each sprint | Tests passing, visual QA approved, API matches spec |
+| Gate 7 | Launch | E2E tests, perf benchmarks, security audit, i18n complete |
+
+---
+
+## Communication Artifacts (File Map)
 
 ```
-□ All features from P0 list implemented and tested
-□ E2E test suite passing (Playwright)
-□ Performance benchmarks met:
-    □ LCP < 1.2s
-    □ FID < 100ms
-    □ CLS < 0.1
-    □ API p99 < 200ms
-    □ WebSocket delivery < 100ms
-□ Accessibility audit passed (WCAG 2.2 AA)
-□ Security penetration test passed
-□ Multi-tenant isolation verified (zero data leakage)
-□ i18n complete (EN + FR)
-□ Dark mode + light mode audited
-□ Mobile responsive audited (320px to 2560px)
-□ Documentation complete (API docs, admin guide)
-□ Monitoring and alerting configured
-□ Backup and recovery tested
+gammahr_v2/
+├── MASTER_PLAN.md              — Vision, tech stack, prototype overview
+├── AGENT_TEAM.md               — 12 agent definitions (Phase 0, 1, 2 roles)
+├── AGENT_WORKFLOW.md           — This file: orchestration meta-prompt
+├── FINAL_CHECKLIST.md          — All prototype issues resolved (✅)
+├── prototype/                  — Static HTML/CSS/JS design prototype
+│   ├── _tokens.css             — Design tokens (source of truth for Next.js)
+│   ├── _components.css         — Component library
+│   ├── _layout.css             — App shell layout
+│   ├── _shared.js              — Global JS utilities (hover cards, presence, etc.)
+│   ├── index.html              — Dashboard
+│   ├── employees.html          — Team directory + employee profile
+│   ├── gantt.html              — Resource Gantt chart
+│   ├── timesheets.html         — Timesheet entry + approval
+│   ├── leaves.html             — Leave management
+│   ├── expenses.html           — Expense management
+│   ├── projects.html           — Project management
+│   ├── clients.html            — Client management
+│   ├── invoices.html           — Invoice management
+│   ├── approvals.html          — Approval hub
+│   ├── calendar.html           — Team calendar
+│   ├── planning.html           — Resource planning
+│   ├── insights.html           — AI insights
+│   ├── hr.html                 — HR (recruitment, onboarding, offboarding)
+│   ├── admin.html              — Admin settings
+│   ├── auth.html               — Authentication + onboarding flows
+│   ├── account.html            — Account & settings (personal)
+│   └── portal/index.html       — Client portal
+├── specs/
+│   ├── APP_BLUEPRINT.md        — Feature map (cross-refs prototype pages)
+│   ├── DESIGN_SYSTEM.md        — Visual design spec (refs prototype CSS)
+│   ├── DATA_ARCHITECTURE.md    — Data models + API + seed data from prototype
+│   └── [Phase 1 deliverables added here]
+└── src/                        — Phase 2: production code
+    ├── backend/                — Rust (Axum) backend
+    └── frontend/               — Next.js frontend
 ```
 
 ---
 
-## 8. How to Start
-
-### Step 1: User Approves This Plan
-
-The user reviews:
-- `MASTER_PLAN.md` — Vision, tech stack, timeline
-- `AGENT_TEAM.md` — Agent definitions
-- `AGENT_WORKFLOW.md` — This workflow
-- `APP_BLUEPRINT.md` — Feature map
-- `DESIGN_SYSTEM.md` — Visual direction
-- `DATA_ARCHITECTURE.md` — Technical foundation
-
-### Step 2: Gate 1 Checkpoint
-
-User confirms: "Yes, proceed with Phase 1 Round 1"
-
-### Step 3: Launch Batch 1 Agents
-
-Spawn 5 agents in parallel:
-1. Product Owner → `specs/FEATURES.md` + `specs/USER_STORIES.md`
-2. Security Engineer → `specs/SECURITY.md` + `specs/THREAT_MODEL.md`
-3. Backend Architect → `specs/API_SPEC.md` + `specs/DOMAIN_EVENTS.md`
-4. DevOps Engineer → `specs/INFRA.md` + `specs/CI_CD.md`
-5. QA Engineer → `specs/TEST_STRATEGY.md`
-
-### Step 4: Review & Iterate
-
-Continue through Rounds 2-5 until all quality gates pass.
-
-### Step 5: Build
-
-Launch Phase 2 sprints, building on the locked specifications.
-
----
-
-## 9. Change Request Protocol (During Phase 2)
-
-If a spec needs to change after the Phase 1 lock:
+## Change Request Protocol (Phase 2)
 
 ```
-1. Requester files change request in specs/CHANGES.md:
+1. File CR in specs/CHANGES.md:
    ## CR-001: [Title]
    Requested by: [Agent or User]
-   Affects: [List of spec files]
-   Reason: [Why the change is needed]
-   Impact: [What sprint work is affected]
+   Affects: [spec files + prototype pages]
+   Reason: [Why needed]
+   Impact: [Sprint work affected]
    Severity: CRITICAL / IMPORTANT / MINOR
 
 2. Orchestrator evaluates:
-   - CRITICAL: Stop sprint, address immediately
-   - IMPORTANT: Address in next sprint
-   - MINOR: Add to backlog
+   CRITICAL → stop sprint, fix immediately
+   IMPORTANT → address in next sprint
+   MINOR → add to backlog
 
-3. Affected agents review and update their deliverables
-
-4. QA Engineer updates test cases
-
-5. Change logged in DECISIONS.md
+3. Update: spec file + corresponding prototype page + DECISIONS.md
 ```
 
-This ensures we don't drift from the blueprint without deliberate, tracked decisions.
+---
+
+## Quick-Start: Starting from Scratch
+
+```
+1. User reads and approves MASTER_PLAN.md
+
+2. Phase 0 — Prototype:
+   a. Agent builds _tokens.css, _layout.css, _components.css, _shared.js
+   b. Parallel agents build all HTML pages (split into 5-6 non-overlapping groups)
+   c. 9 critic agents run in parallel → CRITIC_*.md files
+   d. Consolidation agent → MASTER_CHECKLIST.md
+   e. Remediation agents by severity wave (CRITICAL → HIGH → MEDIUM/LOW)
+   f. Final audit agent → FINAL_CHECKLIST.md, delete CRITIC_*.md
+   g. User reviews prototype in browser → approves design
+
+3. Phase 1 — Specification:
+   a. Batch 1: 5 agents in parallel → first-draft specs
+   b. Batch 2: 3 agents in parallel → dependent specs
+   c. Batch 3: 1 agent → UI mockups + palette options
+   d. Cross-review round → all reviews filed
+   e. Refinement → all HIGH issues resolved
+   f. User approval checkpoint → palette + mockups + priorities
+   g. Final lock → proof-of-concepts validated
+
+4. Phase 2 — Build:
+   10 sprints, each with parallel BE + FE agents
+   QA + UI review after each sprint
+   Launch gate after Sprint 10
+```

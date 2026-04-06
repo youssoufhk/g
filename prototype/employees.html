@@ -11,19 +11,19 @@
     /* ── Page-specific styles ── */
 
     /* Filter bar */
-    .filter-bar {
+    .filter-bar-standard {
       display: flex;
       align-items: center;
       gap: var(--space-3);
       margin-bottom: var(--space-6);
       flex-wrap: wrap;
     }
-    .filter-bar .filter-search {
+    .filter-bar-standard .filter-search {
       position: relative;
       flex: 1;
       min-width: 220px;
     }
-    .filter-bar .filter-search svg {
+    .filter-bar-standard .filter-search svg {
       position: absolute;
       left: var(--space-3);
       top: 50%;
@@ -32,7 +32,7 @@
       color: var(--color-text-3);
       pointer-events: none;
     }
-    .filter-bar .filter-search input {
+    .filter-bar-standard .filter-search input {
       width: 100%;
       height: 36px;
       padding: 0 var(--space-3) 0 36px;
@@ -43,8 +43,8 @@
       font-size: var(--text-body);
       font-family: var(--font-sans);
     }
-    .filter-bar .filter-search input::placeholder { color: var(--color-text-3); }
-    .filter-bar .filter-search input:focus {
+    .filter-bar-standard .filter-search input::placeholder { color: var(--color-text-3); }
+    .filter-bar-standard .filter-search input:focus {
       outline: none;
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px var(--color-primary-muted);
@@ -94,14 +94,16 @@
       border-radius: var(--radius-lg);
       padding: var(--space-5);
       box-shadow: var(--shadow-1);
-      transition: transform var(--motion-normal) var(--ease-out), box-shadow var(--motion-normal) var(--ease-out);
+      transition: transform var(--motion-normal) var(--ease-out), box-shadow var(--motion-normal) var(--ease-out), border-color var(--motion-normal);
       display: flex;
       flex-direction: column;
       gap: var(--space-3);
+      cursor: pointer;
     }
     .employee-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-3);
+      border-color: var(--color-primary);
     }
     .employee-card-top {
       display: flex;
@@ -163,9 +165,9 @@
       border-radius: var(--radius-full);
       transition: width var(--motion-slow) var(--ease-out);
     }
-    .worktime-fill.green { background: var(--color-success); }
-    .worktime-fill.yellow { background: var(--color-warning); }
-    .worktime-fill.red { background: var(--color-error); }
+    .worktime-fill.green, .worktime-fill.high { background: var(--color-success); }
+    .worktime-fill.yellow, .worktime-fill.mid { background: var(--color-warning); }
+    .worktime-fill.red, .worktime-fill.low { background: var(--color-error); }
     .worktime-pct {
       font-family: var(--font-mono);
       font-size: var(--text-caption);
@@ -173,9 +175,9 @@
       min-width: 36px;
       text-align: right;
     }
-    .worktime-pct.green { color: var(--color-success); }
-    .worktime-pct.yellow { color: var(--color-warning); }
-    .worktime-pct.red { color: var(--color-error); }
+    .worktime-pct.green, .worktime-pct.high { color: var(--color-success); }
+    .worktime-pct.yellow, .worktime-pct.mid { color: var(--color-warning); }
+    .worktime-pct.red, .worktime-pct.low { color: var(--color-error); }
 
     .employee-card-footer {
       display: flex;
@@ -420,30 +422,134 @@
     /* Org Chart view */
     .org-chart {
       padding: var(--space-4) 0;
+      overflow-x: auto;
+    }
+    .org-chart-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 700px;
+      padding: var(--space-4);
+    }
+    .org-level {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-6);
+      position: relative;
+      margin-bottom: 0;
+    }
+    .org-level + .org-level {
+      margin-top: 0;
+    }
+    .org-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .org-node-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* Vertical connector from parent to children bar */
+    .org-connector-down {
+      width: 2px;
+      height: var(--space-6);
+      background: var(--color-border-strong);
+    }
+    /* Horizontal bar spanning children */
+    .org-connector-h {
+      height: 2px;
+      background: var(--color-border-strong);
+      align-self: stretch;
+    }
+    /* Connector from h-bar to child */
+    .org-connector-up {
+      width: 2px;
+      height: var(--space-6);
+      background: var(--color-border-strong);
+    }
+    .org-children-row {
+      display: flex;
+      gap: var(--space-5);
+      position: relative;
+      justify-content: center;
+    }
+    .org-child-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .org-node {
       position: relative;
       padding: var(--space-3) var(--space-4);
-      margin-bottom: var(--space-2);
       background: var(--color-surface-0);
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       gap: var(--space-3);
-      transition: box-shadow var(--motion-fast);
+      transition: box-shadow var(--motion-fast), border-color var(--motion-fast), transform var(--motion-fast);
+      cursor: pointer;
+      min-width: 160px;
+      max-width: 200px;
+      text-decoration: none;
     }
     .org-node:hover {
-      box-shadow: var(--shadow-2);
+      box-shadow: var(--shadow-3);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    .org-node.org-node-root {
+      background: var(--color-primary-muted);
+      border-color: var(--color-primary);
+      min-width: 200px;
+    }
+    .org-node.org-node-dept-lead {
+      background: var(--color-surface-1);
+      border-color: var(--color-border-strong);
+    }
+    .org-node-info {
+      flex: 1;
+      overflow: hidden;
     }
     .org-node-name {
       font-weight: var(--weight-semibold);
       color: var(--color-text-1);
       font-size: var(--text-body);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .org-node-role {
-      font-size: var(--text-body-sm);
+      font-size: var(--text-caption);
       color: var(--color-text-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .org-node-dept {
+      font-size: var(--text-caption);
+      color: var(--color-primary);
+      font-weight: var(--weight-medium);
+    }
+    .org-dept-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .org-dept-label {
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+    }
+    .org-direct-reports {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-top: 2px;
     }
     .org-dept-label {
       font-size: var(--text-body-lg);
@@ -617,9 +723,178 @@
 
     /* Hidden utility */
     .hidden { display: none !important; }
+
+    /* ── Breadcrumb nav ── */
+    .breadcrumb ol {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-4) 0;
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .breadcrumb li + li::before {
+      content: '/';
+      margin-right: var(--space-2);
+      color: var(--color-text-3);
+    }
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb [aria-current="page"] { color: var(--color-text-1); font-weight: var(--weight-medium); }
+
+    /* ── Profile Reports-to ── */
+    .profile-reports-to {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      margin-top: var(--space-2);
+    }
+
+    /* ── Profile Timeline Gantt ── */
+    .profile-timeline-gantt {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      margin-bottom: var(--space-5);
+      overflow-x: auto;
+    }
+    .pt-header {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      text-align: center;
+      margin-bottom: var(--space-3);
+      letter-spacing: 0.5px;
+    }
+    .pt-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .pt-row:last-child { margin-bottom: 0; }
+    .pt-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-2);
+      min-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+    .pt-track {
+      flex: 1;
+      height: 20px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-sm);
+      position: relative;
+      overflow: visible;
+    }
+    .pt-bar {
+      position: absolute;
+      top: 0;
+      height: 20px;
+      border-radius: var(--radius-sm);
+      opacity: 0.85;
+      transition: opacity var(--motion-fast);
+      cursor: default;
+    }
+    .pt-bar:hover { opacity: 1; }
+    .pt-bar[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-surface-3);
+      color: var(--color-text-1);
+      font-size: var(--text-caption);
+      white-space: nowrap;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ── Skills proficiency ── */
+    .skill-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .skill-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .skill-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .skill-name {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-1);
+    }
+    .skill-level {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+    }
+    .skill-proficiency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .skill-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .skill-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      transition: width var(--motion-slow) var(--ease-out);
+    }
+
+    /* ── Skeleton loading ── */
+    .skeleton-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--color-surface-2);
+      animation: skeleton-pulse 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .skeleton-title {
+      height: 16px;
+      border-radius: var(--radius-sm);
+      background: var(--color-surface-2);
+      animation: skeleton-pulse 1.4s ease-in-out infinite;
+    }
+    .skeleton-text {
+      height: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--color-surface-2);
+      animation: skeleton-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
   </style>
 </head>
 <body>
+<a href="#main-content" class="skip-to-content">Skip to content</a>
   <div class="app">
     <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
@@ -628,7 +903,7 @@
         <span class="logo-text">GammaHR</span>
       </div>
 
-      <nav class="sidebar-nav">
+      <nav class="sidebar-nav" aria-label="Main navigation">
         <!-- MAIN -->
         <div class="nav-section">
           <div class="nav-section-label">Main</div>
@@ -651,17 +926,25 @@
             <span class="nav-label">Leaves</span>
             <span class="nav-badge">3</span>
           </a>
+          <a href="calendar.html" class="nav-item">
+            <svg data-lucide="calendar"></svg>
+            <span class="nav-label">Calendar</span>
+          </a>
+          <a href="insights.html#ask-ai" class="nav-item">
+            <svg data-lucide="sparkles"></svg>
+            <span class="nav-label">Ask AI</span>
+          </a>
         </div>
 
         <!-- HR -->
         <div class="nav-section">
           <div class="nav-section-label">HR</div>
-          <a href="recruitment.html" class="nav-item">
+          <a href="hr.html" class="nav-item">
             <svg data-lucide="user-search"></svg>
             <span class="nav-label">Recruitment</span>
             <span class="nav-badge">5</span>
           </a>
-          <a href="onboarding.html" class="nav-item">
+          <a href="hr.html" class="nav-item">
             <svg data-lucide="user-check"></svg>
             <span class="nav-label">Onboarding</span>
           </a>
@@ -686,9 +969,9 @@
             <svg data-lucide="calendar-range"></svg>
             <span class="nav-label">Resource Planning</span>
           </a>
-          <a href="calendar.html" class="nav-item">
-            <svg data-lucide="calendar"></svg>
-            <span class="nav-label">Calendar</span>
+          <a href="gantt.html" class="nav-item">
+            <svg data-lucide="gantt-chart-square"></svg>
+            <span class="nav-label">Gantt Chart</span>
           </a>
         </div>
 
@@ -700,7 +983,7 @@
             <span class="nav-label">Invoices</span>
           </a>
           <a href="insights.html" class="nav-item">
-            <svg data-lucide="bar-chart-3"></svg>
+            <svg data-lucide="sparkles"></svg>
             <span class="nav-label">Insights</span>
           </a>
         </div>
@@ -721,6 +1004,10 @@
       </nav>
 
       <div class="sidebar-footer">
+        <button class="nav-item" onclick="GHR && GHR.openShortcuts ? GHR.openShortcuts() : document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
+          <svg data-lucide="keyboard" class="nav-icon"></svg>
+          <span class="nav-label">Help &amp; Shortcuts</span>
+        </button>
         <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
           <svg data-lucide="panel-left-close"></svg>
           <span>Collapse</span>
@@ -746,7 +1033,7 @@
           <button class="mobile-search-btn" onclick="document.getElementById('headerSearch').click()">
             <svg data-lucide="search"></svg>
           </button>
-          <div style="position: relative;">
+          <div class="relative">
             <button class="header-icon-btn" id="notifBtn">
               <svg data-lucide="bell"></svg>
               <span class="notif-dot"></span>
@@ -781,7 +1068,7 @@
               </div>
             </div>
           </div>
-          <div style="position: relative;">
+          <div class="relative">
             <div class="header-user" id="userBtn">
               <div class="avatar avatar-sm avatar-status online">SC</div>
               <div>
@@ -794,7 +1081,7 @@
                 <div class="name">Sarah Chen</div>
                 <div class="email">sarah.chen@gammahr.io</div>
               </div>
-              <a href="employees.html" class="dropdown-item"><svg data-lucide="user"></svg> Profile</a>
+              <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user"></svg> Profile</a>
               <a href="admin.html" class="dropdown-item"><svg data-lucide="settings"></svg> Settings</a>
               <div class="dropdown-divider"></div>
               <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out"></svg> Sign out</a>
@@ -804,7 +1091,7 @@
       </header>
 
       <!-- ============ PAGE CONTENT ============ -->
-      <main class="page-content">
+      <main class="page-content" id="main-content">
 
         <!-- ==================== VIEW 1: DIRECTORY ==================== -->
         <div id="directoryView">
@@ -815,7 +1102,7 @@
               <p class="page-subtitle">12 team members across 6 departments</p>
             </div>
             <div class="page-header-actions">
-              <button class="btn btn-secondary btn-md" id="exportBtn">
+              <button class="btn btn-secondary btn-md" id="exportBtn" onclick="showToast('Export started — CSV downloading...')">
                 <svg data-lucide="download" style="width:16px;height:16px;"></svg>
                 Export
               </button>
@@ -826,8 +1113,16 @@
             </div>
           </div>
 
+          <!-- Breadcrumb -->
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol>
+              <li><a href="index.html">Dashboard</a></li>
+              <li><span aria-current="page">Team Directory</span></li>
+            </ol>
+          </nav>
+
           <!-- Filter Bar -->
-          <div class="filter-bar">
+          <div class="filter-bar-standard">
             <div class="filter-search">
               <svg data-lucide="search"></svg>
               <input type="text" placeholder="Search by name, title, or department..." id="employeeSearch">
@@ -862,20 +1157,35 @@
               <button class="view-toggle-btn" data-view="list" title="List view">
                 <svg data-lucide="list" style="width:16px;height:16px;"></svg>
               </button>
+              <button class="view-toggle-btn" data-view="org" title="Org Chart">
+                <svg data-lucide="network" style="width:16px;height:16px;"></svg>
+              </button>
             </div>
           </div>
 
+          <!-- ===== SKELETON GRID (shown during load) ===== -->
+          <div id="empSkelGrid" style="display:none; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:var(--space-4);">
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+            <div class="card" style="padding:var(--space-4);"><div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);"><div class="skeleton-avatar"></div><div style="flex:1"><div class="skeleton-title" style="margin-bottom:8px"></div><div class="skeleton-text"></div></div></div><div class="skeleton-text" style="margin-bottom:6px"></div><div class="skeleton-text" style="width:60%"></div></div>
+          </div>
+
           <!-- ===== GRID VIEW ===== -->
-          <div id="gridView" class="employee-grid">
+          <div id="empRealGrid"><div id="gridView" class="employee-grid">
 
             <!-- 1. Sarah Chen -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">SC</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">SC</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="sarah-chen">Sarah Chen</a>
-                  <div class="employee-card-title">Engineering Lead</div>
-                  <div class="employee-card-dept">Engineering</div>
+                  <a class="employee-card-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
+                  <div class="employee-card-title">Design Lead</div>
+                  <div class="employee-card-dept">Design</div>
                 </div>
               </div>
               <div class="employee-card-projects">
@@ -889,16 +1199,16 @@
                 <span class="worktime-pct green">87%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 2. John Smith -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">JS</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">JS</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="john-smith">John Smith</a>
+                  <a class="employee-card-name" data-employee="john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#profile-john">John Smith</a>
                   <div class="employee-card-title">Senior Developer</div>
                   <div class="employee-card-dept">Engineering</div>
                 </div>
@@ -908,23 +1218,23 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 92%;"></div>
+                  <div class="worktime-fill green" style="width: 82%;"></div>
                 </div>
-                <span class="worktime-pct green">92%</span>
+                <span class="worktime-pct green">82%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 3. Alice Wang -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status on-leave">AW</div>
+                <span class="avatar-status presence-leave"><div class="avatar avatar-lg">AW</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="alice-wang">Alice Wang</a>
+                  <a class="employee-card-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="75" data-href="employees.html#profile-alice">Alice Wang</a>
                   <div class="employee-card-title">Design Lead</div>
-                  <div class="employee-card-dept">Design</div>
+                  <div class="employee-card-dept">Engineering</div>
                 </div>
               </div>
               <div class="employee-card-projects">
@@ -932,47 +1242,47 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill red" style="width: 45%;"></div>
+                  <div class="worktime-fill yellow" style="width: 75%;"></div>
                 </div>
-                <span class="worktime-pct red">45%</span>
+                <span class="worktime-pct yellow">75%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-error "><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave (returns Apr 12)</span>
+                <span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14–18</span>
               </div>
             </div>
 
             <!-- 4. Bob Taylor -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status offline">BT</div>
+                <span class="avatar-status presence-offline"><div class="avatar avatar-lg">BT</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="bob-taylor">Bob Taylor</a>
+                  <a class="employee-card-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="72" data-href="employees.html#profile-bob">Bob Taylor</a>
                   <div class="employee-card-title">Backend Developer</div>
                   <div class="employee-card-dept">Engineering</div>
                 </div>
               </div>
               <div class="employee-card-projects">
-                <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> BENCH</span>
+                <a href="projects.html">Globex Phase 2</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill red" style="width: 0%;"></div>
+                  <div class="worktime-fill yellow" style="width: 72%;"></div>
                 </div>
-                <span class="worktime-pct red">0%</span>
+                <span class="worktime-pct yellow">72%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
+                <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
               </div>
             </div>
 
             <!-- 5. Carol Kim -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">CK</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">CK</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="carol-kim">Carol Kim</a>
-                  <div class="employee-card-title">Data Analyst</div>
-                  <div class="employee-card-dept">Analytics</div>
+                  <a class="employee-card-name" data-employee="carol-kim" data-hovercard data-name="Carol Kim" data-role="HR Manager" data-dept="HR" data-project="Initech API" data-worktime="78" data-href="employees.html#profile-carol">Carol Kim</a>
+                  <div class="employee-card-title">HR Manager</div>
+                  <div class="employee-card-dept">HR</div>
                 </div>
               </div>
               <div class="employee-card-projects">
@@ -980,21 +1290,21 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 78%;"></div>
+                  <div class="worktime-fill yellow" style="width: 78%;"></div>
                 </div>
-                <span class="worktime-pct green">78%</span>
+                <span class="worktime-pct yellow">78%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 6. David Park -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status away">DP</div>
+                <span class="avatar-status presence-away"><div class="avatar avatar-lg">DP</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="david-park">David Park</a>
+                  <a class="employee-card-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Globex Phase 2" data-worktime="65" data-href="employees.html#profile-david">David Park</a>
                   <div class="employee-card-title">Finance Lead</div>
                   <div class="employee-card-dept">Finance</div>
                 </div>
@@ -1009,18 +1319,18 @@
                 <span class="worktime-pct yellow">65%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-warning "><svg data-lucide="moon" width="12" height="12"></svg> Away</span>
+                <span class="badge badge-warning"><svg data-lucide="moon" width="12" height="12"></svg> Away</span>
               </div>
             </div>
 
             <!-- 7. Emma Laurent -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">EL</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">EL</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="emma-laurent">Emma Laurent</a>
-                  <div class="employee-card-title">QA Engineer</div>
-                  <div class="employee-card-dept">Finance</div>
+                  <a class="employee-card-name" data-employee="emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="78" data-href="employees.html#profile-emma">Emma Laurent</a>
+                  <div class="employee-card-title">HR Specialist</div>
+                  <div class="employee-card-dept">HR</div>
                 </div>
               </div>
               <div class="employee-card-projects">
@@ -1028,21 +1338,21 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 100%;"></div>
+                  <div class="worktime-fill yellow" style="width: 78%;"></div>
                 </div>
-                <span class="worktime-pct green">100%</span>
+                <span class="worktime-pct yellow">78%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 8. Marco Rossi -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">MR</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">MR</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="marco-rossi">Marco Rossi</a>
+                  <a class="employee-card-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a>
                   <div class="employee-card-title">Operations Lead</div>
                   <div class="employee-card-dept">Operations</div>
                 </div>
@@ -1052,17 +1362,17 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 95%;"></div>
+                  <div class="worktime-fill green" style="width: 88%;"></div>
                 </div>
-                <span class="worktime-pct green">95%</span>
+                <span class="worktime-pct green">88%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 9. Sophie Dubois -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">SD</div>
                 <div class="employee-card-info">
@@ -1081,12 +1391,12 @@
                 <span class="worktime-pct green">82%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 10. Yuki Tanaka -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status offline">YT</div>
                 <div class="employee-card-info">
@@ -1105,12 +1415,12 @@
                 <span class="worktime-pct yellow">70%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
+                <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
               </div>
             </div>
 
             <!-- 11. Marie Dupont -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">MD</div>
                 <div class="employee-card-info">
@@ -1129,12 +1439,12 @@
                 <span class="worktime-pct green">100%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
 
             <!-- 12. Liam O'Brien -->
-            <div class="employee-card">
+            <div class="card card-interactive employee-card">
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">LO</div>
                 <div class="employee-card-info">
@@ -1153,7 +1463,7 @@
                 <span class="worktime-pct green">88%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
               </div>
             </div>
           </div>
@@ -1176,127 +1486,286 @@
               <tbody>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SC</div><a class="cell-user-name" data-employee="sarah-chen">Sarah Chen</a></div></td>
-                  <td>Engineering Lead</td>
-                  <td class="cell-secondary">Engineering</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Acme Web Redesign, Initech API</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">87%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SC</div><a class="cell-user-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a></div></td>
+                  <td data-label="Job Title">Design Lead</td>
+                  <td data-label="Department" class="cell-secondary">Design</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign, Initech API</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">87%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">JS</div><a class="cell-user-name" data-employee="john-smith">John Smith</a></div></td>
-                  <td>Senior Developer</td>
-                  <td class="cell-secondary">Engineering</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Globex Phase 2</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">92%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">JS</div><a class="cell-user-name" data-employee="john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#profile-john">John Smith</a></div></td>
+                  <td data-label="Job Title">Senior Developer</td>
+                  <td data-label="Department" class="cell-secondary">Engineering</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Globex Phase 2</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">82%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status on-leave">AW</div><a class="cell-user-name" data-employee="alice-wang">Alice Wang</a></div></td>
-                  <td>Design Lead</td>
-                  <td class="cell-secondary">Design</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Acme Web Redesign</a></td>
-                  <td><span class="font-mono text-error" style="font-weight:var(--weight-semibold)">45%</span></td>
-                  <td><span class="badge badge-error "><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status on-leave">AW</div><a class="cell-user-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering" data-worktime="75" data-href="employees.html#profile-alice">Alice Wang</a></div></td>
+                  <td data-label="Job Title">Design Lead</td>
+                  <td data-label="Department" class="cell-secondary">Engineering</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">75%</span></td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14–18</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">BT</div><a class="cell-user-name" data-employee="bob-taylor">Bob Taylor</a></div></td>
-                  <td>Backend Developer</td>
-                  <td class="cell-secondary">Engineering</td>
-                  <td><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> BENCH</span></td>
-                  <td><span class="font-mono text-error" style="font-weight:var(--weight-semibold)">0%</span></td>
-                  <td><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Offline</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">BT</div><a class="cell-user-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="72" data-href="employees.html#profile-bob">Bob Taylor</a></div></td>
+                  <td data-label="Job Title">Backend Developer</td>
+                  <td data-label="Department" class="cell-secondary">Engineering</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Globex Phase 2</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">72%</span></td>
+                  <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">CK</div><a class="cell-user-name" data-employee="carol-kim">Carol Kim</a></div></td>
-                  <td>Data Analyst</td>
-                  <td class="cell-secondary">Analytics</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Initech API</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">78%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">CK</div><a class="cell-user-name" data-employee="carol-kim" data-hovercard data-name="Carol Kim" data-role="HR Manager" data-dept="HR" data-worktime="78" data-href="employees.html#profile-carol">Carol Kim</a></div></td>
+                  <td data-label="Job Title">HR Manager</td>
+                  <td data-label="Department" class="cell-secondary">HR</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Initech API</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">78%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status away">DP</div><a class="cell-user-name" data-employee="david-park">David Park</a></div></td>
-                  <td>Finance Lead</td>
-                  <td class="cell-secondary">Finance</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Globex Phase 2</a></td>
-                  <td><span class="font-mono text-warning" style="font-weight:var(--weight-semibold)">65%</span></td>
-                  <td><span class="badge badge-warning "><svg data-lucide="moon" width="12" height="12"></svg> Away</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status away">DP</div><a class="cell-user-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="65" data-href="employees.html#profile-david">David Park</a></div></td>
+                  <td data-label="Job Title">Finance Lead</td>
+                  <td data-label="Department" class="cell-secondary">Finance</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Globex Phase 2</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">65%</span></td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="moon" width="12" height="12"></svg> Away</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">EL</div><a class="cell-user-name" data-employee="emma-laurent">Emma Laurent</a></div></td>
-                  <td>QA Engineer</td>
-                  <td class="cell-secondary">Finance</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Internal</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">100%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">EL</div><a class="cell-user-name" data-employee="emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#profile-emma">Emma Laurent</a></div></td>
+                  <td data-label="Job Title">HR Specialist</td>
+                  <td data-label="Department" class="cell-secondary">HR</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Internal</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">78%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MR</div><a class="cell-user-name" data-employee="marco-rossi">Marco Rossi</a></div></td>
-                  <td>Operations Lead</td>
-                  <td class="cell-secondary">Operations</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Acme Web Redesign</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">95%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MR</div><a class="cell-user-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a></div></td>
+                  <td data-label="Job Title">Operations Lead</td>
+                  <td data-label="Department" class="cell-secondary">Operations</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">88%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
                   <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois">Sophie Dubois</a></div></td>
-                  <td>Operations Manager</td>
-                  <td class="cell-secondary">Operations</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Contoso Deal</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">82%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td data-label="Job Title">Operations Manager</td>
+                  <td data-label="Department" class="cell-secondary">Operations</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Contoso Deal</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">82%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
                   <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">YT</div><a class="cell-user-name" data-employee="yuki-tanaka">Yuki Tanaka</a></div></td>
-                  <td>QA Engineer</td>
-                  <td class="cell-secondary">Engineering</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Initech API</a></td>
-                  <td><span class="font-mono text-warning" style="font-weight:var(--weight-semibold)">70%</span></td>
-                  <td><span class="badge badge-default "><svg data-lucide="circle" width="12" height="12"></svg> Offline</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td data-label="Job Title">QA Engineer</td>
+                  <td data-label="Department" class="cell-secondary">Engineering</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Initech API</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">70%</span></td>
+                  <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
                   <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MD</div><a class="cell-user-name" data-employee="marie-dupont">Marie Dupont</a></div></td>
-                  <td>CEO</td>
-                  <td class="cell-secondary">Executive</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Internal</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">100%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td data-label="Job Title">CEO</td>
+                  <td data-label="Department" class="cell-secondary">Executive</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Internal</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">100%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
                   <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien">Liam O'Brien</a></div></td>
-                  <td>Logistics Coordinator</td>
-                  <td class="cell-secondary">Operations</td>
-                  <td><a href="projects.html" style="font-size:var(--text-body-sm)">Acme Web Redesign</a></td>
-                  <td><span class="font-mono text-success" style="font-weight:var(--weight-semibold)">88%</span></td>
-                  <td><span class="badge badge-success "><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
-                  <td><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
+                  <td data-label="Job Title">Logistics Coordinator</td>
+                  <td data-label="Department" class="cell-secondary">Operations</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">88%</span></td>
+                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
               </tbody>
             </table>
           </div>
+
+          <!-- ===== ORG CHART VIEW ===== -->
+          <div id="orgView" class="hidden">
+            <div class="org-chart">
+              <div class="org-chart-inner">
+
+                <!-- Level 0: CEO -->
+                <div class="org-node-wrap">
+                  <a href="employees.html#profile-alex" class="org-node org-node-root" data-hovercard data-name="Alex Morrison" data-role="CEO" data-dept="Executive" data-worktime="72" data-href="employees.html#profile-alex">
+                    <span class="avatar-status presence-online"><div class="avatar">AM</div></span>
+                    <div class="org-node-info">
+                      <div class="org-node-name">Alex Morrison</div>
+                      <div class="org-node-role">CEO &amp; Founder</div>
+                      <div class="org-node-dept">Executive</div>
+                    </div>
+                  </a>
+                  <div class="org-connector-down"></div>
+                </div>
+
+                <!-- Level 1: Department Leads (horizontal row) -->
+                <div style="display:flex; gap:0; position:relative; justify-content:center; width:100%;">
+                  <!-- Horizontal line spanning all branches -->
+                  <div style="position:absolute; top:0; left:20%; right:20%; height:2px; background:var(--color-border-strong);"></div>
+
+                  <!-- Design Branch -->
+                  <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
+                    <div class="org-connector-up"></div>
+                    <a href="employees.html#profile-sarah" class="org-node org-node-dept-lead" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">
+                      <span class="avatar-status presence-online"><div class="avatar">SC</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Sarah Chen</div>
+                        <div class="org-node-role">Design Lead</div>
+                        <div class="org-node-dept">Design</div>
+                        <div class="org-direct-reports">1 direct report</div>
+                      </div>
+                    </a>
+                    <div class="org-connector-down"></div>
+                    <!-- Alice (reports to Sarah) -->
+                    <a href="employees.html#profile-alice" class="org-node" data-hovercard data-name="Alice Wang" data-role="UX Designer" data-dept="Design" data-worktime="45" data-href="employees.html#profile-alice" style="max-width:185px;">
+                      <span class="avatar-status presence-leave"><div class="avatar">AW</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Alice Wang</div>
+                        <div class="org-node-role">UX Designer</div>
+                        <div class="org-node-dept">Design</div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Operations Branch -->
+                  <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
+                    <div class="org-connector-up"></div>
+                    <a href="employees.html#profile-john" class="org-node org-node-dept-lead" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Operations" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#profile-john">
+                      <span class="avatar-status presence-online"><div class="avatar">JS</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">John Smith</div>
+                        <div class="org-node-role">Project Manager</div>
+                        <div class="org-node-dept">Operations</div>
+                        <div class="org-direct-reports">1 direct report</div>
+                      </div>
+                    </a>
+                    <div class="org-connector-down"></div>
+                    <!-- Marco (reports to John) -->
+                    <a href="employees.html#profile-marco" class="org-node" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html#profile-marco" style="max-width:185px;">
+                      <span class="avatar-status presence-online"><div class="avatar">MR</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Marco Rossi</div>
+                        <div class="org-node-role">Operations Lead</div>
+                        <div class="org-node-dept">Operations</div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Engineering Branch -->
+                  <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
+                    <div class="org-connector-up"></div>
+                    <div class="org-node org-node-dept-lead" style="cursor:default; max-width:185px; opacity:0.6;">
+                      <div class="avatar" style="background:var(--color-surface-3);">?</div>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Eng. Manager</div>
+                        <div class="org-node-role">Engineering Lead</div>
+                        <div class="org-node-dept">Engineering</div>
+                        <div class="org-direct-reports">Position open</div>
+                      </div>
+                    </div>
+                    <div class="org-connector-down"></div>
+                    <!-- Bob (Engineering, bench) -->
+                    <a href="employees.html#profile-bob" class="org-node" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob" style="max-width:185px;">
+                      <span class="avatar-status presence-offline"><div class="avatar">BT</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Bob Taylor</div>
+                        <div class="org-node-role">Backend Developer</div>
+                        <div class="org-node-dept">Engineering</div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Finance Branch -->
+                  <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
+                    <div class="org-connector-up"></div>
+                    <a href="employees.html#profile-david" class="org-node org-node-dept-lead" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">
+                      <span class="avatar-status presence-away"><div class="avatar">DP</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">David Park</div>
+                        <div class="org-node-role">Finance Lead</div>
+                        <div class="org-node-dept">Finance</div>
+                        <div class="org-direct-reports">1 direct report</div>
+                      </div>
+                    </a>
+                    <div class="org-connector-down"></div>
+                    <!-- Carol (reports to David) -->
+                    <a href="employees.html#profile-carol" class="org-node" data-hovercard data-name="Carol Kim" data-role="Finance Analyst" data-dept="Finance" data-project="Internal" data-worktime="90" data-href="employees.html#profile-carol" style="max-width:185px;">
+                      <span class="avatar-status presence-online"><div class="avatar">CK</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Carol Kim</div>
+                        <div class="org-node-role">Finance Analyst</div>
+                        <div class="org-node-dept">Finance</div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- HR Branch -->
+                  <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
+                    <div class="org-connector-up"></div>
+                    <a href="employees.html#profile-emma" class="org-node org-node-dept-lead" data-hovercard data-name="Emma Laurent" data-role="HR Manager" data-dept="HR" data-worktime="78" data-href="employees.html#profile-emma">
+                      <span class="avatar-status presence-online"><div class="avatar">EL</div></span>
+                      <div class="org-node-info">
+                        <div class="org-node-name">Emma Laurent</div>
+                        <div class="org-node-role">HR Manager</div>
+                        <div class="org-node-dept">HR</div>
+                        <div class="org-direct-reports">No direct reports</div>
+                      </div>
+                    </a>
+                  </div>
+                </div><!-- /level-1 row -->
+
+              </div><!-- /org-chart-inner -->
+            </div><!-- /org-chart -->
+
+            <!-- Legend -->
+            <div style="display:flex; align-items:center; gap:var(--space-6); padding:var(--space-4) var(--space-4) 0; flex-wrap:wrap;">
+              <div style="font-size:var(--text-caption); color:var(--color-text-3);">
+                <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--color-primary-muted); border:1px solid var(--color-primary); margin-right:4px; vertical-align:middle;"></span>
+                Executive
+              </div>
+              <div style="font-size:var(--text-caption); color:var(--color-text-3);">
+                <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--color-surface-1); border:1px solid var(--color-border-strong); margin-right:4px; vertical-align:middle;"></span>
+                Department Lead
+              </div>
+              <div style="font-size:var(--text-caption); color:var(--color-text-3);">
+                <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--color-surface-0); border:1px solid var(--color-border); margin-right:4px; vertical-align:middle;"></span>
+                Team Member
+              </div>
+              <div style="margin-left:auto; font-size:var(--text-caption); color:var(--color-text-3);">
+                12 employees · 5 departments
+              </div>
+            </div>
+          </div><!-- /orgView -->
+
+          </div><!-- /empRealGrid -->
 
           <!-- Empty State (hidden by default) -->
           <div id="emptyDirectory" class="empty-state hidden">
@@ -1317,6 +1786,12 @@
             Back to Team
           </button>
 
+          <nav class="breadcrumbs mb-3" aria-label="Breadcrumb">
+            <a href="employees.html">Team Directory</a>
+            <span class="separator">/</span>
+            <span class="current" id="breadcrumbName">Sarah Chen</span>
+          </nav>
+
           <!-- Hero Header -->
           <div class="profile-hero">
             <div class="profile-hero-left">
@@ -1327,7 +1802,11 @@
                 Sarah Chen
                 <span class="online-dot"></span>
               </div>
-              <div class="profile-hero-role">Engineering Lead &middot; Engineering</div>
+              <div class="profile-hero-role">Design Lead &middot; Design</div>
+              <div class="profile-reports-to">
+                <span class="text-3">Reports to</span>
+                <a href="employees.html#profile-alex" class="text-primary" data-hovercard data-name="Alex Morrison" data-role="CEO" data-dept="Executive" data-worktime="72" data-href="employees.html#profile-alex">Alex Morrison</a>
+              </div>
               <div class="profile-hero-meta">
                 <div class="profile-hero-meta-item">
                   <svg data-lucide="calendar"></svg>
@@ -1378,7 +1857,7 @@
           </div>
 
           <!-- Profile Tabs -->
-          <div class="tabs" id="profileTabs">
+          <div class="tabs" role="tablist" id="profileTabs">
             <button class="tab active" data-tab="timeline">
               <svg data-lucide="clock" style="width:16px;height:16px;"></svg>
               Timeline
@@ -1410,7 +1889,36 @@
           </div>
 
           <!-- Tab Content: Timeline -->
-          <div class="tab-content active" id="tab-timeline" style="padding-top: var(--space-6);">
+          <div class="tab-content active" id="tab-timeline" class="pt-6">
+            <!-- Mini Gantt — Project History -->
+            <div class="profile-timeline-gantt">
+              <div class="pt-header">Jan 2025 ─────────────────────────────────── Apr 2026</div>
+              <div class="pt-row">
+                <span class="pt-label">Acme Web Redesign</span>
+                <div class="pt-track">
+                  <div class="pt-bar" style="left:72%; width:21%; background:var(--color-primary);" title="Feb 2026 – Apr 2026 · Acme Corp"></div>
+                </div>
+              </div>
+              <div class="pt-row">
+                <span class="pt-label">Initech API Integration</span>
+                <div class="pt-track">
+                  <div class="pt-bar" style="left:86%; width:10%; background:var(--color-accent);" title="Apr 2026 – ongoing · Initech Corp"></div>
+                </div>
+              </div>
+              <div class="pt-row">
+                <span class="pt-label">Vanguard Dashboard</span>
+                <div class="pt-track">
+                  <div class="pt-bar" style="left:33%; width:36%; background:var(--color-info);" title="Jun 2025 – Nov 2025 · Vanguard Inc"></div>
+                </div>
+              </div>
+              <div class="pt-row">
+                <span class="pt-label">Internal Tools Migration</span>
+                <div class="pt-track">
+                  <div class="pt-bar" style="left:0%; width:72%; background:var(--color-warning);" title="Apr 2023 – May 2025 · Internal"></div>
+                </div>
+              </div>
+            </div>
+
             <div class="timeline">
               <div class="timeline-item">
                 <div class="timeline-icon primary"><svg data-lucide="folder-kanban"></svg></div>
@@ -1425,7 +1933,7 @@
               <div class="timeline-item">
                 <div class="timeline-icon accent"><svg data-lucide="receipt"></svg></div>
                 <div class="timeline-date">March 22, 2026</div>
-                <div class="timeline-text">Expense submitted: Conference ticket &mdash; <span class="font-mono">$450.00</span> (approved)</div>
+                <div class="timeline-text">Expense submitted: Conference ticket &mdash; <span class="font-mono">€450.00</span> (approved)</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon warning"><svg data-lucide="palm-tree"></svg></div>
@@ -1450,7 +1958,7 @@
               <div class="timeline-item">
                 <div class="timeline-icon accent"><svg data-lucide="receipt"></svg></div>
                 <div class="timeline-date">January 18, 2026</div>
-                <div class="timeline-text">Expense submitted: Software license (JetBrains) &mdash; <span class="font-mono">$249.00</span> (approved)</div>
+                <div class="timeline-text">Expense submitted: Software license (JetBrains) &mdash; <span class="font-mono">€249.00</span> (approved)</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon error"><svg data-lucide="palm-tree"></svg></div>
@@ -1491,7 +1999,7 @@
           </div>
 
           <!-- Tab Content: Projects -->
-          <div class="tab-content" id="tab-projects" style="padding-top: var(--space-6);">
+          <div class="tab-content" id="tab-projects" class="pt-6">
             <div class="section-header">
               <h3 class="section-title">Active Projects</h3>
             </div>
@@ -1510,19 +2018,19 @@
                 <tbody>
                   <tr>
                     <td><a href="projects.html">Acme Web Redesign</a></td>
-                    <td><a href="clients.html">Acme Corp</a></td>
-                    <td>Lead Operations Lead</td>
-                    <td class="cell-mono">60%</td>
-                    <td>Feb 1, 2026</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Client"><a href="clients.html">Acme Corp</a></td>
+                    <td data-label="Role">Lead Operations Lead</td>
+                    <td data-label="Allocation" class="cell-mono">60%</td>
+                    <td data-label="Start Date">Feb 1, 2026</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
                   </tr>
                   <tr>
                     <td><a href="projects.html">Initech API Integration</a></td>
-                    <td><a href="clients.html">Initech Corp</a></td>
-                    <td>Operations Lead</td>
-                    <td class="cell-mono">40%</td>
-                    <td>Apr 1, 2026</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Client"><a href="clients.html">Initech Corp</a></td>
+                    <td data-label="Role">Operations Lead</td>
+                    <td data-label="Allocation" class="cell-mono">40%</td>
+                    <td data-label="Start Date">Apr 1, 2026</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1545,17 +2053,17 @@
                 <tbody>
                   <tr>
                     <td><a href="projects.html">Vanguard Dashboard</a></td>
-                    <td><a href="clients.html">Vanguard Inc</a></td>
-                    <td>Full Stack Developer</td>
-                    <td>Jun 2025 - Nov 2025</td>
-                    <td><span class="badge badge-info"><svg data-lucide="check-circle" style="width:10px;height:10px;"></svg> Completed</span></td>
+                    <td data-label="Client"><a href="clients.html">Vanguard Inc</a></td>
+                    <td data-label="Role">Full Stack Developer</td>
+                    <td data-label="Duration">Jun 2025 - Nov 2025</td>
+                    <td data-label="Status"><span class="badge badge-info"><svg data-lucide="check-circle" style="width:10px;height:10px;"></svg> Completed</span></td>
                   </tr>
                   <tr>
                     <td><a href="projects.html">Internal Tools Migration</a></td>
-                    <td>Internal</td>
-                    <td>Operations Lead</td>
-                    <td>Apr 2023 - May 2025</td>
-                    <td><span class="badge badge-info"><svg data-lucide="check-circle" style="width:10px;height:10px;"></svg> Completed</span></td>
+                    <td data-label="Client">Internal</td>
+                    <td data-label="Role">Operations Lead</td>
+                    <td data-label="Duration">Apr 2023 - May 2025</td>
+                    <td data-label="Status"><span class="badge badge-info"><svg data-lucide="check-circle" style="width:10px;height:10px;"></svg> Completed</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1563,7 +2071,7 @@
           </div>
 
           <!-- Tab Content: Leaves -->
-          <div class="tab-content" id="tab-leaves" style="padding-top: var(--space-6);">
+          <div class="tab-content" id="tab-leaves" class="pt-6">
             <div class="section-header">
               <h3 class="section-title">Leave Balances</h3>
             </div>
@@ -1618,43 +2126,43 @@
                 <tbody>
                   <tr>
                     <td><span class="badge badge-primary"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                    <td>Mar 10, 2026</td>
-                    <td>Mar 14, 2026</td>
-                    <td class="cell-mono">5</td>
-                    <td>Spring break</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Start Date">Mar 10, 2026</td>
+                    <td data-label="End Date">Mar 14, 2026</td>
+                    <td data-label="Days" class="cell-mono">5</td>
+                    <td data-label="Reason">Spring break</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td><span class="badge badge-error"><svg data-lucide="calendar" width="12" height="12"></svg> Sick</span></td>
-                    <td>Jan 2, 2026</td>
-                    <td>Jan 3, 2026</td>
-                    <td class="cell-mono">2</td>
-                    <td>Flu</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td><span class="badge badge-primary"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                    <td>Aug 4, 2025</td>
-                    <td>Aug 15, 2025</td>
-                    <td class="cell-mono">10</td>
-                    <td>Summer vacation</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td><span class="badge badge-warning"><svg data-lucide="calendar" width="12" height="12"></svg> Sick</span></td>
+                    <td data-label="Start Date">Jan 2, 2026</td>
+                    <td data-label="End Date">Jan 3, 2026</td>
+                    <td data-label="Days" class="cell-mono">2</td>
+                    <td data-label="Reason">Flu</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
                     <td><span class="badge badge-primary"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                    <td>Apr 14, 2025</td>
-                    <td>Apr 18, 2025</td>
-                    <td class="cell-mono">5</td>
-                    <td>Family event</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Start Date">Aug 4, 2025</td>
+                    <td data-label="End Date">Aug 15, 2025</td>
+                    <td data-label="Days" class="cell-mono">10</td>
+                    <td data-label="Reason">Summer vacation</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td><span class="badge badge-error"><svg data-lucide="calendar" width="12" height="12"></svg> Sick</span></td>
-                    <td>Dec 15, 2024</td>
-                    <td>Dec 16, 2024</td>
-                    <td class="cell-mono">2</td>
-                    <td>Medical appointment</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td><span class="badge badge-primary"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
+                    <td data-label="Start Date">Apr 14, 2025</td>
+                    <td data-label="End Date">Apr 18, 2025</td>
+                    <td data-label="Days" class="cell-mono">5</td>
+                    <td data-label="Reason">Family event</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-warning"><svg data-lucide="calendar" width="12" height="12"></svg> Sick</span></td>
+                    <td data-label="Start Date">Dec 15, 2024</td>
+                    <td data-label="End Date">Dec 16, 2024</td>
+                    <td data-label="Days" class="cell-mono">2</td>
+                    <td data-label="Reason">Medical appointment</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1662,7 +2170,7 @@
           </div>
 
           <!-- Tab Content: Timesheets -->
-          <div class="tab-content" id="tab-timesheets" style="padding-top: var(--space-6);">
+          <div class="tab-content" id="tab-timesheets" class="pt-6">
             <div class="section-header">
               <h3 class="section-title">Monthly Timesheet Summary</h3>
             </div>
@@ -1681,51 +2189,51 @@
                 <tbody>
                   <tr>
                     <td>April 2026 <span class="badge badge-warning" style="margin-left:var(--space-1)">In progress</span></td>
-                    <td class="cell-mono">134.0h</td>
-                    <td class="cell-mono">8.5h</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-semibold)">142.5h</td>
-                    <td class="cell-mono">160.0h</td>
-                    <td class="cell-mono text-warning">-17.5h</td>
+                    <td data-label="Billable" class="cell-mono">134.0h</td>
+                    <td data-label="Non-Billable" class="cell-mono">8.5h</td>
+                    <td data-label="Total" class="cell-mono" class="font-semibold">142.5h</td>
+                    <td data-label="Target" class="cell-mono">160.0h</td>
+                    <td data-label="Gap" class="cell-mono text-warning">-17.5h</td>
                   </tr>
                   <tr>
                     <td>March 2026</td>
-                    <td class="cell-mono">148.0h</td>
-                    <td class="cell-mono">12.0h</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-semibold)">160.0h</td>
-                    <td class="cell-mono">160.0h</td>
-                    <td class="cell-mono text-success">0.0h</td>
+                    <td data-label="Billable" class="cell-mono">148.0h</td>
+                    <td data-label="Non-Billable" class="cell-mono">12.0h</td>
+                    <td data-label="Total" class="cell-mono" class="font-semibold">160.0h</td>
+                    <td data-label="Target" class="cell-mono">160.0h</td>
+                    <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
                   <tr>
                     <td>February 2026</td>
-                    <td class="cell-mono">136.5h</td>
-                    <td class="cell-mono">15.5h</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-semibold)">152.0h</td>
-                    <td class="cell-mono">152.0h</td>
-                    <td class="cell-mono text-success">0.0h</td>
+                    <td data-label="Billable" class="cell-mono">136.5h</td>
+                    <td data-label="Non-Billable" class="cell-mono">15.5h</td>
+                    <td data-label="Total" class="cell-mono" class="font-semibold">152.0h</td>
+                    <td data-label="Target" class="cell-mono">152.0h</td>
+                    <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
                   <tr>
                     <td>January 2026</td>
-                    <td class="cell-mono">128.0h</td>
-                    <td class="cell-mono">16.0h</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-semibold)">144.0h</td>
-                    <td class="cell-mono">160.0h</td>
-                    <td class="cell-mono text-error">-16.0h</td>
+                    <td data-label="Billable" class="cell-mono">128.0h</td>
+                    <td data-label="Non-Billable" class="cell-mono">16.0h</td>
+                    <td data-label="Total" class="cell-mono" class="font-semibold">144.0h</td>
+                    <td data-label="Target" class="cell-mono">160.0h</td>
+                    <td data-label="Gap" class="cell-mono text-error">-16.0h</td>
                   </tr>
                   <tr>
                     <td>December 2025</td>
-                    <td class="cell-mono">112.0h</td>
-                    <td class="cell-mono">8.0h</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-semibold)">120.0h</td>
-                    <td class="cell-mono">120.0h</td>
-                    <td class="cell-mono text-success">0.0h</td>
+                    <td data-label="Billable" class="cell-mono">112.0h</td>
+                    <td data-label="Non-Billable" class="cell-mono">8.0h</td>
+                    <td data-label="Total" class="cell-mono" class="font-semibold">120.0h</td>
+                    <td data-label="Target" class="cell-mono">120.0h</td>
+                    <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
                   <tr>
                     <td>November 2025</td>
-                    <td class="cell-mono">152.5h</td>
-                    <td class="cell-mono">7.5h</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-semibold)">160.0h</td>
-                    <td class="cell-mono">160.0h</td>
-                    <td class="cell-mono text-success">0.0h</td>
+                    <td data-label="Billable" class="cell-mono">152.5h</td>
+                    <td data-label="Non-Billable" class="cell-mono">7.5h</td>
+                    <td data-label="Total" class="cell-mono" class="font-semibold">160.0h</td>
+                    <td data-label="Target" class="cell-mono">160.0h</td>
+                    <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
                 </tbody>
               </table>
@@ -1733,7 +2241,7 @@
           </div>
 
           <!-- Tab Content: Expenses -->
-          <div class="tab-content" id="tab-expenses" style="padding-top: var(--space-6);">
+          <div class="tab-content" id="tab-expenses" class="pt-6">
             <div class="section-header">
               <h3 class="section-title">Expense History</h3>
             </div>
@@ -1751,44 +2259,44 @@
                 <tbody>
                   <tr>
                     <td>Mar 22, 2026</td>
-                    <td>Conference</td>
-                    <td class="cell-mono">$450.00</td>
-                    <td><a href="projects.html">Acme Web Redesign</a></td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Type">Conference</td>
+                    <td data-label="Amount" class="cell-mono">€450.00</td>
+                    <td data-label="Project"><a href="projects.html">Acme Web Redesign</a></td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
                     <td>Jan 18, 2026</td>
-                    <td>Software License</td>
-                    <td class="cell-mono">$249.00</td>
-                    <td>Internal</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Type">Software License</td>
+                    <td data-label="Amount" class="cell-mono">€249.00</td>
+                    <td data-label="Project">Internal</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
                     <td>Nov 3, 2025</td>
-                    <td>Travel</td>
-                    <td class="cell-mono">$312.50</td>
-                    <td><a href="projects.html">Vanguard Dashboard</a></td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Type">Travel</td>
+                    <td data-label="Amount" class="cell-mono">€312.50</td>
+                    <td data-label="Project"><a href="projects.html">Vanguard Dashboard</a></td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
                     <td>Sep 15, 2025</td>
-                    <td>Equipment</td>
-                    <td class="cell-mono">$189.99</td>
-                    <td>Internal</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Type">Equipment</td>
+                    <td data-label="Amount" class="cell-mono">€189.99</td>
+                    <td data-label="Project">Internal</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                   <tr>
                     <td>Jul 8, 2025</td>
-                    <td>Training</td>
-                    <td class="cell-mono">$599.00</td>
-                    <td>Internal</td>
-                    <td><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
+                    <td data-label="Type">Training</td>
+                    <td data-label="Amount" class="cell-mono">€599.00</td>
+                    <td data-label="Project">Internal</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check" style="width:10px;height:10px;"></svg> Approved</span></td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
                     <td colspan="2" style="font-weight:var(--weight-semibold);text-align:right;border-top:1px solid var(--color-border)">Total</td>
-                    <td class="cell-mono" style="font-weight:var(--weight-bold);border-top:1px solid var(--color-border)">$1,800.49</td>
+                    <td class="cell-mono" style="font-weight:var(--weight-bold);border-top:1px solid var(--color-border)">€1,800.49</td>
                     <td colspan="2" style="border-top:1px solid var(--color-border)"></td>
                   </tr>
                 </tfoot>
@@ -1797,7 +2305,7 @@
           </div>
 
           <!-- Tab Content: Skills -->
-          <div class="tab-content" id="tab-skills" style="padding-top: var(--space-6);">
+          <div class="tab-content" id="tab-skills" class="pt-6">
             <div class="section-header">
               <h3 class="section-title">Skills &amp; Competencies</h3>
               <button class="btn btn-primary btn-sm">
@@ -1805,22 +2313,84 @@
                 Add Skill
               </button>
             </div>
-            <div class="skill-tags">
-              <span class="skill-tag"><svg data-lucide="code" style="width:14px;height:14px;"></svg> React</span>
-              <span class="skill-tag"><svg data-lucide="code" style="width:14px;height:14px;"></svg> TypeScript</span>
-              <span class="skill-tag"><svg data-lucide="code" style="width:14px;height:14px;"></svg> Rust</span>
-              <span class="skill-tag"><svg data-lucide="database" style="width:14px;height:14px;"></svg> PostgreSQL</span>
-              <span class="skill-tag"><svg data-lucide="box" style="width:14px;height:14px;"></svg> Three.js</span>
-              <span class="skill-tag"><svg data-lucide="container" style="width:14px;height:14px;"></svg> Docker</span>
-              <span class="skill-tag"><svg data-lucide="cloud" style="width:14px;height:14px;"></svg> AWS</span>
-              <span class="skill-tag"><svg data-lucide="network" style="width:14px;height:14px;"></svg> GraphQL</span>
-              <span class="skill-tag"><svg data-lucide="server" style="width:14px;height:14px;"></svg> Node.js</span>
-              <span class="skill-tag"><svg data-lucide="code" style="width:14px;height:14px;"></svg> Python</span>
+            <div class="card" style="padding:var(--space-5);">
+              <div class="skill-items-list">
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> React</span>
+                    <span class="skill-level">Expert</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">90%</span>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> TypeScript</span>
+                    <span class="skill-level">Advanced</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">75%</span>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="pen-tool" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> Figma</span>
+                    <span class="skill-level">Intermediate</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:60%;background:var(--color-info);"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">60%</span>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> CSS/Tailwind</span>
+                    <span class="skill-level">Expert</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">85%</span>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="server" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> Node.js</span>
+                    <span class="skill-level">Intermediate</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:55%;background:var(--color-info);"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">55%</span>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="container" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> Docker</span>
+                    <span class="skill-level">Advanced</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">70%</span>
+                  </div>
+                </div>
+                <div class="skill-item">
+                  <div class="skill-item-header">
+                    <span class="skill-name"><svg data-lucide="cloud" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> AWS</span>
+                    <span class="skill-level">Advanced</span>
+                  </div>
+                  <div class="skill-proficiency">
+                    <div class="skill-bar"><div class="skill-fill" style="width:72%"></div></div>
+                    <span style="font-size:var(--text-caption);color:var(--color-text-3);min-width:36px;text-align:right;">72%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Tab Content: Documents -->
-          <div class="tab-content" id="tab-documents" style="padding-top: var(--space-6);">
+          <div class="tab-content" id="tab-documents" class="pt-6">
             <div class="section-header">
               <h3 class="section-title">Documents</h3>
               <button class="btn btn-primary btn-sm">
@@ -1871,7 +2441,7 @@
 
   <!-- ============ INVITE MODAL ============ -->
   <div class="modal-backdrop" id="inviteModal">
-    <div class="modal modal-sm">
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
       <div class="modal-header">
         <span class="modal-title">Invite Team Member</span>
         <button class="modal-close" id="inviteModalClose"><svg data-lucide="x" style="width:18px;height:18px;"></svg></button>
@@ -1939,6 +2509,9 @@
     </div>
   </div>
 
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
   <!-- ============ EMPTY STATE TOGGLE ============ -->
   <button class="state-toggle" id="stateToggle">
     <svg data-lucide="toggle-left" style="width:16px;height:16px;"></svg>
@@ -1950,6 +2523,24 @@
   <script>
     // Initialize Lucide icons
     lucide.createIcons();
+
+    // ── Toast ──
+    function showToast(message, type) {
+      type = type || 'info';
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const iconMap = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.innerHTML = `
+        <div class="toast-icon"><svg data-lucide="${iconMap[type] || 'info'}" width="20" height="20"></svg></div>
+        <div class="toast-content"><div class="toast-title">${message}</div></div>
+        <button class="toast-close" onclick="this.parentElement.remove()"><svg data-lucide="x" width="16" height="16"></svg></button>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => { toast.classList.add('removing'); setTimeout(() => toast.remove(), 200); }, 4000);
+    }
 
     // ── State ──
     let isEmptyState = false;
@@ -2060,18 +2651,24 @@
       if (e.target === inviteModal) inviteModal.classList.remove('active');
     });
 
-    // ── View Toggle (Grid / List) ──
+    // ── View Toggle (Grid / List / Org) ──
+    const orgView = document.getElementById('orgView');
     document.querySelectorAll('.view-toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const view = btn.dataset.view;
+        gridView.classList.add('hidden');
+        listView.classList.add('hidden');
+        orgView.classList.add('hidden');
         if (view === 'grid') {
           gridView.classList.remove('hidden');
-          listView.classList.add('hidden');
-        } else {
-          gridView.classList.add('hidden');
+        } else if (view === 'list') {
           listView.classList.remove('hidden');
+        } else if (view === 'org') {
+          orgView.classList.remove('hidden');
+          // Re-init lucide icons for org chart nodes
+          if (typeof lucide !== 'undefined') lucide.createIcons();
         }
       });
     });
@@ -2184,12 +2781,57 @@
 
     // ── Init: navigate based on current hash ──
     navigateToView();
+
+    // ── Skeleton loading for grid ──
+    (function() {
+      const skel = document.getElementById('empSkelGrid');
+      const real = document.getElementById('empRealGrid');
+      if (skel && real) {
+        skel.style.display = 'grid';
+        real.style.display = 'none';
+        setTimeout(function() {
+          skel.style.display = 'none';
+          real.style.display = '';
+        }, 600);
+      }
+    })();
+
+    // ── Command palette items navigation ──
+    document.querySelectorAll('.cmd-palette-item').forEach(function(item) {
+      const href = item.dataset.href;
+      if (href) {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', function() { window.location.href = href; });
+      }
+    });
+
+    // Wire command palette items
+    const paletteItems = document.querySelectorAll('.cmd-palette-item');
+    const paletteLinks = ['index.html','employees.html','timesheets.html', null, null, null, null];
+    paletteItems.forEach(function(item, i) {
+      if (paletteLinks[i]) {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', function() { closeCmdPalette(); window.location.href = paletteLinks[i]; });
+      }
+    });
+  </script>
+  <script src="_shared.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.GHR) {
+        GHR.initHoverCard && GHR.initHoverCard();
+        GHR.initPresence && GHR.initPresence();
+        GHR.initRoleSwitcher && GHR.initRoleSwitcher();
+        GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
+        GHR.initSkeletons && GHR.initSkeletons();
+      }
+    });
   </script>
 
-  <nav class="bottom-nav" aria-label="Mobile navigation">
+  <nav class="bottom-nav" aria-label="Bottom navigation">
     <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
     <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
-    <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
+    <a href="employees.html" class="bottom-nav-item active"><svg data-lucide="users" width="22" height="22"></svg><span>Team</span></a>
     <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
     <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
   </nav>

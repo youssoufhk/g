@@ -46,6 +46,41 @@
 
 ---
 
+## Phase 0: The Prototype
+
+Before any Phase 1 or Phase 2 work begins, a fully interactive HTML/CSS/JS prototype exists at `/prototype/`. This prototype has been built, audited by 9 specialized critic agents, and has had all 213 identified issues resolved. It is **the approved visual spec** for the entire frontend.
+
+**Every agent must know:**
+- The prototype is not throwaway code — it is the approved design reference
+- `/prototype/_tokens.css` locks the color palette (Earth & Sage), typography, and spacing
+- `/prototype/_components.css` defines every component: buttons, badges, cards, modals, tables, hover cards, skeleton loading, 3D perspective, glassmorphism, avatar groups
+- `/prototype/_shared.js` implements global behaviors: hover cards, presence simulation, role switcher, keyboard shortcuts (G+key navigation, Cmd+K palette, ? help), skeleton loading, command palette, toasts
+- The canonical dataset (8 employees, 4 clients, 7 projects, invoices) is fixed — see `specs/DATA_ARCHITECTURE.md §Seed Data`
+
+**Phase 0 Deliverable (already complete):**
+| File | What it approves |
+|------|-----------------|
+| `prototype/index.html` | Dashboard design |
+| `prototype/auth.html` | Login, registration, MFA, onboarding flows |
+| `prototype/employees.html` | Employee directory and profile page |
+| `prototype/gantt.html` | Resource Gantt chart with drag, context menu, filters |
+| `prototype/leaves.html` | Leave request, balance, conflict detection |
+| `prototype/expenses.html` | Expense list, OCR upload, analytics |
+| `prototype/timesheets.html` | Week grid, month heatmap, copy-forward |
+| `prototype/projects.html` | Project list, detail view, milestones |
+| `prototype/clients.html` | Client list, detail, portal entry |
+| `prototype/portal/index.html` | Client-facing portal |
+| `prototype/invoices.html` | Invoice list, edit mode, record payment |
+| `prototype/calendar.html` | Day/week/month/quarter/year views |
+| `prototype/approvals.html` | Approvals hub with KPIs and detail panels |
+| `prototype/admin.html` | Admin panel with audit log, holiday management |
+| `prototype/insights.html` | AI insights, team performance, client health |
+| `prototype/planning.html` | Resource planning, what-if scenarios |
+| `prototype/account.html` | Account & Settings with 2FA, sessions, GDPR |
+| `prototype/hr.html` | HR module: recruitment, onboarding, offboarding |
+
+---
+
 ## Agent 1: Product Owner
 
 **Role:** Vision keeper, requirements definer, feature prioritizer
@@ -56,6 +91,10 @@
 - Acceptance criteria that leave zero ambiguity
 - Prioritization frameworks (RICE, MoSCoW)
 - Competitive analysis (BambooHR, Personio, Harvest, Toggl, Float)
+
+**Phase 0 Input:**
+- All feature flows visible in prototype HTML files — use these as validated acceptance criteria
+- The prototype represents what users have already approved; Phase 1 specs must align with it, not contradict it
 
 **Phase 1 Deliverables:**
 - [ ] Complete feature specification for every module (see APP_BLUEPRINT.md)
@@ -94,6 +133,11 @@
 - Accessibility (WCAG 2.2 AA compliance)
 - Mobile-first responsive design
 - Navigation patterns for complex apps (sidebar, command palette, breadcrumbs)
+
+**Phase 0 Input:**
+- Full UX flows implemented in all 17 prototype HTML files — all flows are approved; Phase 1 is optimization, not redesign
+- Interaction map (hover cards, keyboard shortcuts, role switcher, command palette) is already implemented in `_shared.js` — document it, don't replace it
+- Empty states, loading states (skeleton), and error paths are already defined in the prototype
 
 **Phase 1 Deliverables:**
 - [ ] Site map: complete page hierarchy with role-based visibility
@@ -140,6 +184,10 @@
 - Icon design (3D-rendered, consistent style)
 - Dark-mode-first design
 - Design token systems (colors, spacing, radius, shadows, motion)
+
+**Phase 0 Input:**
+- `_tokens.css` locks the color palette (Earth & Sage) and typography — the palette decision is already made; extend, don't replace
+- `_components.css` is the component library (buttons, badges, cards, modals, tables, hover cards, glassmorphism, 3D perspective, avatar groups) — use it as the design spec baseline
 
 **Phase 1 Deliverables:**
 - [ ] **3 Color Palette Proposals** with sample mockups for user to choose
@@ -209,6 +257,10 @@
 - 3D integration architecture (React Three Fiber, canvas management)
 - Accessibility architecture (focus management, ARIA patterns)
 
+**Phase 0 Input:**
+- Prototype demonstrates the component tree and state patterns — derive the React component hierarchy directly from the HTML structure
+- `_shared.js` shows the utility pattern (GHR namespace, init functions, event delegation) — use this as the model for client-side state utilities
+
 **Phase 1 Deliverables:**
 - [ ] **Component Tree** — complete hierarchy from App Shell to leaf components
 - [ ] **State Management Plan**
@@ -268,6 +320,11 @@
 - Responsive design implementation
 - Performance optimization (memo, virtualization, code splitting)
 
+**Phase 0 Input:**
+- Each prototype HTML file is the pixel-perfect spec for the corresponding Next.js page — replicate it exactly
+- `_components.css` and `_tokens.css` define the visual target; translate these directly into Tailwind classes and design tokens
+- `_shared.js` behaviors (hover cards, presence, command palette, keyboard shortcuts, skeleton loading) must all be replicated in React
+
 **Phase 1 Deliverables:**
 - [ ] Proof-of-concept: 3D card component with depth effect
 - [ ] Proof-of-concept: Gantt chart with 1000+ rows virtualized
@@ -311,6 +368,10 @@
 - CQRS patterns where beneficial
 - Security architecture (auth, RBAC, row-level security)
 - Performance architecture (connection pooling, query optimization)
+
+**Phase 0 Input:**
+- Canonical 8-employee, 4-client, 7-project dataset in `specs/DATA_ARCHITECTURE.md §Seed Data` must match prototype exactly — the prototype HTML files are the source of truth for what the data looks like
+- Every field visible in the prototype UI (names, statuses, relationships, computed values) must be representable by the data model
 
 **Phase 1 Deliverables:**
 - [ ] **Complete Data Model** (see DATA_ARCHITECTURE.md)
@@ -371,6 +432,10 @@
 - Error handling (thiserror, anyhow)
 - Testing (unit, integration, property-based)
 
+**Phase 0 Input:**
+- Seed data SQL must produce the exact data shown in prototype HTML files (8 employees, 4 clients, 7 projects, invoices, leave balances, timesheets)
+- The prototype's displayed computed values (totals, statuses, dates) serve as integration test expectations for API responses
+
 **Phase 1 Deliverables:**
 - [ ] Proof-of-concept: Multi-tenant schema switching middleware
 - [ ] Proof-of-concept: Real-time WebSocket broadcast
@@ -418,6 +483,10 @@
 - Rate limiting and DDoS mitigation
 - Secrets management
 - Supply chain security (dependency auditing)
+
+**Phase 0 Input:**
+- `prototype/auth.html` shows approved auth flows (MFA, passkey, SSO, rate limiting, company registration, session management) — these are the UX targets for the security implementation
+- The role switcher in the prototype (HR Admin, Project Manager, Employee, Client) defines the four roles the RBAC matrix must cover
 
 **Phase 1 Deliverables:**
 - [ ] **Threat Model** — STRIDE analysis for every component
@@ -476,6 +545,10 @@
 - Client-side WebSocket management (reconnection, backoff)
 - Optimistic UI updates with server reconciliation
 
+**Phase 0 Input:**
+- `prototype/_shared.js` `GHR.initPresence()` shows the presence simulation (online/offline/away states, avatar indicators, "currently viewing" labels) — real implementation must match this behavior exactly
+- Presence indicators appear throughout the prototype (employee list, Gantt, approvals hub) — every location must be supported by the WebSocket design
+
 **Phase 1 Deliverables:**
 - [ ] **WebSocket Protocol Specification**
   - Message types (subscribe, unsubscribe, presence, data update, notification)
@@ -531,6 +604,10 @@
 - Visual regression testing
 - Performance testing (k6, criterion benchmarks)
 - Multi-tenant testing (isolation verification)
+
+**Phase 0 Input:**
+- Every interaction in every prototype HTML file is a test case — the prototype is the acceptance test spec
+- The 9 critic audit reports (`prototype/audits/`) document edge cases and failure modes that were identified and resolved — use them as a source of regression test cases
 
 **Phase 1 Deliverables:**
 - [ ] **Test Strategy Document**
@@ -592,6 +669,9 @@
 - Health check design
 - Backup and disaster recovery
 
+**Phase 0 Input:**
+- Prototype has no DevOps implications — skip Phase 0
+
 **Phase 1 Deliverables:**
 - [ ] **Infrastructure Architecture**
   - Container topology diagram
@@ -650,6 +730,10 @@
 - Cross-cutting concern identification
 - Risk management
 - Communication facilitation
+
+**Phase 0 Input:**
+- AGENT_WORKFLOW.md Phase 0 section defines the 9 critic agents and their audit process; prototype is the output
+- The 213 resolved issues and audit reports (`prototype/audits/`) are the quality baseline — Phase 1 and Phase 2 quality gates must be at least as rigorous as the Phase 0 critic process
 
 **Phase 1 Deliverables:**
 - [ ] **Master Schedule** — Gantt chart of agent deliverables with dependencies

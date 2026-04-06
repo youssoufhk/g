@@ -33,6 +33,7 @@
   --color-warning-muted:  hsla(38, 65%, 50%, 0.15);
   --color-error:          hsl(5, 65%, 52%);
   --color-error-muted:    hsla(5, 65%, 52%, 0.15);
+  --color-error-hover:    hsl(5, 65%, 58%);
   --color-info:           hsl(200, 40%, 52%);
   --color-info-muted:     hsla(200, 40%, 52%, 0.15);
 
@@ -74,6 +75,7 @@
   --color-bar-bench:      hsla(38, 65%, 50%, 0.08);
   --color-surface-weekend:hsla(35, 10%, 8%, 0.6);
   --color-row-hover:      hsla(35, 10%, 11%, 0.4);
+  --color-internal:       var(--color-bar-nonbillable); /* alias for non-billable/internal time bars */
 
   /* ── WFH / Remote Color ── */
   --color-wfh:            hsl(175, 35%, 45%);
@@ -134,6 +136,11 @@
   --shadow-3: 0 4px 8px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
   --shadow-4: 0 8px 16px rgba(0,0,0,0.3), 0 16px 32px rgba(0,0,0,0.25);
   --shadow-5: 0 16px 32px rgba(0,0,0,0.35), 0 32px 64px rgba(0,0,0,0.3);
+  --shadow-md: var(--shadow-3);
+
+  /* ── Overlay ── */
+  --overlay-bg:      rgba(0,0,0,0.6);
+  --overlay-bg-soft: rgba(0,0,0,0.5);
 
   /* ── Glassmorphism ── */
   --glass-bg:     rgba(23, 21, 18, 0.75);
@@ -157,6 +164,88 @@
   --sidebar-wide:       256px;
 }
 
+/* ── Light Mode Override ── */
+[data-theme="light"] {
+  /* Backgrounds & Surfaces */
+  --color-bg:             hsl(40, 20%, 97%);
+  --color-surface-0:      hsl(40, 15%, 100%);
+  --color-surface-1:      hsl(40, 12%, 97%);
+  --color-surface-2:      hsl(40, 10%, 94%);
+  --color-surface-3:      hsl(40, 8%, 90%);
+
+  /* Primary — Deeper Sage for light bg */
+  --color-primary:        hsl(155, 30%, 34%);
+  --color-primary-hover:  hsl(155, 30%, 28%);
+  --color-primary-active: hsl(155, 30%, 24%);
+  --color-primary-muted:  hsla(155, 30%, 34%, 0.10);
+
+  /* Accent — Deeper Terracotta */
+  --color-accent:         hsl(30, 60%, 42%);
+  --color-accent-hover:   hsl(30, 60%, 36%);
+  --color-accent-active:  hsl(30, 60%, 32%);
+  --color-accent-muted:   hsla(30, 60%, 42%, 0.10);
+
+  /* Semantic */
+  --color-success:        hsl(152, 28%, 36%);
+  --color-success-muted:  hsla(152, 28%, 36%, 0.12);
+  --color-warning:        hsl(38, 70%, 42%);
+  --color-warning-muted:  hsla(38, 70%, 42%, 0.12);
+  --color-error:          hsl(5, 68%, 44%);
+  --color-error-muted:    hsla(5, 68%, 44%, 0.12);
+  --color-error-hover:    hsl(5, 68%, 38%);
+  --color-info:           hsl(200, 45%, 40%);
+  --color-info-muted:     hsla(200, 45%, 40%, 0.12);
+
+  /* Financial */
+  --color-gold:           hsl(38, 65%, 40%);
+  --color-gold-hover:     hsl(38, 65%, 34%);
+  --color-gold-muted:     hsla(38, 65%, 40%, 0.12);
+
+  /* Text — dark on light */
+  --color-text-1:         hsl(35, 12%, 10%);
+  --color-text-2:         hsl(35, 8%, 38%);
+  --color-text-3:         hsl(35, 5%, 55%);
+  --color-text-inv:       hsl(40, 20%, 97%);
+
+  /* Borders */
+  --color-border:         hsl(35, 12%, 84%);
+  --color-border-subtle:  hsl(35, 10%, 90%);
+  --color-border-strong:  hsl(35, 14%, 72%);
+
+  /* Chart Colors (darker for light bg) */
+  --color-chart-1:        hsl(155, 30%, 34%);
+  --color-chart-2:        hsl(38, 65%, 40%);
+  --color-chart-3:        hsl(30, 60%, 42%);
+  --color-chart-4:        hsl(200, 45%, 40%);
+  --color-chart-5:        hsl(270, 45%, 46%);
+  --color-chart-6:        hsl(5, 68%, 44%);
+
+  /* Gantt / Planning */
+  --color-bar-billable:   hsla(155, 30%, 34%, 0.25);
+  --color-bar-nonbillable:hsla(200, 45%, 40%, 0.20);
+  --color-bar-leave:      hsla(200, 45%, 40%, 0.10);
+  --color-bar-bench:      hsla(38, 70%, 42%, 0.10);
+  --color-surface-weekend:hsla(35, 10%, 84%, 0.6);
+  --color-row-hover:      hsla(35, 10%, 88%, 0.6);
+
+  /* Shadows (lighter for light mode) */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-2: 0 2px 4px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-3: 0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.06);
+  --shadow-4: 0 8px 16px rgba(0,0,0,0.10), 0 16px 32px rgba(0,0,0,0.07);
+  --shadow-5: 0 16px 32px rgba(0,0,0,0.12), 0 32px 64px rgba(0,0,0,0.08);
+  --shadow-md: var(--shadow-3);
+
+  /* Overlay */
+  --overlay-bg:      rgba(0,0,0,0.4);
+  --overlay-bg-soft: rgba(0,0,0,0.3);
+
+  /* Glassmorphism */
+  --glass-bg:     rgba(255, 253, 248, 0.85);
+  --glass-border: rgba(35, 30, 20, 0.08);
+  --glass-blur:   blur(20px) saturate(1.2);
+}
+
 /* ── Global Reset & Base ── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -178,6 +267,7 @@ body {
   color: var(--color-text-1);
   background: var(--color-bg);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {

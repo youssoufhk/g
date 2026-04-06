@@ -259,25 +259,25 @@
     .back-btn svg { width: 18px; height: 18px; }
 
     /* Filter bar */
-    .filter-bar {
+    .filter-bar-standard {
       display: flex;
       align-items: center;
       gap: var(--space-3);
       margin-bottom: var(--space-4);
       flex-wrap: wrap;
     }
-    .filter-bar .form-select,
-    .filter-bar .form-input {
+    .filter-bar-standard .form-select,
+    .filter-bar-standard .form-input {
       height: 36px;
       min-width: 160px;
       background: var(--color-surface-0);
     }
-    .filter-bar .search-wrapper {
+    .filter-bar-standard .search-wrapper {
       position: relative;
       flex: 1;
       min-width: 200px;
     }
-    .filter-bar .search-wrapper svg {
+    .filter-bar-standard .search-wrapper svg {
       position: absolute;
       left: var(--space-3);
       top: 50%;
@@ -286,13 +286,35 @@
       width: 16px; height: 16px;
       pointer-events: none;
     }
-    .filter-bar .search-wrapper .form-input {
+    .filter-bar-standard .search-wrapper .form-input {
       padding-left: 36px;
     }
 
     /* View transitions */
     .view { display: none; }
     .view.active { display: block; }
+
+    /* Mobile breakpoints */
+    @media (max-width: 639px) {
+      .client-card {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
+      .client-info { min-width: 100%; order: 2; }
+      .client-logo { order: 1; }
+      .client-revenue {
+        min-width: 100%;
+        order: 3;
+        text-align: left;
+        border-top: 1px solid var(--color-border-subtle);
+        padding-top: var(--space-2);
+      }
+      .client-meta { flex-wrap: wrap; }
+      .filter-bar-standard { flex-wrap: wrap; }
+      .filter-bar-standard .form-select,
+      .filter-bar-standard .form-input { min-width: 100%; }
+      .filter-bar-standard .search-wrapper { min-width: 100%; }
+    }
 
     /* Empty state overrides */
     .populated-content,
@@ -304,6 +326,7 @@
   </style>
 </head>
 <body class="show-populated">
+<a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
@@ -313,7 +336,7 @@
       <span class="logo-text">GammaHR</span>
     </div>
 
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="Main navigation">
       <!-- MAIN -->
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
@@ -346,7 +369,7 @@
           <span class="nav-label">Recruitment</span>
           <span class="nav-badge">5</span>
         </a>
-        <a href="hr.html#onboarding" class="nav-item">
+        <a href="hr.html" class="nav-item">
           <svg data-lucide="user-plus"></svg>
           <span class="nav-label">Onboarding</span>
         </a>
@@ -362,6 +385,10 @@
         <a href="projects.html" class="nav-item">
           <svg data-lucide="folder"></svg>
           <span class="nav-label">Projects</span>
+        </a>
+        <a href="gantt.html" class="nav-item">
+          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
+          <span class="nav-label">Gantt Chart</span>
         </a>
         <a href="clients.html" class="nav-item active">
           <svg data-lucide="building-2"></svg>
@@ -402,10 +429,18 @@
           <svg data-lucide="settings"></svg>
           <span class="nav-label">Settings</span>
         </a>
+        <a href="insights.html" class="nav-item">
+          <svg data-lucide="sparkles"></svg>
+          <span class="nav-label">Ask AI</span>
+        </a>
       </div>
     </nav>
 
     <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);color:var(--color-text-2);margin-bottom:var(--space-2);" onclick="showToast('info','Shortcuts','Press Cmd+K to open command palette.')">
+        <svg data-lucide="keyboard" width="14" height="14"></svg>
+        <span style="font-size:var(--text-body-sm);">Help &amp; Shortcuts</span>
+      </button>
       <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
         <svg data-lucide="panel-left-close"></svg>
         <span>Collapse</span>
@@ -435,7 +470,7 @@
 
       <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
-        <div style="position: relative;">
+        <div class="relative">
           <button class="header-icon-btn" id="notifBtn" aria-label="Notifications">
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
@@ -471,7 +506,7 @@
           </div>
         </div>
 
-        <div style="position: relative;">
+        <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm">SC</div>
             <div>
@@ -484,10 +519,10 @@
               <div class="name">Sarah Chen</div>
               <div class="email">sarah.chen@gammahr.io</div>
             </div>
-            <a href="employees.html" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
+            <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user" width="16" height="16"></svg> Profile</a>
             <a href="admin.html" class="dropdown-item"><svg data-lucide="settings" width="16" height="16"></svg> Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
+            <a href="auth.html" class="dropdown-item destructive"><svg data-lucide="log-out" width="16" height="16"></svg> Sign out</a>
           </div>
         </div>
       </div>
@@ -499,6 +534,13 @@
       <!-- ═══════ LIST VIEW ═══════ -->
       <div class="view" id="listView">
         <div class="populated-content">
+          <!-- Breadcrumb -->
+          <nav class="breadcrumbs mb-4">
+            <a href="index.html">Home</a>
+            <span class="separator">&rsaquo;</span>
+            <span class="current">Clients</span>
+          </nav>
+
           <!-- Page header -->
           <div class="page-header">
             <div class="page-header-left">
@@ -516,14 +558,24 @@
           </div>
 
           <!-- Filter bar -->
-          <div class="filter-bar">
-            <select class="form-select form-input-sm">
+          <div class="filter-bar-standard">
+            <!-- Saved Views -->
+            <div class="relative" style="flex-shrink:0;">
+              <select class="form-select form-input-sm" id="savedViewsSelect" onchange="applySavedView(this.value)">
+                <option value="">Saved Views</option>
+                <option value="active">Active Clients</option>
+                <option value="revenue">By Revenue</option>
+                <option value="new">New This Quarter</option>
+                <option value="at-risk">At Risk</option>
+              </select>
+            </div>
+            <select class="form-select form-input-sm" id="filterStatus">
               <option>All Statuses</option>
               <option>Active</option>
               <option>Inactive</option>
               <option>New</option>
             </select>
-            <select class="form-select form-input-sm">
+            <select class="form-select form-input-sm" id="filterIndustry">
               <option>All Industries</option>
               <option>Technology</option>
               <option>Manufacturing</option>
@@ -544,14 +596,15 @@
               <div class="client-info">
                 <div class="client-name">Acme Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 3 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 5 active projects</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 12 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Jane Doe (jane@acme.com)</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Jan 2024</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
+                  <a href="portal/index.html" target="_blank" class="badge badge-default" onclick="event.stopPropagation()" style="text-decoration:none;"><svg data-lucide="external-link" width="10" height="10"></svg> Portal</a>
                 </div>
               </div>
-              <div class="client-revenue">
+              <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;95,900</span>
                 <div class="client-revenue-label">YTD Revenue</div>
               </div>
@@ -568,9 +621,10 @@
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Bob Smith</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since May 2025</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
+                  <a href="portal/index.html" target="_blank" class="badge badge-default" onclick="event.stopPropagation()" style="text-decoration:none;"><svg data-lucide="external-link" width="10" height="10"></svg> Portal</a>
                 </div>
               </div>
-              <div class="client-revenue">
+              <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;89,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
               </div>
@@ -587,9 +641,10 @@
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Bill Lumbergh</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Sep 2025</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>
+                  <a href="portal/index.html" target="_blank" class="badge badge-default" onclick="event.stopPropagation()" style="text-decoration:none;"><svg data-lucide="external-link" width="10" height="10"></svg> Portal</a>
                 </div>
               </div>
-              <div class="client-revenue">
+              <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;42,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
               </div>
@@ -605,9 +660,10 @@
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 2 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Michael Scott</span>
                   <span class="badge badge-info"><svg data-lucide="sparkles" width="12" height="12"></svg> New</span>
+                  <a href="portal/index.html" target="_blank" class="badge badge-default" onclick="event.stopPropagation()" style="text-decoration:none;"><svg data-lucide="external-link" width="10" height="10"></svg> Portal</a>
                 </div>
               </div>
-              <div class="client-revenue">
+              <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;0</span>
                 <div class="client-revenue-label">YTD Revenue</div>
               </div>
@@ -626,7 +682,7 @@
                   <span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Inactive</span>
                 </div>
               </div>
-              <div class="client-revenue">
+              <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;67,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
               </div>
@@ -660,7 +716,7 @@
         </button>
 
         <!-- AI Client Intelligence -->
-        <div class="ai-insight-card mb-4" style="margin-top: var(--space-4);">
+        <div class="ai-insight-card mb-4" class="mt-4">
           <div class="ai-header">
             <svg data-lucide="sparkles" width="16" height="16"></svg> AI Client Intelligence
           </div>
@@ -675,7 +731,7 @@
           </div>
         </div>
 
-        <div style="margin-top: var(--space-4);">
+        <div class="mt-4">
           <!-- Client Health Summary -->
           <div class="grid-4 mb-4">
             <div class="stat-card">
@@ -751,11 +807,20 @@
             </div>
           </div>
 
+          <!-- View Client Portal link -->
+          <div style="margin-bottom:var(--space-4);">
+            <a href="portal/index.html" target="_blank" class="btn btn-secondary btn-sm">
+              <svg data-lucide="external-link" width="14" height="14"></svg>
+              View Client Portal &rarr;
+            </a>
+          </div>
+
           <!-- Tabs -->
-          <div class="tabs" id="detailTabs">
+          <div class="tabs" role="tablist" id="detailTabs">
             <button class="tab active" data-tab="tab-overview">Overview</button>
             <button class="tab" data-tab="tab-projects">Projects <span class="tab-count">5</span></button>
             <button class="tab" data-tab="tab-team">Team <span class="tab-count">8</span></button>
+            <button class="tab" data-tab="tab-timesheets">Timesheets</button>
             <button class="tab" data-tab="tab-invoices">Invoices <span class="tab-count">6</span></button>
             <button class="tab" data-tab="tab-documents">Documents <span class="tab-count">3</span></button>
           </div>
@@ -778,7 +843,7 @@
                 <div class="stat-card">
                   <div class="stat-label">Team Members</div>
                   <div class="stat-value">12</div>
-                  <div class="stat-trend" style="color: var(--color-text-2);">Across all projects</div>
+                  <div class="stat-trend" class="text-2">Across all projects</div>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Avg Project Health</div>
@@ -863,53 +928,53 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   <tbody>
                     <tr>
                       <td><a href="projects.html#detail/acme-web">Web Redesign</a></td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td class="font-mono">&euro;32,200</td>
-                      <td class="font-mono">64%</td>
-                      <td class="font-mono">48%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;32,200</td>
+                      <td data-label="Budget Used" class="font-mono">64%</td>
+                      <td data-label="Margin" class="font-mono">48%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
                       <td><a href="projects.html#detail/acme-mobile">Mobile App</a></td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td class="font-mono">&euro;18,500</td>
-                      <td class="font-mono">45%</td>
-                      <td class="font-mono">42%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;18,500</td>
+                      <td data-label="Budget Used" class="font-mono">45%</td>
+                      <td data-label="Margin" class="font-mono">42%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
                       <td><a href="projects.html">CRM Integration</a></td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td class="font-mono">&euro;24,800</td>
-                      <td class="font-mono">72%</td>
-                      <td class="font-mono">38%</td>
-                      <td><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;24,800</td>
+                      <td data-label="Budget Used" class="font-mono">72%</td>
+                      <td data-label="Margin" class="font-mono">38%</td>
+                      <td data-label="Health"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
                     </tr>
                     <tr>
                       <td><a href="projects.html">Brand Guidelines</a></td>
-                      <td><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                      <td class="font-mono">&euro;8,400</td>
-                      <td class="font-mono">100%</td>
-                      <td class="font-mono">52%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                      <td data-label="Status"><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;8,400</td>
+                      <td data-label="Budget Used" class="font-mono">100%</td>
+                      <td data-label="Margin" class="font-mono">52%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
                     </tr>
                     <tr>
                       <td><a href="projects.html">Security Audit</a></td>
-                      <td><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                      <td class="font-mono">&euro;12,000</td>
-                      <td class="font-mono">100%</td>
-                      <td class="font-mono">55%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                      <td data-label="Status"><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;12,000</td>
+                      <td data-label="Budget Used" class="font-mono">100%</td>
+                      <td data-label="Margin" class="font-mono">55%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
                       <td><strong>TOTAL</strong></td>
-                      <td></td>
-                      <td class="font-mono"><strong>&euro;95,900</strong></td>
-                      <td></td>
-                      <td class="font-mono"><strong>45%</strong></td>
-                      <td></td>
+                      <td data-label="Status"></td>
+                      <td data-label="Revenue" class="font-mono"><strong>&euro;95,900</strong></td>
+                      <td data-label="Budget Used"></td>
+                      <td data-label="Margin" class="font-mono"><strong>45%</strong></td>
+                      <td data-label="Health"></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -931,37 +996,37 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   <tbody>
                     <tr>
                       <td><a href="projects.html#detail/globex-phase2">Phase 2</a></td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td class="font-mono">&euro;22,400</td>
-                      <td class="font-mono">35%</td>
-                      <td class="font-mono">44%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;22,400</td>
+                      <td data-label="Budget Used" class="font-mono">35%</td>
+                      <td data-label="Margin" class="font-mono">44%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
                       <td><a href="projects.html">DataViz Dashboard</a></td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td class="font-mono">&euro;8,600</td>
-                      <td class="font-mono">18%</td>
-                      <td class="font-mono">46%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;8,600</td>
+                      <td data-label="Budget Used" class="font-mono">18%</td>
+                      <td data-label="Margin" class="font-mono">46%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
                       <td><a href="projects.html">Data Migration</a></td>
-                      <td><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                      <td class="font-mono">&euro;120,000</td>
-                      <td class="font-mono">100%</td>
-                      <td class="font-mono">38%</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                      <td data-label="Status"><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;120,000</td>
+                      <td data-label="Budget Used" class="font-mono">100%</td>
+                      <td data-label="Margin" class="font-mono">38%</td>
+                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
                       <td><strong>TOTAL</strong></td>
-                      <td></td>
-                      <td class="font-mono"><strong>&euro;151,000</strong></td>
-                      <td></td>
-                      <td class="font-mono"><strong>40%</strong></td>
-                      <td></td>
+                      <td data-label="Status"></td>
+                      <td data-label="Revenue" class="font-mono"><strong>&euro;151,000</strong></td>
+                      <td data-label="Budget Used"></td>
+                      <td data-label="Margin" class="font-mono"><strong>40%</strong></td>
+                      <td data-label="Health"></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -983,7 +1048,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <div class="team-member-row">
                   <div class="avatar avatar-sm">SC</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#sarah-chen">Sarah Chen</a></div>
+                    <div class="team-member-name"><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Senior Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></div>
                     <div class="team-member-role">Senior Developer</div>
                   </div>
                   <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
@@ -993,7 +1058,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <div class="team-member-row">
                   <div class="avatar avatar-sm" style="background: var(--color-gold);">JS</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#john-smith">John Smith</a></div>
+                    <div class="team-member-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></div>
                     <div class="team-member-role">Project Manager</div>
                   </div>
                   <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">PM</div>
@@ -1003,7 +1068,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <div class="team-member-row">
                   <div class="avatar avatar-sm" style="background: var(--color-info);">AW</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#alice-wang">Alice Wang</a></div>
+                    <div class="team-member-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></div>
                     <div class="team-member-role">UI Designer</div>
                   </div>
                   <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Designer</div>
@@ -1013,7 +1078,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <div class="team-member-row">
                   <div class="avatar avatar-sm" style="background: var(--color-error);">MR</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#marco-rossi">Marco Rossi</a></div>
+                    <div class="team-member-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Frontend Developer" data-dept="Engineering" data-worktime="78">Marco Rossi</a></div>
                     <div class="team-member-role">Frontend Developer</div>
                   </div>
                   <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
@@ -1023,7 +1088,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <div class="team-member-row">
                   <div class="avatar avatar-sm" style="background: var(--color-primary);">EL</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#emma-laurent">Emma Laurent</a></div>
+                    <div class="team-member-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="Backend Developer" data-dept="Engineering" data-worktime="91">Emma Laurent</a></div>
                     <div class="team-member-role">Backend Developer</div>
                   </div>
                   <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
@@ -1033,7 +1098,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <div class="team-member-row">
                   <div class="avatar avatar-sm" style="background: var(--color-success);">BT</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+                    <div class="team-member-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="QA Engineer" data-dept="Engineering" data-worktime="85">Bob Taylor</a></div>
                     <div class="team-member-role">QA Engineer</div>
                   </div>
                   <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">QA</div>
@@ -1064,6 +1129,71 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
             </div>
           </div>
 
+          <!-- Tab: Timesheets -->
+          <div class="tab-content" id="tab-timesheets">
+            <div style="padding-top: var(--space-4);">
+              <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Pending Client Review</h3>
+              <div class="data-table-wrapper">
+                <table class="data-table mobile-cards">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Week</th>
+                      <th>Project</th>
+                      <th>Hours</th>
+                      <th data-sensitive="financials">Billable</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Lead Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                      <td data-label="Week">Week 13</td>
+                      <td data-label="Project"><a href="projects.html#detail/acme-web">Web Redesign</a></td>
+                      <td data-label="Hours" class="font-mono">32h</td>
+                      <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;2,720</td>
+                      <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending Review</span></td>
+                      <td data-label="">
+                        <button class="btn btn-ghost btn-xs" onclick="showToast('success','Approved','Timesheet approved successfully.')"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
+                        <button class="btn btn-ghost btn-xs" onclick="showToast('warning','Flagged','Timesheet has been flagged for review.')"><svg data-lucide="flag" width="14" height="14"></svg> Flag</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                      <td data-label="Week">Week 13</td>
+                      <td data-label="Project"><a href="projects.html#detail/acme-web">Web Redesign</a></td>
+                      <td data-label="Hours" class="font-mono">38h</td>
+                      <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;3,230</td>
+                      <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending Review</span></td>
+                      <td data-label="">
+                        <button class="btn btn-ghost btn-xs" onclick="showToast('success','Approved','Timesheet approved successfully.')"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
+                        <button class="btn btn-ghost btn-xs" onclick="showToast('warning','Flagged','Timesheet has been flagged for review.')"><svg data-lucide="flag" width="14" height="14"></svg> Flag</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></td>
+                      <td data-label="Week">Week 12</td>
+                      <td data-label="Project"><a href="projects.html#detail/acme-mobile">Mobile App</a></td>
+                      <td data-label="Hours" class="font-mono">28h</td>
+                      <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;2,100</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                      <td data-label=""></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="3"><strong>Total</strong></td>
+                      <td class="font-mono"><strong>98h</strong></td>
+                      <td class="font-mono" data-sensitive="financials"><strong>&euro;8,050</strong></td>
+                      <td colspan="2"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <!-- Tab: Invoices -->
           <div class="tab-content" id="tab-invoices">
             <div style="padding-top: var(--space-4);" id="acme-invoices-content">
@@ -1080,39 +1210,39 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   <tbody>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-048</a></td>
-                      <td>Mar 15, 2026</td>
-                      <td class="font-mono">&euro;12,400</td>
-                      <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                      <td data-label="Date">Mar 15, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;12,400</td>
+                      <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-045</a></td>
-                      <td>Feb 15, 2026</td>
-                      <td class="font-mono">&euro;11,200</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                      <td data-label="Date">Feb 15, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;11,200</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-043</a></td>
-                      <td>Feb 15, 2026</td>
-                      <td class="font-mono">&euro;5,000</td>
-                      <td><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
+                      <td data-label="Date">Feb 15, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;5,000</td>
+                      <td data-label="Status"><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-041</a></td>
-                      <td>Jan 15, 2026</td>
-                      <td class="font-mono">&euro;8,500</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                      <td data-label="Date">Jan 15, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;8,500</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-039</a></td>
-                      <td>Jan 15, 2026</td>
-                      <td class="font-mono">&euro;8,600</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                      <td data-label="Date">Jan 15, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;8,600</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2025-031</a></td>
-                      <td>Nov 1, 2025</td>
-                      <td class="font-mono">&euro;9,200</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                      <td data-label="Date">Nov 1, 2025</td>
+                      <td data-label="Amount" class="font-mono">&euro;9,200</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -1132,21 +1262,21 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   <tbody>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-047</a></td>
-                      <td>Mar 28, 2026</td>
-                      <td class="font-mono">&euro;8,200</td>
-                      <td><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
+                      <td data-label="Date">Mar 28, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;8,200</td>
+                      <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-044</a></td>
-                      <td>Feb 28, 2026</td>
-                      <td class="font-mono">&euro;9,400</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                      <td data-label="Date">Feb 28, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;9,400</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
                       <td><a href="invoices.html#detail">INV-2026-040</a></td>
-                      <td>Jan 1, 2026</td>
-                      <td class="font-mono">&euro;15,000</td>
-                      <td><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
+                      <td data-label="Date">Jan 1, 2026</td>
+                      <td data-label="Amount" class="font-mono">&euro;15,000</td>
+                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -1195,7 +1325,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
 
 <!-- ════════════════════════════════════════ NEW CLIENT MODAL ════════════════════════════════════════ -->
 <div class="modal-backdrop" id="newClientModal">
-  <div class="modal modal-lg">
+  <div class="modal modal-lg" role="dialog" aria-modal="true">
     <div class="modal-header">
       <h3 class="modal-title">New Client</h3>
       <button class="modal-close" id="closeNewClient"><svg data-lucide="x" width="18" height="18"></svg></button>
@@ -1488,9 +1618,42 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
   document.querySelectorAll('.client-card').forEach(function(card) {
     card.addEventListener('click', function() {
       var clientId = this.getAttribute('data-client') || 'acme';
-      window.location.hash = 'detail/' + clientId;
+      history.pushState({ client: clientId }, '', '#detail/' + clientId);
+      handleHash();
     });
   });
+
+  // ── Browser back/forward ──
+  window.addEventListener('popstate', function() {
+    handleHash();
+  });
+
+  // ── Escape key closes detail panel ──
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var dv = document.getElementById('detailView');
+      if (dv && dv.classList.contains('active')) {
+        history.pushState({}, '', '#list');
+        handleHash();
+      }
+    }
+  });
+
+  // ── Saved Views ──
+  window.applySavedView = function(view) {
+    var messages = {
+      'active': 'Showing active clients',
+      'revenue': 'Sorted by revenue (highest first)',
+      'new': 'Showing clients added this quarter',
+      'at-risk': 'Showing at-risk clients'
+    };
+    if (view && messages[view]) {
+      showToast('info', 'View Applied', messages[view]);
+    }
+  };
+
+  // ── showToast global alias (for onclick handlers in HTML) ──
+  window.showToast = showToast;
 
   // ── Back to list ──
   backToList.addEventListener('click', function() {
@@ -1520,6 +1683,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
   }
 
   // ── New Client Modal ──
+  window.openAddClientModal = function() { openModal(newClientModal); };
   newClientBtn.addEventListener('click', function() { openModal(newClientModal); });
   emptyNewClientBtn.addEventListener('click', function() { openModal(newClientModal); });
   closeNewClient.addEventListener('click', function() { closeModal(newClientModal); });
@@ -1585,12 +1749,24 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
   <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+<script src="_shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.GHR) {
+    GHR.initHoverCard();
+    GHR.initPresence();
+    GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts();
+    GHR.initSkeletons();
+  }
+});
+</script>
 </body>
 </html>

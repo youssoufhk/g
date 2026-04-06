@@ -30,7 +30,25 @@
 
 ---
 
+## 1.5 Prototype as Source of Truth
+
+The design system described in this document has been fully implemented in the HTML prototype. When any specification here conflicts with what is in the prototype files, **the prototype wins** — it has been visually validated and approved.
+
+| Spec concept | Live implementation |
+|---|---|
+| Color tokens | `prototype/_tokens.css` — all CSS custom properties |
+| Component library | `prototype/_components.css` — copy styles from here directly into Next.js components |
+| App shell / layout | `prototype/_layout.css` — sidebar, top bar, mobile nav, filter bars |
+| Shared JS behaviour | `prototype/_shared.js` — hover cards, presence, role switcher, keyboard shortcuts, skeleton loading, command palette, toasts |
+| Page designs | `prototype/*.html` — approved visual spec per page |
+
+When implementing the Next.js frontend, developers should open the corresponding prototype HTML file in a browser and replicate it exactly. The CSS tokens map directly to `tailwind.config.ts` custom properties.
+
+---
+
 ## 2. Color System — Earth & Sage (Locked)
+
+> **Live tokens:** `prototype/_tokens.css` §Colors — all values below are implemented as CSS custom properties in that file.
 
 > **Palette locked. No alternatives.** Earth & Sage was selected after full visual validation.
 > Rationale: sage/green semantics align perfectly with approval flows, active states, and healthy utilization — the core HR interaction patterns. Terracotta + aged gold provide a full semantic color language, not just aesthetics.
@@ -192,6 +210,8 @@ BORDERS
 
 ## 3. Typography
 
+> **Live tokens:** `prototype/_tokens.css` §Typography
+
 ### Font Stack
 
 ```css
@@ -232,6 +252,8 @@ BORDERS
 ---
 
 ## 4. Spacing System
+
+> **Live tokens:** `prototype/_tokens.css` §Spacing
 
 **Base unit: 4px**
 
@@ -377,6 +399,8 @@ Used ONLY on:
 
 ## 8. Motion & Animation
 
+> **Live implementation:** `prototype/_components.css` §Animations and `prototype/_shared.js` for JS-driven transitions.
+
 ### Timing Tokens
 
 | Token | Duration | Easing | Use |
@@ -433,6 +457,8 @@ When `prefers-reduced-motion: reduce`:
 ---
 
 ## 9. Component Specifications
+
+> **Live implementation:** `prototype/_components.css` — contains the complete component CSS. Copy from here, do not rewrite from scratch.
 
 ### 9.1 Button
 

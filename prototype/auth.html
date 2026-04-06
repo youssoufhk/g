@@ -17,7 +17,7 @@
     }
     .auth-container {
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
     }
     .auth-card {
       background: var(--color-surface-0);
@@ -63,9 +63,7 @@
       padding: 0 var(--space-4);
       font-size: var(--text-body);
     }
-    .password-wrapper {
-      position: relative;
-    }
+    .password-wrapper { position: relative; }
     .password-wrapper .toggle-pass {
       position: absolute;
       right: var(--space-3);
@@ -121,7 +119,7 @@
     }
     .forgot-link a:hover { color: var(--color-primary); }
 
-    /* Error state */
+    /* Error/alert states */
     .auth-error {
       display: none;
       padding: var(--space-3);
@@ -133,19 +131,15 @@
       text-align: center;
     }
     .auth-error.visible { display: block; }
-
-    /* MFA section */
-    .mfa-section {
-      display: none;
-      flex-direction: column;
-      gap: var(--space-4);
-    }
-    .mfa-section.visible { display: flex; }
-    .mfa-input {
+    .alert-error {
+      padding: var(--space-3);
+      background: var(--color-error-muted);
+      border: 1px solid var(--color-error);
+      border-radius: var(--radius-md);
+      color: var(--color-error);
+      font-size: var(--text-body-sm);
       text-align: center;
-      font-family: var(--font-mono);
-      font-size: var(--text-heading-2);
-      letter-spacing: 8px;
+      margin-bottom: var(--space-3);
     }
 
     /* Shake animation */
@@ -158,7 +152,7 @@
     }
     .shake { animation: shake 0.4s ease; }
 
-    /* Forgot password view */
+    /* View system */
     .auth-view { display: none; }
     .auth-view.active { display: block; }
 
@@ -182,13 +176,215 @@
       font-size: var(--text-caption);
       margin-top: var(--space-1);
     }
+
+    /* SSO inline panel */
+    .sso-panel {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-2);
+    }
+    .sso-panel.open { display: flex; }
+
+    /* Step indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: var(--space-8);
+    }
+    .step-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      flex: 1;
+    }
+    .step-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border);
+      background: var(--color-surface-1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-3);
+      z-index: 1;
+      position: relative;
+      transition: all var(--motion-fast);
+    }
+    .step-dot.active {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      color: var(--color-white);
+    }
+    .step-dot.done {
+      border-color: var(--color-success);
+      background: var(--color-success);
+      color: var(--color-white);
+    }
+    .step-label {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      margin-top: var(--space-2);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .step-node.active .step-label { color: var(--color-accent); }
+    .step-node.done .step-label { color: var(--color-success); }
+    .step-node:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: calc(50% + 16px);
+      right: calc(-50% + 16px);
+      height: 2px;
+      background: var(--color-border);
+    }
+    .step-node.done::after { background: var(--color-success); }
+
+    /* MFA digit inputs */
+    .mfa-digits {
+      display: flex;
+      gap: var(--space-2);
+      justify-content: center;
+    }
+    .mfa-digit {
+      width: 48px;
+      height: 56px;
+      text-align: center;
+      font-size: var(--text-heading-2);
+      font-family: var(--font-mono);
+      font-weight: var(--weight-bold);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-1);
+      color: var(--color-text-1);
+      transition: border-color var(--motion-fast);
+    }
+    .mfa-digit:focus {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+    .mfa-digit.filled { border-color: var(--color-accent); }
+
+    /* Success screen */
+    @keyframes checkPop {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-check {
+      width: 72px; height: 72px;
+      background: var(--color-success);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--space-6);
+      animation: checkPop 0.5s ease forwards;
+    }
+
+    /* Photo upload zone */
+    .photo-upload-zone {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8) var(--space-4);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .photo-upload-zone:hover, .photo-upload-zone.drag-over {
+      border-color: var(--color-accent);
+      background: var(--color-accent-muted, rgba(99,102,241,0.05));
+    }
+
+    /* App store badges */
+    .app-store-badges {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      margin-top: var(--space-4);
+    }
+    .app-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .app-badge:hover { border-color: var(--color-border-strong); color: var(--color-text-1); }
+
+    /* Feature tour cards */
+    .tour-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-6) 0;
+    }
+    .tour-card {
+      padding: var(--space-4);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+    .tour-card svg { color: var(--color-accent); margin-bottom: var(--space-2); }
+    .tour-card h4 { font-size: var(--text-body); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-1); }
+    .tour-card p { font-size: var(--text-caption); color: var(--color-text-2); }
+
+    /* Subdomain preview */
+    .subdomain-preview {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-1);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+    }
+    .subdomain-preview span { color: var(--color-accent); font-weight: var(--weight-semibold); }
+
+    /* Wizard footer nav */
+    .wizard-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-6);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* Rate limit */
+    #rateLimitMsg { display: none; }
+    .countdown-badge {
+      display: inline-block;
+      background: var(--color-error);
+      color: var(--color-white);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-bold);
+    }
   </style>
 </head>
 <body>
   <div class="auth-page">
     <div class="auth-container">
-      <!-- LOGIN VIEW -->
-      <div class="auth-view active" id="login-view">
+
+      <!-- ═══════════════════════════════════════════
+           VIEW 1: LOGIN
+      ═══════════════════════════════════════════ -->
+      <div class="auth-view active" id="view-login">
         <div class="auth-card">
           <div class="auth-logo">
             <div class="logo-3d">G</div>
@@ -198,6 +394,10 @@
 
           <div class="auth-error" id="login-error">
             Invalid email or password. Please try again.
+          </div>
+
+          <div class="alert-error" id="rateLimitMsg">
+            Too many login attempts. Please try again in <span class="countdown-badge" id="rateLimitCountdown">15:00</span>
           </div>
 
           <form class="auth-form" id="login-form" onsubmit="return false;">
@@ -215,26 +415,28 @@
               </div>
             </div>
             <div class="forgot-link">
-              <a href="#" onclick="showView('forgot-view')">Forgot password?</a>
+              <a href="#" onclick="showView('view-forgot'); return false;">Forgot password?</a>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg auth-submit" onclick="handleLogin()">
+            <button type="submit" class="btn btn-primary btn-lg auth-submit" id="loginBtn" onclick="handleLogin()">
               <svg data-lucide="log-in" width="18" height="18"></svg>
               Sign In
             </button>
           </form>
 
-          <!-- MFA Section -->
-          <div class="mfa-section" id="mfa-section">
+          <!-- MFA inline section (post-login) -->
+          <div id="mfa-inline" style="display:none; flex-direction:column; gap: var(--space-4);">
             <div style="text-align:center; margin-bottom: var(--space-2);">
               <svg data-lucide="shield-check" width="32" height="32" style="color: var(--color-primary);"></svg>
               <p style="font-size: var(--text-body); color: var(--color-text-1); margin-top: var(--space-2); font-weight: var(--weight-semibold);">Two-Factor Authentication</p>
               <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-top: var(--space-1);">Enter the 6-digit code from your authenticator app</p>
             </div>
-            <input type="text" class="form-input mfa-input" maxlength="6" placeholder="000000" id="mfa-code">
-            <button class="btn btn-primary btn-lg auth-submit" onclick="handleMFA()">
+            <div class="mfa-digits" id="mfaInlineDigits"></div>
+            <div class="auth-error" id="mfa-inline-error">Invalid code. Try again or use a recovery code.</div>
+            <button class="btn btn-primary btn-lg auth-submit" onclick="handleInlineMFA()">
               Verify Code
             </button>
             <p style="text-align: center; font-size: var(--text-body-sm); color: var(--color-text-2);">
+              <a href="#" onclick="showView('view-mfa'); return false;">Set up MFA on this account</a> &nbsp;·&nbsp;
               <a href="#">Use a recovery code</a>
             </p>
           </div>
@@ -242,46 +444,61 @@
           <div class="auth-divider">or</div>
 
           <div class="alt-login">
-            <button class="btn btn-secondary btn-lg">
+            <!-- Passkey button -->
+            <button class="btn btn-secondary btn-lg" id="passkeyBtn" onclick="handlePasskey()">
               <svg data-lucide="key" width="18" height="18"></svg>
               Sign in with Passkey
             </button>
-            <button class="btn btn-secondary btn-lg">
+            <!-- SSO button -->
+            <button class="btn btn-secondary btn-lg" id="ssoBtn" onclick="toggleSSO()">
               <svg data-lucide="building" width="18" height="18"></svg>
               Sign in with SSO
             </button>
+            <!-- SSO inline panel -->
+            <div class="sso-panel" id="ssoPanelEl">
+              <p style="font-size: var(--text-body-sm); font-weight: var(--weight-semibold); color: var(--color-text-1);">SSO Configuration</p>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">Company Domain</label>
+                <input type="text" class="form-input" id="ssoDomain" placeholder="yourcompany.com">
+              </div>
+              <button class="btn btn-primary" onclick="handleSSO()">Continue with SSO</button>
+              <div id="ssoRedirectMsg" style="display:none; font-size: var(--text-body-sm); color: var(--color-text-2); text-align:center;">
+                <svg data-lucide="loader" width="14" height="14" style="vertical-align:-2px; animation: spin 1s linear infinite;"></svg>
+                Redirecting to your identity provider...
+              </div>
+            </div>
           </div>
 
           <div class="auth-footer" style="margin-top: var(--space-6);">
             <div style="height:1px; background: var(--color-border); margin-bottom: var(--space-4);"></div>
-            Don't have an account?<br>
-            <a href="#">Contact your administrator</a>
+            New to GammaHR? &nbsp;<a href="#" onclick="showView('view-company-setup'); return false;">Create your company</a><br>
+            <span style="margin-top: var(--space-2); display:inline-block;">Invited employee? <a href="#" onclick="showView('view-employee-onboard'); return false;">Join here</a></span>
           </div>
         </div>
       </div>
 
-      <!-- FORGOT PASSWORD VIEW -->
-      <div class="auth-view" id="forgot-view">
+      <!-- ═══════════════════════════════════════════
+           VIEW 2: FORGOT PASSWORD
+      ═══════════════════════════════════════════ -->
+      <div class="auth-view" id="view-forgot">
         <div class="auth-card">
           <div class="auth-logo">
             <div class="logo-3d">G</div>
             <h1>Reset Password</h1>
             <p>Enter your email to receive a reset link</p>
           </div>
-
           <form class="auth-form" onsubmit="return false;">
             <div class="form-group">
               <label class="form-label">Email</label>
-              <input type="email" class="form-input" placeholder="you@company.com" autofocus>
+              <input type="email" class="form-input" id="forgot-email" placeholder="you@company.com">
             </div>
             <button class="btn btn-primary btn-lg auth-submit" onclick="handleForgot()">
               <svg data-lucide="mail" width="18" height="18"></svg>
               Send Reset Link
             </button>
           </form>
-
           <div class="auth-footer" style="margin-top: var(--space-6);">
-            <a href="#" onclick="showView('login-view')">
+            <a href="#" onclick="showView('view-login'); return false;">
               <svg data-lucide="arrow-left" width="14" height="14" style="vertical-align: -2px;"></svg>
               Back to Sign In
             </a>
@@ -289,78 +506,624 @@
         </div>
       </div>
 
-      <!-- RESET SENT VIEW -->
-      <div class="auth-view" id="reset-sent-view">
+      <!-- ═══════════════════════════════════════════
+           VIEW 3: RESET EMAIL SENT
+      ═══════════════════════════════════════════ -->
+      <div class="auth-view" id="view-reset-sent">
         <div class="auth-card" style="text-align: center;">
           <div style="margin-bottom: var(--space-6);">
-            <svg data-lucide="mail-check" width="48" height="48" style="color: var(--color-success);"></svg>
+            <svg data-lucide="mail-check" width="56" height="56" style="color: var(--color-success);"></svg>
           </div>
-          <h2 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); margin-bottom: var(--space-2);">Check your email</h2>
-          <p style="color: var(--color-text-2); margin-bottom: var(--space-6);">
-            We sent a password reset link to your email address. The link will expire in 1 hour.
+          <h2 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); margin-bottom: var(--space-3);">Check your email</h2>
+          <p style="color: var(--color-text-2); margin-bottom: var(--space-6); line-height: 1.6;">
+            We sent a reset link to<br><strong id="reset-email-display" style="color: var(--color-text-1);">your email address</strong>.<br>
+            <span style="font-size: var(--text-body-sm);">The link will expire in 1 hour.</span>
           </p>
-          <button class="btn btn-secondary btn-lg" style="width: 100%;" onclick="showView('login-view')">
-            <svg data-lucide="arrow-left" width="18" height="18"></svg>
+          <button class="btn btn-secondary btn-lg" id="resendBtn" onclick="handleResend()" style="width:100%; margin-bottom: var(--space-3);">
+            <svg data-lucide="refresh-cw" width="16" height="16"></svg>
+            Resend email
+          </button>
+          <button class="btn btn-ghost btn-lg" style="width:100%;" onclick="showView('view-login')">
+            <svg data-lucide="arrow-left" width="16" height="16"></svg>
             Back to Sign In
           </button>
         </div>
       </div>
 
-      <!-- 2FA SETUP VIEW -->
-      <div class="auth-view" id="mfa-setup-view">
+      <!-- ═══════════════════════════════════════════
+           VIEW 4: MFA SETUP / VERIFICATION
+      ═══════════════════════════════════════════ -->
+      <div class="auth-view" id="view-mfa">
         <div class="auth-card">
           <div class="auth-logo">
             <div class="logo-3d">G</div>
             <h1>Set Up 2FA</h1>
-            <p>Scan this QR code with your authenticator app</p>
+            <p>Secure your account with an authenticator app</p>
           </div>
 
-          <div style="text-align: center; margin-bottom: var(--space-6);">
-            <!-- Fake QR code -->
-            <div style="width: 180px; height: 180px; background: var(--color-white); border-radius: var(--radius-md); margin: 0 auto; display: flex; align-items: center; justify-content: center; padding: var(--space-4);">
-              <svg width="148" height="148" viewBox="0 0 148 148">
-                <rect fill="currentColor" x="0" y="0" width="20" height="20"/>
-                <rect fill="currentColor" x="24" y="0" width="8" height="8"/>
-                <rect fill="currentColor" x="40" y="0" width="20" height="20"/>
-                <rect fill="currentColor" x="68" y="0" width="12" height="12"/>
-                <rect fill="currentColor" x="88" y="0" width="8" height="8"/>
-                <rect fill="currentColor" x="128" y="0" width="20" height="20"/>
-                <rect fill="currentColor" x="0" y="24" width="8" height="8"/>
-                <rect fill="currentColor" x="16" y="24" width="8" height="8"/>
-                <rect fill="currentColor" x="40" y="24" width="8" height="8"/>
-                <rect fill="currentColor" x="56" y="24" width="8" height="8"/>
-                <rect fill="currentColor" x="72" y="24" width="16" height="8"/>
-                <rect fill="currentColor" x="128" y="24" width="8" height="8"/>
-                <rect fill="currentColor" x="144" y="24" width="4" height="8"/>
-                <rect fill="currentColor" x="0" y="40" width="20" height="20"/>
-                <rect fill="currentColor" x="32" y="40" width="12" height="12"/>
-                <rect fill="currentColor" x="52" y="40" width="8" height="8"/>
-                <rect fill="currentColor" x="80" y="40" width="20" height="8"/>
-                <rect fill="currentColor" x="128" y="40" width="20" height="20"/>
-                <text x="74" y="90" text-anchor="middle" font-size="12" fill="var(--color-text-3)">QR Code</text>
-              </svg>
+          <!-- Step indicator -->
+          <div class="step-indicator" id="mfaStepIndicator">
+            <div class="step-node active" id="mfaStep1Node">
+              <div class="step-dot active">1</div>
+              <div class="step-label">Install App</div>
             </div>
-            <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-3);">
-              Manual key: <code style="font-family: var(--font-mono); color: var(--color-text-1);">JBSWY3DPEHPK3PXP</code>
-            </p>
+            <div class="step-node" id="mfaStep2Node">
+              <div class="step-dot">2</div>
+              <div class="step-label">Scan QR</div>
+            </div>
+            <div class="step-node" id="mfaStep3Node">
+              <div class="step-dot">3</div>
+              <div class="step-label">Verify</div>
+            </div>
           </div>
 
-          <form class="auth-form" onsubmit="return false;">
-            <div class="form-group">
-              <label class="form-label">Verification Code</label>
-              <input type="text" class="form-input mfa-input" maxlength="6" placeholder="000000">
+          <!-- Step 1: Install App -->
+          <div id="mfaS1">
+            <div style="text-align:center; margin-bottom: var(--space-6);">
+              <svg data-lucide="smartphone" width="48" height="48" style="color: var(--color-accent); margin-bottom: var(--space-4);"></svg>
+              <h3 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-2);">Install an Authenticator App</h3>
+              <p style="color: var(--color-text-2); font-size: var(--text-body-sm); margin-bottom: var(--space-2);">Download Google Authenticator or Authy on your smartphone to generate one-time codes.</p>
             </div>
-            <button class="btn btn-primary btn-lg auth-submit" onclick="showView('login-view')">
-              <svg data-lucide="check" width="18" height="18"></svg>
-              Verify & Enable 2FA
-            </button>
-          </form>
+            <div class="app-store-badges">
+              <div class="app-badge">
+                <svg data-lucide="smartphone" width="16" height="16"></svg>
+                App Store
+              </div>
+              <div class="app-badge">
+                <svg data-lucide="play" width="16" height="16"></svg>
+                Google Play
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="showView('view-login')">Cancel</button>
+              <button class="btn btn-primary" onclick="mfaGoStep(2)">
+                Next: Scan QR Code
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
 
-          <div class="auth-footer" style="margin-top: var(--space-4);">
-            <a href="#" onclick="showView('login-view')">Skip for now</a>
+          <!-- Step 2: Scan QR -->
+          <div id="mfaS2" style="display:none;">
+            <div style="text-align:center; margin-bottom: var(--space-4);">
+              <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-4);">Open your authenticator app and scan this QR code.</p>
+              <!-- Stylized QR code SVG -->
+              <div style="width:180px; height:180px; background: var(--color-white); border-radius: var(--radius-md); margin: 0 auto; padding: 12px; display:flex; align-items:center; justify-content:center;">
+                <svg width="156" height="156" viewBox="0 0 156 156" style="color: #1a1a1a;">
+                  <!-- Top-left finder pattern -->
+                  <rect x="0" y="0" width="42" height="42" fill="currentColor" rx="4"/>
+                  <rect x="6" y="6" width="30" height="30" fill="white" rx="2"/>
+                  <rect x="12" y="12" width="18" height="18" fill="currentColor" rx="2"/>
+                  <!-- Top-right finder pattern -->
+                  <rect x="114" y="0" width="42" height="42" fill="currentColor" rx="4"/>
+                  <rect x="120" y="6" width="30" height="30" fill="white" rx="2"/>
+                  <rect x="126" y="12" width="18" height="18" fill="currentColor" rx="2"/>
+                  <!-- Bottom-left finder pattern -->
+                  <rect x="0" y="114" width="42" height="42" fill="currentColor" rx="4"/>
+                  <rect x="6" y="120" width="30" height="30" fill="white" rx="2"/>
+                  <rect x="12" y="126" width="18" height="18" fill="currentColor" rx="2"/>
+                  <!-- Data modules (simulated) -->
+                  <rect x="48" y="0" width="6" height="6" fill="currentColor"/>
+                  <rect x="60" y="0" width="6" height="6" fill="currentColor"/>
+                  <rect x="72" y="0" width="6" height="6" fill="currentColor"/>
+                  <rect x="84" y="6" width="6" height="6" fill="currentColor"/>
+                  <rect x="96" y="0" width="6" height="6" fill="currentColor"/>
+                  <rect x="108" y="6" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="12" width="6" height="6" fill="currentColor"/>
+                  <rect x="72" y="12" width="6" height="6" fill="currentColor"/>
+                  <rect x="96" y="12" width="6" height="6" fill="currentColor"/>
+                  <rect x="54" y="18" width="6" height="6" fill="currentColor"/>
+                  <rect x="78" y="18" width="6" height="6" fill="currentColor"/>
+                  <rect x="102" y="18" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="24" width="6" height="6" fill="currentColor"/>
+                  <rect x="66" y="24" width="6" height="6" fill="currentColor"/>
+                  <rect x="90" y="24" width="6" height="6" fill="currentColor"/>
+                  <rect x="60" y="30" width="6" height="6" fill="currentColor"/>
+                  <rect x="84" y="30" width="6" height="6" fill="currentColor"/>
+                  <rect x="108" y="30" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="60" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="78" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="96" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="114" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="132" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="54" y="54" width="6" height="6" fill="currentColor"/>
+                  <rect x="72" y="54" width="6" height="6" fill="currentColor"/>
+                  <rect x="90" y="54" width="6" height="6" fill="currentColor"/>
+                  <rect x="108" y="54" width="6" height="6" fill="currentColor"/>
+                  <rect x="126" y="54" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="66" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="84" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="102" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="120" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="60" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="78" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="96" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="114" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="132" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="0" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="12" y="48" width="6" height="6" fill="currentColor"/>
+                  <rect x="24" y="54" width="6" height="6" fill="currentColor"/>
+                  <rect x="6" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="30" y="60" width="6" height="6" fill="currentColor"/>
+                  <rect x="0" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="18" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="36" y="66" width="6" height="6" fill="currentColor"/>
+                  <rect x="6" y="72" width="6" height="6" fill="currentColor"/>
+                  <rect x="24" y="72" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="72" width="6" height="6" fill="currentColor"/>
+                  <rect x="66" y="72" width="6" height="6" fill="currentColor"/>
+                  <rect x="84" y="72" width="6" height="6" fill="currentColor"/>
+                  <rect x="96" y="78" width="6" height="6" fill="currentColor"/>
+                  <rect x="108" y="72" width="6" height="6" fill="currentColor"/>
+                  <rect x="120" y="78" width="6" height="6" fill="currentColor"/>
+                  <rect x="12" y="78" width="6" height="6" fill="currentColor"/>
+                  <rect x="30" y="84" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="84" width="6" height="6" fill="currentColor"/>
+                  <rect x="60" y="90" width="6" height="6" fill="currentColor"/>
+                  <rect x="78" y="84" width="6" height="6" fill="currentColor"/>
+                  <rect x="90" y="90" width="6" height="6" fill="currentColor"/>
+                  <rect x="114" y="84" width="6" height="6" fill="currentColor"/>
+                  <rect x="132" y="90" width="6" height="6" fill="currentColor"/>
+                  <rect x="0" y="96" width="6" height="6" fill="currentColor"/>
+                  <rect x="18" y="96" width="6" height="6" fill="currentColor"/>
+                  <rect x="36" y="102" width="6" height="6" fill="currentColor"/>
+                  <rect x="54" y="96" width="6" height="6" fill="currentColor"/>
+                  <rect x="72" y="102" width="6" height="6" fill="currentColor"/>
+                  <rect x="84" y="96" width="6" height="6" fill="currentColor"/>
+                  <rect x="108" y="96" width="6" height="6" fill="currentColor"/>
+                  <rect x="126" y="96" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="108" width="6" height="6" fill="currentColor"/>
+                  <rect x="66" y="108" width="6" height="6" fill="currentColor"/>
+                  <rect x="78" y="114" width="6" height="6" fill="currentColor"/>
+                  <rect x="90" y="108" width="6" height="6" fill="currentColor"/>
+                  <rect x="114" y="108" width="6" height="6" fill="currentColor"/>
+                  <rect x="132" y="114" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="120" width="6" height="6" fill="currentColor"/>
+                  <rect x="60" y="126" width="6" height="6" fill="currentColor"/>
+                  <rect x="72" y="120" width="6" height="6" fill="currentColor"/>
+                  <rect x="96" y="120" width="6" height="6" fill="currentColor"/>
+                  <rect x="108" y="126" width="6" height="6" fill="currentColor"/>
+                  <rect x="120" y="120" width="6" height="6" fill="currentColor"/>
+                  <rect x="48" y="132" width="6" height="6" fill="currentColor"/>
+                  <rect x="66" y="138" width="6" height="6" fill="currentColor"/>
+                  <rect x="84" y="132" width="6" height="6" fill="currentColor"/>
+                  <rect x="102" y="138" width="6" height="6" fill="currentColor"/>
+                  <rect x="120" y="132" width="6" height="6" fill="currentColor"/>
+                  <rect x="138" y="132" width="6" height="6" fill="currentColor"/>
+                </svg>
+              </div>
+              <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-3);">
+                Can't scan? Manual key:
+              </p>
+              <code style="font-family: var(--font-mono); color: var(--color-text-1); font-size: var(--text-body); letter-spacing: 2px; background: var(--color-surface-1); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); display:inline-block; margin-top: var(--space-1);">JBSW Y3DP EHPK 3PXP</code>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="mfaGoStep(1)">
+                <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                Back
+              </button>
+              <button class="btn btn-primary" onclick="mfaGoStep(3)">
+                I've scanned it
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Verify -->
+          <div id="mfaS3" style="display:none;">
+            <div style="text-align:center; margin-bottom: var(--space-4);">
+              <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Enter the 6-digit code shown in your authenticator app to confirm setup.</p>
+            </div>
+            <div class="mfa-digits" id="mfaSetupDigits"></div>
+            <div class="auth-error" id="mfaSetupError" style="margin-top: var(--space-3);">Invalid code. Expected <strong>123456</strong> for this demo.</div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="mfaGoStep(2)">
+                <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                Back
+              </button>
+              <button class="btn btn-primary" id="mfaVerifyBtn" onclick="handleMFASetupVerify()">
+                <svg data-lucide="shield-check" width="16" height="16"></svg>
+                Verify & Enable 2FA
+              </button>
+            </div>
+          </div>
+
+          <!-- Step success -->
+          <div id="mfaSuccess" style="display:none; text-align:center; padding: var(--space-4) 0;">
+            <div class="success-check">
+              <svg data-lucide="check" width="36" height="36" style="color: white;"></svg>
+            </div>
+            <h3 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-2);">2FA Enabled!</h3>
+            <p style="color: var(--color-text-2); font-size: var(--text-body-sm);">Your account is now protected. Redirecting to dashboard...</p>
           </div>
         </div>
       </div>
+
+      <!-- ═══════════════════════════════════════════
+           VIEW 5: COMPANY REGISTRATION WIZARD
+      ═══════════════════════════════════════════ -->
+      <div class="auth-view" id="view-company-setup">
+        <div class="auth-card">
+          <div class="auth-logo" style="margin-bottom: var(--space-4);">
+            <div class="logo-3d">G</div>
+            <h1>Create Your Company</h1>
+            <p>Set up GammaHR for your team</p>
+          </div>
+
+          <!-- Stepper -->
+          <div class="step-indicator" id="companyStepIndicator">
+            <div class="step-node active" id="csStep1Node">
+              <div class="step-dot active">1</div>
+              <div class="step-label">Company</div>
+            </div>
+            <div class="step-node" id="csStep2Node">
+              <div class="step-dot">2</div>
+              <div class="step-label">Admin</div>
+            </div>
+            <div class="step-node" id="csStep3Node">
+              <div class="step-dot">3</div>
+              <div class="step-label">Invite</div>
+            </div>
+            <div class="step-node" id="csStep4Node">
+              <div class="step-dot">4</div>
+              <div class="step-label">Customize</div>
+            </div>
+          </div>
+
+          <!-- Step 1: Company Details -->
+          <div id="csS1">
+            <div class="auth-form">
+              <div class="form-group">
+                <label class="form-label">Company Name <span style="color:var(--color-error)">*</span></label>
+                <input type="text" class="form-input" id="companyName" placeholder="Acme Inc." oninput="updateSubdomain(this.value)">
+                <div class="subdomain-preview">
+                  Your URL: <span id="subdomainPreview">your-company</span>.gammahr.com
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Industry</label>
+                <select class="form-input form-select">
+                  <option>Technology</option>
+                  <option>Consulting</option>
+                  <option>Agency</option>
+                  <option>Healthcare</option>
+                  <option>Finance</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+                <div class="form-group">
+                  <label class="form-label">Company Size</label>
+                  <select class="form-input form-select">
+                    <option>1–10</option>
+                    <option selected>11–50</option>
+                    <option>51–200</option>
+                    <option>201–500</option>
+                    <option>500+</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Country</label>
+                  <select class="form-input form-select">
+                    <option selected>France</option>
+                    <option>Germany</option>
+                    <option>United Kingdom</option>
+                    <option>United States</option>
+                    <option>Spain</option>
+                    <option>Italy</option>
+                    <option>Netherlands</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="showView('view-login')">Cancel</button>
+              <button class="btn btn-primary" onclick="companyGoStep(2)">
+                Next: Admin Account
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Admin Account -->
+          <div id="csS2" style="display:none;">
+            <div class="auth-form">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+                <div class="form-group">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-input" placeholder="Sarah">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-input" placeholder="Chen">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Work Email</label>
+                <input type="email" class="form-input" placeholder="sarah@company.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="password-wrapper">
+                  <input type="password" class="form-input" id="companyAdminPass" placeholder="Create a strong password" oninput="updateStrength(this.value, 'companyStrength', 'companyStrengthText')">
+                  <button type="button" class="toggle-pass" onclick="togglePassword('companyAdminPass', this)">
+                    <svg data-lucide="eye" width="18" height="18"></svg>
+                  </button>
+                </div>
+                <div class="strength-meter" id="companyStrength">
+                  <div class="strength-bar" id="csb1"></div>
+                  <div class="strength-bar" id="csb2"></div>
+                  <div class="strength-bar" id="csb3"></div>
+                  <div class="strength-bar" id="csb4"></div>
+                </div>
+                <div class="strength-text" id="companyStrengthText" style="color: var(--color-text-3);"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone <span style="font-size: var(--text-caption); color: var(--color-text-3);">(optional)</span></label>
+                <input type="tel" class="form-input" placeholder="+33 6 12 34 56 78">
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="companyGoStep(1)">
+                <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                Back
+              </button>
+              <button class="btn btn-primary" onclick="companyGoStep(3)">
+                Next: Invite Team
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Invite Team -->
+          <div id="csS3" style="display:none;">
+            <div class="auth-form">
+              <div style="text-align:center; margin-bottom: var(--space-4);">
+                <svg data-lucide="users" width="40" height="40" style="color: var(--color-accent); margin-bottom: var(--space-2);"></svg>
+                <p style="color: var(--color-text-2); font-size: var(--text-body-sm);">Invite your team to GammaHR. They'll receive a welcome email with a link to set up their account.</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label">How many employees are you planning to manage?</label>
+                <input type="number" class="form-input" value="12" min="1" max="10000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Invite by email <span style="font-size: var(--text-caption); color: var(--color-text-3);">(one per line)</span></label>
+                <textarea class="form-input" rows="4" placeholder="alice@company.com&#10;bob@company.com&#10;carol@company.com" style="height:auto; padding: var(--space-3) var(--space-4); resize:vertical;"></textarea>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <div>
+                <button class="btn btn-ghost" onclick="companyGoStep(2)">
+                  <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                  Back
+                </button>
+                <button class="btn btn-ghost" onclick="companyGoStep(4)" style="margin-left: var(--space-2); font-size: var(--text-body-sm); color: var(--color-text-3);">Skip for now</button>
+              </div>
+              <button class="btn btn-primary" onclick="companyGoStep(4)">
+                Next: Customize
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: Customize -->
+          <div id="csS4" style="display:none;">
+            <div class="auth-form">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+                <div class="form-group">
+                  <label class="form-label">Working Hours/Day</label>
+                  <input type="number" class="form-input" value="8" min="1" max="24">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Leave Days/Year</label>
+                  <input type="number" class="form-input" value="25" min="0" max="365">
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+                <div class="form-group">
+                  <label class="form-label">Fiscal Year Start</label>
+                  <select class="form-input form-select">
+                    <option selected>January</option>
+                    <option>April</option>
+                    <option>July</option>
+                    <option>October</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Currency</label>
+                  <select class="form-input form-select">
+                    <option selected>EUR (€)</option>
+                    <option>USD ($)</option>
+                    <option>GBP (£)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Timezone</label>
+                <select class="form-input form-select">
+                  <option selected>Europe/Paris (UTC+1)</option>
+                  <option>Europe/London (UTC+0)</option>
+                  <option>America/New_York (UTC-5)</option>
+                  <option>America/Los_Angeles (UTC-8)</option>
+                  <option>Asia/Tokyo (UTC+9)</option>
+                </select>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="companyGoStep(3)">
+                <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                Back
+              </button>
+              <button class="btn btn-primary" id="finishSetupBtn" onclick="handleCompanyFinish()">
+                Finish Setup &amp; Launch GammaHR →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════
+           VIEW 6: EMPLOYEE ONBOARDING
+      ═══════════════════════════════════════════ -->
+      <div class="auth-view" id="view-employee-onboard">
+        <div class="auth-card">
+          <div class="auth-logo" style="margin-bottom: var(--space-4);">
+            <div class="logo-3d">G</div>
+            <h1>Welcome!</h1>
+            <p>Complete your profile to get started</p>
+          </div>
+
+          <!-- Stepper -->
+          <div class="step-indicator" id="onboardStepIndicator">
+            <div class="step-node active" id="obStep1Node">
+              <div class="step-dot active">1</div>
+              <div class="step-label">Password</div>
+            </div>
+            <div class="step-node" id="obStep2Node">
+              <div class="step-dot">2</div>
+              <div class="step-label">Profile</div>
+            </div>
+            <div class="step-node" id="obStep3Node">
+              <div class="step-dot">3</div>
+              <div class="step-label">Tour</div>
+            </div>
+          </div>
+
+          <!-- Step 1: Set Password -->
+          <div id="obS1">
+            <div style="background: var(--color-surface-1); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-5); display:flex; align-items:center; gap: var(--space-3);">
+              <div class="avatar avatar-md avatar-sage">SC</div>
+              <div>
+                <div style="font-size: var(--text-body); font-weight: var(--weight-semibold); color: var(--color-text-1);">Welcome to GammaHR!</div>
+                <div style="font-size: var(--text-body-sm); color: var(--color-text-2);">You've been invited by <strong>Sarah Chen</strong></div>
+              </div>
+            </div>
+            <div class="auth-form">
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <div class="password-wrapper">
+                  <input type="password" class="form-input" id="onboardPass" placeholder="Create a strong password" oninput="updateStrength(this.value, 'onboardStrength', 'onboardStrengthText')">
+                  <button type="button" class="toggle-pass" onclick="togglePassword('onboardPass', this)">
+                    <svg data-lucide="eye" width="18" height="18"></svg>
+                  </button>
+                </div>
+                <div class="strength-meter" id="onboardStrength">
+                  <div class="strength-bar" id="ob1"></div>
+                  <div class="strength-bar" id="ob2"></div>
+                  <div class="strength-bar" id="ob3"></div>
+                  <div class="strength-bar" id="ob4"></div>
+                </div>
+                <div class="strength-text" id="onboardStrengthText" style="color: var(--color-text-3);"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" class="form-input" placeholder="Repeat password">
+              </div>
+              <label style="display:flex; align-items:flex-start; gap: var(--space-3); cursor:pointer; font-size: var(--text-body-sm); color: var(--color-text-2);">
+                <input type="checkbox" style="margin-top:3px; flex-shrink:0;">
+                <span>I agree to the <a href="#" style="color:var(--color-primary);">Terms of Service</a> and <a href="#" style="color:var(--color-primary);">Privacy Policy</a></span>
+              </label>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="showView('view-login')">Cancel</button>
+              <button class="btn btn-primary" onclick="onboardGoStep(2)">
+                Continue
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Complete Profile -->
+          <div id="obS2" style="display:none;">
+            <div class="auth-form">
+              <div class="form-group">
+                <label class="form-label">Profile Photo</label>
+                <div class="photo-upload-zone" id="photoDropZone"
+                     ondragover="this.classList.add('drag-over'); event.preventDefault();"
+                     ondragleave="this.classList.remove('drag-over');"
+                     ondrop="this.classList.remove('drag-over'); event.preventDefault(); showToast('success','Photo uploaded','Profile photo updated successfully');"
+                     onclick="showToast('info','Upload','Click to choose a file from your device')">
+                  <svg data-lucide="upload-cloud" width="32" height="32" style="color: var(--color-text-3); margin-bottom: var(--space-2);"></svg>
+                  <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Drag & drop your photo here</p>
+                  <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-1);">or click to browse · JPG, PNG up to 5MB</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-input" placeholder="+33 6 12 34 56 78">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+                <div class="form-group">
+                  <label class="form-label">Emergency Contact</label>
+                  <input type="text" class="form-input" placeholder="Full name">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Emergency Phone</label>
+                  <input type="tel" class="form-input" placeholder="+33 6 ...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-input" value="2026-04-14">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Bio <span style="font-size: var(--text-caption); color: var(--color-text-3);">(optional)</span></label>
+                <textarea class="form-input" rows="3" placeholder="A short introduction about yourself..." style="height:auto; padding: var(--space-3) var(--space-4); resize:vertical;"></textarea>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-ghost" onclick="onboardGoStep(1)">
+                <svg data-lucide="arrow-left" width="16" height="16"></svg>
+                Back
+              </button>
+              <button class="btn btn-primary" onclick="onboardGoStep(3)">
+                Continue
+                <svg data-lucide="arrow-right" width="16" height="16"></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Quick Tour / All Set -->
+          <div id="obS3" style="display:none;">
+            <div style="text-align:center; margin-bottom: var(--space-6);">
+              <div class="success-check">
+                <svg data-lucide="check" width="36" height="36" style="color: white;"></svg>
+              </div>
+              <h2 style="font-size: var(--text-heading-2); font-weight: var(--weight-bold); color: var(--color-text-1); margin-bottom: var(--space-2);">You're all set!</h2>
+              <p style="color: var(--color-text-2); font-size: var(--text-body-sm);">Here's what you can do with GammaHR:</p>
+            </div>
+            <div class="tour-grid">
+              <div class="tour-card">
+                <svg data-lucide="clock" width="28" height="28"></svg>
+                <h4>Timesheets</h4>
+                <p>Log and submit your work hours weekly</p>
+              </div>
+              <div class="tour-card">
+                <svg data-lucide="calendar-off" width="28" height="28"></svg>
+                <h4>Leave Requests</h4>
+                <p>Request time off and track your balance</p>
+              </div>
+              <div class="tour-card">
+                <svg data-lucide="receipt" width="28" height="28"></svg>
+                <h4>Expenses</h4>
+                <p>Submit and track expense reimbursements</p>
+              </div>
+              <div class="tour-card">
+                <svg data-lucide="users" width="28" height="28"></svg>
+                <h4>Your Team</h4>
+                <p>View colleagues, org chart, and contacts</p>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg auth-submit" onclick="window.location.href='index.html'">
+              Start Exploring →
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -371,78 +1134,394 @@
   <script>
     lucide.createIcons();
 
-    function showView(viewId) {
-      document.querySelectorAll('.auth-view').forEach(v => v.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
+    // ── Toast system ──────────────────────────────
+    function showToast(type, title, message) {
+      var container = document.getElementById('toast-container');
+      var iconMap = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
+      var toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.innerHTML =
+        '<div class="toast-icon"><svg data-lucide="' + iconMap[type] + '" width="18" height="18"></svg></div>' +
+        '<div class="toast-content"><div class="toast-title">' + title + '</div>' +
+        (message ? '<div class="toast-message">' + message + '</div>' : '') + '</div>' +
+        '<button class="toast-close"><svg data-lucide="x" width="14" height="14"></svg></button>';
+      container.appendChild(toast);
+      lucide.createIcons({ nodes: [toast] });
+      toast.querySelector('.toast-close').addEventListener('click', function() { removeToast(toast); });
+      setTimeout(function() { removeToast(toast); }, 4000);
     }
-
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-      } else {
-        input.type = 'password';
+    function removeToast(toast) {
+      if (toast.parentNode) {
+        toast.classList.add('removing');
+        setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
       }
     }
 
+    // ── View system ──────────────────────────────
+    function showView(viewId) {
+      document.querySelectorAll('.auth-view').forEach(function(v) { v.classList.remove('active'); });
+      var target = document.getElementById(viewId);
+      if (target) target.classList.add('active');
+    }
+    // Expose for MFA account settings trigger
+    function showMFASetup() { showView('view-mfa'); }
+
+    // ── Password toggle ──────────────────────────
+    function togglePassword(inputId, btn) {
+      var input = document.getElementById(inputId);
+      var icon = btn.querySelector('svg');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) { icon.setAttribute('data-lucide', 'eye-off'); lucide.createIcons({ nodes: [btn] }); }
+      } else {
+        input.type = 'password';
+        if (icon) { icon.setAttribute('data-lucide', 'eye'); lucide.createIcons({ nodes: [btn] }); }
+      }
+    }
+
+    // ── Password strength ───────────────────────
+    function updateStrength(val, meterId, textId) {
+      var bars = document.querySelectorAll('#' + meterId + ' .strength-bar');
+      var textEl = document.getElementById(textId);
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      var levels = ['', 'weak', 'medium', 'strong', 'strong'];
+      var labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      var colors = ['', 'var(--color-error)', 'var(--color-warning)', 'var(--color-success)', 'var(--color-success)'];
+      bars.forEach(function(b, i) {
+        b.className = 'strength-bar';
+        if (val.length > 0 && i < score) b.classList.add(score <= 1 ? 'weak' : score === 2 ? 'medium' : 'strong');
+      });
+      if (textEl) {
+        textEl.textContent = val.length > 0 ? labels[score] || 'Strong' : '';
+        textEl.style.color = colors[score] || 'var(--color-success)';
+      }
+    }
+
+    // ── Rate limiting ────────────────────────────
+    var loginAttempts = 0;
+    var rateLimitActive = false;
+
+    function startRateLimitCountdown() {
+      var totalSecs = 15 * 60;
+      var countdownEl = document.getElementById('rateLimitCountdown');
+      var rateLimitMsg = document.getElementById('rateLimitMsg');
+      var submitBtn = document.getElementById('loginBtn');
+      rateLimitMsg.style.display = 'block';
+      if (submitBtn) { submitBtn.disabled = true; }
+      rateLimitActive = true;
+      var interval = setInterval(function() {
+        totalSecs--;
+        var m = Math.floor(totalSecs / 60);
+        var s = totalSecs % 60;
+        if (countdownEl) countdownEl.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        if (totalSecs <= 0) {
+          clearInterval(interval);
+          rateLimitMsg.style.display = 'none';
+          if (submitBtn) { submitBtn.disabled = false; }
+          loginAttempts = 0;
+          rateLimitActive = false;
+        }
+      }, 1000);
+    }
+
+    // ── Login handler ────────────────────────────
     function handleLogin() {
-      const form = document.getElementById('login-form');
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      const error = document.getElementById('login-error');
-      const mfa = document.getElementById('mfa-section');
+      if (rateLimitActive) return;
+      var form = document.getElementById('login-form');
+      var email = document.getElementById('login-email').value;
+      var password = document.getElementById('login-password').value;
+      var error = document.getElementById('login-error');
+      var submitBtn = document.getElementById('loginBtn');
 
       if (!email || !password) {
+        loginAttempts++;
         error.classList.add('visible');
-        form.classList.add('shake');
-        setTimeout(() => form.classList.remove('shake'), 400);
+        if (form) { form.classList.add('shake'); setTimeout(function() { form.classList.remove('shake'); }, 400); }
+        if (loginAttempts >= 5) { startRateLimitCountdown(); }
         return;
       }
 
-      // Simulate login — show loading
-      const btn = form.querySelector('.auth-submit');
-      btn.classList.add('btn-loading');
-      btn.disabled = true;
+      submitBtn.classList.add('btn-loading');
+      submitBtn.disabled = true;
 
-      setTimeout(() => {
-        btn.classList.remove('btn-loading');
-        btn.disabled = false;
+      setTimeout(function() {
+        submitBtn.classList.remove('btn-loading');
+        submitBtn.disabled = false;
         error.classList.remove('visible');
-
-        // Show MFA
         form.style.display = 'none';
-        mfa.classList.add('visible');
-        document.getElementById('mfa-code').focus();
+        var mfaInline = document.getElementById('mfa-inline');
+        mfaInline.style.display = 'flex';
+        buildMFADigits('mfaInlineDigits');
+        lucide.createIcons({ nodes: [document.getElementById('mfa-inline')] });
       }, 1500);
     }
 
-    function handleMFA() {
-      const code = document.getElementById('mfa-code').value;
+    // ── Passkey handler ──────────────────────────
+    function handlePasskey() {
+      var btn = document.getElementById('passkeyBtn');
+      var originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg class="spin-icon" data-lucide="loader" width="18" height="18" style="animation:spin 1s linear infinite;"></svg> Authenticating...';
+      btn.disabled = true;
+      lucide.createIcons({ nodes: [btn] });
+      setTimeout(function() {
+        showToast('success', 'Passkey verified', 'Authentication successful. Signing you in...');
+        setTimeout(function() { window.location.href = 'index.html'; }, 1200);
+      }, 1500);
+    }
+
+    // ── SSO handler ──────────────────────────────
+    function toggleSSO() {
+      var panel = document.getElementById('ssoPanelEl');
+      panel.classList.toggle('open');
+    }
+    function handleSSO() {
+      var domain = document.getElementById('ssoDomain').value;
+      if (!domain) { showToast('error', 'Domain required', 'Please enter your company domain'); return; }
+      document.getElementById('ssoRedirectMsg').style.display = 'block';
+      lucide.createIcons({ nodes: [document.getElementById('ssoRedirectMsg')] });
+    }
+
+    // ── Forgot password ──────────────────────────
+    function handleForgot() {
+      var emailEl = document.getElementById('forgot-email');
+      var email = emailEl ? emailEl.value : '';
+      if (!email) { showToast('error', 'Email required', 'Please enter your email address'); return; }
+      var displayEl = document.getElementById('reset-email-display');
+      if (displayEl) displayEl.textContent = email;
+      showView('view-reset-sent');
+    }
+
+    // ── Resend handler ───────────────────────────
+    function handleResend() {
+      var btn = document.getElementById('resendBtn');
+      btn.disabled = true;
+      var countdown = 30;
+      showToast('success', 'Email sent', 'Reset link resent to your inbox');
+      var interval = setInterval(function() {
+        btn.innerHTML = '<svg data-lucide="refresh-cw" width="16" height="16"></svg> Resend email (' + countdown + 's)';
+        lucide.createIcons({ nodes: [btn] });
+        countdown--;
+        if (countdown < 0) {
+          clearInterval(interval);
+          btn.innerHTML = '<svg data-lucide="refresh-cw" width="16" height="16"></svg> Resend email';
+          lucide.createIcons({ nodes: [btn] });
+          btn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    // ── MFA digit input builder ──────────────────
+    function buildMFADigits(containerId) {
+      var container = document.getElementById(containerId);
+      container.innerHTML = '';
+      for (var i = 0; i < 6; i++) {
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.maxLength = 1;
+        inp.inputMode = 'numeric';
+        inp.pattern = '[0-9]';
+        inp.className = 'mfa-digit';
+        inp.dataset.index = i;
+        inp.addEventListener('input', makeMFAInputHandler(containerId));
+        inp.addEventListener('keydown', makeMFAKeydownHandler(containerId));
+        container.appendChild(inp);
+      }
+    }
+    function makeMFAInputHandler(containerId) {
+      return function(e) {
+        var inp = e.target;
+        var val = inp.value.replace(/[^0-9]/g, '');
+        inp.value = val;
+        if (val) {
+          inp.classList.add('filled');
+          var next = inp.parentElement.querySelector('[data-index="' + (parseInt(inp.dataset.index) + 1) + '"]');
+          if (next) next.focus();
+        } else {
+          inp.classList.remove('filled');
+        }
+        checkMFAComplete(containerId);
+      };
+    }
+    function makeMFAKeydownHandler(containerId) {
+      return function(e) {
+        if (e.key === 'Backspace' && !e.target.value) {
+          var prev = e.target.parentElement.querySelector('[data-index="' + (parseInt(e.target.dataset.index) - 1) + '"]');
+          if (prev) { prev.value = ''; prev.classList.remove('filled'); prev.focus(); }
+        }
+      };
+    }
+    function getMFACode(containerId) {
+      return Array.from(document.getElementById(containerId).querySelectorAll('.mfa-digit'))
+        .map(function(i) { return i.value; }).join('');
+    }
+    function checkMFAComplete(containerId) {
+      var code = getMFACode(containerId);
       if (code.length === 6) {
-        // Redirect to dashboard
-        window.location.href = 'index.html';
+        if (containerId === 'mfaInlineDigits') {
+          setTimeout(handleInlineMFA, 300);
+        } else if (containerId === 'mfaSetupDigits') {
+          setTimeout(handleMFASetupVerify, 300);
+        }
       }
     }
 
-    function handleForgot() {
-      showView('reset-sent-view');
+    // ── MFA inline verify ────────────────────────
+    function handleInlineMFA() {
+      var code = getMFACode('mfaInlineDigits');
+      var err = document.getElementById('mfa-inline-error');
+      if (code === '123456' || code.length === 6) {
+        // Demo: accept any 6-digit code
+        err.classList.remove('visible');
+        showToast('success', 'Signed in', 'Welcome back, Sarah!');
+        setTimeout(function() { window.location.href = 'index.html'; }, 800);
+      } else {
+        err.classList.add('visible');
+      }
     }
 
-    // Enter key handlers
-    document.getElementById('login-password').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleLogin();
-    });
-    document.getElementById('mfa-code')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleMFA();
+    // ── MFA setup wizard ─────────────────────────
+    var currentMFAStep = 1;
+    function mfaGoStep(step) {
+      document.getElementById('mfaS1').style.display = step === 1 ? 'block' : 'none';
+      document.getElementById('mfaS2').style.display = step === 2 ? 'block' : 'none';
+      document.getElementById('mfaS3').style.display = step === 3 ? 'block' : 'none';
+      document.getElementById('mfaSuccess').style.display = 'none';
+      currentMFAStep = step;
+      // Update step dots
+      for (var s = 1; s <= 3; s++) {
+        var node = document.getElementById('mfaStep' + s + 'Node');
+        var dot = node.querySelector('.step-dot');
+        node.classList.remove('active', 'done');
+        dot.classList.remove('active', 'done');
+        if (s < step) { node.classList.add('done'); dot.classList.add('done'); dot.innerHTML = '<svg data-lucide="check" width="14" height="14"></svg>'; }
+        else if (s === step) { node.classList.add('active'); dot.classList.add('active'); dot.textContent = s; }
+        else { dot.textContent = s; }
+      }
+      if (step === 3) {
+        buildMFADigits('mfaSetupDigits');
+      }
+      lucide.createIcons();
+    }
+
+    function handleMFASetupVerify() {
+      var code = getMFACode('mfaSetupDigits');
+      var errEl = document.getElementById('mfaSetupError');
+      if (code === '123456') {
+        errEl.classList.remove('visible');
+        document.getElementById('mfaS3').style.display = 'none';
+        document.getElementById('mfaSuccess').style.display = 'block';
+        // Update all steps to done
+        for (var s = 1; s <= 3; s++) {
+          var node = document.getElementById('mfaStep' + s + 'Node');
+          var dot = node.querySelector('.step-dot');
+          node.classList.remove('active');
+          node.classList.add('done');
+          dot.classList.remove('active');
+          dot.classList.add('done');
+          dot.innerHTML = '<svg data-lucide="check" width="14" height="14"></svg>';
+        }
+        lucide.createIcons();
+        setTimeout(function() { window.location.href = 'index.html'; }, 2000);
+      } else {
+        errEl.classList.add('visible');
+        // Clear digits and re-focus first
+        var digits = document.querySelectorAll('#mfaSetupDigits .mfa-digit');
+        digits.forEach(function(d) { d.value = ''; d.classList.remove('filled'); });
+        if (digits[0]) digits[0].focus();
+      }
+    }
+
+    // ── Company setup wizard ─────────────────────
+    var currentCSStep = 1;
+    function companyGoStep(step) {
+      for (var s = 1; s <= 4; s++) {
+        var el = document.getElementById('csS' + s);
+        if (el) el.style.display = s === step ? 'block' : 'none';
+        var node = document.getElementById('csStep' + s + 'Node');
+        if (node) {
+          var dot = node.querySelector('.step-dot');
+          node.classList.remove('active', 'done');
+          dot.classList.remove('active', 'done');
+          if (s < step) {
+            node.classList.add('done'); dot.classList.add('done');
+            dot.innerHTML = '<svg data-lucide="check" width="14" height="14"></svg>';
+          } else if (s === step) {
+            node.classList.add('active'); dot.classList.add('active');
+            dot.textContent = s;
+          } else {
+            dot.textContent = s;
+          }
+        }
+      }
+      currentCSStep = step;
+      lucide.createIcons();
+    }
+
+    function handleCompanyFinish() {
+      var btn = document.getElementById('finishSetupBtn');
+      btn.innerHTML = '<svg data-lucide="loader" width="16" height="16" style="animation:spin 1s linear infinite;"></svg> Setting up your workspace...';
+      btn.disabled = true;
+      lucide.createIcons({ nodes: [btn] });
+      setTimeout(function() {
+        window.location.href = 'index.html';
+      }, 2000);
+    }
+
+    function updateSubdomain(val) {
+      var slug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'your-company';
+      var preview = document.getElementById('subdomainPreview');
+      if (preview) preview.textContent = slug;
+    }
+
+    // ── Employee onboarding wizard ───────────────
+    var currentOBStep = 1;
+    function onboardGoStep(step) {
+      for (var s = 1; s <= 3; s++) {
+        var el = document.getElementById('obS' + s);
+        if (el) el.style.display = s === step ? 'block' : 'none';
+        var node = document.getElementById('obStep' + s + 'Node');
+        if (node) {
+          var dot = node.querySelector('.step-dot');
+          node.classList.remove('active', 'done');
+          dot.classList.remove('active', 'done');
+          if (s < step) {
+            node.classList.add('done'); dot.classList.add('done');
+            dot.innerHTML = '<svg data-lucide="check" width="14" height="14"></svg>';
+          } else if (s === step) {
+            node.classList.add('active'); dot.classList.add('active');
+            dot.textContent = s;
+          } else {
+            dot.textContent = s;
+          }
+        }
+      }
+      currentOBStep = step;
+      lucide.createIcons();
+    }
+
+    // ── Keyboard handlers ────────────────────────
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var activeView = document.querySelector('.auth-view.active');
+        if (!activeView) return;
+        var id = activeView.id;
+        if (id === 'view-login') handleLogin();
+        else if (id === 'view-forgot') handleForgot();
+      }
     });
 
-    // View switcher links
-    document.querySelectorAll('[data-view]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        showView(link.dataset.view);
-      });
-    });
+    // ── Spin animation ───────────────────────────
+    var styleEl = document.createElement('style');
+    styleEl.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+    document.head.appendChild(styleEl);
+
+    // Init MFA digit containers
+    buildMFADigits('mfaInlineDigits');
+    buildMFADigits('mfaSetupDigits');
   </script>
 </body>
 </html>
