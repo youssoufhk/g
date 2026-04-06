@@ -264,7 +264,7 @@ Dispatch 10 critic agents simultaneously. Each reads ALL prototype files but thr
 > Flag any completion state (after submitting a timesheet, approving a request, generating an invoice) that feels flat, empty, or unsatisfying. Flag any missing positive feedback moment — places where a small animation, a "all done" message, or a visible progress state would create a sense of accomplishment. Flag any page where the primary value of the app is not immediately obvious to a new user.
 >
 > **The Anti-Tempolia Test (most important):**
-> For every data entry flow — timesheets, expense forms, leave requests, project assignments — ask: "Is there ANYTHING here that feels like manual work the app should have done?" If yes, flag it CRITICAL.
+> For every single flow in the app — timesheets, expenses, leave requests, project assignments, employee onboarding, invoice generation, approval queues, HR recruitment, resource planning, calendar events, account settings, everything — ask: "Is there ANYTHING here that feels like manual work the app should have done?" If yes, flag it CRITICAL. No module is exempt.
 >
 > Severity guide:
 > - CRITICAL: This flow feels like Tempolia. A user would dread doing this repeatedly.
@@ -416,6 +416,6 @@ The enhancement cycle is complete when:
 - [ ] Every interactive element on every page has a working handler
 - [ ] All 10 canonical data points are consistent across all pages
 - [ ] The prototype feels like a €50/user/month premium product in a live browser demo
-- [ ] The timesheet and expense flows specifically feel like reviewing and confirming — not manual data entry
+- [ ] Every data entry flow across all modules (timesheets, expenses, leaves, projects, onboarding, invoices, approvals — everything) feels like reviewing and confirming, not manual data entry
 - [ ] Every completion state (submit timesheet, approve request, generate invoice) has a satisfying, positive response
 - [ ] A first-time user opening any page can immediately see what the page does and what action to take next
