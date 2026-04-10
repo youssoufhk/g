@@ -10,26 +10,8 @@
   <style>
     /* ── Expense page-specific styles ── */
 
-    /* Filter bar */
-    .filter-bar-standard {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: var(--space-3) var(--space-4);
-      background: var(--color-surface-0);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      margin-bottom: var(--space-4);
-      flex-wrap: wrap;
-    }
-    .filter-bar-standard .form-select,
-    .filter-bar-standard .form-input {
-      height: 32px;
-      font-size: var(--text-body-sm);
-      min-width: 140px;
-      width: auto;
-    }
-    .filter-bar-standard .toggle-wrap {
+    /* Filter bar — uses canonical .filter-bar-standard from _layout.css */
+    .toggle-wrap {
       display: flex;
       align-items: center;
       gap: var(--space-2);
@@ -452,7 +434,7 @@
     }
     .empty-state svg { width: 48px; height: 48px; color: var(--color-text-3); margin-bottom: var(--space-4); }
     .empty-state h3 {
-      font-size: var(--text-heading-2);
+      font-size: var(--text-heading-3);
       font-weight: var(--weight-semibold);
       color: var(--color-text-1);
       margin-bottom: var(--space-2);
@@ -472,7 +454,7 @@
       margin-bottom: var(--space-4);
     }
     @media (max-width: 1023px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 639px) { .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 639px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
 
     /* Mobile expense item stacking (issue 33) */
     @media (max-width: 639px) {
@@ -531,42 +513,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="receipt" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">2 expense reports pending your approval</div>
-                  <div class="notif-time">5 minutes ago</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">David Park's equipment expense exceeds daily limit</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Your travel expense (&#8364;450) has been approved</div>
-                  <div class="notif-time">Yesterday</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="x-circle" width="16" height="16" style="color: var(--color-error);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Equipment expense (&#8364;1,200) rejected: over budget limit</div>
-                  <div class="notif-time">2 days ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -594,7 +541,6 @@
 
     <!-- ── PAGE CONTENT ── -->
     <main class="page-content" id="main-content">
-      <div class="page-content-narrow">
 
         <!-- Page Header -->
         <div class="page-header">
@@ -649,37 +595,65 @@
           <div class="pt-6">
 
             <!-- Stats -->
-            <div class="stats-grid">
-              <div class="stat-card">
+            <div class="stats-grid perspective-container stagger-reveal">
+              <div class="stat-card card-3d card-interactive" data-animate="fade-up">
                 <div class="stat-label">This Month</div>
-                <div class="stat-value">&euro;1,240</div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+                  <div class="stat-value">&euro;1,240</div>
+                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
+                    <polyline points="0,20 10,16 20,18 30,12 40,14 50,8 64,6" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="0,20 10,16 20,18 30,12 40,14 50,8 64,6 64,24 0,24" fill="url(#expSpark1)" stroke="none"/>
+                    <defs><linearGradient id="expSpark1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-success)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-success)" stop-opacity="0"/></linearGradient></defs>
+                  </svg>
+                </div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="14" height="14"></svg>
-                  +15% vs last month
+                  +15% vs last month (&euro;1,078)
                 </div>
               </div>
-              <div class="stat-card">
+              <div class="stat-card card-3d card-interactive" data-animate="fade-up">
                 <div class="stat-label">Pending</div>
-                <div class="stat-value">&euro;67.30</div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+                  <div class="stat-value" id="statPendingAmount">&euro;67.30</div>
+                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
+                    <polyline points="0,12 10,14 20,10 30,16 40,8 50,12 64,10" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="0,12 10,14 20,10 30,16 40,8 50,12 64,10 64,24 0,24" fill="url(#expSpark2)" stroke="none"/>
+                    <defs><linearGradient id="expSpark2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-warning)" stop-opacity="0.12"/><stop offset="100%" stop-color="var(--color-warning)" stop-opacity="0"/></linearGradient></defs>
+                  </svg>
+                </div>
                 <div class="stat-trend" style="color: var(--color-warning);">
                   <svg data-lucide="clock" width="14" height="14"></svg>
-                  1 item awaiting review
+                  1 item awaiting review &bull; &euro;340 last month
                 </div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Billable</div>
-                <div class="stat-value">78%</div>
-                <div class="stat-trend" class="text-2">
-                  <svg data-lucide="target" width="14" height="14"></svg>
-                  of total expenses
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+                  <div class="stat-value">78%</div>
+                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
+                    <polyline points="0,18 10,16 20,14 30,12 40,10 50,8 64,6" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="0,18 10,16 20,14 30,12 40,10 50,8 64,6 64,24 0,24" fill="url(#expSpark3)" stroke="none"/>
+                    <defs><linearGradient id="expSpark3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.12"/><stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/></linearGradient></defs>
+                  </svg>
+                </div>
+                <div class="stat-trend" style="color:var(--color-text-2);">
+                  <svg data-lucide="trending-up" width="14" height="14"></svg>
+                  +5% vs last month (73%)
                 </div>
               </div>
               <div class="stat-card">
                 <div class="stat-label">Top Category</div>
-                <div class="stat-value" style="font-family: var(--font-sans); font-size: var(--text-heading-2);">Travel</div>
-                <div class="stat-trend" class="text-2">
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+                  <div class="stat-value" style="font-family: var(--font-sans); font-size: var(--text-heading-2);">Travel</div>
+                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
+                    <polyline points="0,14 10,18 20,12 30,16 40,6 50,10 64,4" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="0,14 10,18 20,12 30,16 40,6 50,10 64,4 64,24 0,24" fill="url(#expSpark4)" stroke="none"/>
+                    <defs><linearGradient id="expSpark4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-info)" stop-opacity="0.12"/><stop offset="100%" stop-color="var(--color-info)" stop-opacity="0"/></linearGradient></defs>
+                  </svg>
+                </div>
+                <div class="stat-trend" style="color:var(--color-text-2);">
                   <svg data-lucide="plane" width="14" height="14"></svg>
-                  &euro;450 this month
+                  &euro;450 this month &bull; &euro;320 last month
                 </div>
               </div>
             </div>
@@ -701,27 +675,27 @@
                 </div>
               </div>
               <style>.saved-views-menu.active{opacity:1!important;visibility:visible!important;transform:translateY(0)!important;}.saved-view-item{padding:var(--space-2) var(--space-3);font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;}.saved-view-item:hover{background:var(--color-surface-2);}</style>
-              <select class="form-select">
-                <option>All Status</option>
-                <option>Approved</option>
-                <option>Pending</option>
-                <option>Rejected</option>
+              <select class="form-select" id="myExpenseStatus" onchange="filterMyExpenses()">
+                <option value="">All Status</option>
+                <option value="Approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Rejected">Rejected</option>
               </select>
-              <select class="form-select">
-                <option>All Types</option>
-                <option>Travel</option>
-                <option>Hotel</option>
-                <option>Meals</option>
-                <option>Software</option>
-                <option>Equipment</option>
-                <option>Transport</option>
+              <select class="form-select" id="myExpenseType" onchange="filterMyExpenses()">
+                <option value="">All Types</option>
+                <option value="Travel">Travel</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Meals">Meals</option>
+                <option value="Software">Software</option>
+                <option value="Equipment">Equipment</option>
+                <option value="Transport">Transport</option>
               </select>
-              <select class="form-select">
-                <option>All Projects</option>
-                <option>Acme Web Redesign</option>
-                <option>Globex Phase 2</option>
-                <option>Initech API</option>
-                <option>Contoso Deal</option>
+              <select class="form-select" id="myExpenseProject" onchange="filterMyExpenses()">
+                <option value="">All Projects</option>
+                <option value="Acme Web Redesign">Acme Web Redesign</option>
+                <option value="Globex Phase 2">Globex Phase 2</option>
+                <option value="Initech API">Initech API</option>
+                <option value="Contoso Deal">Contoso Deal</option>
               </select>
               <div class="toggle-wrap">
                 <div class="toggle-switch" id="billableToggle" onclick="this.classList.toggle('active')"></div>
@@ -952,9 +926,9 @@
                     <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:var(--space-1);"></svg>
                     Form auto-filled from receipt. Please review.
                   </div>
-                  <button class="btn btn-primary btn-sm" style="margin-top:var(--space-3);width:100%;" onclick="applyAiToForm()">
-                    <svg data-lucide="arrow-right" width="16" height="16"></svg>
-                    Apply to Expense Form &rarr;
+                  <button class="btn btn-secondary btn-sm" style="margin-top:var(--space-3);width:100%;" onclick="applyAiToForm()">
+                    <svg data-lucide="refresh-cw" width="16" height="16"></svg>
+                    Re-apply AI Results
                   </button>
                 </div>
 
@@ -1012,7 +986,7 @@
                     <label class="form-label">Project</label>
                     <select class="form-select" id="formProject">
                       <option value="">None</option>
-                      <option value="acme">Acme Web Redesign</option>
+                      <option value="acme" selected>Acme Web Redesign</option>
                       <option value="globex">Globex Phase 2</option>
                       <option value="initech">Initech API</option>
                       <option value="contoso">Contoso Deal</option>
@@ -1050,7 +1024,38 @@
         <!-- ═══════════════ TAB 3: TEAM EXPENSES ═══════════════ -->
         <div class="tab-content" id="tab-team-expenses" data-min-role="pm">
           <div class="pt-6">
-            <div class="data-table-wrapper">
+            <!-- Search / Filter Bar -->
+            <div class="filter-bar-standard" style="margin-bottom:var(--space-4);">
+              <div class="filter-search">
+                <svg data-lucide="search" width="16" height="16"></svg>
+                <input type="text" placeholder="Search team expenses..." id="teamExpenseSearch" oninput="filterTeamExpenses()">
+              </div>
+              <select class="form-select" id="teamExpenseStatus" onchange="filterTeamExpenses()">
+                <option value="">All Statuses</option>
+                <option>Approved</option>
+                <option>Pending</option>
+              </select>
+              <select class="form-select" id="teamExpenseType" onchange="filterTeamExpenses()">
+                <option value="">All Types</option>
+                <option>Travel</option>
+                <option>Hotel</option>
+                <option>Meals</option>
+                <option>Software</option>
+                <option>Equipment</option>
+                <option>Transport</option>
+              </select>
+            </div>
+            <!-- Empty state for no results -->
+            <div class="empty-state" id="teamExpenseEmpty" style="display:none;">
+              <svg data-lucide="search" width="48" height="48"></svg>
+              <h3>No team expenses match your filters</h3>
+              <p>Try adjusting your search or filter criteria to see more results.</p>
+              <button class="btn btn-secondary btn-sm" onclick="clearTeamExpenseFilters()">
+                <svg data-lucide="x" width="16" height="16"></svg>
+                Clear Filters
+              </button>
+            </div>
+            <div class="data-table-wrapper" id="teamExpenseTable">
               <table class="data-table mobile-cards">
                 <thead>
                   <tr>
@@ -1072,7 +1077,7 @@
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">JS</div><a href="employees.html#john-smith" style="color:var(--color-text-1);">John Smith</a></div></td>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">JS</div><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#john-smith" style="color:var(--color-text-1);">John Smith</a></div></td>
                     <td data-label="Type">Meals</td>
                     <td data-label="Amount" class="cell-mono">&euro;120.00</td>
                     <td data-label="Date">Mar 5, 2026</td>
@@ -1080,7 +1085,7 @@
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">MR</div><a href="employees.html#marco-rossi" style="color:var(--color-text-1);">Marco Rossi</a></div></td>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">BT</div><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color:var(--color-text-1);">Bob Taylor</a></div></td>
                     <td data-label="Type">Hotel</td>
                     <td data-label="Amount" class="cell-mono">&euro;340.00</td>
                     <td data-label="Date">Apr 2, 2026</td>
@@ -1088,7 +1093,7 @@
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">CW</div><a href="employees.html#carol-williams" style="color:var(--color-text-1);">Carol Williams</a></div></td>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">CW</div><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams" style="color:var(--color-text-1);">Carol Williams</a></div></td>
                     <td data-label="Type">Software</td>
                     <td data-label="Amount" class="cell-mono">&euro;89.00</td>
                     <td data-label="Date">Jan 10, 2026</td>
@@ -1096,7 +1101,7 @@
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">DP</div><a href="employees.html#david-park" style="color:var(--color-text-1);">David Park</a></div></td>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">DP</div><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park" style="color:var(--color-text-1);">David Park</a></div></td>
                     <td data-label="Type">Equipment</td>
                     <td data-label="Amount" class="cell-mono">&euro;1,450.00</td>
                     <td data-label="Date">Apr 3, 2026</td>
@@ -1136,13 +1141,20 @@
               </p>
             </div>
 
+            <!-- All-cleared empty state -->
+            <div class="empty-state" id="approvalEmpty" style="display:none;">
+              <svg data-lucide="party-popper" width="48" height="48"></svg>
+              <h3>You're all caught up!</h3>
+              <p>No pending expenses to review. New submissions will appear here automatically.</p>
+            </div>
+
             <div class="expense-list" id="approvalList">
 
               <!-- 1. Bob Taylor - Hotel -->
               <div class="approval-item" data-approval="1">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">BT</div>
-                  <div class="emp-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+                  <div class="emp-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1182,7 +1194,7 @@
               <div class="approval-item" data-approval="2">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">CW</div>
-                  <div class="emp-name"><a href="employees.html#carol-williams">Carol Williams</a></div>
+                  <div class="emp-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1222,7 +1234,7 @@
               <div class="approval-item" data-approval="3">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">DP</div>
-                  <div class="emp-name"><a href="employees.html#david-park">David Park</a></div>
+                  <div class="emp-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1262,7 +1274,7 @@
               <div class="approval-item" data-approval="4">
                 <div class="approval-employee">
                   <div class="avatar avatar-sm">LO</div>
-                  <div class="emp-name"><a href="employees.html#liam-obrien">Liam O'Brien</a></div>
+                  <div class="emp-name"><a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1305,6 +1317,16 @@
         <!-- ═══════════════ TAB 4: ANALYTICS ═══════════════ -->
         <div class="tab-content" id="tab-analytics">
           <div class="pt-6">
+            <!-- Insufficient data state (hidden by default; shown for new companies) -->
+            <div class="empty-state" id="analyticsEmpty" style="display:none;">
+              <svg data-lucide="bar-chart-2" width="48" height="48"></svg>
+              <h3>Not enough data to generate analytics</h3>
+              <p>Analytics will appear once your team has submitted enough expenses. Keep tracking to unlock spending insights, trends, and category breakdowns.</p>
+              <button class="btn btn-primary btn-sm" onclick="switchTab('submit')">
+                <svg data-lucide="plus" width="16" height="16"></svg>
+                Submit First Expense
+              </button>
+            </div>
             <!-- Row 1: Charts -->
             <div class="analytics-chart-row" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">
               <!-- Expense by Category donut -->
@@ -1324,11 +1346,11 @@
                     <text x="70" y="81" text-anchor="middle" font-size="16" font-weight="600" fill="var(--color-text-1)" font-family="var(--font-mono)">€4,470</text>
                   </svg>
                   <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-2);">
-                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-info);"></span>Travel</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">35%</span></div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-primary);"></span>Accommodation</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">25%</span></div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-success);"></span>Meals</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">20%</span></div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-warning);"></span>Equipment</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">12%</span></div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:2px;background:var(--color-text-3);"></span>Other</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">8%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-info);"></span>Travel</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">35%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-primary);"></span>Accommodation</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">25%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-success);"></span>Meals</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">20%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-warning);"></span>Equipment</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">12%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:var(--text-body-sm);"><span style="display:flex;align-items:center;gap:var(--space-1-5);"><span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-text-3);"></span>Other</span><span style="font-family:var(--font-mono);color:var(--color-text-2);">8%</span></div>
                   </div>
                 </div>
               </div>
@@ -1423,11 +1445,11 @@
                   </svg>
                   <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-3);">
                     <div style="display:flex;align-items:center;justify-content:space-between;">
-                      <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);"><div style="width:12px;height:12px;border-radius:2px;background:var(--color-primary);"></div>Billable</div>
+                      <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-primary);"></div>Billable</div>
                       <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-1);" data-sensitive="financials">67% · €2,995</div>
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;">
-                      <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);"><div style="width:12px;height:12px;border-radius:2px;background:var(--color-surface-2);border:1px solid var(--color-border);"></div>Non-billable</div>
+                      <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-surface-2);border:1px solid var(--color-border);"></div>Non-billable</div>
                       <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);" data-sensitive="financials">33% · €1,475</div>
                     </div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);padding-top:var(--space-2);border-top:1px solid var(--color-border-subtle);" data-sensitive="financials">Total YTD: <strong style="font-family:var(--font-mono);color:var(--color-text-2);">€4,470</strong></div>
@@ -1438,7 +1460,6 @@
           </div>
         </div>
 
-      </div>
     </main>
   </div>
 </div>
@@ -1658,6 +1679,8 @@
       aiBtn.disabled = false;
       aiBtn.classList.remove('btn-loading');
       lucide.createIcons();
+      // Auto-fill the form immediately (FEEL fix: no manual "Apply" step)
+      applyAiToForm();
     }, 2000);
   };
 
@@ -1700,7 +1723,17 @@
       });
     });
     uploadZone.addEventListener('click', () => {
-      // Simulate file picker
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.pdf,.jpg,.jpeg,.png';
+      input.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+          showToast('success', 'File Selected', this.files[0].name + ' ready for AI scan.');
+          // Auto-trigger AI scan after upload
+          startAiScan();
+        }
+      });
+      input.click();
     });
   }
 
@@ -1794,6 +1827,23 @@
       document.getElementById('formProject').value = '';
       document.getElementById('formBillable').checked = false;
       document.getElementById('formDesc').value = '';
+
+      // Briefly highlight new item (pulse)
+      newItem.style.transition = 'background 0.3s';
+      newItem.style.background = 'var(--color-success-muted)';
+      setTimeout(function() { newItem.style.background = ''; }, 1500);
+
+      // Update Pending stat card to reflect new submission
+      var statEl = document.getElementById('statPendingAmount');
+      if (statEl) {
+        var currentText = statEl.textContent.replace(/[€$£]/g, '').replace(',', '');
+        var currentVal = parseFloat(currentText) || 0;
+        var newVal = currentVal + parseFloat(amount);
+        statEl.textContent = currSymbol + newVal.toFixed(2);
+        statEl.style.transition = 'color 0.3s';
+        statEl.style.color = 'var(--color-warning)';
+        setTimeout(function() { statEl.style.color = ''; }, 1500);
+      }
 
       // Switch tab and toast
       switchTab('my-expenses');
@@ -1914,6 +1964,13 @@
     const remaining = document.querySelectorAll('#approvalList .approval-item:not(.fading)').length;
     const countBadge = document.querySelector('[data-tab="approval"] .tab-count');
     if (countBadge) countBadge.textContent = remaining;
+    // Show "all cleared" empty state
+    var approvalEmpty = document.getElementById('approvalEmpty');
+    var approvalList = document.getElementById('approvalList');
+    if (remaining === 0 && approvalEmpty) {
+      approvalEmpty.style.display = 'flex';
+      if (approvalList) approvalList.style.display = 'none';
+    }
   }
 
   // ── Toast system ──
@@ -1963,6 +2020,83 @@
     }
   };
 
+  // ── Team Expense Filtering ──
+  window.filterTeamExpenses = function() {
+    var search = (document.getElementById('teamExpenseSearch') || {}).value || '';
+    search = search.toLowerCase();
+    var rows = document.querySelectorAll('#teamExpenseTable tbody tr');
+    var visible = 0;
+    rows.forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      var match = !search || text.indexOf(search) >= 0;
+      row.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    var emptyEl = document.getElementById('teamExpenseEmpty');
+    var tableEl = document.getElementById('teamExpenseTable');
+    if (emptyEl) emptyEl.style.display = visible === 0 ? 'flex' : 'none';
+    if (tableEl) tableEl.style.display = visible === 0 ? 'none' : '';
+  };
+
+  window.clearTeamExpenseFilters = function() {
+    var searchEl = document.getElementById('teamExpenseSearch');
+    var statusEl = document.getElementById('teamExpenseStatus');
+    var typeEl = document.getElementById('teamExpenseType');
+    if (searchEl) searchEl.value = '';
+    if (statusEl) statusEl.value = '';
+    if (typeEl) typeEl.value = '';
+    filterTeamExpenses();
+  };
+
+  // ── My Expenses Filtering (INT fix: 3 filter selects now have IDs and JS) ──
+  window.filterMyExpenses = function() {
+    var statusFilter = (document.getElementById('myExpenseStatus') || {}).value || '';
+    var typeFilter = (document.getElementById('myExpenseType') || {}).value || '';
+    var projectFilter = (document.getElementById('myExpenseProject') || {}).value || '';
+    var items = document.querySelectorAll('#expenseList .expense-item');
+    var visible = 0;
+    items.forEach(function(item) {
+      var show = true;
+      var text = item.textContent;
+      if (statusFilter && text.indexOf(statusFilter) < 0) show = false;
+      if (typeFilter) {
+        var typeEl = item.querySelector('.expense-type');
+        if (typeEl && typeEl.textContent.trim() !== typeFilter) show = false;
+      }
+      if (projectFilter) {
+        var links = item.querySelectorAll('.expense-meta a');
+        var hasProject = false;
+        links.forEach(function(a) { if (a.textContent.trim() === projectFilter) hasProject = true; });
+        if (!hasProject) show = false;
+      }
+      item.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+  };
+
+  // ── Event delegation for dynamically created Edit/Cancel buttons (INT fix) ──
+  document.getElementById('expenseList').addEventListener('click', function(e) {
+    var editBtn = e.target.closest('.btn-ghost');
+    var cancelBtn = e.target.closest('.btn-destructive-ghost');
+    if (editBtn && editBtn.textContent.trim() === 'Edit') {
+      e.preventDefault();
+      showToast('info', 'Edit Expense', 'Opening expense editor...');
+      switchTab('submit');
+    }
+    if (cancelBtn && cancelBtn.textContent.trim() === 'Cancel') {
+      e.preventDefault();
+      var item = cancelBtn.closest('.expense-item');
+      if (item) {
+        item.classList.add('fading');
+        setTimeout(function() { item.remove(); }, 400);
+        showToast('success', 'Cancelled', 'Expense has been cancelled.');
+      }
+    }
+  });
+
+  // ── Team expense empty state: add "Clear filters" CTA (EDGE fix) ──
+  // Already present in the teamExpenseEmpty div
+
   // ── Init icons ──
   lucide.createIcons();
 
@@ -1970,7 +2104,7 @@
 </script>
 
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item active"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

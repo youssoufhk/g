@@ -64,7 +64,7 @@
       display: flex; align-items: center; justify-content: center;
       color: var(--color-white);
       font-weight: var(--weight-bold);
-      font-size: 13px;
+      font-size: var(--text-body-sm);
     }
     .portal-brand {
       font-size: var(--text-body-sm);
@@ -82,7 +82,7 @@
       display: flex; align-items: center; justify-content: center;
       color: var(--color-white);
       font-weight: var(--weight-bold);
-      font-size: 14px;
+      font-size: var(--text-body);
     }
     .portal-client-name {
       font-size: var(--text-heading-3);
@@ -133,7 +133,14 @@
     }
     .portal-nav-item svg { width: 18px; height: 18px; }
     @media (max-width: 639px) {
-      .portal-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .portal-nav {
+        overflow-x: auto; -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none; scrollbar-width: none;
+        position: relative;
+        mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 24px), transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 24px), transparent);
+      }
+      .portal-nav::-webkit-scrollbar { display: none; }
       .portal-nav-item { white-space: nowrap; min-height: 44px; }
       .portal-header { flex-wrap: wrap; gap: var(--space-2); height: auto; min-height: 56px; padding: var(--space-3) var(--space-4); }
       .portal-notice { flex-direction: column; gap: var(--space-1); text-align: center; }
@@ -483,6 +490,13 @@
     }
     .btn-error:hover { filter: brightness(1.1); }
 
+    /* ── Slide panel mobile fullscreen ── */
+    @media (max-width: 639px) {
+      .slide-panel { width: 100vw; }
+      .slide-panel-header { padding: var(--space-3) var(--space-4); }
+      .slide-panel-body { padding: var(--space-4); }
+    }
+
     /* ── Hidden on mobile helper ── */
     @media (max-width: 639px) {
       .hidden-mobile { display: none !important; }
@@ -522,7 +536,7 @@
           </div>
           <svg data-lucide="chevron-down" width="14" height="14" style="color: var(--color-text-3);"></svg>
         </div>
-        <a href="../auth.html" class="btn btn-ghost btn-sm">
+        <a href="auth.html" class="btn btn-ghost btn-sm">
           <svg data-lucide="log-out" width="16" height="16"></svg>
           <span class="hidden-mobile">Sign out</span>
         </a>
@@ -592,24 +606,58 @@
         <!-- Stat Cards -->
         <div class="grid-4 mb-6">
           <div class="stat-card">
-            <div class="stat-label">Active Projects</div>
-            <div class="stat-value" style="font-size: var(--text-heading-2);">3</div>
-            <div class="stat-trend up">All on track</div>
+            <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+              <div>
+                <div class="stat-label">Active Projects</div>
+                <div class="stat-value" style="font-size: var(--text-heading-2);">3</div>
+              </div>
+              <svg width="48" height="24" viewBox="0 0 48 24" style="opacity:0.5;"><polyline points="2,20 10,18 18,16 26,14 34,10 42,8 46,6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="stat-trend up">+1 this quarter</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Hours This Month</div>
-            <div class="stat-value" style="font-size: var(--text-heading-2);">342h</div>
+            <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+              <div>
+                <div class="stat-label">Hours This Month</div>
+                <div class="stat-value" style="font-size: var(--text-heading-2);">342h</div>
+              </div>
+              <svg width="48" height="24" viewBox="0 0 48 24" style="opacity:0.5;"><polyline points="2,18 8,20 14,16 20,14 26,12 32,10 38,8 46,6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
             <div class="stat-trend up">+8% vs last month</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Outstanding Invoices</div>
-            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€17,400</div>
-            <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">2 invoices pending</div>
+            <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+              <div>
+                <div class="stat-label">Outstanding Invoices</div>
+                <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€17,400</div>
+              </div>
+              <svg width="48" height="24" viewBox="0 0 48 24" style="opacity:0.5;"><polyline points="2,8 10,10 18,14 26,12 34,16 42,18 46,20" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">2 invoices &middot; avg 18d to payment</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Team Members</div>
-            <div class="stat-value" style="font-size: var(--text-heading-2);">12</div>
-            <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">Across 3 projects</div>
+            <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+              <div>
+                <div class="stat-label">Team Members</div>
+                <div class="stat-value" style="font-size: var(--text-heading-2);">12</div>
+              </div>
+              <svg width="48" height="24" viewBox="0 0 48 24" style="opacity:0.5;"><polyline points="2,12 10,12 18,12 26,12 34,12 42,12 46,12" fill="none" stroke="var(--color-text-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-1);">Steady &middot; across 3 projects</div>
+          </div>
+        </div>
+
+        <!-- AI Proactive Alert -->
+        <div style="background: var(--color-error-muted, rgba(239,68,68,0.08)); border: 1px solid var(--color-error); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-5); margin-bottom: var(--space-5); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap: var(--space-3);" id="overdueAlert">
+          <div style="display:flex; align-items:center; gap: var(--space-2); font-size: var(--text-body-sm); font-weight: var(--weight-medium); color: var(--color-error);">
+            <svg data-lucide="alert-circle" width="18" height="18"></svg>
+            <span><strong style="color: var(--color-text-1);">INV-2026-043</strong> is 26 days overdue — €5,000 · Mobile App. Payment was due Mar 15.</span>
+          </div>
+          <div style="display:flex; gap: var(--space-2);">
+            <button class="btn btn-primary btn-sm" onclick="openPaymentModal('INV-2026-043', '€5,000')">
+              <svg data-lucide="credit-card" width="14" height="14"></svg> Pay Now
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('overdueAlert').style.display='none'">Dismiss</button>
           </div>
         </div>
 
@@ -781,7 +829,7 @@
             <span class="project-meta-item"><svg data-lucide="calendar"></svg> Feb 1 — Jul 31, 2026</span>
             <span class="project-meta-item"><svg data-lucide="users"></svg> 5 team members</span>
           </div>
-          <h4 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-4) 0 var(--space-3);">Team</h4>
+          <h3 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-4) 0 var(--space-3);">Team</h3>
           <div class="team-grid-portal">
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-sage">SC</div>
@@ -797,6 +845,7 @@
               <div class="avatar avatar-md avatar-sage-gold">AW</div>
               <div class="member-name">Alice Wang</div>
               <div class="member-role">Software Engineer</div>
+              <span class="badge badge-warning" style="font-size: var(--text-overline);">On Leave Apr 14–18</span>
             </div>
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-amber">MR</div>
@@ -809,7 +858,45 @@
               <div class="member-role">Junior Developer</div>
             </div>
           </div>
-          <h4 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-6) 0 var(--space-3);">Milestones</h4>
+          <!-- Budget Consumption -->
+          <h3 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-6) 0 var(--space-3);">Budget Consumption</h3>
+          <div style="display:flex; gap: var(--space-6); flex-wrap:wrap; margin-bottom: var(--space-4);">
+            <div style="flex:1; min-width:200px;">
+              <div style="display:flex; justify-content:space-between; font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-1);">
+                <span>Hours: 288h / 500h</span><span class="font-mono">58%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:58%; background: var(--color-accent);"></div></div>
+            </div>
+            <div style="flex:1; min-width:200px;">
+              <div style="display:flex; justify-content:space-between; font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-1);">
+                <span>Cost: €24,500 / €50,000</span><span class="font-mono">49%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:49%; background: var(--color-success);"></div></div>
+            </div>
+          </div>
+          <!-- Burndown Chart -->
+          <h3 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-4) 0 var(--space-3);">Burndown</h3>
+          <div style="background: var(--color-surface-1); border:1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-4);">
+            <svg viewBox="0 0 400 120" width="100%" style="max-height:120px;">
+              <!-- Ideal line -->
+              <line x1="20" y1="10" x2="380" y2="110" stroke="var(--color-text-3)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+              <!-- Actual burndown -->
+              <polyline points="20,10 80,22 140,38 200,55 240,68 280,80" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="280" cy="80" r="4" fill="var(--color-accent)"/>
+              <!-- Labels -->
+              <text x="20" y="118" fill="var(--color-text-3)" font-size="9">Feb</text>
+              <text x="100" y="118" fill="var(--color-text-3)" font-size="9">Mar</text>
+              <text x="180" y="118" fill="var(--color-text-3)" font-size="9">Apr</text>
+              <text x="260" y="118" fill="var(--color-text-3)" font-size="9">May</text>
+              <text x="340" y="118" fill="var(--color-text-3)" font-size="9">Jul</text>
+            </svg>
+            <div style="display:flex; gap: var(--space-4); font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-2);">
+              <span style="display:flex; align-items:center; gap: var(--space-1);"><span style="width:12px; height:2px; background: var(--color-text-3); opacity:0.5; display:inline-block;"></span> Ideal</span>
+              <span style="display:flex; align-items:center; gap: var(--space-1);"><span style="width:12px; height:2px; background: var(--color-accent); display:inline-block;"></span> Actual</span>
+              <span>212h remaining</span>
+            </div>
+          </div>
+          <h3 style="font-size: var(--text-heading-3); font-weight: var(--weight-semibold); margin: var(--space-4) 0 var(--space-3);">Milestones</h3>
           <div class="data-table-wrapper">
             <table class="data-table mobile-cards">
               <thead>
@@ -1037,8 +1124,22 @@
            INVOICES
       ════════════════════════════════════ -->
       <section class="portal-section" id="sec-invoices">
-        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Invoices</h2>
-        <div class="data-table-wrapper">
+        <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-4);">Invoices</h2>
+        <!-- Invoice filter bar -->
+        <div class="ts-filter-bar" style="margin-bottom: var(--space-4);">
+          <button class="ts-filter-btn active" id="invFilterAll" onclick="applyInvFilter('all')">All</button>
+          <button class="ts-filter-btn" id="invFilterOutstanding" onclick="applyInvFilter('outstanding')">Outstanding</button>
+          <button class="ts-filter-btn" id="invFilterPaid" onclick="applyInvFilter('paid')">Paid</button>
+        </div>
+        <!-- Invoices empty state (shown when filter returns no results) -->
+        <div id="invoicesEmptyState" class="card" style="display:none;">
+          <div class="empty-state-card">
+            <svg data-lucide="file-text" width="48" height="48"></svg>
+            <div class="empty-title">No invoices found</div>
+            <div class="empty-sub">There are no invoices matching this filter. Try a different filter or check back later.</div>
+          </div>
+        </div>
+        <div class="data-table-wrapper" id="invTableWrapper">
           <table class="data-table mobile-cards">
             <thead>
               <tr>
@@ -1052,7 +1153,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr data-inv-status="outstanding">
                 <td style="font-weight: var(--weight-semibold);">INV-2026-048</td>
                 <td data-label="Project">Website Redesign</td>
                 <td data-label="Issue Date">Apr 1, 2026</td>
@@ -1065,7 +1166,7 @@
                   <button class="btn btn-primary btn-xs" onclick="openPaymentModal('INV-2026-048', '€12,400')"><svg data-lucide="credit-card" width="14" height="14"></svg> Pay</button>
                 </td>
               </tr>
-              <tr>
+              <tr data-inv-status="paid">
                 <td style="font-weight: var(--weight-semibold);">INV-2026-045</td>
                 <td data-label="Project">Website Redesign</td>
                 <td data-label="Issue Date">Mar 1, 2026</td>
@@ -1077,7 +1178,7 @@
                   <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-045','Website Redesign','Mar 1, 2026','Mar 31, 2026','Paid')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
-              <tr>
+              <tr data-inv-status="outstanding">
                 <td style="font-weight: var(--weight-semibold);">INV-2026-043</td>
                 <td data-label="Project">Mobile App</td>
                 <td data-label="Issue Date">Feb 15, 2026</td>
@@ -1090,7 +1191,7 @@
                   <button class="btn btn-primary btn-xs" onclick="openPaymentModal('INV-2026-043', '€5,000')"><svg data-lucide="credit-card" width="14" height="14"></svg> Pay</button>
                 </td>
               </tr>
-              <tr>
+              <tr data-inv-status="paid">
                 <td style="font-weight: var(--weight-semibold);">INV-2026-041</td>
                 <td data-label="Project">CRM Integration</td>
                 <td data-label="Issue Date">Jan 15, 2026</td>
@@ -1106,15 +1207,15 @@
           </table>
         </div>
         <div style="margin-top: var(--space-6); display: flex; gap: var(--space-4); flex-wrap:wrap;">
-          <div class="stat-card" style="flex:1; min-width:140px;">
+          <div class="stat-card" style="flex:1; min-width:100px;">
             <div class="stat-label">Total Paid (YTD)</div>
             <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-success);">€19,400</div>
           </div>
-          <div class="stat-card" style="flex:1; min-width:140px;">
+          <div class="stat-card" style="flex:1; min-width:100px;">
             <div class="stat-label">Outstanding</div>
-            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€12,400</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-gold);">€17,400</div>
           </div>
-          <div class="stat-card" style="flex:1; min-width:140px;">
+          <div class="stat-card" style="flex:1; min-width:100px;">
             <div class="stat-label">Overdue</div>
             <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-error);">€5,000</div>
           </div>
@@ -1126,6 +1227,14 @@
       ════════════════════════════════════ -->
       <section class="portal-section" id="sec-messages">
         <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Messages</h2>
+        <!-- Messages empty state (hidden when messages exist) -->
+        <div id="messagesEmptyState" class="card" style="display:none;">
+          <div class="empty-state-card">
+            <svg data-lucide="message-square" width="48" height="48"></svg>
+            <div class="empty-title">No messages yet</div>
+            <div class="empty-sub">Your account manager will reach out soon. You can also start a conversation below.</div>
+          </div>
+        </div>
         <div class="card" style="display:flex; flex-direction:column;">
           <div class="messages-list" id="messagesList">
             <!-- Company message 1: urgent -->
@@ -1164,8 +1273,16 @@
           </div>
           <div class="messages-reply">
             <div class="avatar avatar-sm avatar-violet">JD</div>
-            <input class="form-input" id="messageInput" style="flex:1;" placeholder="Reply to your account manager..." onkeydown="if(event.key==='Enter') sendPortalMessage()">
-            <button class="btn btn-primary" onclick="sendPortalMessage()">
+            <div style="flex:1; display:flex; flex-direction:column; gap: var(--space-1);">
+              <input class="form-input" id="messageInput" style="width:100%;" placeholder="Reply to your account manager... Type @ to mention" onkeydown="if(event.key==='Enter') sendPortalMessage()">
+              <div style="font-size: var(--text-caption); color: var(--color-text-3); display:flex; align-items:center; gap: var(--space-2);">
+                <span style="opacity:0.6;">Tip: @ to mention</span>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('info', 'Attach File', 'File attachment coming soon')" title="Attach file" style="flex-shrink:0;">
+              <svg data-lucide="paperclip" width="16" height="16"></svg>
+            </button>
+            <button class="btn btn-primary" onclick="sendPortalMessage()" style="flex-shrink:0;">
               <svg data-lucide="send" width="16" height="16"></svg>
             </button>
           </div>
@@ -1177,6 +1294,14 @@
       ════════════════════════════════════ -->
       <section class="portal-section" id="sec-documents">
         <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold); margin-bottom: var(--space-6);">Documents</h2>
+        <!-- Documents empty state (hidden when documents exist) -->
+        <div id="documentsEmptyState" class="card" style="display:none;">
+          <div class="empty-state-card">
+            <svg data-lucide="paperclip" width="48" height="48"></svg>
+            <div class="empty-title">No documents shared yet</div>
+            <div class="empty-sub">When your team shares documents, they will appear here for download.</div>
+          </div>
+        </div>
         <div class="card">
           <div class="card-body" style="padding: 0;">
             <!-- Service Agreement -->
@@ -1294,7 +1419,7 @@
           <div class="card-header"><span class="card-title">Line Items</span></div>
           <div class="card-body" style="padding: 0;">
             <div class="data-table-wrapper">
-              <table class="data-table" id="invoiceLineItems">
+              <table class="data-table mobile-cards" id="invoiceLineItems">
                 <thead>
                   <tr>
                     <th>Description</th>
@@ -1422,6 +1547,9 @@
     </div>
   </div>
 
+  <!-- Notification Panel -->
+  <div id="notifPanel"></div>
+
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -1515,14 +1643,22 @@
 
     function confirmFlag(btn) {
       var flagForm = btn.closest('.flag-form');
-      var reason = flagForm.querySelector('input').value;
+      var reasonInput = flagForm.querySelector('input');
+      var reason = reasonInput.value.trim();
+      if (!reason) {
+        reasonInput.style.borderColor = 'var(--color-error)';
+        reasonInput.setAttribute('placeholder', 'Please provide a reason for flagging');
+        reasonInput.focus();
+        showToast('warning', 'Reason required', 'Please provide a reason before flagging this timesheet.');
+        return;
+      }
       var row = btn.closest('tr');
       var statusCell = row.querySelector('.ts-status-cell');
       statusCell.innerHTML = '<span class="badge badge-error"><svg data-lucide="flag" width="12" height="12"></svg> Flagged</span>';
       var actionsCell = btn.closest('td');
-      actionsCell.innerHTML = '<span style="font-size: var(--text-caption); color: var(--color-error);">Flagged: ' + (reason || 'No reason given') + '</span>';
+      actionsCell.innerHTML = '<span style="font-size: var(--text-caption); color: var(--color-error);">Flagged: ' + reason + '</span>';
       lucide.createIcons({ nodes: [row] });
-      showToast('warning', 'Timesheet flagged', reason ? 'Reason: ' + reason : 'Timesheet has been flagged for review');
+      showToast('warning', 'Timesheet flagged', 'Reason: ' + reason);
     }
 
     function cancelFlag(btn) {
@@ -1596,7 +1732,7 @@
       if (data && data.lines) {
         data.lines.forEach(function(line) {
           var tr = document.createElement('tr');
-          tr.innerHTML = '<td>' + line.desc + '</td><td class="font-mono">' + line.hours + '</td><td class="font-mono">' + line.rate + '</td><td class="font-mono">' + line.amount + '</td>';
+          tr.innerHTML = '<td data-label="Description">' + line.desc + '</td><td data-label="Hours" class="font-mono">' + line.hours + '</td><td data-label="Rate" class="font-mono">' + line.rate + '</td><td data-label="Amount" class="font-mono">' + line.amount + '</td>';
           tbody.appendChild(tr);
         });
       }
@@ -1666,16 +1802,22 @@
       var textEl = document.getElementById('aiResponseText');
       var q = question.toLowerCase();
       var answer;
-      if (q.includes('invoice') || q.includes('payment') || q.includes('overdue')) {
-        answer = 'You currently have <strong>4 invoices</strong> on file. INV-2026-043 (€5,000, Mobile App) is overdue since Mar 15 — please arrange payment by Apr 15 to avoid disruption. INV-2026-048 (€12,400) is due Apr 30. Total outstanding: <strong>€17,400</strong>. Paid YTD: €19,400.';
-      } else if (q.includes('timesheet') || q.includes('hours') || q.includes('time')) {
-        answer = 'Your team logged <strong>342 hours</strong> this month across all projects. The most recent timesheets from Mar 30 – Apr 5 are pending your approval. Sarah Chen (31h), Marco Rossi (40h), John Smith (15h), and Liam O\'Brien (32h) are awaiting your review in the Timesheets tab.';
-      } else if (q.includes('project') || q.includes('status') || q.includes('progress')) {
-        answer = 'You have <strong>3 active projects</strong>: Website Redesign (55% complete, on track — Sprint 1 in progress), Mobile App (15% complete, early stage), and CRM Integration (20% complete). All projects are currently on track with their milestones.';
-      } else if (q.includes('team') || q.includes('member') || q.includes('who')) {
-        answer = 'Your team consists of <strong>12 members across 3 projects</strong>. The Website Redesign team includes Sarah Chen (Project Manager), John Smith (Senior Developer), Alice Wang (Software Engineer), Marco Rossi (Operations Lead), and Liam O\'Brien (Junior Dev).';
+      if (q.includes('latest') || q.includes('recent') || q.includes('last invoice')) {
+        answer = 'Your most recent invoice is <strong>INV-2026-048</strong> — <strong>€12,400</strong> for Website Redesign, sent Apr 1. As of today (Apr 10), it\'s due in <strong>20 days</strong> (Apr 30). You\'re on track — no action needed yet.<br><br>⚠️ Also: <strong>INV-2026-043</strong> (€5,000 · Mobile App) is 26 days overdue. That one needs attention first. <a href="#" onclick="switchTab(\'invoices\'); return false;" style="color:var(--color-accent);">View both in Invoices →</a>';
+      } else if (q.includes('invoice') || q.includes('payment') || q.includes('overdue') || q.includes('owe') || q.includes('pay')) {
+        answer = 'As of today (Apr 10), here\'s your outstanding invoice summary:<br><br><strong>2 invoices totalling €17,400</strong>:<br>• <strong>INV-2026-048</strong> — €12,400 · Website Redesign · due Apr 30 · <span style="color:var(--color-info); font-weight:var(--weight-semibold);">20 days remaining</span><br>• <strong>INV-2026-043</strong> — €5,000 · Mobile App · was due Mar 15 · <span style="color:var(--color-error); font-weight:var(--weight-semibold);">26 days overdue</span><br><br>💡 <strong>Action needed:</strong> INV-2026-043 is past due. Settling it now avoids any service impact. INV-2026-048 is on track — you have 20 days.<br><br>Paid this year: €19,400 across 2 invoices · Avg payment cycle: 18 days. <a href="#" onclick="switchTab(\'invoices\'); return false;" style="color:var(--color-accent);">Pay now in Invoices →</a>';
+      } else if (q.includes('timesheet') || q.includes('hours') || q.includes('time') || q.includes('approve')) {
+        answer = 'Your team logged <strong>342 hours</strong> this month — that\'s <strong>+8% vs last month</strong>, indicating steady velocity.<br><br><strong>4 timesheets pending your approval</strong> (week of Mar 30 – Apr 5):<br>• Sarah Chen — 31h (€2,635)<br>• Marco Rossi — 40h (€3,400)<br>• John Smith — 15h (€1,425)<br>• Liam O\'Brien — 32h (€2,080)<br><br>💡 All entries look consistent with prior weeks. You can <a href="#" onclick="switchTab(\'timesheets\'); return false;" style="color:var(--color-accent);">bulk-approve them in one click →</a>';
+      } else if (q.includes('project') || q.includes('status') || q.includes('progress') || q.includes('track')) {
+        answer = 'All <strong>3 active projects</strong> are on track:<br><br>• <strong>Website Redesign</strong> — 55% complete, Sprint 1 in progress, €24,500 of €50,000 spent (49%)<br>• <strong>Mobile App</strong> — 15% complete, early stage, €5,440 of €35,000 spent (16%)<br>• <strong>CRM Integration</strong> — 20% complete, €3,570 of €18,000 spent (20%)<br><br>💡 Website Redesign is tracking slightly ahead of schedule. Next milestone (Dev Sprint 1) is due Apr 15. <a href="#" onclick="switchTab(\'projects\'); return false;" style="color:var(--color-accent);">See project details →</a>';
+      } else if (q.includes('team') || q.includes('member') || q.includes('who') || q.includes('availability') || q.includes('available')) {
+        answer = 'Your team has <strong>12 members across 3 projects</strong>. Here\'s who\'s on your key project:<br><br><strong>Website Redesign</strong>:<br>• Sarah Chen — Project Manager · Active<br>• John Smith — Senior Developer · Active<br>• Alice Wang — Software Engineer · <span style="color:var(--color-warning); font-weight:var(--weight-semibold);">On Leave Apr 14–18</span> (back Apr 22)<br>• Marco Rossi — Operations Lead · Away<br>• Liam O\'Brien — Junior Developer · Active<br><br>💡 <strong>Heads up:</strong> Alice\'s leave begins in 4 days. If Sprint 1 deliverables depend on her work, you may want to flag this with Sarah Chen now. <a href="#" onclick="switchTab(\'messages\'); return false;" style="color:var(--color-accent);">Send a message to your team →</a>';
+      } else if (q.includes('budget') || q.includes('spend') || q.includes('cost')) {
+        answer = 'Across your 3 projects, you\'ve spent <strong>€33,510 of €103,000</strong> total budget (33%):<br><br>• Website Redesign: €24,500 / €50,000 (49%) — on pace<br>• Mobile App: €5,440 / €35,000 (16%) — early stage<br>• CRM Integration: €3,570 / €18,000 (20%) — on pace<br><br>💡 All projects are within expected burn rate for their completion percentages.';
+      } else if (q.includes('help') || q.includes('what can') || q.includes('how do')) {
+        answer = 'I have full context on your Acme Corp account. Here are some things I can help with:<br><br>• <strong>"What invoices are outstanding?"</strong> — payment status and amounts<br>• <strong>"How many hours were logged this month?"</strong> — timesheet summaries<br>• <strong>"What is the status of my projects?"</strong> — progress and milestones<br>• <strong>"Who is on my team?"</strong> — team members and availability<br>• <strong>"What\'s my budget usage?"</strong> — spend vs budget across projects<br><br>Just ask naturally — I\'ll pull the relevant data.';
       } else {
-        answer = 'I can help you with information about your <strong>invoices</strong>, <strong>timesheets</strong>, <strong>project status</strong>, and <strong>team members</strong>. Try asking something like "What invoices are overdue?" or "How many hours were logged this month?"';
+        answer = 'I wasn\'t sure what you meant by that. Here are some questions I can answer about your Acme Corp account:<br><br>• "What invoices are outstanding?"<br>• "How many hours were logged this month?"<br>• "What is the status of my projects?"<br>• "Who is on my team?"<br>• "What\'s my latest invoice?"<br>• "How\'s my budget looking?"<br><br>Try rephrasing, or ask about invoices, timesheets, projects, team, or budget.';
       }
       textEl.innerHTML = answer;
       panel.classList.add('open');
@@ -1713,6 +1855,32 @@
           row.style.display = (status === filter) ? '' : 'none';
         }
       });
+    }
+
+    // ── Invoice filter ────────────────────────
+    function applyInvFilter(filter) {
+      ['all','outstanding','paid'].forEach(function(f) {
+        var btn = document.getElementById('invFilter' + f.charAt(0).toUpperCase() + f.slice(1));
+        if (btn) btn.classList.toggle('active', f === filter);
+      });
+      var visibleCount = 0;
+      document.querySelectorAll('#sec-invoices .data-table tbody tr').forEach(function(row) {
+        var status = row.dataset.invStatus || 'outstanding';
+        if (filter === 'all') {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          var show = (status === filter);
+          row.style.display = show ? '' : 'none';
+          if (show) visibleCount++;
+        }
+      });
+      var emptyState = document.getElementById('invoicesEmptyState');
+      var tableWrapper = document.getElementById('invTableWrapper');
+      if (emptyState && tableWrapper) {
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        tableWrapper.style.display = visibleCount === 0 ? 'none' : '';
+      }
     }
 
     // ── Bulk approve modal ──────────────────────

@@ -229,6 +229,16 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .scenario-chart-svg { min-width: 320px; }
+
+    /* What-If SVG responsive text at small widths */
+    @media (max-width: 400px) {
+      .scenario-chart-svg { min-width: 280px; }
+      #scenarioChart { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .scenario-details { grid-template-columns: repeat(2, 1fr); }
+      .scenario-stat-value { font-size: var(--text-body); }
+    }
+
     /* Hiring pipeline */
     .hiring-item {
       display: flex;
@@ -341,35 +351,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="calendar-range" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">2 projects ending this month &mdash; plan reallocation</div>
-                  <div class="notif-time">10 minutes ago</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="users" width="16" height="16" style="color: var(--color-info);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">3 employees currently on bench</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="trending-up" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">React skill demand increased &mdash; consider hiring</div>
-                  <div class="notif-time">Yesterday</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
         <div class="relative">
           <div class="header-user" id="userMenuBtn">
@@ -435,8 +417,8 @@
 
       <!-- Section 1: Capacity Overview -->
       <div class="mb-6" data-min-role="pm">
-        <div class="capacity-grid">
-          <div class="capacity-card">
+        <div class="capacity-grid stagger-reveal perspective-container">
+          <div class="capacity-card card-interactive card-3d" data-animate>
             <div class="capacity-card-title">April 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
@@ -451,8 +433,14 @@
               <div style="width:90%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap surplus">Gap: +208h (surplus)</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-2);">
+              <svg viewBox="0 0 60 20" width="60" height="20" style="flex-shrink:0;">
+                <polyline points="2,16 12,14 22,12 32,10 42,8 52,6 58,4" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span style="font-size:var(--text-caption);color:var(--color-success);font-weight:var(--weight-medium);">+3% vs last month</span>
+            </div>
           </div>
-          <div class="capacity-card">
+          <div class="capacity-card card-interactive card-3d" data-animate>
             <div class="capacity-card-title">May 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
@@ -467,8 +455,14 @@
               <div style="width:90%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap surplus">Gap: +216h (surplus)</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-2);">
+              <svg viewBox="0 0 60 20" width="60" height="20" style="flex-shrink:0;">
+                <polyline points="2,14 12,13 22,11 32,10 42,8 52,6 58,5" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span style="font-size:var(--text-caption);color:var(--color-success);font-weight:var(--weight-medium);">+4% vs last month</span>
+            </div>
           </div>
-          <div class="capacity-card">
+          <div class="capacity-card card-interactive card-3d" data-animate>
             <div class="capacity-card-title">June 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
@@ -483,6 +477,12 @@
               <div style="width:80%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap warning">Gap: +416h (growing gap)</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-2);">
+              <svg viewBox="0 0 60 20" width="60" height="20" style="flex-shrink:0;">
+                <polyline points="2,8 12,10 22,11 32,12 42,14 52,15 58,16" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span style="font-size:var(--text-caption);color:var(--color-warning);font-weight:var(--weight-medium);">-10% vs last month</span>
+            </div>
           </div>
         </div>
 
@@ -493,70 +493,30 @@
           <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">— All employees are at or above 100% allocation. Consider hiring or rescheduling.</span>
         </div>
 
-        <!-- Stacked Bar Chart -->
-        <div class="card">
-          <div class="chart-container">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);">
-              <div class="chart-title" style="margin-bottom:0;" id="capacityChartTitle">Capacity vs Allocation</div>
-              <div style="display:flex;gap:var(--space-1);background:var(--color-surface-1);border-radius:var(--radius-md);padding:2px;">
-                <button class="zoom-btn active" data-period="1M" onclick="setCapacityPeriod(this,'1M')">1M</button>
-                <button class="zoom-btn" data-period="3M" onclick="setCapacityPeriod(this,'3M')">3M</button>
-                <button class="zoom-btn" data-period="6M" onclick="setCapacityPeriod(this,'6M')">6M</button>
-                <button class="zoom-btn" data-period="1Y" onclick="setCapacityPeriod(this,'1Y')">1Y</button>
-              </div>
+        <!-- Capacity Summary -->
+        <div class="card" style="padding:var(--space-3) var(--space-4);">
+          <div style="display:flex;align-items:center;justify-content:center;gap:var(--space-6);flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <svg data-lucide="clock" width="16" height="16" style="color:var(--color-primary);"></svg>
+              <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">Available</span>
+              <span style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);padding:var(--space-1) var(--space-2);background:var(--color-surface-1);border-radius:var(--radius-md);">208h</span>
             </div>
-            <svg viewBox="0 0 700 200" preserveAspectRatio="xMidYMid meet">
-              <!-- Y axis labels -->
-              <text x="10" y="24" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">2,500h</text>
-              <text x="10" y="72" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">2,000h</text>
-              <text x="10" y="119" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">1,500h</text>
-              <text x="10" y="167" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">1,000h</text>
-              <!-- Grid -->
-              <line x1="60" y1="68" x2="680" y2="68" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
-              <line x1="60" y1="115" x2="680" y2="115" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
-              <line x1="60" y1="163" x2="680" y2="163" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
-              <line x1="60" y1="180" x2="680" y2="180" stroke="var(--color-border)" stroke-width="1"/>
-              <!-- April: Available 2080 outline, Allocated 1872 filled, Bench 208h -->
-              <!-- Scale: 2500h = y20, 0 = y180, range=160. h/2500*160 -->
-              <rect x="120" y="47" width="100" height="133" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
-              <rect x="120" y="60" width="100" height="120" rx="4" fill="var(--color-primary)" opacity="0.8"/>
-              <rect x="120" y="47" width="100" height="13" rx="4" fill="var(--color-warning)" opacity="0.5"/>
-              <text x="170" y="55" fill="var(--color-text-2)" font-size="12" font-family="var(--font-mono)" text-anchor="middle">1,872h</text>
-              <!-- May: 2160 avail, 1944 alloc, Bench 216h -->
-              <rect x="300" y="42" width="100" height="138" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
-              <rect x="300" y="56" width="100" height="124" rx="4" fill="var(--color-primary)" opacity="0.8"/>
-              <rect x="300" y="42" width="100" height="14" rx="4" fill="var(--color-warning)" opacity="0.5"/>
-              <text x="350" y="50" fill="var(--color-text-2)" font-size="12" font-family="var(--font-mono)" text-anchor="middle">1,944h</text>
-              <!-- June: 2080 avail, 1664 alloc, Bench 416h -->
-              <rect x="480" y="47" width="100" height="133" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
-              <rect x="480" y="74" width="100" height="106" rx="4" fill="var(--color-primary)" opacity="0.8"/>
-              <rect x="480" y="47" width="100" height="27" rx="4" fill="var(--color-warning)" opacity="0.5"/>
-              <text x="530" y="68" fill="var(--color-text-2)" font-size="12" font-family="var(--font-mono)" text-anchor="middle">1,664h</text>
-              <!-- Month labels -->
-              <text x="170" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">April</text>
-              <text x="350" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">May</text>
-              <text x="530" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">June</text>
-            </svg>
-            <div style="display: flex; gap: var(--space-4); justify-content: center; margin-top: var(--space-2);">
-              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
-                <div style="width: 12px; height: 12px; background: var(--color-primary); border-radius: 2px; opacity: 0.8;"></div>
-                Allocated
-              </div>
-              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
-                <div style="width: 12px; height: 12px; border: 2px dashed var(--color-border-strong); border-radius: 2px;"></div>
-                Available
-              </div>
-              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
-                <div style="width: 12px; height: 12px; background: var(--color-warning); border-radius: 2px; opacity: 0.5;"></div>
-                Bench / Unallocated
-              </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <svg data-lucide="bar-chart-3" width="16" height="16" style="color:var(--color-success);"></svg>
+              <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">Allocated</span>
+              <span style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);padding:var(--space-1) var(--space-2);background:var(--color-surface-1);border-radius:var(--radius-md);">1,872h</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <svg data-lucide="user-minus" width="16" height="16" style="color:var(--color-warning);"></svg>
+              <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">Bench</span>
+              <span style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);padding:var(--space-1) var(--space-2);background:var(--color-surface-1);border-radius:var(--radius-md);">3 people</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Section 2: Bench Forecast -->
-      <div class="card mb-6">
+      <div class="card card-interactive mb-6" data-animate>
         <div class="card-header">
           <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
             <svg data-lucide="user-minus" width="18" height="18" style="color: var(--color-warning);"></svg>
@@ -570,11 +530,11 @@
           <div class="bench-item">
             <div class="avatar avatar-sm">BT</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
-              <div class="bench-detail">Senior Developer &bull; Python, REST APIs, Django</div>
+              <div class="bench-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
+              <div class="bench-detail">Backend Developer &bull; Python, REST APIs, Django</div>
             </div>
             <div class="bench-days">21 days</div>
-            <button class="btn btn-primary btn-xs" onclick="assignToProject('Bob Taylor')">Assign</button>
+            <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Bob Taylor')">Assign</button>
           </div>
           <div class="bench-item">
             <div class="avatar avatar-sm">JW</div>
@@ -583,7 +543,7 @@
               <div class="bench-detail">DevOps Engineer &bull; AWS, Docker, Kubernetes</div>
             </div>
             <div class="bench-days">14 days</div>
-            <button class="btn btn-primary btn-xs" onclick="assignToProject('James Wilson')">Assign</button>
+            <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('James Wilson')">Assign</button>
           </div>
           <div class="bench-item">
             <div class="avatar avatar-sm">LM</div>
@@ -592,7 +552,7 @@
               <div class="bench-detail">Business Analyst &bull; Data Analytics, SQL</div>
             </div>
             <div class="bench-days">7 days</div>
-            <button class="btn btn-primary btn-xs" onclick="assignToProject('Lisa Martinez')">Assign</button>
+            <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Lisa Martinez')">Assign</button>
           </div>
 
           <!-- Forecast (next 30 days) -->
@@ -635,7 +595,7 @@
             <div class="ai-rec-body">
               <div class="ai-rec-text">Alice Wang has skills matching Globex Phase 3 requirements (UI/UX Design, React, Figma)</div>
               <div class="ai-rec-actions">
-                <button class="btn btn-primary btn-xs" onclick="assignToProject('Alice Wang')">Assign</button>
+                <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Alice Wang')">Assign</button>
                 <button class="btn btn-ghost btn-xs" onclick="showToast('info','Opening Profile','Loading Alice Wang profile...')">View Profile</button>
               </div>
             </div>
@@ -645,7 +605,7 @@
             <div class="ai-rec-body">
               <div class="ai-rec-text"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a> could support Acme Web Redesign (design expertise + data analytics needed)</div>
               <div class="ai-rec-actions">
-                <button class="btn btn-primary btn-xs" onclick="assignToProject('Carol Williams')">Assign</button>
+                <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Carol Williams')">Assign</button>
                 <button class="btn btn-ghost btn-xs" onclick="showToast('info','Opening Profile','Loading Carol Williams profile...')">View Profile</button>
               </div>
             </div>
@@ -657,12 +617,12 @@
         <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Bench Recommendations</div>
         <div class="ai-body">
           <strong>Bob Taylor</strong> (Backend Developer) has been on bench for 3 weeks. 85% skill match with <a href="projects.html#globex-phase-2">Globex Phase 2</a> backend module. <strong>Recommendation:</strong> Assign immediately to reduce bench cost by EUR 4,200/week.<br><br>
-          <strong>Lisa Martinez</strong> (UI/UX Designer) becomes available May 1. Pre-assign to <a href="projects.html#initech-api">Initech API</a> UX design phase starting May 5. Skill match: 92%.
+          <strong>Lisa Martinez</strong> (Business Analyst) becomes available May 1. Pre-assign to <a href="projects.html#initech-api">Initech API</a> analytics phase starting May 5. Skill match: 92%.
         </div>
       </div>
 
       <!-- Section 3: Skills Matrix -->
-      <div class="card mb-6">
+      <div class="card card-interactive mb-6" data-animate>
         <div class="card-header">
           <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
             <svg data-lucide="puzzle" width="18" height="18" style="color: var(--color-info);"></svg>
@@ -728,7 +688,7 @@
       </div>
 
       <!-- Section 3b: Resource Allocation Matrix -->
-      <div class="card mb-6" data-min-role="pm" id="allocationMatrix">
+      <div class="card card-interactive mb-6" data-min-role="pm" id="allocationMatrix" data-animate>
         <div class="card-header">
           <span class="card-title" style="display:flex;align-items:center;gap:var(--space-2);">
             <svg data-lucide="grid" width="18" height="18" style="color:var(--color-primary);"></svg>
@@ -830,7 +790,7 @@
                 <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);">78%</td>
               </tr>
               <tr>
-                <td><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0">Bob Taylor <span class="badge badge-warning" style="font-size:var(--text-overline);">Bench</span></a></td>
+                <td><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0">Bob Taylor <span class="badge badge-warning" style="font-size:var(--text-overline);">Bench</span></a></td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Acme Web Redesign',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Initech API',0)">—</td>
@@ -860,7 +820,7 @@
       </div>
 
       <!-- Section 4: What-If Scenarios -->
-      <div class="card mb-6" data-min-role="pm">
+      <div class="card card-interactive mb-6" data-min-role="pm" data-animate>
         <div class="card-header">
           <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
             <svg data-lucide="git-branch" width="18" height="18" style="color: var(--color-accent);"></svg>
@@ -889,7 +849,7 @@
             <div id="scenarioChart" style="margin-bottom:var(--space-4);">
               <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-3);">Capacity Projection: Before vs After</div>
               <div style="width:100%;overflow-x:auto;">
-            <svg id="scenarioChartSvg" viewBox="0 0 500 140" preserveAspectRatio="xMinYMid meet" style="min-width:320px;width:100%;">
+            <svg id="scenarioChartSvg" viewBox="0 0 500 140" preserveAspectRatio="xMinYMid meet" class="scenario-chart-svg" style="width:100%;">
                 <!-- Rendered by JS -->
               </svg>
               </div>
@@ -946,7 +906,7 @@
               <svg data-lucide="save" width="16" height="16"></svg>
               Save Scenario
             </button>
-            <button class="btn btn-secondary btn-md" id="compareScenarioBtn" onclick="GHR && GHR.showToast ? GHR.showToast('info','Compare Mode','Side-by-side comparison view is coming in the full product.') : showToast('info','Compare','Side-by-side comparison view coming soon.')">
+            <button class="btn btn-secondary btn-md" id="compareScenarioBtn" onclick="openScenarioCompare()">
               <svg data-lucide="columns" width="16" height="16"></svg>
               Compare
             </button>
@@ -956,7 +916,7 @@
       </div>
 
       <!-- Section 5: Hiring Pipeline -->
-      <div class="card mb-6">
+      <div class="card card-interactive mb-6" data-animate>
         <div class="card-header">
           <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
             <svg data-lucide="user-plus" width="18" height="18" style="color: var(--color-success);"></svg>
@@ -1016,7 +976,7 @@
     <main class="page-content empty-content" style="flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
       <div class="card" style="max-width: 500px; text-align: center; padding: var(--space-8);">
         <svg data-lucide="calendar-range" width="48" height="48" style="color: var(--color-primary); margin-bottom: var(--space-4);"></svg>
-        <h3 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No planning data yet</h3>
+        <h2 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No planning data yet</h2>
         <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">Set up your projects and team assignments to start forecasting capacity and planning resources.</p>
         <a href="projects.html" class="btn btn-primary btn-md">Set Up Projects</a>
       </div>
@@ -1033,6 +993,11 @@
       <button class="modal-close" onclick="document.getElementById('assignProjectModal').classList.remove('active')"><svg data-lucide="x" width="18" height="18"></svg></button>
     </div>
     <div class="modal-body">
+      <!-- AI suggestion banner (shown when a recommendation is available) -->
+      <div id="assignAiSuggestion" style="display:none;margin-bottom:var(--space-4);padding:var(--space-3);background:var(--color-accent-muted);border:1px solid var(--color-accent);border-radius:var(--radius-md);gap:var(--space-2);align-items:flex-start;">
+        <svg data-lucide="sparkles" width="16" height="16" style="color:var(--color-accent);flex-shrink:0;margin-top:2px;"></svg>
+        <span id="assignAiSuggestionText" style="font-size:var(--text-body-sm);color:var(--color-text-1);">AI pre-filled from skill match.</span>
+      </div>
       <div class="form-group mb-4">
         <label class="form-label">Employee</label>
         <input type="text" class="form-input" id="assignEmployeeName" readonly style="background:var(--color-surface-1);">
@@ -1343,11 +1308,28 @@
   // ── Assign to Project ──
   window.assignToProject = function(employeeName) {
     document.getElementById('assignEmployeeName').value = employeeName;
-    document.getElementById('assignProjectSelect').value = '';
-    document.getElementById('assignStartDate').value = '2026-04-07';
-    document.getElementById('assignAllocSlider').value = 80;
-    document.getElementById('assignAllocLabel').textContent = '80%';
+    // AI suggestion: pre-select best-fit project based on employee skills
+    var suggestions = {
+      'Bob Taylor': { project: 'initech-api', alloc: 80, note: 'AI pre-filled: 85% skill match with Initech API backend module (Python, Node.js).' },
+      'James Wilson': { project: 'initech-api', alloc: 60, note: 'AI pre-filled: DevOps skills match Initech API infrastructure needs.' },
+      'Lisa Martinez': { project: 'initech-api', alloc: 70, note: 'AI pre-filled: 92% skill match with Initech API analytics phase.' },
+      'Alice Wang': { project: 'globex-phase-3', alloc: 80, note: 'AI pre-filled: UI/UX and React skills match Globex Phase 3.' },
+      'Carol Williams': { project: 'acme-redesign', alloc: 50, note: 'AI pre-filled: Design expertise needed for Acme Web Redesign.' }
+    };
+    var sug = suggestions[employeeName];
+    document.getElementById('assignProjectSelect').value = sug ? sug.project : '';
+    document.getElementById('assignStartDate').value = '2026-04-14';
+    document.getElementById('assignAllocSlider').value = sug ? sug.alloc : 80;
+    document.getElementById('assignAllocLabel').textContent = (sug ? sug.alloc : 80) + '%';
     document.getElementById('assignNotes').value = '';
+    var suggBanner = document.getElementById('assignAiSuggestion');
+    var suggText = document.getElementById('assignAiSuggestionText');
+    if (sug && suggBanner && suggText) {
+      suggText.textContent = sug.note;
+      suggBanner.style.cssText = 'display:flex;margin-bottom:var(--space-4);padding:var(--space-3);background:var(--color-accent-muted);border:1px solid var(--color-accent);border-radius:var(--radius-md);gap:var(--space-2);align-items:flex-start;';
+    } else if (suggBanner) {
+      suggBanner.style.display = 'none';
+    }
     document.getElementById('assignProjectModal').classList.add('active');
     lucide.createIcons({ nodes: [document.getElementById('assignProjectModal')] });
   };
@@ -1402,15 +1384,7 @@
     this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
   });
 
-  // ── Capacity Period Switcher ──
-  window.setCapacityPeriod = function(btn, period) {
-    document.querySelectorAll('[data-period]').forEach(function(b) { b.classList.remove('active'); });
-    btn.classList.add('active');
-    var labels = { '1M': 'Capacity vs Allocation — April 2026', '3M': 'Capacity vs Allocation — Apr–Jun 2026', '6M': 'Capacity vs Allocation — Apr–Sep 2026', '1Y': 'Capacity vs Allocation — Apr 2026–Mar 2027' };
-    var titleEl = document.getElementById('capacityChartTitle');
-    if (titleEl) titleEl.textContent = labels[period] || 'Capacity vs Allocation';
-    showToast('info', 'Period Updated', 'Showing ' + period + ' capacity forecast.');
-  };
+  // (Capacity chart removed — replaced with compact summary)
 
   // ── Allocation Matrix Popover ──
   var _allocCell = null;
@@ -1441,6 +1415,19 @@
   document.addEventListener('click', function(e) {
     var pop = document.getElementById('allocPopover');
     if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && !e.target.closest('.alloc-cell')) closeAllocPopover();
+  });
+
+  // ── Scenario Compare ──
+  window.openScenarioCompare = function() {
+    var modal = document.getElementById('scenarioCompareModal');
+    if (modal) { modal.classList.add('active'); lucide.createIcons(); }
+  };
+  window.closeScenarioCompare = function() {
+    var modal = document.getElementById('scenarioCompareModal');
+    if (modal) modal.classList.remove('active');
+  };
+  document.getElementById('scenarioCompareModal') && document.getElementById('scenarioCompareModal').addEventListener('click', function(e) {
+    if (e.target === this) closeScenarioCompare();
   });
 
   // ── initSkeletons via _shared.js ──
@@ -1530,7 +1517,57 @@
   </div>
 </div>
 
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<!-- ══════════════════════ SCENARIO COMPARE MODAL ══════════════════════ -->
+<div class="modal-backdrop" id="scenarioCompareModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:700px;">
+    <div class="modal-header">
+      <div class="modal-title">Scenario Comparison</div>
+      <button class="modal-close" onclick="closeScenarioCompare()"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);" class="grid-2">
+        <div>
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-3);">Baseline (Current)</div>
+          <div class="card" style="padding:var(--space-4);">
+            <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Team Work Time</div>
+            <div style="font-size:var(--text-heading-2);font-weight:var(--weight-bold);color:var(--color-text-1);" class="font-mono">82%</div>
+            <div style="margin:var(--space-3) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:82%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--text-body-sm);">
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Available capacity</span><span class="font-mono">2,076h/mo</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Bench employees</span><span>1 (Bob Taylor)</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Open projects</span><span>7</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Revenue forecast (Q2)</span><span class="font-mono" style="color:var(--color-text-1);">€134k</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-3);">Win Contoso Deal</div>
+          <div class="card" style="padding:var(--space-4);border-color:var(--color-primary);">
+            <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Team Work Time</div>
+            <div style="font-size:var(--text-heading-2);font-weight:var(--weight-bold);color:var(--color-error);" class="font-mono">98%</div>
+            <div style="margin:var(--space-3) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:98%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--text-body-sm);">
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Available capacity</span><span class="font-mono" style="color:var(--color-error);">42h/mo</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Bench employees</span><span style="color:var(--color-success);">0 (all assigned)</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Open projects</span><span>8</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--color-text-2);">Revenue forecast (Q2)</span><span class="font-mono" style="color:var(--color-success);">€158k</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:var(--space-4);padding:var(--space-3);background:var(--color-warning-muted);border-radius:var(--radius-md);display:flex;gap:var(--space-3);align-items:flex-start;">
+        <svg data-lucide="alert-triangle" width="18" height="18" style="color:var(--color-warning);flex-shrink:0;margin-top:2px;"></svg>
+        <div style="font-size:var(--text-body-sm);color:var(--color-text-1);"><strong>Risk:</strong> At 98% work time, 1 team member going on leave would cause delivery delays. Recommend hiring 1 backend developer before committing to Contoso.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeScenarioCompare()">Close</button>
+      <button class="btn btn-primary" onclick="closeScenarioCompare();GHR&&GHR.showToast&&GHR.showToast('success','Scenario Saved','Contoso Deal scenario saved to planning.')">Accept Scenario</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

@@ -296,7 +296,6 @@
       .client-health-grid { grid-template-columns: 1fr !important; }
       .year-cal-grid { grid-template-columns: repeat(2, 1fr) !important; }
       .stats-row { grid-template-columns: repeat(2, 1fr) !important; }
-      #tab-team-performance a[style*="min-width"] { min-width: 80px !important; }
     }
 
     /* ── Mobile: AI query row stacking ── */
@@ -381,14 +380,14 @@
 
     /* ── AI show-chart inline SVG ── */
     #aiInlineChart {
-      display: none;
+      display: block;
       margin-top: var(--space-3);
       padding: var(--space-3);
       background: var(--color-surface-0);
       border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
     }
-    #aiInlineChart.visible { display: block; }
+    #aiInlineChart.hidden { display: none; }
 
     /* ── AI data table ── */
     #aiDataTable {
@@ -401,6 +400,28 @@
     .scheduled-reports-section {
       padding: var(--space-4);
       border-top: 1px solid var(--color-border-subtle);
+    }
+
+    /* ── Insufficient data empty state ── */
+    .insufficient-data {
+      display: none;
+      text-align: center;
+      padding: var(--space-8) var(--space-4);
+      color: var(--color-text-3);
+    }
+    .insufficient-data svg { margin: 0 auto var(--space-3); opacity: 0.3; display: block; }
+    .insufficient-data .insuf-title {
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
+      margin-bottom: var(--space-2);
+    }
+    .insufficient-data .insuf-desc {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-3);
+      max-width: 360px;
+      margin: 0 auto;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -534,7 +555,7 @@
           <div class="ai-response-actions">
             <button class="btn btn-secondary btn-sm" id="aiShowDataBtn"><svg data-lucide="table" width="14" height="14"></svg> Show Data</button>
             <button class="btn btn-ghost btn-sm" id="aiExportBtn"><svg data-lucide="download" width="14" height="14"></svg> Export</button>
-            <button class="btn btn-ghost btn-sm" id="aiShowChartBtn">&#128202; Show Chart</button>
+            <button class="btn btn-ghost btn-sm" id="aiShowChartBtn">&#128202; Hide Chart</button>
           </div>
           <!-- AI inline data table (toggled by Show Data) -->
           <div id="aiDataTable">
@@ -691,13 +712,13 @@
                   Work Time trending up
                   <span class="badge badge-success"><svg data-lucide="trending-up" width="12" height="12"></svg> Positive</span>
                 </div>
-                <div class="insight-desc">Team avg work time rose from 72% to 78% over last 3 months. This suggests improved resource allocation and reduced bench time across the organization.</div>
+                <div class="insight-desc">Team avg work time rose from 72% to 82% over last 3 months. This suggests improved resource allocation and reduced bench time across the organization.</div>
                 <div class="insight-meta">
                   <span>Affected: Entire team</span>
                   <span>Period: Jan &ndash; Mar 2026</span>
                 </div>
                 <div class="insight-actions">
-                  <button class="btn btn-secondary btn-sm">View Details</button>
+                  <button class="btn btn-secondary btn-sm" onclick="GHR.showToast('info','Opening Details','Loading detailed work time trend analysis...')">View Details</button>
                 </div>
               </div>
             </div>
@@ -715,7 +736,7 @@
                   <span>Period: Q1 2026</span>
                 </div>
                 <div class="insight-actions">
-                  <button class="btn btn-secondary btn-sm">View Breakdown</button>
+                  <button class="btn btn-secondary btn-sm" onclick="GHR.showToast('info','Opening Breakdown','Loading travel expense breakdown by category...')">View Breakdown</button>
                 </div>
               </div>
             </div>
@@ -764,7 +785,7 @@
                   <span>Days remaining: ~45</span>
                 </div>
                 <div class="insight-actions">
-                  <button class="btn btn-secondary btn-sm">View Burndown</button>
+                  <button class="btn btn-secondary btn-sm" onclick="GHR.showToast('info','Opening Burndown','Loading Acme project budget burndown chart...')">View Burndown</button>
                   <button class="btn btn-ghost btn-sm insight-action" data-action="notify-pm">Notify PM</button>
                 </div>
               </div>
@@ -813,6 +834,17 @@
 
         <!-- Work Time Tab -->
         <div class="tab-content active" id="tab-worktime">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2025-05-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <div class="chart-container" class="relative">
             <div class="chart-title">Team Work Time Over Time</div>
             <div class="chart-tooltip" id="utilTooltip"></div>
@@ -950,6 +982,17 @@
 
         <!-- Revenue Tab -->
         <div class="tab-content" id="tab-revenue" data-min-role="pm" data-sensitive="financials">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2025-05-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <div class="chart-container" class="relative">
             <div class="chart-title">Monthly Revenue</div>
             <div class="chart-tooltip" id="revTooltip"></div>
@@ -1042,34 +1085,34 @@
             <div class="chart-title">Revenue by Project (Top 5)</div>
             <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-2);">
               <div>
-                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                   <span>Globex Platform</span><span class="cell-mono">&euro;120,000</span>
                 </div>
-                <div style="height:8px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:100%;background:var(--color-chart-2);border-radius:99px;opacity:0.85;"></div></div>
+                <div style="height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:100%;background:var(--color-chart-2);border-radius:var(--radius-full);opacity:0.85;"></div></div>
               </div>
               <div>
-                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                   <span>Acme Web Redesign</span><span class="cell-mono">&euro;85,000</span>
                 </div>
-                <div style="height:8px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:71%;background:var(--color-chart-1);border-radius:99px;opacity:0.85;"></div></div>
+                <div style="height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:71%;background:var(--color-chart-1);border-radius:var(--radius-full);opacity:0.85;"></div></div>
               </div>
               <div>
-                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                   <span>Contoso CRM</span><span class="cell-mono">&euro;68,000</span>
                 </div>
-                <div style="height:8px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:57%;background:var(--color-chart-4);border-radius:99px;opacity:0.85;"></div></div>
+                <div style="height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:57%;background:var(--color-chart-4);border-radius:var(--radius-full);opacity:0.85;"></div></div>
               </div>
               <div>
-                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                   <span>Initech API</span><span class="cell-mono">&euro;45,000</span>
                 </div>
-                <div style="height:8px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:38%;background:var(--color-chart-5);border-radius:99px;opacity:0.85;"></div></div>
+                <div style="height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:38%;background:var(--color-chart-5);border-radius:var(--radius-full);opacity:0.85;"></div></div>
               </div>
               <div>
-                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                   <span>Atlas Redesign</span><span class="cell-mono">&euro;35,000</span>
                 </div>
-                <div style="height:8px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:29%;background:var(--color-chart-3);border-radius:99px;opacity:0.85;"></div></div>
+                <div style="height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:29%;background:var(--color-chart-3);border-radius:var(--radius-full);opacity:0.85;"></div></div>
               </div>
             </div>
           </div>
@@ -1077,6 +1120,17 @@
 
         <!-- Expenses Tab -->
         <div class="tab-content" id="tab-expenses">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2026-01-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <!-- Expenses by Category Donut -->
           <div class="donut-wrap">
             <svg viewBox="0 0 200 200" width="180" height="180">
@@ -1169,6 +1223,17 @@
 
         <!-- Projects Tab -->
         <div class="tab-content" id="tab-projects">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2026-01-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <div style="padding: var(--space-4); overflow-x: auto;">
             <div class="chart-title">Project Profitability</div>
             <table class="data-table mobile-cards">
@@ -1209,7 +1274,7 @@
                 </tr>
                 <tr>
                   <td><a href="projects.html#contoso-crm">Contoso CRM</a></td>
-                  <td><a href="clients.html#contoso">Contoso Ltd</a></td>
+                  <td><a href="clients.html#contoso">Contoso Inc</a></td>
                   <td class="cell-mono">&euro;68,000</td>
                   <td class="cell-mono">&euro;52,000</td>
                   <td><span class="font-mono" style="color: var(--color-success);">24%</span></td>
@@ -1266,6 +1331,17 @@
         </div>
         <!-- Leave Patterns Tab -->
         <div class="tab-content" id="tab-leave-patterns">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2026-01-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <div style="padding:var(--space-4);">
             <!-- KPI Row -->
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);" class="insights-kpi-grid">
@@ -1359,60 +1435,60 @@
                 <div class="chart-title">Days Taken per Employee (2026 YTD)</div>
                 <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-3);">
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-sarah" class="text-primary" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
                       <span style="color:var(--color-text-2);">7d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:28%;background:var(--color-chart-1);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:28%;background:var(--color-chart-1);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-alice" class="text-primary" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-href="employees.html#profile-alice">Alice Wang</a>
-                      <span style="color:var(--color-warning);">14d <span style="font-size:10px;">On leave</span></span>
+                      <span style="color:var(--color-warning);">14d <span style="font-size:var(--text-overline);">On leave</span></span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:56%;background:var(--color-warning);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:56%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-john" class="text-primary" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#profile-john">John Smith</a>
                       <span style="color:var(--color-text-2);">5d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:20%;background:var(--color-chart-1);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:20%;background:var(--color-chart-1);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-marco" class="text-primary" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a>
                       <span style="color:var(--color-text-2);">3d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:12%;background:var(--color-chart-1);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:12%;background:var(--color-chart-1);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-emma" class="text-primary" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#profile-emma">Emma Laurent</a>
                       <span style="color:var(--color-text-2);">8d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:32%;background:var(--color-chart-1);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:32%;background:var(--color-chart-1);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-david" class="text-primary" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">David Park</a>
                       <span style="color:var(--color-text-2);">10d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:40%;background:var(--color-chart-1);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:40%;background:var(--color-chart-1);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-carol" class="text-primary" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#profile-carol">Carol Williams</a>
                       <span style="color:var(--color-text-2);">4d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:16%;background:var(--color-chart-1);border-radius:99px;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:16%;background:var(--color-chart-1);border-radius:var(--radius-full);"></div></div>
                   </div>
                   <div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;font-size:var(--text-body-sm);margin-bottom:var(--space-1);">
                       <a href="employees.html#profile-bob" class="text-primary" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
                       <span style="color:var(--color-text-2);">11d</span>
                     </div>
-                    <div style="height:6px;background:var(--color-surface-2);border-radius:99px;"><div style="height:100%;width:44%;background:var(--color-chart-6);border-radius:99px;opacity:0.7;"></div></div>
+                    <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);"><div style="height:100%;width:44%;background:var(--color-chart-6);border-radius:var(--radius-full);opacity:0.7;"></div></div>
                   </div>
                 </div>
               </div>
@@ -1462,6 +1538,17 @@
 
         <!-- Team Performance Tab -->
         <div class="tab-content" id="tab-team-performance">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2026-01-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <div style="padding: var(--space-4);">
             <!-- Mini KPI Cards -->
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-bottom:var(--space-6);" class="stats-row">
@@ -1491,56 +1578,56 @@
             <div class="chart-title">Work Time by Employee</div>
             <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-6);">
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">Carol Williams</a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">Carol Williams</a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:90%;height:100%;background:var(--color-success);border-radius:var(--radius-full);transition:width 0.5s;"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);">90%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">Marco Rossi</a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">Marco Rossi</a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:88%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);">88%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">Sarah Chen</a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">Sarah Chen</a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:87%;height:100%;background:var(--color-success);border-radius:var(--radius-full);transition:width 0.5s;"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);">87%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">John Smith</a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">John Smith</a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:82%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);">82%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">Emma Laurent</a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">Emma Laurent</a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:78%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);">78%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">Alice Wang <span style="font-size:var(--text-caption);color:var(--color-warning);">On Leave</span></a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">Alice Wang <span style="font-size:var(--text-caption);color:var(--color-warning);">On Leave</span></a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:45%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);">45%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-1);">David Park</a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-1);">David Park</a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:45%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div>
                 </div>
                 <span style="min-width:40px;text-align:right;font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);">45%</span>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-3);">
-                <a href="employees.html" style="min-width:100px;font-size:var(--text-body-sm);color:var(--color-text-3);">Bob Taylor <span style="font-size:var(--text-caption);color:var(--color-text-3);">Bench</span></a>
+                <a href="employees.html" style="font-size:var(--text-body-sm);color:var(--color-text-3);">Bob Taylor <span style="font-size:var(--text-caption);color:var(--color-text-3);">Bench</span></a>
                 <div style="flex:1;height:16px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                   <div style="width:2%;height:100%;background:var(--color-surface-3);border-radius:var(--radius-full);"></div>
                 </div>
@@ -1592,6 +1679,17 @@
 
         <!-- Client Health Tab -->
         <div class="tab-content" id="tab-client-health" data-min-role="pm">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <label style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Date range:</label>
+              <input type="date" class="form-input form-input-sm" value="2026-01-01" style="max-width:140px;">
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">to</span>
+              <input type="date" class="form-input form-input-sm" value="2026-04-30" style="max-width:140px;">
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="GHR.showToast('success','Compare Mode Active','Overlay loaded — prior period shown in grey, current in colour.')">
+              <svg data-lucide="git-compare" width="14" height="14"></svg> Compare vs Last Period
+            </button>
+          </div>
           <div style="padding: var(--space-4);">
             <!-- Client Health Cards -->
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4);margin-bottom:var(--space-6);" class="client-health-grid">
@@ -1617,8 +1715,8 @@
                   <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-3);font-size:var(--text-body-sm);">
-                  <div><span class="text-3">Last invoice</span><div>INV-2026-041 — Overdue</div></div>
-                  <div><span class="text-3">Outstanding</span><div class="font-mono" style="color:var(--color-error);">€12,000</div></div>
+                  <div><span class="text-3">Last invoice</span><div>INV-2026-052 — Pending</div></div>
+                  <div><span class="text-3">Outstanding</span><div class="font-mono" style="color:var(--color-warning);">€8,200</div></div>
                   <div><span class="text-3">Last contact</span><div>14 days ago</div></div>
                   <div><span class="text-3">Projects</span><div>1 active</div></div>
                 </div>
@@ -1643,7 +1741,7 @@
               <!-- Contoso -->
               <div class="card" style="padding:var(--space-4);">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">
-                  <div style="font-weight:var(--weight-semibold);font-size:var(--text-body);">Contoso Ltd</div>
+                  <div style="font-weight:var(--weight-semibold);font-size:var(--text-body);">Contoso Inc</div>
                   <span class="badge badge-info"><svg data-lucide="circle" width="12" height="12"></svg> New</span>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-3);font-size:var(--text-body-sm);">
@@ -1690,7 +1788,7 @@
                     <td><span class="badge badge-success">Healthy</span></td>
                   </tr>
                   <tr>
-                    <td><a href="clients.html">Contoso Ltd</a></td>
+                    <td><a href="clients.html">Contoso Inc</a></td>
                     <td><div class="worktime-bar-wrap"><div class="worktime-bar"><div class="worktime-bar-fill" style="width:71%;background:var(--color-info);"></div></div><span class="worktime-pct">71</span></div></td>
                     <td class="cell-mono" style="color:var(--color-warning);">€5,000</td>
                     <td class="cell-mono">8</td>
@@ -1705,6 +1803,16 @@
 
         <!-- Scheduled Reports Tab -->
         <div class="tab-content" id="tab-scheduled-reports">
+          <!-- Empty state for no scheduled reports -->
+          <div class="scheduled-reports-empty" style="display:none;text-align:center;padding:var(--space-12) var(--space-8);">
+            <svg data-lucide="calendar-clock" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin:0 auto var(--space-4);display:block;"></svg>
+            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">No scheduled reports yet</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:360px;margin:0 auto var(--space-4);">Set up automated weekly or monthly report delivery to your inbox. Reports include work time summaries, revenue snapshots, and AI-highlighted anomalies.</div>
+            <button class="btn btn-primary btn-md" onclick="openScheduleModal()">
+              <svg data-lucide="plus" width="16" height="16"></svg>
+              Create Your First Schedule
+            </button>
+          </div>
           <div class="scheduled-reports-section">
             <div style="display:flex;align-items:flex-start;gap:var(--space-3);margin-bottom:var(--space-6);">
               <svg data-lucide="calendar-clock" style="width:24px;height:24px;flex-shrink:0;color:var(--color-accent);margin-top:2px;"></svg>
@@ -1720,31 +1828,31 @@
               <div class="card" style="padding:var(--space-4);">
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);">
                   <div>
-                    <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:4px;">Weekly Team Summary</div>
+                    <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">Weekly Team Summary</div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);">Every Monday, 08:00 &mdash; sarah.chen@gammahr.io</div>
                   </div>
                   <div style="display:flex;gap:var(--space-2);align-items:center;">
                     <span class="badge badge-success">Active</span>
-                    <button class="btn btn-ghost btn-sm" onclick="GHR.showToast('info','Coming Soon','Report schedule editing is available in the full product.')">Edit</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openScheduleModal()">Edit</button>
                   </div>
                 </div>
               </div>
               <div class="card" style="padding:var(--space-4);">
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);">
                   <div>
-                    <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:4px;">Monthly Finance Digest</div>
+                    <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">Monthly Finance Digest</div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);">1st of month, 07:30 &mdash; management@gammahr.io</div>
                   </div>
                   <div style="display:flex;gap:var(--space-2);align-items:center;">
                     <span class="badge badge-success">Active</span>
-                    <button class="btn btn-ghost btn-sm" onclick="GHR.showToast('info','Coming Soon','Report schedule editing is available in the full product.')">Edit</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openScheduleModal()">Edit</button>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Add Schedule CTA -->
-            <button class="btn btn-primary btn-md" style="display:flex;align-items:center;gap:var(--space-2);" onclick="GHR.showToast('info','Coming Soon','Scheduled reports are available in the full product.')">
+            <button class="btn btn-primary btn-md" style="display:flex;align-items:center;gap:var(--space-2);" onclick="openScheduleModal()">
               <svg data-lucide="plus" width="16" height="16"></svg>
               Add Schedule
             </button>
@@ -1753,6 +1861,16 @@
 
         <!-- Forecasting Tab -->
         <div class="tab-content" id="tab-forecasting">
+          <!-- Empty state for insufficient historical data -->
+          <div class="forecasting-empty" style="display:none;text-align:center;padding:var(--space-12) var(--space-8);">
+            <svg data-lucide="brain" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin:0 auto var(--space-4);display:block;"></svg>
+            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">Not enough data for forecasting</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:400px;margin:0 auto var(--space-4);">AI-powered forecasting requires at least 3 months of timesheet and project data to generate reliable predictions. Keep logging to unlock this feature.</div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);justify-content:center;">
+              <div style="width:120px;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:40%;height:100%;background:var(--color-accent);border-radius:var(--radius-full);"></div></div>
+              <span style="font-size:var(--text-caption);color:var(--color-text-3);">40% of data needed</span>
+            </div>
+          </div>
           <div style="padding:var(--space-4);">
             <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-4);background:var(--color-accent-muted);border:1px solid var(--color-accent);border-radius:var(--radius-md);margin-bottom:var(--space-6);">
               <svg data-lucide="brain" style="width:24px;height:24px;flex-shrink:0;color:var(--color-accent);margin-top:2px;"></svg>
@@ -1781,10 +1899,10 @@
             <div class="card" style="padding:var(--space-6);text-align:center;">
               <svg data-lucide="line-chart" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin-bottom:var(--space-3);"></svg>
               <div style="font-size:var(--text-body);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">Detailed forecasting charts</div>
-              <div style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-4);">Interactive revenue projections, capacity planning timelines, and hiring roadmaps will be available in the full product.</div>
-              <button class="btn btn-primary btn-md" onclick="GHR.showToast('info','Coming Soon','Detailed forecasting is available in the full product.')">
+              <div style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-4);">Detailed interactive revenue projections, capacity planning timelines, and hiring roadmaps — click View Forecast to explore.</div>
+              <button class="btn btn-primary btn-md" onclick="openForecastPanel()">
                 <svg data-lucide="sparkles" width="16" height="16"></svg>
-                Enable Forecasting
+                View Forecast
               </button>
             </div>
           </div>
@@ -1798,7 +1916,7 @@
     <main class="page-content empty-content" style="flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
       <div class="card" style="max-width: 500px; text-align: center; padding: var(--space-8);">
         <svg data-lucide="sparkles" width="48" height="48" style="color: var(--color-accent); margin-bottom: var(--space-4);"></svg>
-        <h3 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No insights yet</h3>
+        <h2 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No insights yet</h2>
         <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">AI insights will appear here once you have enough timesheet, expense, and project data. Start logging to unlock powerful analytics.</p>
         <a href="timesheets.html" class="btn btn-primary btn-md">Log Your First Timesheet</a>
       </div>
@@ -1974,13 +2092,13 @@
     var followUps = [];
 
     if (q.includes('work time') || q.includes('capacity') || q.includes('utiliz') || q.includes('utilis') || q.includes('available') || q.includes('bench')) {
-      response = '<strong>Team Work Time Analysis</strong><br><br>Your team currently averages <strong>78% work time</strong> this month — up from 72% in January. <strong>3 employees</strong> have significant capacity: Bob Taylor (100% available, on bench), James Wilson (80% free after offboarding task), and David Park (60% available from Apr 8). Consider assigning Bob to Initech API which needs Python skills.';
+      response = '<strong>Team Work Time Analysis</strong><br><br>Your team currently averages <strong>82% work time</strong> this month — up from 72% in January. <strong>3 employees</strong> have significant capacity: Bob Taylor (100% available, on bench), James Wilson (80% free after offboarding task), and David Park (60% available from Apr 8). Consider assigning Bob to Initech API which needs Python skills.';
       followUps = ['Who is on bench this week?', 'Which projects need more resource?', 'Show capacity forecast for next month'];
     } else if (q.includes('invoice') || q.includes('revenue') || q.includes('billing') || q.includes('unbilled')) {
-      response = '<strong>Revenue &amp; Billing Insights</strong><br><br>In March 2026, total invoiced: <strong class="font-mono">&euro;127,400</strong>. Unbilled logged hours: <strong>142h</strong> worth ~<strong class="font-mono">&euro;14,200</strong>. Two invoices overdue: Globex Corp (<span class="font-mono">&euro;18,200</span>, 32 days) and Contoso Ltd (<span class="font-mono">&euro;9,600</span>, 18 days). Recommend chasing Globex Corp first — highest amount and longest overdue.';
+      response = '<strong>Revenue &amp; Billing Insights</strong><br><br>In March 2026, total invoiced: <strong class="font-mono">&euro;127,400</strong>. Unbilled logged hours: <strong>142h</strong> worth ~<strong class="font-mono">&euro;14,200</strong>. One invoice pending: Globex Corp INV-2026-052 (<span class="font-mono">&euro;8,200</span>, 14 days). INV-2026-041 (Acme Corp, <span class="font-mono">&euro;9,800</span>) is paid. Recommend following up with Globex on the outstanding amount.';
       followUps = ['Show overdue invoices', 'Which client has the most unbilled hours?', 'Revenue trend last 6 months'];
     } else if (q.includes('leave') || q.includes('absence') || q.includes('holiday') || q.includes('time off')) {
-      response = '<strong>Leave &amp; Absence Overview</strong><br><br>This month: <strong>3 leave requests pending</strong> approval. <strong>2 employees</strong> are on leave this week (Sarah Chen – annual, Mei Wang – sick). Leave balance highlights: Bob Taylor has 18 days remaining (highest), Marco Rossi has 2 days (at risk of losing allocation). Q2 peak leave period starts May 15 — recommend planning cover now.';
+      response = '<strong>Leave &amp; Absence Overview</strong><br><br>This month: <strong>3 leave requests pending</strong> approval. <strong>1 employee</strong> is on leave this week (Alice Wang – on leave Apr 14-18). Emma Laurent has annual leave scheduled Apr 14-18 as well. Leave balance highlights: Bob Taylor has 18 days remaining (highest), Marco Rossi has 2 days (at risk of losing allocation). Q2 peak leave period starts May 15 — recommend planning cover now.';
       followUps = ['Who has leave requests pending?', 'Show leave calendar for April', 'Employees with low leave balance'];
     } else if (q.includes('project') || q.includes('deadline') || q.includes('budget') || q.includes('overrun') || q.includes('over budget')) {
       response = '<strong>Project Status Summary</strong><br><br>2 projects are at risk: <strong>Atlas Redesign</strong> is 89% through budget at only 65% completion — 11% margin remaining. <strong>Initech API</strong> is 84% budget consumed at 70% complete. All other projects tracking within 5% tolerance. Recommend immediate scope review meetings for both at-risk projects.';
@@ -1992,7 +2110,7 @@
       response = '<strong>Performance Highlights — Q1 2026</strong><br><br>Top performers by composite score: <strong>1. Carol Williams</strong> (90% work time, all sprints completed), <strong>2. Marco Rossi</strong> (88% work time, zero defects), <strong>3. Sarah Chen</strong> (87% work time, 100% on-time delivery). <strong>1 employee</strong> flagged for review: Bob Taylor (0% work time — on bench, not a performance issue). Recommend scheduling Q1 review sessions.';
       followUps = ['Show full team performance', 'Who needs a performance review?', 'Compare Q1 vs Q4 last year'];
     } else {
-      response = 'Based on your team data for that query: your team of <strong>12 members</strong> averages <strong>78% work time</strong> this month. There are <strong>3 pending approvals</strong>, <strong>2 at-risk projects</strong>, and <strong>€14,200</strong> in unbilled hours. I can go deeper on any specific area — try asking about capacity, invoices, leaves, projects, or expenses.';
+      response = 'Based on your team data for that query: your team of <strong>12 members</strong> averages <strong>82% work time</strong> this month. There are <strong>3 pending approvals</strong>, <strong>2 at-risk projects</strong>, and <strong>€14,200</strong> in unbilled hours. I can go deeper on any specific area — try asking about capacity, invoices, leaves, projects, or expenses.';
       followUps = ['Who has capacity this week?', 'Show revenue insights', 'Which projects are at risk?'];
     }
 
@@ -2110,6 +2228,18 @@
     });
   }
 
+  // ── Add "insufficient data" empty states to analytics tabs ──
+  ['tab-worktime','tab-revenue','tab-expenses','tab-projects','tab-leave-patterns','tab-team-performance','tab-client-health'].forEach(function(tabId) {
+    var tab = document.getElementById(tabId);
+    if (!tab) return;
+    var emptyDiv = document.createElement('div');
+    emptyDiv.className = 'insufficient-data';
+    emptyDiv.innerHTML = '<svg data-lucide="bar-chart-3" width="40" height="40"></svg>' +
+      '<div class="insuf-title">Insufficient data</div>' +
+      '<div class="insuf-desc">Not enough data available for this view. Try selecting a different time period or adjusting your filters.</div>';
+    tab.appendChild(emptyDiv);
+  });
+
   // ── AI Response: Show Data button ──
   var aiShowDataBtn = document.getElementById('aiShowDataBtn');
   var aiDataTable = document.getElementById('aiDataTable');
@@ -2128,8 +2258,8 @@
   var aiInlineChart = document.getElementById('aiInlineChart');
   if (aiShowChartBtn && aiInlineChart) {
     aiShowChartBtn.addEventListener('click', function() {
-      var visible = aiInlineChart.classList.toggle('visible');
-      this.textContent = visible ? '📊 Hide Chart' : '📊 Show Chart';
+      var isHidden = aiInlineChart.classList.toggle('hidden');
+      this.textContent = isHidden ? '📊 Show Chart' : '📊 Hide Chart';
     });
   }
 
@@ -2153,12 +2283,151 @@
     GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
   }
 
+  // ── Schedule Report Modal ──
+  window.openScheduleModal = function() {
+    var modal = document.getElementById('scheduleReportModal');
+    if (modal) { modal.classList.add('active'); lucide.createIcons(); }
+  };
+  window.closeScheduleModal = function() {
+    var modal = document.getElementById('scheduleReportModal');
+    if (modal) modal.classList.remove('active');
+  };
+  window.submitSchedule = function() {
+    var freq = document.getElementById('schedFrequency') ? document.getElementById('schedFrequency').value : 'weekly';
+    var email = document.getElementById('schedEmail') ? document.getElementById('schedEmail').value : '';
+    closeScheduleModal();
+    GHR && GHR.showToast && GHR.showToast('success', 'Schedule Created', 'Report will be delivered ' + freq + (email ? ' to ' + email : '') + '.');
+  };
+
+  // ── Forecast Panel ──
+  window.openForecastPanel = function() {
+    var modal = document.getElementById('forecastDetailModal');
+    if (modal) { modal.classList.add('active'); lucide.createIcons(); }
+  };
+  window.closeForecastPanel = function() {
+    var modal = document.getElementById('forecastDetailModal');
+    if (modal) modal.classList.remove('active');
+  };
+  document.getElementById('scheduleReportModal') && document.getElementById('scheduleReportModal').addEventListener('click', function(e) {
+    if (e.target === this) closeScheduleModal();
+  });
+  document.getElementById('forecastDetailModal') && document.getElementById('forecastDetailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeForecastPanel();
+  });
+
   // All "Carol Kim" references corrected to "Carol Williams" in HTML above
 
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<!-- ════════════════ SCHEDULE REPORT MODAL ════════════════ -->
+<div class="modal-backdrop" id="scheduleReportModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Schedule Report Delivery</h3>
+      <button class="modal-close" onclick="closeScheduleModal()"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Report Type</label>
+        <select class="form-select" id="schedReportType">
+          <option value="weekly-summary">Weekly Team Summary</option>
+          <option value="monthly-finance">Monthly Finance Digest</option>
+          <option value="project-status">Project Status Report</option>
+          <option value="capacity">Capacity & Work Time Report</option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Frequency</label>
+        <select class="form-select" id="schedFrequency">
+          <option value="weekly">Weekly (every Monday)</option>
+          <option value="bi-weekly">Bi-weekly</option>
+          <option value="monthly">Monthly (1st of month)</option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Delivery Time</label>
+        <input type="time" class="form-input" value="08:00" id="schedTime">
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Recipients</label>
+        <input type="email" class="form-input" id="schedEmail" placeholder="email@example.com" value="sarah.chen@gammahr.io">
+        <div class="form-help">Separate multiple emails with commas.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeScheduleModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitSchedule()">
+        <svg data-lucide="calendar-clock" width="14" height="14"></svg>
+        Create Schedule
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ FORECAST DETAIL MODAL ════════════════ -->
+<div class="modal-backdrop" id="forecastDetailModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:560px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Q2 2026 Forecast</h3>
+      <button class="modal-close" onclick="closeForecastPanel()"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-bottom:var(--space-6);">
+        <div class="card" style="padding:var(--space-4);text-align:center;">
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Revenue</div>
+          <div style="font-size:var(--text-heading-2);font-weight:var(--weight-bold);color:var(--color-gold);" class="font-mono">€145k</div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);">+8% vs Q1</div>
+        </div>
+        <div class="card" style="padding:var(--space-4);text-align:center;">
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Work Time</div>
+          <div style="font-size:var(--text-heading-2);font-weight:var(--weight-bold);color:var(--color-text-1);">82%</div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-2);">avg next 90 days</div>
+        </div>
+        <div class="card" style="padding:var(--space-4);text-align:center;">
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Hire Need</div>
+          <div style="font-size:var(--text-heading-2);font-weight:var(--weight-bold);color:var(--color-error);">2</div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-2);">React x1, DevOps x1</div>
+        </div>
+      </div>
+      <div class="chart-title" style="margin-bottom:var(--space-3);">Revenue Projection — Q2 2026</div>
+      <svg viewBox="0 0 500 120" style="width:100%;height:auto;" role="img" aria-label="Revenue projection chart">
+        <!-- Background grid -->
+        <line x1="0" y1="30" x2="500" y2="30" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="0" y1="60" x2="500" y2="60" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <line x1="0" y1="90" x2="500" y2="90" stroke="var(--color-border-subtle)" stroke-width="1"/>
+        <!-- Q1 bars (baseline) -->
+        <rect x="20" y="50" width="40" height="55" fill="var(--color-border-strong)" rx="3" opacity="0.7"/>
+        <rect x="90" y="45" width="40" height="60" fill="var(--color-border-strong)" rx="3" opacity="0.7"/>
+        <rect x="160" y="40" width="40" height="65" fill="var(--color-border-strong)" rx="3" opacity="0.7"/>
+        <!-- Q2 bars (forecast) -->
+        <rect x="250" y="42" width="40" height="63" fill="var(--color-primary)" rx="3" opacity="0.85"/>
+        <rect x="320" y="35" width="40" height="70" fill="var(--color-primary)" rx="3" opacity="0.85"/>
+        <rect x="390" y="28" width="40" height="77" fill="var(--color-primary)" rx="3" opacity="0.85"/>
+        <!-- Labels -->
+        <text x="40" y="115" text-anchor="middle" font-size="10" fill="var(--color-text-3)" font-family="var(--font-sans)">Jan</text>
+        <text x="110" y="115" text-anchor="middle" font-size="10" fill="var(--color-text-3)" font-family="var(--font-sans)">Feb</text>
+        <text x="180" y="115" text-anchor="middle" font-size="10" fill="var(--color-text-3)" font-family="var(--font-sans)">Mar</text>
+        <text x="270" y="115" text-anchor="middle" font-size="10" fill="var(--color-primary)" font-family="var(--font-sans)">Apr</text>
+        <text x="340" y="115" text-anchor="middle" font-size="10" fill="var(--color-primary)" font-family="var(--font-sans)">May</text>
+        <text x="410" y="115" text-anchor="middle" font-size="10" fill="var(--color-primary)" font-family="var(--font-sans)">Jun</text>
+        <!-- Forecast marker -->
+        <line x1="235" y1="10" x2="235" y2="105" stroke="var(--color-primary)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="237" y="18" font-size="9" fill="var(--color-primary)" font-family="var(--font-sans)">Forecast →</text>
+      </svg>
+      <div style="display:flex;gap:var(--space-4);justify-content:center;margin-top:var(--space-3);">
+        <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-text-2);"><div style="width:12px;height:12px;background:var(--color-border-strong);border-radius:2px;opacity:0.7;"></div>Historical</div>
+        <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-text-2);"><div style="width:12px;height:12px;background:var(--color-primary);border-radius:2px;opacity:0.85;"></div>Forecast</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeForecastPanel()">Close</button>
+      <button class="btn btn-primary" onclick="closeForecastPanel();GHR&&GHR.showToast&&GHR.showToast('success','Export Queued','Forecast report will be sent to your email shortly.')">Export Forecast</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

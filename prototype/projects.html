@@ -39,22 +39,6 @@
     }
     .view-toggle-btn svg { width: 14px; height: 14px; }
 
-    /* Filter bar */
-    .filter-bar-standard {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-      flex-wrap: wrap;
-    }
-    .filter-bar-standard .form-select {
-      width: auto;
-      min-width: 140px;
-      height: 32px;
-      font-size: var(--text-body-sm);
-      background-color: var(--color-surface-1);
-    }
-
     /* ── KANBAN BOARD ── */
     .kanban-board {
       display: grid;
@@ -516,35 +500,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Initech API Integration is at risk &mdash; budget 69% consumed</div>
-                  <div class="notif-time">15 minutes ago</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-info);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Sarah Chen submitted 40h timesheet for Acme Web Redesign</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Globex Data Migration marked as completed</div>
-                  <div class="notif-time">Yesterday</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="notif-panel" id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -594,7 +550,7 @@
               <svg data-lucide="download" width="16" height="16"></svg>
               Export
             </button>
-            <button class="btn btn-primary btn-md" id="newProjectBtn">
+            <button class="btn btn-primary btn-md" id="newProjectBtn" data-min-role="pm">
               <svg data-lucide="plus" width="16" height="16"></svg>
               New Project
             </button>
@@ -625,27 +581,28 @@
             <option value="mine">My Projects</option>
           </select>
           <div style="flex: 1;"></div>
-          <select class="form-select" id="filterStatus">
+          <select class="form-select" id="filterStatus" onchange="filterProjects()">
             <option value="">All Statuses</option>
             <option value="planning">Planning</option>
             <option value="active">Active</option>
             <option value="on-hold">On Hold</option>
             <option value="completed">Completed</option>
           </select>
-          <select class="form-select" id="filterClient">
+          <select class="form-select" id="filterClient" onchange="filterProjects()">
             <option value="">All Clients</option>
-            <option>Acme Corp</option>
-            <option>Globex Corp</option>
-            <option>Initech</option>
-            <option>Contoso Inc</option>
-            <option>Internal</option>
+            <option value="Acme Corp">Acme Corp</option>
+            <option value="Globex Corp">Globex Corp</option>
+            <option value="Initech">Initech</option>
+            <option value="Contoso Inc">Contoso Inc</option>
+            <option value="Umbrella Corp">Umbrella Corp</option>
+            <option value="Internal">Internal</option>
           </select>
-          <select class="form-select" id="filterBilling">
+          <select class="form-select" id="filterBilling" onchange="filterProjects()">
             <option value="">All Billing</option>
-            <option>Hourly</option>
-            <option>Daily</option>
-            <option>Fixed Price</option>
-            <option>Retainer</option>
+            <option value="Hourly">Hourly</option>
+            <option value="Daily">Daily</option>
+            <option value="Fixed Price">Fixed Price</option>
+            <option value="Retainer">Retainer</option>
           </select>
         </div>
 
@@ -662,7 +619,7 @@
                 </div>
                 <span class="col-count">3</span>
               </div>
-              <div class="kanban-cards">
+              <div class="kanban-cards stagger-reveal">
 
                 <div class="project-card card-interactive" data-project="contoso-deal" onclick="showDetail('contoso-deal')">
                   <div class="project-card-name">Contoso Deal</div>
@@ -689,7 +646,7 @@
 
                 <div class="project-card card-interactive" data-project="dataviz-dashboard" onclick="showDetail('dataviz-dashboard')">
                   <div class="project-card-name">DataViz Dashboard</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
                   <div class="project-card-meta">
                     <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 1 member</span>
@@ -709,7 +666,7 @@
                 </div>
                 <span class="col-count">4</span>
               </div>
-              <div class="kanban-cards">
+              <div class="kanban-cards stagger-reveal">
 
                 <div class="project-card card-interactive" data-project="acme-web" onclick="showDetail('acme-web')">
                   <div class="project-card-name">Acme Web Redesign</div>
@@ -799,11 +756,11 @@
                 </div>
                 <span class="col-count">3</span>
               </div>
-              <div class="kanban-cards">
+              <div class="kanban-cards stagger-reveal">
 
                 <div class="project-card card-interactive" data-project="globex-migration" onclick="showDetail('globex-migration')">
                   <div class="project-card-name">Globex Data Migration</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
                   <div class="project-card-meta">
                     <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;120k</span></span>
                   </div>
@@ -938,7 +895,7 @@
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('dataviz-dashboard')">
                   <td><strong>DataViz Dashboard</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
                   <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;95/h</td>
                   <td data-label="Team Size">1</td>
                   <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
@@ -947,7 +904,7 @@
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('globex-migration')">
                   <td><strong>Globex Data Migration</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
                   <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed &euro;120k</td>
                   <td data-label="Team Size">&mdash;</td>
                   <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;120,000</span></td>
@@ -1003,7 +960,7 @@
                   <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;">Jan</div>
                   <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;">Feb</div>
                   <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;">Mar</div>
-                  <div style="font-size:var(--text-caption);color:var(--color-primary);text-align:center;font-weight:600;">Apr</div>
+                  <div style="font-size:var(--text-caption);color:var(--color-primary);text-align:center;font-weight:var(--weight-semibold);">Apr</div>
                   <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;">May</div>
                   <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;">Jun</div>
                   <div style="font-size:var(--text-caption);color:var(--color-text-3);text-align:center;">Jul</div>
@@ -1027,7 +984,7 @@
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><!-- Jan -->
-                  <div style="grid-column:2/8;background:var(--color-primary);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;position:relative;cursor:pointer;" title="Acme Web Redesign — Feb 1 – Jul 31, 2026">
+                  <div style="grid-column:2/8;background:var(--color-primary);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:var(--weight-semibold);position:relative;cursor:pointer;" title="Acme Web Redesign — Feb 1 – Jul 31, 2026">
                     Feb 1 – Jul 31
                     <span style="position:absolute;right:0;top:0;bottom:0;width:64%;background:rgba(255,255,255,0.12);border-radius:0 4px 4px 0;" title="64% budget consumed"></span>
                   </div>
@@ -1044,7 +1001,7 @@
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
-                  <div style="grid-column:1/7;background:var(--color-primary-active);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;position:relative;" title="Globex Phase 2 — Jan 15 – Jun 30, 2026">
+                  <div style="grid-column:1/7;background:var(--color-primary-active);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:var(--weight-semibold);position:relative;" title="Globex Phase 2 — Jan 15 – Jun 30, 2026">
                     Jan 15 – Jun 30
                     <span style="position:absolute;right:0;top:0;bottom:0;width:35%;background:rgba(255,255,255,0.12);border-radius:0 4px 4px 0;" title="35% budget consumed"></span>
                   </div>
@@ -1062,7 +1019,7 @@
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><!-- Jan,Feb -->
-                  <div style="grid-column:3/10;background:var(--color-warning);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-inv);font-weight:600;position:relative;" title="Initech API — Mar 1 – Sep 30, 2026">
+                  <div style="grid-column:3/10;background:var(--color-warning);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-inv);font-weight:var(--weight-semibold);position:relative;" title="Initech API — Mar 1 – Sep 30, 2026">
                     Mar 1 – Sep 30
                     <span style="position:absolute;right:0;top:0;bottom:0;width:69%;background:rgba(0,0,0,0.08);border-radius:0 4px 4px 0;" title="69% budget consumed"></span>
                   </div>
@@ -1080,7 +1037,7 @@
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><div></div><!-- Jan–Mar -->
-                  <div style="grid-column:4/11;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;position:relative;" title="Acme Mobile App — Apr 1 – Oct 31, 2026">
+                  <div style="grid-column:4/11;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:var(--weight-semibold);position:relative;" title="Acme Mobile App — Apr 1 – Oct 31, 2026">
                     Apr 1 – Oct 31
                     <span style="position:absolute;right:0;top:0;bottom:0;width:15%;background:rgba(255,255,255,0.12);border-radius:0 4px 4px 0;" title="15% budget consumed"></span>
                   </div>
@@ -1098,7 +1055,7 @@
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><div></div><div></div><!-- Jan–Apr -->
-                  <div style="grid-column:5/13;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;opacity:0.75;border:1px dashed rgba(255,255,255,0.4);" title="Contoso Deal — May 1 – Dec 31, 2026 (Planning)">
+                  <div style="grid-column:5/13;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:var(--weight-semibold);opacity:0.75;border:1px dashed rgba(255,255,255,0.4);" title="Contoso Deal — May 1 – Dec 31, 2026 (Planning)">
                     May 1 – Dec 31 (planned)
                   </div>
                 </div>
@@ -1263,73 +1220,78 @@
                 <strong>Recommendation:</strong> Prioritize core endpoints and defer non-critical integrations to Phase 2. Schedule technical review with Diana Park to reassess estimates.
               </div>
             </div>
-            <div class="overview-stats" id="acme-overview-stats">
-              <div class="stat-card">
+            <div class="overview-stats stagger-reveal" id="acme-overview-stats">
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Total Hours</div>
                 <div class="stat-value font-mono">388h</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   +12% this week
                 </div>
-              </div>
-              <div class="stat-card">
+              </div></div>
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Budget Used</div>
                 <div class="stat-value font-mono">64%</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   On track
                 </div>
-              </div>
-              <div class="stat-card">
+              </div></div>
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Revenue</div>
-                <div class="stat-value font-mono">&euro;32,200</div>
+                <div class="stat-value font-mono" data-sensitive="financials">&euro;32,200</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   +&euro;4,800 this month
                 </div>
-              </div>
-              <div class="stat-card">
+              </div></div>
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Margin</div>
-                <div class="stat-value font-mono">48%</div>
+                <div class="stat-value font-mono" data-sensitive="financials">48%</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   +2% vs last month
                 </div>
-              </div>
+              </div></div>
             </div>
-            <div class="overview-stats" id="initech-overview-stats" style="display:none;">
-              <div class="stat-card">
+            <div class="overview-stats stagger-reveal" id="initech-overview-stats" style="display:none;">
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Total Hours</div>
                 <div class="stat-value font-mono">305h</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   +8% this week
                 </div>
-              </div>
-              <div class="stat-card">
+              </div></div>
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Budget Used</div>
                 <div class="stat-value font-mono">69%</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   On pace
                 </div>
-              </div>
-              <div class="stat-card">
+              </div></div>
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Revenue</div>
-                <div class="stat-value font-mono">&euro;27,495</div>
+                <div class="stat-value font-mono" data-sensitive="financials">&euro;27,495</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   +&euro;3,100 this month
                 </div>
-              </div>
-              <div class="stat-card">
+              </div></div>
+              <div class="stat-card perspective-container"><div class="card-3d">
                 <div class="stat-label">Margin</div>
-                <div class="stat-value font-mono">47%</div>
+                <div class="stat-value font-mono" data-sensitive="financials">47%</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="12" height="12"></svg>
                   +1% vs last month
                 </div>
-              </div>
+              </div></div>
+            </div>
+            <div class="overview-stats stagger-reveal" id="generic-overview-stats" style="display:none;"></div>
+            <div class="ai-insight-card mb-4" id="generic-ai-insight" style="display:none;">
+              <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Project Intelligence</div>
+              <div class="ai-body" id="generic-ai-body"></div>
             </div>
 
             <div class="grid-2 gap-6">
@@ -1434,10 +1396,10 @@
                     <td data-label="Role">Project Manager</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;85/h</td>
                     <td data-label="Hours" class="font-mono">120h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;10,200</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;45/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;5,400</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;4,800 (47%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;10,200</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;45/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;5,400</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;4,800 (47%)</td>
                   </tr>
                   <tr>
                     <td>
@@ -1449,10 +1411,10 @@
                     <td data-label="Role">Senior Developer</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;95/h</td>
                     <td data-label="Hours" class="font-mono">80h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;7,600</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;50/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;4,000</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;3,600 (47%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;7,600</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;50/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;4,000</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;3,600 (47%)</td>
                   </tr>
                   <tr>
                     <td>
@@ -1464,10 +1426,10 @@
                     <td data-label="Role">Software Engineer</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;75/h</td>
                     <td data-label="Hours" class="font-mono">88h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;6,600</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;40/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;3,520</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;3,080 (47%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;6,600</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;40/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;3,520</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;3,080 (47%)</td>
                   </tr>
                   <tr>
                     <td>
@@ -1479,10 +1441,10 @@
                     <td data-label="Role">Operations Lead</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;85/h</td>
                     <td data-label="Hours" class="font-mono">65h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;5,525</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;42/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;2,730</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;2,795 (51%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;5,525</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;42/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;2,730</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;2,795 (51%)</td>
                   </tr>
                   <tr>
                     <td>
@@ -1491,13 +1453,13 @@
                         <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="95" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Liam O&rsquo;Brien</a>
                       </div>
                     </td>
-                    <td data-label="Role">Junior Dev</td>
+                    <td data-label="Role">Junior Developer</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;65/h</td>
                     <td data-label="Hours" class="font-mono">35h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;2,275</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;35/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;1,225</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;1,050 (46%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;2,275</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;35/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;1,225</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;1,050 (46%)</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -1505,10 +1467,10 @@
                     <td colspan="2"><strong>TOTALS</strong></td>
                     <td></td>
                     <td class="font-mono"><strong>388h</strong></td>
-                    <td class="font-mono"><strong>&euro;32,200</strong></td>
+                    <td class="font-mono" data-sensitive="financials"><strong>&euro;32,200</strong></td>
                     <td></td>
-                    <td class="font-mono"><strong>&euro;16,875</strong></td>
-                    <td class="font-mono"><strong>&euro;15,325 (48%)</strong></td>
+                    <td class="font-mono" data-sensitive="financials"><strong>&euro;16,875</strong></td>
+                    <td class="font-mono" data-sensitive="financials"><strong>&euro;15,325 (48%)</strong></td>
                   </tr>
                 </tfoot>
               </table>
@@ -1528,7 +1490,7 @@
                   <tr>
                     <th>Member</th>
                     <th>Role</th>
-                    <th data-sensitive="billing">Bill Rate</th>
+                    <th data-sensitive="financials">Bill Rate</th>
                     <th>Hours</th>
                     <th data-sensitive="financials">Revenue</th>
                     <th data-sensitive="financials">Cost Rate</th>
@@ -1545,12 +1507,12 @@
                       </div>
                     </td>
                     <td data-label="Role">Lead Backend Dev</td>
-                    <td data-label="Bill Rate" class="font-mono" data-sensitive="billing">&euro;95/h</td>
+                    <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;95/h</td>
                     <td data-label="Hours" class="font-mono">145h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;13,775</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;52/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;7,540</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;6,235 (45%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;13,775</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;52/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;7,540</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;6,235 (45%)</td>
                   </tr>
                   <tr>
                     <td>
@@ -1560,12 +1522,12 @@
                       </div>
                     </td>
                     <td data-label="Role">DevOps Engineer</td>
-                    <td data-label="Bill Rate" class="font-mono" data-sensitive="billing">&euro;90/h</td>
+                    <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;90/h</td>
                     <td data-label="Hours" class="font-mono">92h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;8,280</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;48/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;4,416</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;3,864 (47%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;8,280</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;48/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;4,416</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;3,864 (47%)</td>
                   </tr>
                   <tr>
                     <td>
@@ -1575,12 +1537,12 @@
                       </div>
                     </td>
                     <td data-label="Role">Backend Developer</td>
-                    <td data-label="Bill Rate" class="font-mono" data-sensitive="billing">&euro;80/h</td>
+                    <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;80/h</td>
                     <td data-label="Hours" class="font-mono">68h</td>
-                    <td data-label="Revenue" class="font-mono">&euro;5,440</td>
-                    <td data-label="Cost Rate" class="font-mono">&euro;38/h</td>
-                    <td data-label="Cost" class="font-mono">&euro;2,584</td>
-                    <td data-label="Gross Margin" class="font-mono">&euro;2,856 (53%)</td>
+                    <td data-label="Revenue" class="font-mono" data-sensitive="financials">&euro;5,440</td>
+                    <td data-label="Cost Rate" class="font-mono" data-sensitive="financials">&euro;38/h</td>
+                    <td data-label="Cost" class="font-mono" data-sensitive="financials">&euro;2,584</td>
+                    <td data-label="Gross Margin" class="font-mono" data-sensitive="financials">&euro;2,856 (53%)</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -1588,15 +1550,16 @@
                     <td colspan="2"><strong>TOTALS</strong></td>
                     <td></td>
                     <td class="font-mono"><strong>305h</strong></td>
-                    <td class="font-mono"><strong>&euro;27,495</strong></td>
+                    <td class="font-mono" data-sensitive="financials"><strong>&euro;27,495</strong></td>
                     <td></td>
-                    <td class="font-mono"><strong>&euro;14,540</strong></td>
-                    <td class="font-mono"><strong>&euro;12,955 (47%)</strong></td>
+                    <td class="font-mono" data-sensitive="financials"><strong>&euro;14,540</strong></td>
+                    <td class="font-mono" data-sensitive="financials"><strong>&euro;12,955 (47%)</strong></td>
                   </tr>
                 </tfoot>
               </table>
             </div>
             </div>
+            <div id="generic-team-tab" style="display:none;"></div>
           </div>
 
           <!-- ── Tab: Timesheets ── -->
@@ -1752,10 +1715,12 @@
               </table>
             </div>
             </div>
+            <div id="generic-timesheets-tab" style="display:none;"></div>
           </div>
 
           <!-- ── Tab: Expenses ── -->
           <div class="tab-content" id="tab-expenses">
+            <div id="acme-expenses-tab">
             <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Project Expenses</h3>
             <div class="data-table-wrapper">
               <table class="data-table mobile-cards">
@@ -1812,6 +1777,8 @@
                 </tfoot>
               </table>
             </div>
+            </div>
+            <div id="generic-expenses-tab" style="display:none;"></div>
           </div>
 
           <!-- ── Tab: Invoices ── -->
@@ -1880,6 +1847,7 @@
               </table>
             </div>
             </div>
+            <div id="generic-invoices-tab" style="display:none;"></div>
           </div>
 
           <!-- ── Tab: Milestones ── -->
@@ -1894,6 +1862,7 @@
                 Add Milestone
               </button>
             </div>
+            <div id="acme-milestones-tab">
             <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Milestone Tracker</h3>
             <div class="card">
               <div class="card-body" style="padding:0;">
@@ -1974,6 +1943,8 @@
                 </div>
               </div>
             </div>
+            </div>
+            <div id="generic-milestones-tab" style="display:none;"></div>
           </div>
 
           <!-- ── Tab: Activity ── -->
@@ -1988,6 +1959,7 @@
                 Add Milestone
               </button>
             </div>
+            <div id="acme-activity-tab">
             <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Recent Activity</h3>
             <div class="card">
               <div class="card-body" style="padding:0;">
@@ -2060,6 +2032,8 @@
                 </div>
               </div>
             </div>
+            </div>
+            <div id="generic-activity-tab" style="display:none;"></div>
           </div>
 
         </div>
@@ -2167,8 +2141,7 @@
         <div class="form-group">
           <label class="form-label">Billing Model <span class="required">*</span></label>
           <select class="form-select" id="billingModelSelect">
-            <option value="">Select billing model...</option>
-            <option value="hourly">Hourly</option>
+            <option value="hourly" selected>Hourly</option>
             <option value="daily">Daily</option>
             <option value="fixed">Fixed Price</option>
             <option value="retainer">Retainer</option>
@@ -2176,15 +2149,15 @@
         </div>
         <div class="form-group">
           <label class="form-label">Rate / Amount</label>
-          <input type="text" class="form-input font-mono" placeholder="e.g. 85.00">
+          <input type="text" class="form-input font-mono" placeholder="e.g. 85.00" value="85.00">
         </div>
         <div class="form-group">
           <label class="form-label">Start Date</label>
-          <input type="date" class="form-input">
+          <input type="date" class="form-input" id="newProjectStart">
         </div>
         <div class="form-group">
           <label class="form-label">End Date</label>
-          <input type="date" class="form-input">
+          <input type="date" class="form-input" id="newProjectEnd">
         </div>
         <div class="form-group" style="grid-column:1/-1;">
           <label class="form-label">Description</label>
@@ -2206,10 +2179,10 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-md" onclick="closeModal();showToast('info','Templates','Select a project template to pre-fill details: Web App, Mobile App, Consulting Engagement, or Security Audit.')">
+      <button class="btn btn-secondary btn-md" onclick="closeModal();showToast('info','Templates','Select a project template to pre-fill details: Web App, Mobile App, Consulting Engagement, or Security Audit.')">
         <svg data-lucide="layout-template" width="16" height="16"></svg> Create from Template
       </button>
-      <button class="btn btn-secondary btn-md" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-ghost btn-md" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary btn-md" id="createProjectBtn" onclick="createProject()">
         <svg data-lucide="plus" width="16" height="16"></svg>
         Create Project
@@ -2260,9 +2233,9 @@
       </div>
     </div>
     <div class="cmd-palette-footer" style="display:flex;gap:var(--space-4);padding:var(--space-2) var(--space-4);border-top:1px solid var(--color-border-subtle);font-size:var(--text-caption);color:var(--color-text-3);">
-      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:10px;">&#8593;&#8595;</kbd> Navigate</span>
-      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:10px;">&#9166;</kbd> Open</span>
-      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:10px;">ESC</kbd> Close</span>
+      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:var(--text-overline);">&#8593;&#8595;</kbd> Navigate</span>
+      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:var(--text-overline);">&#9166;</kbd> Open</span>
+      <span><kbd style="padding:1px 4px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:var(--text-overline);">ESC</kbd> Close</span>
     </div>
   </div>
 </div>
@@ -2425,30 +2398,420 @@
 
   // ── Project data map for detail variants ──
   var currentProject = 'acme-web';
+
+  // Avatar color helper
+  var avatarColors = {
+    'SC': '', 'JS': 'var(--color-info)', 'MR': 'var(--color-error)', 'CW': 'var(--color-chart-5)',
+    'AW': 'var(--color-gold)', 'DP': 'var(--color-warning)', 'EL': 'var(--color-primary)',
+    'BT': 'var(--color-accent)', 'LO': 'var(--color-primary)', 'SD': 'var(--color-info)'
+  };
+
   var projectData = {
     'acme-web': {
       title: 'Acme Corp &mdash; Website Redesign',
       client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
       budgetPct: 64,
       budgetText: '&euro;32,200 / &euro;50,000 (64%)',
-      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Feb 1, 2026</span>'
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Feb 1, 2026</span>',
+      description: 'Full website redesign including new design system, responsive layouts, and analytics dashboard.',
+      status: 'active',
+      timeline: 'Feb 1 &mdash; Jul 31, 2026',
+      timelinePct: 55,
+      stats: { hours: '388h', budgetUsed: '64%', revenue: '&euro;32,200', margin: '48%', hoursTrend: '+12% this week', revTrend: '+&euro;4,800 this month', marginTrend: '+2% vs last month' },
+      team: [
+        { name: 'Sarah Chen', initials: 'SC', role: 'Project Manager', dept: 'Engineering', worktime: 87, hours: '120h', billRate: '&euro;85/h', revenue: '&euro;10,200', costRate: '&euro;45/h', cost: '&euro;5,400', margin: '&euro;4,800 (47%)' },
+        { name: 'John Smith', initials: 'JS', role: 'Senior Developer', dept: 'Engineering', worktime: 82, hours: '80h', billRate: '&euro;95/h', revenue: '&euro;7,600', costRate: '&euro;50/h', cost: '&euro;4,000', margin: '&euro;3,600 (47%)' },
+        { name: 'Alice Wang', initials: 'AW', role: 'Software Engineer', dept: 'Engineering', worktime: 45, hours: '88h', billRate: '&euro;75/h', revenue: '&euro;6,600', costRate: '&euro;40/h', cost: '&euro;3,520', margin: '&euro;3,080 (47%)' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'Operations Lead', dept: 'Operations', worktime: 88, hours: '65h', billRate: '&euro;85/h', revenue: '&euro;5,525', costRate: '&euro;42/h', cost: '&euro;2,730', margin: '&euro;2,795 (51%)' },
+        { name: "Liam O'Brien", initials: 'LO', role: 'Junior Developer', dept: 'Engineering', worktime: 95, hours: '35h', billRate: '&euro;65/h', revenue: '&euro;2,275', costRate: '&euro;35/h', cost: '&euro;1,225', margin: '&euro;1,050 (46%)' }
+      ],
+      aiInsight: '<strong>Budget Alert:</strong> Acme Web Redesign is burning budget 15% faster than planned. At current rate, budget will be exhausted by <strong>May 20</strong>. Team velocity has declined 12% in the last 2 sprints.<br><br><strong>Risk Assessment:</strong> Risk score 7/10. Primary risks: scope creep on the analytics module and Sarah Chen\'s overallocation (assigned to 2 other projects simultaneously).<br><br><strong>Recommendation:</strong> Consider reducing Sprint 3 scope or renegotiating timeline with Acme Corp. Reassigning 1 developer from Globex Phase 2 could recover 2 weeks.',
+      activity: [
+        { name: 'Sarah Chen', initials: 'SC', text: 'submitted timesheet for <span class="highlight">40h</span>', time: '2 hours ago' },
+        { name: 'John Smith', initials: 'JS', text: 'approved Alice Wang\'s expense <span class="highlight">&euro;450</span>', time: '3 hours ago' },
+        { name: 'Alice Wang', initials: 'AW', text: 'uploaded 3 design mockups to <span class="highlight">Design Phase</span>', time: '5 hours ago' },
+        { name: 'Marco Rossi', initials: 'MR', text: 'completed task <span class="highlight">Header Component</span>', time: 'Yesterday' },
+        { name: "Liam O'Brien", initials: 'LO', text: 'pushed 12 commits to <span class="highlight">feature/auth</span>', time: 'Yesterday' }
+      ],
+      milestones: [
+        { name: 'Discovery &amp; Requirements', dates: 'Feb 1 &mdash; Feb 14, 2026', status: 'complete' },
+        { name: 'Design Phase', dates: 'Feb 15 &mdash; Mar 15, 2026', status: 'complete' },
+        { name: 'Development Sprint 1', dates: 'Mar 16 &mdash; Apr 15, 2026', status: 'in-progress', pct: 60 },
+        { name: 'Development Sprint 2', dates: 'Apr 16 &mdash; May 15, 2026', status: 'upcoming' },
+        { name: 'Testing &amp; QA', dates: 'May 16 &mdash; Jun 15, 2026', status: 'upcoming' },
+        { name: 'Launch', dates: 'Jul 1, 2026', status: 'upcoming' }
+      ]
     },
     'initech-api': {
       title: 'Initech &mdash; API Integration',
       client: 'Client: <a href="clients.html#detail/initech">Initech</a>',
       budgetPct: 69,
       budgetText: '&euro;27,495 / &euro;40,000 (69%)',
-      badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>'
+      badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>',
+      description: 'REST API integration with Initech legacy systems, including authentication, data sync, and reporting endpoints.',
+      status: 'at-risk',
+      timeline: 'Mar 1 &mdash; Sep 30, 2026',
+      timelinePct: 55,
+      stats: { hours: '305h', budgetUsed: '69%', revenue: '&euro;27,495', margin: '47%', hoursTrend: '+8% this week', revTrend: '+&euro;3,100 this month', marginTrend: '+1% vs last month' },
+      team: [
+        { name: 'Sarah Chen', initials: 'SC', role: 'Project Lead', dept: 'Engineering', worktime: 87, hours: '95h', billRate: '&euro;95/h', revenue: '&euro;9,025', costRate: '&euro;45/h', cost: '&euro;4,275', margin: '&euro;4,750 (53%)' },
+        { name: 'John Smith', initials: 'JS', role: 'Senior Developer', dept: 'Engineering', worktime: 82, hours: '145h', billRate: '&euro;95/h', revenue: '&euro;13,775', costRate: '&euro;50/h', cost: '&euro;7,250', margin: '&euro;6,525 (47%)' },
+        { name: 'Bob Taylor', initials: 'BT', role: 'Backend Developer', dept: 'Engineering', worktime: 0, hours: '65h', billRate: '&euro;80/h', revenue: '&euro;5,200', costRate: '&euro;38/h', cost: '&euro;2,470', margin: '&euro;2,730 (53%)' }
+      ],
+      aiInsight: '<strong>Budget Alert:</strong> Initech API Integration is at 69% budget with timeline at 55%. Burn rate is accelerating &mdash; projected overrun of 8% if current pace continues.<br><br><strong>Risk Assessment:</strong> Risk score 6/10. API complexity higher than estimated. 3 integration endpoints behind schedule.<br><br><strong>Recommendation:</strong> Prioritize core endpoints and defer non-critical integrations to Phase 2. Schedule technical review with John Smith to reassess estimates.',
+      activity: [
+        { name: 'John Smith', initials: 'JS', text: 'committed API auth module to <span class="highlight">feature/oauth</span>', time: '1 hour ago' },
+        { name: 'Bob Taylor', initials: 'BT', text: 'filed bug report <span class="highlight">BUG-342: Rate limiting</span>', time: '3 hours ago' },
+        { name: 'Sarah Chen', initials: 'SC', text: 'updated project risk status to <span class="highlight">At Risk</span>', time: 'Yesterday' }
+      ],
+      milestones: [
+        { name: 'API Discovery &amp; Design', dates: 'Mar 1 &mdash; Mar 21, 2026', status: 'complete' },
+        { name: 'Core Endpoints', dates: 'Mar 22 &mdash; May 15, 2026', status: 'in-progress', pct: 45 },
+        { name: 'Authentication &amp; Security', dates: 'May 16 &mdash; Jun 30, 2026', status: 'upcoming' },
+        { name: 'Integration Testing', dates: 'Jul 1 &mdash; Aug 15, 2026', status: 'upcoming' },
+        { name: 'Go-Live', dates: 'Sep 30, 2026', status: 'upcoming' }
+      ]
+    },
+    'globex-phase2': {
+      title: 'Globex Corp &mdash; Phase 2 Migration',
+      client: 'Client: <a href="clients.html#detail/globex">Globex Corp</a>',
+      budgetPct: 35,
+      budgetText: '&euro;63,000 / &euro;180,000 (35%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;90/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>',
+      description: 'Phase 2 of the Globex infrastructure migration including microservices decomposition and cloud-native deployment.',
+      status: 'active',
+      timeline: 'Jan 15 &mdash; Jun 30, 2026',
+      timelinePct: 60,
+      stats: { hours: '700h', budgetUsed: '35%', revenue: '&euro;63,000', margin: '52%', hoursTrend: '+5% this week', revTrend: '+&euro;7,200 this month', marginTrend: 'Stable' },
+      team: [
+        { name: 'Sarah Chen', initials: 'SC', role: 'Project Manager', dept: 'Engineering', worktime: 87, hours: '180h', billRate: '&euro;90/h', revenue: '&euro;16,200', costRate: '&euro;45/h', cost: '&euro;8,100', margin: '&euro;8,100 (50%)' },
+        { name: 'John Smith', initials: 'JS', role: 'Lead Architect', dept: 'Engineering', worktime: 82, hours: '210h', billRate: '&euro;95/h', revenue: '&euro;19,950', costRate: '&euro;50/h', cost: '&euro;10,500', margin: '&euro;9,450 (47%)' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'DevOps Lead', dept: 'Operations', worktime: 88, hours: '160h', billRate: '&euro;90/h', revenue: '&euro;14,400', costRate: '&euro;42/h', cost: '&euro;6,720', margin: '&euro;7,680 (53%)' },
+        { name: 'Carol Williams', initials: 'CW', role: 'UX Consultant', dept: 'Design', worktime: 90, hours: '150h', billRate: '&euro;85/h', revenue: '&euro;12,750', costRate: '&euro;44/h', cost: '&euro;6,600', margin: '&euro;6,150 (48%)' }
+      ],
+      aiInsight: '<strong>Status:</strong> Globex Phase 2 is on track. Budget consumption at 35% aligns with timeline progress at 60%.<br><br><strong>Highlights:</strong> Microservices migration completed ahead of schedule. Cloud infrastructure provisioning 90% done. Team velocity is steady.<br><br><strong>Recommendation:</strong> Consider starting Phase 3 scoping with Globex. Current team has bandwidth for parallel discovery.',
+      activity: [
+        { name: 'Marco Rossi', initials: 'MR', text: 'deployed staging environment for <span class="highlight">Service Mesh</span>', time: '1 hour ago' },
+        { name: 'John Smith', initials: 'JS', text: 'merged PR <span class="highlight">#247: API Gateway config</span>', time: '4 hours ago' },
+        { name: 'Sarah Chen', initials: 'SC', text: 'approved timesheet for <span class="highlight">Week 13</span>', time: 'Yesterday' },
+        { name: 'Carol Williams', initials: 'CW', text: 'updated dashboard wireframes in <span class="highlight">Figma</span>', time: '2 days ago' }
+      ],
+      milestones: [
+        { name: 'Infrastructure Setup', dates: 'Jan 15 &mdash; Feb 14, 2026', status: 'complete' },
+        { name: 'Microservices Migration', dates: 'Feb 15 &mdash; Apr 15, 2026', status: 'in-progress', pct: 75 },
+        { name: 'Data Migration', dates: 'Apr 16 &mdash; May 31, 2026', status: 'upcoming' },
+        { name: 'UAT &amp; Go-Live', dates: 'Jun 1 &mdash; Jun 30, 2026', status: 'upcoming' }
+      ]
+    },
+    'acme-mobile': {
+      title: 'Acme Corp &mdash; Mobile App',
+      client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
+      budgetPct: 15,
+      budgetText: '&euro;14,250 / &euro;95,000 (15%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;85/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Apr 1, 2026</span>',
+      description: 'Native iOS and Android companion app for the Acme web platform. Phase 1 covers authentication, dashboard, and notifications.',
+      status: 'active',
+      timeline: 'Apr 1 &mdash; Oct 31, 2026',
+      timelinePct: 5,
+      stats: { hours: '168h', budgetUsed: '15%', revenue: '&euro;14,250', margin: '51%', hoursTrend: '+22% this week', revTrend: '+&euro;5,100 this month', marginTrend: '+3% vs last month' },
+      team: [
+        { name: 'Carol Williams', initials: 'CW', role: 'Design Lead', dept: 'Design', worktime: 90, hours: '88h', billRate: '&euro;85/h', revenue: '&euro;7,480', costRate: '&euro;44/h', cost: '&euro;3,872', margin: '&euro;3,608 (48%)' },
+        { name: 'Alice Wang', initials: 'AW', role: 'Mobile Developer', dept: 'Engineering', worktime: 45, hours: '80h', billRate: '&euro;85/h', revenue: '&euro;6,800', costRate: '&euro;40/h', cost: '&euro;3,200', margin: '&euro;3,600 (53%)' }
+      ],
+      aiInsight: '<strong>Status:</strong> Acme Mobile App just kicked off. Early budget consumption at 15% is healthy for Week 1.<br><br><strong>Note:</strong> Alice Wang is on partial allocation (45%). Consider adding a second developer once the architecture is finalized in Sprint 2.<br><br><strong>Recommendation:</strong> Align mobile design tokens with the web redesign to maintain consistency across platforms.',
+      activity: [
+        { name: 'Carol Williams', initials: 'CW', text: 'created project structure and <span class="highlight">design system</span>', time: '2 hours ago' },
+        { name: 'Alice Wang', initials: 'AW', text: 'set up React Native project with <span class="highlight">CI/CD pipeline</span>', time: 'Yesterday' }
+      ],
+      milestones: [
+        { name: 'Discovery &amp; Architecture', dates: 'Apr 1 &mdash; Apr 21, 2026', status: 'in-progress', pct: 30 },
+        { name: 'Design &amp; Prototyping', dates: 'Apr 22 &mdash; May 31, 2026', status: 'upcoming' },
+        { name: 'Development Sprint 1', dates: 'Jun 1 &mdash; Jul 15, 2026', status: 'upcoming' },
+        { name: 'Development Sprint 2', dates: 'Jul 16 &mdash; Sep 15, 2026', status: 'upcoming' },
+        { name: 'App Store Submission', dates: 'Oct 1, 2026', status: 'upcoming' }
+      ]
+    },
+    'contoso-deal': {
+      title: 'Contoso Inc &mdash; Deal Platform',
+      client: 'Client: <a href="clients.html#detail/contoso">Contoso Inc</a>',
+      budgetPct: 0,
+      budgetText: '&euro;0 / &euro;120,000 (0%)',
+      badges: '<span class="badge badge-info badge-lg"><svg data-lucide="circle-dashed" width="14" height="14"></svg> Planning</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed Price</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: May 1, 2026</span>',
+      description: 'Deal management platform for Contoso Inc. Fixed-price engagement covering CRM integration, deal pipeline, and reporting.',
+      status: 'planning',
+      timeline: 'May 1 &mdash; Dec 31, 2026',
+      timelinePct: 0,
+      stats: { hours: '0h', budgetUsed: '0%', revenue: '&euro;0', margin: '&mdash;', hoursTrend: 'Not started', revTrend: 'Not started', marginTrend: '&mdash;' },
+      team: [
+        { name: 'David Park', initials: 'DP', role: 'Finance Lead', dept: 'Finance', worktime: 45, hours: '0h', billRate: '&euro;90/h', revenue: '&euro;0', costRate: '&euro;46/h', cost: '&euro;0', margin: '&mdash;' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'Operations Lead', dept: 'Operations', worktime: 88, hours: '0h', billRate: '&euro;85/h', revenue: '&euro;0', costRate: '&euro;42/h', cost: '&euro;0', margin: '&mdash;' }
+      ],
+      aiInsight: '<strong>Status:</strong> Contoso Deal Platform is in planning phase. Kick-off scheduled for May 1, 2026.<br><br><strong>Staffing:</strong> David Park and Marco Rossi are assigned. Consider adding a frontend developer before sprint 1.<br><br><strong>Recommendation:</strong> Finalize SOW and milestone schedule with Contoso before May 1. Fixed-price projects benefit from tight scope definition upfront.',
+      activity: [
+        { name: 'David Park', initials: 'DP', text: 'created project and set budget to <span class="highlight">&euro;120,000</span>', time: '3 days ago' },
+        { name: 'Marco Rossi', initials: 'MR', text: 'uploaded <span class="highlight">requirements document v1</span>', time: '4 days ago' }
+      ],
+      milestones: [
+        { name: 'Scoping &amp; SOW', dates: 'Apr 15 &mdash; Apr 30, 2026', status: 'in-progress', pct: 20 },
+        { name: 'Phase 1: CRM Integration', dates: 'May 1 &mdash; Jul 31, 2026', status: 'upcoming' },
+        { name: 'Phase 2: Deal Pipeline', dates: 'Aug 1 &mdash; Oct 31, 2026', status: 'upcoming' },
+        { name: 'Phase 3: Reporting &amp; Launch', dates: 'Nov 1 &mdash; Dec 31, 2026', status: 'upcoming' }
+      ]
+    },
+    'internal-portal': {
+      title: 'Internal &mdash; Employee Portal v2',
+      client: 'Internal',
+      budgetPct: 0,
+      budgetText: '&euro;0 / &euro;45,000 (0%)',
+      badges: '<span class="badge badge-info badge-lg"><svg data-lucide="circle-dashed" width="14" height="14"></svg> Planning</span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: TBD</span><span class="separator"></span><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> No team assigned</span>',
+      description: 'Internal employee self-service portal v2 rebuild. Covers leave requests, expense submissions, and team directory.',
+      status: 'planning',
+      timeline: 'TBD',
+      timelinePct: 0,
+      stats: { hours: '0h', budgetUsed: '0%', revenue: '&mdash;', margin: '&mdash;', hoursTrend: 'Not started', revTrend: 'Internal project', marginTrend: '&mdash;' },
+      team: [],
+      aiInsight: '<strong>Status:</strong> Internal Portal v2 has no team assigned yet. This project is blocked on staffing.<br><br><strong>Recommendation:</strong> Assign at least a project lead and one developer. Bob Taylor (0% allocated) and Emma Laurent are good candidates. Prioritize this if employee satisfaction survey feedback requires it.',
+      activity: [
+        { name: 'Emma Laurent', initials: 'EL', text: 'created project brief for <span class="highlight">Portal v2</span>', time: '1 week ago' }
+      ],
+      milestones: []
+    },
+    'dataviz-dashboard': {
+      title: 'Globex &mdash; DataViz Dashboard',
+      client: 'Client: <a href="clients.html#detail/globex">Globex Corp</a>',
+      budgetPct: 10,
+      budgetText: '&euro;7,650 / &euro;78,000 (10%)',
+      badges: '<span class="badge badge-info badge-lg"><svg data-lucide="circle-dashed" width="14" height="14"></svg> Planning</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;95/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Mar 1, 2026</span>',
+      description: 'Interactive data visualization dashboard for Globex Corp executive reporting. D3.js-based charts with real-time data feeds.',
+      status: 'planning',
+      timeline: 'Mar 1 &mdash; Aug 31, 2026',
+      timelinePct: 20,
+      stats: { hours: '82h', budgetUsed: '10%', revenue: '&euro;7,650', margin: '49%', hoursTrend: '+6% this week', revTrend: '+&euro;1,900 this month', marginTrend: 'Stable' },
+      team: [
+        { name: 'Carol Williams', initials: 'CW', role: 'Design Lead', dept: 'Design', worktime: 90, hours: '82h', billRate: '&euro;95/h', revenue: '&euro;7,650', costRate: '&euro;44/h', cost: '&euro;3,608', margin: '&euro;4,042 (53%)' }
+      ],
+      aiInsight: '<strong>Status:</strong> DataViz Dashboard is in early planning. Carol Williams is the only assigned resource.<br><br><strong>Risk:</strong> Single-person dependency. If Carol is unavailable, the project stalls entirely.<br><br><strong>Recommendation:</strong> Add a frontend developer with D3.js experience. Consider Sophie Dubois (Business Analyst) for requirements gathering.',
+      activity: [
+        { name: 'Carol Williams', initials: 'CW', text: 'completed initial <span class="highlight">wireframes for executive dashboard</span>', time: '2 days ago' },
+        { name: 'Carol Williams', initials: 'CW', text: 'created color palette and <span class="highlight">chart style guide</span>', time: '5 days ago' }
+      ],
+      milestones: [
+        { name: 'Requirements &amp; Wireframes', dates: 'Mar 1 &mdash; Apr 15, 2026', status: 'in-progress', pct: 70 },
+        { name: 'Chart Component Library', dates: 'Apr 16 &mdash; Jun 15, 2026', status: 'upcoming' },
+        { name: 'Dashboard Assembly &amp; Testing', dates: 'Jun 16 &mdash; Aug 15, 2026', status: 'upcoming' },
+        { name: 'Launch', dates: 'Aug 31, 2026', status: 'upcoming' }
+      ]
+    },
+    'globex-migration': {
+      title: 'Globex Corp &mdash; Data Migration',
+      client: 'Client: <a href="clients.html#detail/globex">Globex Corp</a>',
+      budgetPct: 100,
+      budgetText: '&euro;120,000 / &euro;120,000 (100%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle-2" width="14" height="14"></svg> Completed</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed &euro;120K</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>May 2025 &ndash; Nov 2025</span>',
+      description: 'Full data migration from legacy Oracle systems to cloud-native PostgreSQL. Included ETL pipelines, data validation, and rollback procedures.',
+      status: 'completed',
+      timeline: 'May 1 &mdash; Nov 30, 2025',
+      timelinePct: 100,
+      stats: { hours: '1,420h', budgetUsed: '100%', revenue: '&euro;120,000', margin: '44%', hoursTrend: 'Project complete', revTrend: 'Final: &euro;120,000', marginTrend: 'Final: 44%' },
+      team: [
+        { name: 'John Smith', initials: 'JS', role: 'Lead Developer', dept: 'Engineering', worktime: 82, hours: '480h', billRate: '&euro;90/h', revenue: '&euro;43,200', costRate: '&euro;50/h', cost: '&euro;24,000', margin: '&euro;19,200 (44%)' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'DevOps Engineer', dept: 'Operations', worktime: 88, hours: '520h', billRate: '&euro;85/h', revenue: '&euro;44,200', costRate: '&euro;42/h', cost: '&euro;21,840', margin: '&euro;22,360 (51%)' },
+        { name: 'Emma Laurent', initials: 'EL', role: 'Data Analyst', dept: 'HR', worktime: 78, hours: '420h', billRate: '&euro;80/h', revenue: '&euro;33,600', costRate: '&euro;40/h', cost: '&euro;16,800', margin: '&euro;16,800 (50%)' }
+      ],
+      aiInsight: '<strong>Project Complete:</strong> Globex Data Migration finished on time and within budget. Client satisfaction: 5/5 stars.<br><br><strong>Retrospective:</strong> Strong team collaboration. ETL pipeline reusable for future migrations. Recommend templating this approach for similar engagements.<br><br><strong>Follow-up:</strong> Globex Phase 2 is the continuation project. Phase 3 scoping discussions scheduled for Q3.',
+      activity: [
+        { name: 'Sarah Chen', initials: 'SC', text: 'marked project as <span class="highlight">Completed</span>', time: 'Nov 30, 2025' },
+        { name: 'Marco Rossi', initials: 'MR', text: 'completed final <span class="highlight">data validation report</span>', time: 'Nov 28, 2025' },
+        { name: 'John Smith', initials: 'JS', text: 'deployed production migration <span class="highlight">v3.2 final</span>', time: 'Nov 25, 2025' }
+      ],
+      milestones: [
+        { name: 'Discovery &amp; Planning', dates: 'May 1 &mdash; May 31, 2025', status: 'complete' },
+        { name: 'ETL Pipeline Development', dates: 'Jun 1 &mdash; Aug 15, 2025', status: 'complete' },
+        { name: 'Data Migration &amp; Validation', dates: 'Aug 16 &mdash; Oct 31, 2025', status: 'complete' },
+        { name: 'Go-Live &amp; Handover', dates: 'Nov 1 &mdash; Nov 30, 2025', status: 'complete' }
+      ]
+    },
+    'acme-crm': {
+      title: 'Acme Corp &mdash; CRM Setup',
+      client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
+      budgetPct: 100,
+      budgetText: '&euro;45,000 / &euro;45,000 (100%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle-2" width="14" height="14"></svg> Completed</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;80/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Jan &ndash; Apr 2025</span>',
+      description: 'CRM implementation and customization for Acme Corp. HubSpot integration with custom workflows, reporting, and team training.',
+      status: 'completed',
+      timeline: 'Jan 6 &mdash; Apr 30, 2025',
+      timelinePct: 100,
+      stats: { hours: '562h', budgetUsed: '100%', revenue: '&euro;45,000', margin: '46%', hoursTrend: 'Project complete', revTrend: 'Final: &euro;45,000', marginTrend: 'Final: 46%' },
+      team: [
+        { name: 'John Smith', initials: 'JS', role: 'Technical Lead', dept: 'Engineering', worktime: 82, hours: '220h', billRate: '&euro;80/h', revenue: '&euro;17,600', costRate: '&euro;50/h', cost: '&euro;11,000', margin: '&euro;6,600 (38%)' },
+        { name: 'Emma Laurent', initials: 'EL', role: 'Business Analyst', dept: 'HR', worktime: 78, hours: '180h', billRate: '&euro;80/h', revenue: '&euro;14,400', costRate: '&euro;40/h', cost: '&euro;7,200', margin: '&euro;7,200 (50%)' },
+        { name: 'Bob Taylor', initials: 'BT', role: 'Backend Developer', dept: 'Engineering', worktime: 0, hours: '162h', billRate: '&euro;80/h', revenue: '&euro;12,960', costRate: '&euro;38/h', cost: '&euro;6,156', margin: '&euro;6,804 (53%)' }
+      ],
+      aiInsight: '<strong>Project Complete:</strong> Acme CRM Setup delivered on budget. Client trained and onboarded successfully.<br><br><strong>Outcome:</strong> 98% adoption rate within first month. Acme reported 30% improvement in lead tracking efficiency.<br><br><strong>Follow-up:</strong> Acme Web Redesign and Mobile App are follow-on projects from this engagement.',
+      activity: [
+        { name: 'Emma Laurent', initials: 'EL', text: 'completed client training session for <span class="highlight">Sales Team</span>', time: 'Apr 28, 2025' },
+        { name: 'John Smith', initials: 'JS', text: 'deployed final CRM customization <span class="highlight">v2.1</span>', time: 'Apr 25, 2025' },
+        { name: 'Bob Taylor', initials: 'BT', text: 'merged API integration for <span class="highlight">HubSpot webhooks</span>', time: 'Apr 20, 2025' }
+      ],
+      milestones: [
+        { name: 'Requirements Gathering', dates: 'Jan 6 &mdash; Jan 24, 2025', status: 'complete' },
+        { name: 'CRM Configuration', dates: 'Jan 27 &mdash; Mar 7, 2025', status: 'complete' },
+        { name: 'Integration &amp; Testing', dates: 'Mar 10 &mdash; Apr 11, 2025', status: 'complete' },
+        { name: 'Training &amp; Handover', dates: 'Apr 14 &mdash; Apr 30, 2025', status: 'complete' }
+      ]
+    },
+    'initech-audit': {
+      title: 'Initech &mdash; Security Audit',
+      client: 'Client: <a href="clients.html#detail/initech">Initech</a>',
+      budgetPct: 100,
+      budgetText: '&euro;30,000 / &euro;30,000 (100%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle-2" width="14" height="14"></svg> Completed</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed &euro;30K</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Oct &ndash; Dec 2025</span>',
+      description: 'Comprehensive security audit of Initech infrastructure including penetration testing, code review, and compliance assessment.',
+      status: 'completed',
+      timeline: 'Oct 1 &mdash; Dec 15, 2025',
+      timelinePct: 100,
+      stats: { hours: '380h', budgetUsed: '100%', revenue: '&euro;30,000', margin: '42%', hoursTrend: 'Project complete', revTrend: 'Final: &euro;30,000', marginTrend: 'Final: 42%' },
+      team: [
+        { name: 'John Smith', initials: 'JS', role: 'Security Lead', dept: 'Engineering', worktime: 82, hours: '200h', billRate: '&euro;95/h', revenue: '&euro;19,000', costRate: '&euro;50/h', cost: '&euro;10,000', margin: '&euro;9,000 (47%)' },
+        { name: 'Bob Taylor', initials: 'BT', role: 'Penetration Tester', dept: 'Engineering', worktime: 0, hours: '180h', billRate: '&euro;80/h', revenue: '&euro;14,400', costRate: '&euro;38/h', cost: '&euro;6,840', margin: '&euro;7,560 (53%)' }
+      ],
+      aiInsight: '<strong>Project Complete:</strong> Initech Security Audit delivered. 12 critical vulnerabilities identified and remediated.<br><br><strong>Outcome:</strong> Initech passed SOC 2 compliance audit following our recommendations. Led directly to the API Integration project.<br><br><strong>Follow-up:</strong> Annual re-audit scheduled for Oct 2026.',
+      activity: [
+        { name: 'John Smith', initials: 'JS', text: 'delivered final <span class="highlight">Security Audit Report</span>', time: 'Dec 15, 2025' },
+        { name: 'Bob Taylor', initials: 'BT', text: 'completed penetration testing on <span class="highlight">production environment</span>', time: 'Dec 10, 2025' },
+        { name: 'John Smith', initials: 'JS', text: 'identified critical vulnerability in <span class="highlight">auth module</span>', time: 'Nov 20, 2025' }
+      ],
+      milestones: [
+        { name: 'Scope &amp; Methodology', dates: 'Oct 1 &mdash; Oct 14, 2025', status: 'complete' },
+        { name: 'Vulnerability Assessment', dates: 'Oct 15 &mdash; Nov 15, 2025', status: 'complete' },
+        { name: 'Penetration Testing', dates: 'Nov 16 &mdash; Dec 5, 2025', status: 'complete' },
+        { name: 'Report &amp; Remediation', dates: 'Dec 6 &mdash; Dec 15, 2025', status: 'complete' }
+      ]
     }
   };
+
+  // ── Dynamic content renderer for generic projects ──
+  function renderGenericOverview(data) {
+    var el = document.getElementById('generic-overview-stats');
+    if (!el) return;
+    var s = data.stats;
+    el.innerHTML =
+      '<div class="stat-card perspective-container"><div class="card-3d"><div class="stat-label">Total Hours</div><div class="stat-value font-mono">' + s.hours + '</div><div class="stat-trend up"><svg data-lucide="trending-up" width="12" height="12"></svg> ' + s.hoursTrend + '</div></div></div>' +
+      '<div class="stat-card perspective-container"><div class="card-3d"><div class="stat-label">Budget Used</div><div class="stat-value font-mono">' + s.budgetUsed + '</div><div class="stat-trend up"><svg data-lucide="trending-up" width="12" height="12"></svg> On track</div></div></div>' +
+      '<div class="stat-card perspective-container"><div class="card-3d"><div class="stat-label">Revenue</div><div class="stat-value font-mono" data-sensitive="financials">' + s.revenue + '</div><div class="stat-trend up"><svg data-lucide="trending-up" width="12" height="12"></svg> ' + s.revTrend + '</div></div></div>' +
+      '<div class="stat-card perspective-container"><div class="card-3d"><div class="stat-label">Margin</div><div class="stat-value font-mono" data-sensitive="financials">' + s.margin + '</div><div class="stat-trend up"><svg data-lucide="trending-up" width="12" height="12"></svg> ' + s.marginTrend + '</div></div></div>';
+  }
+
+  function renderGenericTeam(data) {
+    var el = document.getElementById('generic-team-tab');
+    if (!el) return;
+    if (!data.team || data.team.length === 0) {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;"><svg data-lucide="users" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No team members assigned</h3><p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;margin-bottom:var(--space-6);">Add team members to start tracking time and expenses for this project.</p><button class="btn btn-primary btn-sm" onclick="document.getElementById(\'addTeamMemberModal\').classList.add(\'active\')"><svg data-lucide="plus" width="14" height="14"></svg> Add Team Member</button></div>';
+      return;
+    }
+    var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);"><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);">Team Members</h3><button class="btn btn-primary btn-sm" onclick="document.getElementById(\'addTeamMemberModal\').classList.add(\'active\')"><svg data-lucide="plus" width="14" height="14"></svg> Add Team Member</button></div>';
+    html += '<div class="data-table-wrapper"><table class="data-table mobile-cards"><thead><tr><th>Member</th><th>Role</th><th data-sensitive="financials">Bill Rate</th><th>Hours</th><th data-sensitive="financials">Revenue</th><th data-sensitive="financials">Cost Rate</th><th data-sensitive="financials">Cost</th><th data-sensitive="financials">Gross Margin</th></tr></thead><tbody>';
+    data.team.forEach(function(m) {
+      var bg = avatarColors[m.initials] ? ' style="background:' + avatarColors[m.initials] + ';"' : '';
+      var slug = m.name.toLowerCase().replace(/[^a-z]+/g, '-');
+      html += '<tr><td><div class="team-member-row"><div class="avatar avatar-sm"' + bg + '>' + m.initials + '</div><a href="employees.html#' + slug + '" data-hovercard data-name="' + m.name + '" data-role="' + m.role + '" data-dept="' + m.dept + '" data-worktime="' + m.worktime + '" style="font-weight:var(--weight-medium);color:var(--color-text-1);">' + m.name + '</a></div></td>';
+      html += '<td data-label="Role">' + m.role + '</td>';
+      html += '<td data-label="Bill Rate" class="font-mono" data-sensitive="financials">' + m.billRate + '</td>';
+      html += '<td data-label="Hours" class="font-mono">' + m.hours + '</td>';
+      html += '<td data-label="Revenue" class="font-mono" data-sensitive="financials">' + m.revenue + '</td>';
+      html += '<td data-label="Cost Rate" class="font-mono" data-sensitive="financials">' + m.costRate + '</td>';
+      html += '<td data-label="Cost" class="font-mono" data-sensitive="financials">' + m.cost + '</td>';
+      html += '<td data-label="Gross Margin" class="font-mono" data-sensitive="financials">' + m.margin + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    el.innerHTML = html;
+  }
+
+  function renderGenericTimesheets(data) {
+    var el = document.getElementById('generic-timesheets-tab');
+    if (!el) return;
+    if (!data.team || data.team.length === 0 || data.stats.hours === '0h') {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;"><svg data-lucide="clock" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No timesheets submitted yet</h3><p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;">Timesheets will appear here once team members start logging hours to this project.</p></div>';
+      return;
+    }
+    var html = '<h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Employee Timesheets</h3>';
+    html += '<div class="data-table-wrapper"><table class="data-table mobile-cards"><thead><tr><th>Employee</th><th>Role</th><th>Hours Logged</th><th data-sensitive="financials">Billable Amount</th></tr></thead><tbody>';
+    data.team.forEach(function(m) {
+      if (m.hours === '0h') return;
+      html += '<tr><td>' + m.name + '</td><td data-label="Role">' + m.role + '</td><td data-label="Hours" class="font-mono">' + m.hours + '</td><td data-label="Billable" class="font-mono" data-sensitive="financials">' + m.revenue + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    el.innerHTML = html;
+  }
+
+  function renderGenericExpenses(data) {
+    var el = document.getElementById('generic-expenses-tab');
+    if (!el) return;
+    el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;"><svg data-lucide="receipt" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No expenses recorded</h3><p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;">Expenses will appear here once team members submit claims against this project.</p></div>';
+  }
+
+  function renderGenericInvoices(data) {
+    var el = document.getElementById('generic-invoices-tab');
+    if (!el) return;
+    if (data.status === 'planning' || data.stats.revenue === '&euro;0') {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;"><svg data-lucide="file-text" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No invoices generated</h3><p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;">Invoices will be generated once billable work begins on this project.</p></div>';
+    } else {
+      el.innerHTML = '<h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Project Invoices</h3><p style="font-size:var(--text-body);color:var(--color-text-2);">Total revenue: <span class="font-mono" data-sensitive="financials">' + data.stats.revenue + '</span>. View all invoices on the <a href="invoices.html">Invoices page</a>.</p>';
+    }
+  }
+
+  function renderGenericMilestones(data) {
+    var el = document.getElementById('generic-milestones-tab');
+    if (!el) return;
+    if (!data.milestones || data.milestones.length === 0) {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;"><svg data-lucide="flag" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No milestones defined yet</h3><p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;margin-bottom:var(--space-6);">Break your project into phases and track progress with milestones.</p><button class="btn btn-primary btn-sm" onclick="showToast(\'success\',\'Milestone Created\',\'First milestone added.\')"><svg data-lucide="plus" width="14" height="14"></svg> Add Milestone</button></div>';
+      return;
+    }
+    var html = '<h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Milestone Tracker</h3><div class="card"><div class="card-body" style="padding:0;"><div class="milestone-list" style="padding:var(--space-4);">';
+    data.milestones.forEach(function(ms) {
+      var iconClass = ms.status === 'complete' ? 'complete' : ms.status === 'in-progress' ? 'in-progress' : 'upcoming';
+      var iconName = ms.status === 'complete' ? 'check' : ms.status === 'in-progress' ? 'loader' : 'circle';
+      var badgeClass = ms.status === 'complete' ? 'badge-success' : ms.status === 'in-progress' ? 'badge-info' : 'badge-default';
+      var badgeLabel = ms.status === 'complete' ? 'Complete' : ms.status === 'in-progress' ? 'In Progress' : 'Upcoming';
+      var badgeIcon = ms.status === 'complete' ? 'check-circle' : ms.status === 'in-progress' ? 'loader' : 'circle';
+      html += '<div class="milestone-item"><div class="milestone-icon ' + iconClass + '"><svg data-lucide="' + iconName + '" width="16" height="16"></svg></div><div class="milestone-content"><div class="milestone-name">' + ms.name + '</div><div class="milestone-dates">' + ms.dates + '</div><span class="badge ' + badgeClass + '"><svg data-lucide="' + badgeIcon + '" width="12" height="12"></svg> ' + badgeLabel + '</span>';
+      if (ms.pct !== undefined) {
+        html += '<div class="milestone-progress" style="margin-top:var(--space-2);"><div class="progress-bar" style="height:6px;"><div class="progress-bar-fill blue" style="width:' + ms.pct + '%;"></div></div><span style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">' + ms.pct + '%</span></div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div></div></div>';
+    el.innerHTML = html;
+  }
+
+  function renderGenericActivity(data) {
+    var el = document.getElementById('generic-activity-tab');
+    if (!el) return;
+    if (!data.activity || data.activity.length === 0) {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;"><svg data-lucide="activity" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg><h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No activity yet</h3><p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;">Activity will appear here as the team logs time and hits milestones.</p></div>';
+      return;
+    }
+    var html = '<h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Recent Activity</h3><div class="card"><div class="card-body" style="padding:0;"><div class="activity-feed" style="padding:var(--space-4);">';
+    data.activity.forEach(function(a) {
+      var bg = avatarColors[a.initials] ? ' style="background:' + avatarColors[a.initials] + ';"' : '';
+      html += '<div class="activity-item"><div class="avatar avatar-xs"' + bg + '>' + a.initials + '</div><div class="activity-text"><span class="name">' + a.name + '</span> ' + a.text + '</div><span class="activity-time">' + a.time + '</span></div>';
+    });
+    html += '</div></div></div>';
+    el.innerHTML = html;
+  }
 
   function applyProjectVariant(id) {
     var isAcme = (id === 'acme-web');
     var isInitech = (id === 'initech-api');
+    var isGeneric = !isAcme && !isInitech;
 
-    // Toggle variant sections
-    var acmeSections = ['acme-team-tab','acme-invoices-tab','acme-timesheets-tab','acme-overview-stats'];
-    var initechSections = ['initech-team-tab','initech-invoices-tab','initech-timesheets-tab','initech-overview-stats'];
+    // Toggle variant sections: acme, initech, generic
+    var acmeSections = ['acme-team-tab','acme-invoices-tab','acme-timesheets-tab','acme-overview-stats','acme-expenses-tab','acme-milestones-tab','acme-activity-tab','acme-ai-insight'];
+    var initechSections = ['initech-team-tab','initech-invoices-tab','initech-timesheets-tab','initech-overview-stats','initech-ai-insight'];
+    // Generic sections shown for all projects except acme-web (for expenses/milestones/activity, also for initech)
+    var genericSections = ['generic-team-tab','generic-invoices-tab','generic-timesheets-tab','generic-overview-stats','generic-ai-insight'];
+    // These generic sections show for initech too (since initech has no specific content for them)
+    var genericAlwaysSections = ['generic-expenses-tab','generic-milestones-tab','generic-activity-tab'];
 
     acmeSections.forEach(function(sId) {
       var el = document.getElementById(sId);
@@ -2458,6 +2821,21 @@
       var el = document.getElementById(sId);
       if (el) el.style.display = isInitech ? '' : 'none';
     });
+    genericSections.forEach(function(sId) {
+      var el = document.getElementById(sId);
+      if (el) el.style.display = isGeneric ? '' : 'none';
+    });
+    // These generic sections show for both initech and other non-acme projects
+    genericAlwaysSections.forEach(function(sId) {
+      var el = document.getElementById(sId);
+      if (el) el.style.display = (!isAcme) ? '' : 'none';
+    });
+
+    // Also hide milestones-empty-state and activity-empty-state for generic
+    var msEmpty = document.getElementById('milestones-empty-state');
+    var actEmpty = document.getElementById('activity-empty-state');
+    if (msEmpty) msEmpty.style.display = 'none';
+    if (actEmpty) actEmpty.style.display = 'none';
 
     // Update header
     var data = projectData[id] || projectData['acme-web'];
@@ -2466,8 +2844,35 @@
     document.getElementById('detail-badges').innerHTML = data.badges;
     document.getElementById('detail-budget-bar').style.width = data.budgetPct + '%';
     document.getElementById('detail-budget-text').innerHTML = data.budgetText;
+    document.getElementById('breadcrumb-project-name').textContent = data.title.replace(/&mdash;/g, '\u2014').replace(/&ndash;/g, '\u2013').replace(/&euro;/g, '\u20AC').replace(/&amp;/g, '&').replace(/<[^>]*>/g, '');
+
+    // Budget bar color
+    var bar = document.getElementById('detail-budget-bar');
+    bar.className = 'progress-bar-fill';
+    if (data.budgetPct >= 80) bar.classList.add('red');
+    else if (data.budgetPct >= 60) bar.classList.add('yellow');
+    else bar.classList.add('green');
+
+    // Render dynamic content for generic projects
+    if (isGeneric) {
+      renderGenericOverview(data);
+      renderGenericTeam(data);
+      renderGenericTimesheets(data);
+      renderGenericInvoices(data);
+
+      // AI Insight
+      var aiBody = document.getElementById('generic-ai-body');
+      if (aiBody && data.aiInsight) aiBody.innerHTML = data.aiInsight;
+    }
+    // Expenses, milestones, activity render for all non-acme projects
+    if (!isAcme) {
+      renderGenericExpenses(data);
+      renderGenericMilestones(data);
+      renderGenericActivity(data);
+    }
 
     lucide.createIcons();
+    if (window.GHR && GHR.initHoverCard) GHR.initHoverCard();
   }
 
   // ── Show detail view ──
@@ -2499,11 +2904,24 @@
   });
 
   // ── Kanban undo toast ──
-  window.showUndoToast = function(projectName, newStatus) {
-    showToast('info', 'Status Updated', projectName + ' &rarr; ' + newStatus + ' <button onclick="undoStatusChange()" style="margin-left:8px;text-decoration:underline;background:none;border:none;color:inherit;cursor:pointer;font-size:inherit;">Undo</button>');
+  // Track last status change for undo (INT MEDIUM fix)
+  var _lastStatusChange = null;
+  window.showUndoToast = function(projectName, newStatus, card, originalColumn) {
+    _lastStatusChange = { card: card, originalColumn: originalColumn };
+    showToast('info', 'Status Updated', projectName + ' \u2192 ' + newStatus + ' <button onclick="undoStatusChange()" style="margin-left:8px;text-decoration:underline;background:none;border:none;color:inherit;cursor:pointer;font-size:inherit;">Undo</button>');
   };
   window.undoStatusChange = function() {
-    showToast('info', 'Undone', 'Status change has been reverted.');
+    if (_lastStatusChange && _lastStatusChange.card && _lastStatusChange.originalColumn) {
+      var cardsContainer = _lastStatusChange.originalColumn.querySelector('.kanban-cards');
+      if (cardsContainer) {
+        cardsContainer.appendChild(_lastStatusChange.card);
+        if (window.lucide) lucide.createIcons({ nodes: [_lastStatusChange.card] });
+      }
+      _lastStatusChange = null;
+      showToast('success', 'Reverted', 'Project status has been restored to its previous column.');
+    } else {
+      showToast('info', 'Nothing to Undo', 'No recent status change to revert.');
+    }
   };
 
   // ── Tab switching ──
@@ -2590,6 +3008,113 @@
     }, 4000);
   };
 
+  // ── Project filter logic (EDGE CRITICAL fix) ──
+  window.filterProjects = function() {
+    var statusVal = document.getElementById('filterStatus').value.toLowerCase();
+    var clientVal = document.getElementById('filterClient').value;
+    var billingVal = document.getElementById('filterBilling').value.toLowerCase();
+
+    // Map billing filter values to text that appears in cards
+    var billingTextMap = {
+      'hourly': ['/h', 'hourly'],
+      'daily': ['daily', '/d'],
+      'fixed price': ['fixed'],
+      'retainer': ['retainer']
+    };
+    var billingAliases = billingVal ? (billingTextMap[billingVal] || [billingVal]) : [];
+
+    // Map status filter values to column data-project patterns or badge text
+    var statusColumnMap = {
+      'planning': 'planning',
+      'active': 'active',
+      'on-hold': 'on hold',
+      'completed': 'complet'
+    };
+
+    // Filter kanban cards
+    var cards = document.querySelectorAll('.project-card[data-project]');
+    var visibleCount = 0;
+    cards.forEach(function(card) {
+      var cardText = card.textContent.toLowerCase();
+      var clientText = (card.querySelector('.project-card-client') || {}).textContent || '';
+      var billingText = cardText;
+
+      // Status: check the column header text (parent .kanban-column > header)
+      var colHeader = card.closest('.kanban-column');
+      var colTitle = colHeader ? (colHeader.querySelector('.col-title') || {}).textContent || '' : '';
+      var colTitleLower = colTitle.toLowerCase();
+
+      var statusMatch = true;
+      if (statusVal) {
+        var expected = statusColumnMap[statusVal] || statusVal;
+        statusMatch = colTitleLower.indexOf(expected) !== -1 || cardText.indexOf(expected) !== -1;
+      }
+
+      var clientMatch = !clientVal || clientText.indexOf(clientVal) !== -1;
+
+      var billingMatch = !billingVal;
+      if (billingVal && billingAliases.length > 0) {
+        billingMatch = billingAliases.some(function(alias) { return billingText.indexOf(alias) !== -1; });
+      }
+
+      var show = statusMatch && clientMatch && billingMatch;
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+
+    // Filter list view rows
+    var rows = document.querySelectorAll('#listViewTable tbody tr');
+    rows.forEach(function(row) {
+      var rowText = row.textContent.toLowerCase();
+      var clientCell = row.querySelector('td:nth-child(2)');
+      var clientCellText = clientCell ? clientCell.textContent : '';
+      var billingCell = row.querySelector('td:nth-child(3)');
+      var billingCellText = billingCell ? billingCell.textContent.toLowerCase() : '';
+      var healthCell = row.querySelector('td:nth-child(6)');
+      var healthText = healthCell ? healthCell.textContent.toLowerCase() : '';
+
+      var statusMatch = true;
+      if (statusVal) {
+        var expected = statusColumnMap[statusVal] || statusVal;
+        statusMatch = rowText.indexOf(expected) !== -1 || healthText.indexOf(expected) !== -1;
+      }
+
+      var clientMatch = !clientVal || clientCellText.indexOf(clientVal) !== -1;
+
+      var billingMatch = !billingVal;
+      if (billingVal && billingAliases.length > 0) {
+        billingMatch = billingAliases.some(function(alias) { return billingCellText.indexOf(alias) !== -1; });
+      }
+
+      row.style.display = (statusMatch && clientMatch && billingMatch) ? '' : 'none';
+    });
+
+    // Show/hide empty state
+    var emptyState = document.getElementById('emptyState');
+    if (emptyState) emptyState.classList.toggle('active', visibleCount === 0 && (statusVal || clientVal || billingVal));
+
+    // Show filter feedback
+    if (statusVal || clientVal || billingVal) {
+      showToast('info', 'Filter Applied', visibleCount + ' project' + (visibleCount !== 1 ? 's' : '') + ' matching filters');
+    }
+  };
+
+  // ── New Project modal smart defaults (FEEL fix) ──
+  (function() {
+    var origNewProjectClick = document.getElementById('newProjectBtn');
+    if (origNewProjectClick) {
+      origNewProjectClick.addEventListener('click', function() {
+        var today = new Date();
+        var endDate = new Date(today);
+        endDate.setMonth(endDate.getMonth() + 3);
+        var startEl = document.getElementById('newProjectStart');
+        var endEl = document.getElementById('newProjectEnd');
+        if (startEl && !startEl.value) startEl.value = today.toISOString().split('T')[0];
+        if (endEl && !endEl.value) endEl.value = endDate.toISOString().split('T')[0];
+      });
+    }
+  })();
+
   // ── Export button ──
   document.getElementById('exportBtn').addEventListener('click', function() {
     showToast('success', 'Export Started', 'Project data is being exported to CSV...');
@@ -2638,7 +3163,7 @@
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

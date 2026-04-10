@@ -339,7 +339,7 @@
       text-align: center;
     }
     .tour-card svg { color: var(--color-accent); margin-bottom: var(--space-2); }
-    .tour-card h4 { font-size: var(--text-body); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-1); }
+    .tour-card h3 { font-size: var(--text-body); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-1); margin-top: 0; }
     .tour-card p { font-size: var(--text-caption); color: var(--color-text-2); }
 
     /* Subdomain preview */
@@ -432,7 +432,7 @@
             </button>
             <div style="text-align:center;margin-top:var(--space-2);">
               <a href="#" style="font-size:var(--text-body-sm);color:var(--color-text-2);" onclick="handleMagicLink(event)">
-                <svg data-lucide="sparkles" width="14" height="14" style="vertical-align:-2px;color:var(--color-accent);margin-right:4px;"></svg>
+                <svg data-lucide="sparkles" width="14" height="14" style="vertical-align:-2px;color:var(--color-accent);margin-right:var(--space-1);"></svg>
                 Send me a magic link instead
               </a>
             </div>
@@ -604,7 +604,7 @@
               <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-4);">Open your authenticator app and scan this QR code.</p>
               <!-- Stylized QR code SVG -->
               <div style="width:180px; height:180px; background: var(--color-white); border-radius: var(--radius-md); margin: 0 auto; padding: var(--space-3); display:flex; align-items:center; justify-content:center;">
-                <svg width="156" height="156" viewBox="0 0 156 156" style="color: #1a1a1a;">
+                <svg width="156" height="156" viewBox="0 0 156 156" style="color: var(--color-text-1);">
                   <!-- Top-left finder pattern -->
                   <rect x="0" y="0" width="42" height="42" fill="currentColor" rx="4"/>
                   <rect x="6" y="6" width="30" height="30" fill="white" rx="2"/>
@@ -750,7 +750,7 @@
             <div class="success-check">
               <svg data-lucide="check" width="36" height="36" style="color: var(--color-white);"></svg>
             </div>
-            <h3 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-2);">2FA Enabled!</h3>
+            <h2 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-2);">2FA Enabled!</h2>
             <p style="color: var(--color-text-2); font-size: var(--text-body-sm);">Your account is now protected. Redirecting to dashboard...</p>
           </div>
         </div>
@@ -863,7 +863,7 @@
               <div class="form-group">
                 <label class="form-label">Password</label>
                 <div class="password-wrapper">
-                  <input type="password" class="form-input" id="companyAdminPass" placeholder="Create a strong password" oninput="updateStrength(this.value, 'companyStrength', 'companyStrengthText')">
+                  <input type="password" class="form-input" id="companyAdminPass" placeholder="Create a strong password" oninput="updateStrength(this.value, 'companyStrength', 'companyStrengthText'); updatePasswordReqs2(this.value);">
                   <button type="button" class="toggle-pass" onclick="togglePassword('companyAdminPass', this)">
                     <svg data-lucide="eye" width="18" height="18"></svg>
                   </button>
@@ -875,6 +875,12 @@
                   <div class="strength-bar" id="csb4"></div>
                 </div>
                 <div class="strength-text" id="companyStrengthText" style="color: var(--color-text-3);"></div>
+                <div id="passwordReqs2" style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);display:flex;flex-direction:column;gap:2px;">
+                  <span id="req2-length" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>At least 8 characters</span>
+                  <span id="req2-upper" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>One uppercase letter</span>
+                  <span id="req2-number" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>One number</span>
+                  <span id="req2-special" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>One special character</span>
+                </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Phone <span style="font-size: var(--text-caption); color: var(--color-text-3);">(optional)</span></label>
@@ -907,6 +913,57 @@
               <div class="form-group">
                 <label class="form-label">Invite by email <span style="font-size: var(--text-caption); color: var(--color-text-3);">(one per line)</span></label>
                 <textarea class="form-input" rows="4" placeholder="alice@company.com&#10;bob@company.com&#10;carol@company.com" style="height:auto; padding: var(--space-3) var(--space-4); resize:vertical;"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Working Days</label>
+                <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> Mon
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> Tue
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> Wed
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> Thu
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> Fri
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-3);cursor:pointer;">
+                    <input type="checkbox"> Sat
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-3);cursor:pointer;">
+                    <input type="checkbox"> Sun
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Leave Types</label>
+                <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+                  <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked disabled> Annual Leave
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked disabled> Sick Leave
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> Personal Leave
+                  </label>
+                  <label style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-body-sm);color:var(--color-text-2);cursor:pointer;">
+                    <input type="checkbox" checked> WFH (Work From Home)
+                  </label>
+                </div>
+                <p style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">You can add more leave types later in Settings.</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Language</label>
+                <select class="form-input form-select">
+                  <option value="en" selected>English</option>
+                  <option value="fr">Fran&ccedil;ais</option>
+                </select>
               </div>
             </div>
             <div class="wizard-nav">
@@ -1034,7 +1091,7 @@
               <div class="form-group">
                 <label class="form-label">New Password</label>
                 <div class="password-wrapper">
-                  <input type="password" class="form-input" id="onboardPass" placeholder="Create a strong password" oninput="updateStrength(this.value, 'onboardStrength', 'onboardStrengthText')">
+                  <input type="password" class="form-input" id="onboardPass" placeholder="Create a strong password" oninput="updateStrength(this.value, 'onboardStrength', 'onboardStrengthText'); updatePasswordReqs(this.value);">
                   <button type="button" class="toggle-pass" onclick="togglePassword('onboardPass', this)">
                     <svg data-lucide="eye" width="18" height="18"></svg>
                   </button>
@@ -1046,6 +1103,12 @@
                   <div class="strength-bar" id="ob4"></div>
                 </div>
                 <div class="strength-text" id="onboardStrengthText" style="color: var(--color-text-3);"></div>
+                <div id="passwordReqs" style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);display:flex;flex-direction:column;gap:2px;">
+                  <span id="req-length" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>At least 8 characters</span>
+                  <span id="req-upper" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>One uppercase letter</span>
+                  <span id="req-number" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>One number</span>
+                  <span id="req-special" data-check="false"><svg data-lucide="circle" width="12" height="12" style="vertical-align:-2px;margin-right:var(--space-1);"></svg>One special character</span>
+                </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Confirm Password</label>
@@ -1127,22 +1190,22 @@
             <div class="tour-grid">
               <div class="tour-card">
                 <svg data-lucide="clock" width="28" height="28"></svg>
-                <h4>Timesheets</h4>
+                <h3>Timesheets</h3>
                 <p>Log and submit your work hours weekly</p>
               </div>
               <div class="tour-card">
                 <svg data-lucide="calendar-off" width="28" height="28"></svg>
-                <h4>Leave Requests</h4>
+                <h3>Leave Requests</h3>
                 <p>Request time off and track your balance</p>
               </div>
               <div class="tour-card">
                 <svg data-lucide="receipt" width="28" height="28"></svg>
-                <h4>Expenses</h4>
+                <h3>Expenses</h3>
                 <p>Submit and track expense reimbursements</p>
               </div>
               <div class="tour-card">
                 <svg data-lucide="users" width="28" height="28"></svg>
-                <h4>Your Team</h4>
+                <h3>Your Team</h3>
                 <p>View colleagues, org chart, and contacts</p>
               </div>
             </div>
@@ -1595,6 +1658,42 @@
           }
         }
       } catch(e) { /* Intl not supported */ }
+    });
+
+    // ── Password requirements checklist (Issue 13) ──
+    function updateReqItem(id, passed) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var icon = passed ? 'check-circle' : 'circle';
+      var color = passed ? 'var(--color-success)' : 'var(--color-text-3)';
+      el.style.color = color;
+      var svg = el.querySelector('svg');
+      if (svg) { svg.setAttribute('data-lucide', icon); }
+      lucide.createIcons({ nodes: [el] });
+    }
+    function updatePasswordReqs(val) {
+      updateReqItem('req-length', val.length >= 8);
+      updateReqItem('req-upper', /[A-Z]/.test(val));
+      updateReqItem('req-number', /[0-9]/.test(val));
+      updateReqItem('req-special', /[^A-Za-z0-9]/.test(val));
+    }
+    function updatePasswordReqs2(val) {
+      updateReqItem('req2-length', val.length >= 8);
+      updateReqItem('req2-upper', /[A-Z]/.test(val));
+      updateReqItem('req2-number', /[0-9]/.test(val));
+      updateReqItem('req2-special', /[^A-Za-z0-9]/.test(val));
+    }
+  </script>
+  <script src="_shared.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.GHR) {
+        GHR.initHoverCard();
+        GHR.initPresence();
+        GHR.initRoleSwitcher();
+        GHR.initKeyboardShortcuts();
+        GHR.initSkeletons();
+      }
     });
   </script>
 </body>

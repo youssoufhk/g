@@ -511,7 +511,7 @@
     }
     .empty-state svg { color: var(--color-text-3); margin-bottom: var(--space-4); }
     .empty-state h3 {
-      font-size: var(--text-heading-2);
+      font-size: var(--text-heading-3);
       font-weight: var(--weight-semibold);
       color: var(--color-text-1);
       margin-bottom: var(--space-2);
@@ -617,6 +617,81 @@
   #tsAutoSave { opacity: 0; transition: opacity 0.5s; }
   #tsAutoSave.visible { opacity: 1; }
 
+  /* ── Submitted completion card ── */
+  .ts-completion-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-6);
+    background: var(--color-surface-0);
+    border: 1px solid var(--color-success);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+  }
+  .ts-completion-card .completion-check {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: var(--color-success-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-3);
+    animation: completionPop 0.4s var(--ease-out);
+  }
+  .ts-completion-card .completion-check svg { color: var(--color-success); }
+  .ts-completion-card .completion-title {
+    font-size: var(--text-heading-2);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-1);
+    margin-bottom: var(--space-1);
+  }
+  .ts-completion-card .completion-subtitle {
+    font-size: var(--text-body-sm);
+    color: var(--color-text-2);
+    margin-bottom: var(--space-3);
+  }
+  .ts-completion-card .completion-stats {
+    display: flex;
+    gap: var(--space-6);
+    font-size: var(--text-body-sm);
+    color: var(--color-text-2);
+  }
+  .ts-completion-card .completion-stats strong {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-1);
+  }
+  @keyframes completionPop {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── Cell hover tooltip ── */
+  .ts-cell[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface-3);
+    color: var(--color-text-1);
+    font-family: var(--font-sans);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-regular);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    z-index: 100;
+    box-shadow: var(--shadow-2);
+    pointer-events: none;
+  }
+
+  /* ── Status bar flex-wrap for tablet ── */
+  .ts-status-bar { flex-wrap: wrap; }
+
   /* ── Approval queue filter bar ── */
   .aq-filter-bar {
     display: flex;
@@ -652,6 +727,11 @@
       pointer-events: none;
       position: relative;
     }
+
+    /* ── Saved Views dropdown ── */
+    .saved-views-menu.active { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; }
+    .saved-view-item { padding: var(--space-2) var(--space-3); font-size: var(--text-body-sm); color: var(--color-text-1); cursor: pointer; }
+    .saved-view-item:hover { background: var(--color-surface-2); }
   </style>
 </head>
 <body class="show-populated">
@@ -687,42 +767,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Timesheet reminder: 7 team members have not submitted this week</div>
-                  <div class="notif-time">2 minutes ago</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Bob Taylor submitted only 8h this week - needs review</div>
-                  <div class="notif-time">18 minutes ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Carol Williams's timesheet approved for Mar 23-29</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="file-text" width="16" height="16" style="color: var(--color-info);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Invoice INV-2026-0041 generated for Contoso Ltd</div>
-                  <div class="notif-time">3 hours ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -762,7 +807,100 @@
           <h1 class="page-title">Timesheet Management</h1>
           <p class="page-subtitle">Track hours, review submissions, and manage team timesheets</p>
         </div>
+        <div class="page-header-actions">
+          <div style="position:relative;display:inline-block;">
+            <button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.classList.toggle('active')" style="gap:var(--space-1-5);">
+              <svg data-lucide="bookmark" width="14" height="14"></svg>
+              Saved Views
+              <svg data-lucide="chevron-down" width="12" height="12"></svg>
+            </button>
+            <div class="saved-views-menu" style="position:absolute;top:calc(100% + 4px);right:0;min-width:180px;background:var(--color-surface-3);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-3);z-index:500;padding:var(--space-1) 0;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all var(--motion-fast) var(--ease-out);">
+              <div class="saved-view-item" onclick="showToast('info','View','This Week view applied');this.closest('.saved-views-menu').classList.remove('active');">This Week</div>
+              <div class="saved-view-item" onclick="showToast('info','View','Pending Approval view applied');this.closest('.saved-views-menu').classList.remove('active');">Pending Approval</div>
+              <div class="saved-view-item" onclick="showToast('info','View','Billable Only view applied');this.closest('.saved-views-menu').classList.remove('active');">Billable Only</div>
+              <div class="saved-view-item" onclick="showToast('info','View','Overtime This Month view applied');this.closest('.saved-views-menu').classList.remove('active');">Overtime This Month</div>
+              <div class="saved-view-item" onclick="showToast('info','View','My Team view applied');this.closest('.saved-views-menu').classList.remove('active');" data-min-role="pm">My Team</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-md" onclick="exportTimesheets()">
+            <svg data-lucide="download" width="16" height="16"></svg>
+            Export
+          </button>
+        </div>
       </div>
+
+      <!-- Stat Cards -->
+      <div class="ts-stats-grid perspective-container stagger-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-4);">
+        <!-- Hours This Week -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);position:relative;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div>
+              <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Hours This Week</div>
+              <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">34h <span style="font-size:var(--text-body-sm);font-weight:var(--weight-regular);color:var(--color-text-3);">/ 40h</span></div>
+            </div>
+            <svg width="44" height="44" viewBox="0 0 44 44" style="flex-shrink:0;" data-animate="scale-in">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="var(--color-surface-2)" stroke-width="4"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="var(--color-warning)" stroke-width="4" stroke-dasharray="96.3 16.8" stroke-dashoffset="0" transform="rotate(-90 22 22)" stroke-linecap="round"/>
+              <text x="22" y="24" text-anchor="middle" font-size="10" font-weight="600" fill="var(--color-text-1)" font-family="var(--font-mono)">85%</text>
+            </svg>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:var(--space-2);margin-top:var(--space-2);">
+            <svg width="80" height="24" viewBox="0 0 80 24" data-animate="draw-line" style="flex-shrink:0;">
+              <polyline points="0,20 12,18 24,16 36,14 48,10 60,12 72,8 80,6" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="0,20 12,18 24,16 36,14 48,10 60,12 72,8 80,6 80,24 0,24" fill="url(#tsSparkHours)" stroke="none"/>
+              <defs><linearGradient id="tsSparkHours" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-warning)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-warning)" stop-opacity="0"/></linearGradient></defs>
+            </svg>
+          </div>
+          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:var(--space-1);">
+            <svg data-lucide="alert-triangle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+            6h remaining (Fri is holiday)
+          </div>
+        </div>
+        <!-- Billable Rate -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Billable Rate</div>
+          <div style="display:flex;align-items:flex-end;gap:var(--space-3);">
+            <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">87%</div>
+            <svg width="80" height="28" viewBox="0 0 80 28" style="margin-bottom:2px;" data-animate="draw-line">
+              <polyline points="0,22 12,18 24,20 36,14 48,16 60,10 72,6 80,8" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="0,22 12,18 24,20 36,14 48,16 60,10 72,6 80,8" fill="url(#sparkFill1)" stroke="none"/>
+              <defs><linearGradient id="sparkFill1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/></linearGradient></defs>
+            </svg>
+          </div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
+            <svg data-lucide="trending-up" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+            +3% vs last week
+          </div>
+        </div>
+        <!-- Pending Approval -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Pending Approval</div>
+          <div style="display:flex;align-items:flex-end;gap:var(--space-3);">
+            <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">2</div>
+            <span class="badge badge-warning" style="margin-bottom:4px;"><svg data-lucide="clock" width="12" height="12"></svg> awaiting</span>
+          </div>
+          <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;margin-top:var(--space-2);">
+            <div style="height:100%;width:87.5%;background:var(--color-success);border-radius:var(--radius-full);transition:width 0.4s;"></div>
+          </div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-2);">
+            <svg data-lucide="user" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+            7/8 team submitted
+          </div>
+        </div>
+        <!-- Overtime -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Overtime</div>
+          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">0h</div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
+            <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+            No overtime this week
+          </div>
+        </div>
+      </div>
+      <style>
+        @media (max-width: 1023px) { .ts-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 639px) { .ts-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+      </style>
 
       <!-- Tabs -->
       <div class="tabs mb-4">
@@ -832,6 +970,10 @@
                 <svg data-lucide="file-text" width="16" height="16"></svg>
                 Start from Template
               </div>
+              <div class="copy-dropdown-item" data-copy="save-template">
+                <svg data-lucide="bookmark" width="16" height="16"></svg>
+                Save Week as Template
+              </div>
             </div>
           </div>
           <button class="btn btn-secondary btn-sm" style="margin-left: var(--space-2);" onclick="exportTimesheets()">
@@ -846,6 +988,20 @@
           <span>Submitted for Review -- Awaiting manager approval</span>
         </div>
 
+        <!-- Completion Card (shown after submit, hidden by default) -->
+        <div class="ts-completion-card" id="tsCompletionCard" style="display:none;">
+          <div class="completion-check">
+            <svg data-lucide="check" width="28" height="28"></svg>
+          </div>
+          <div class="completion-title">All done for the week!</div>
+          <div class="completion-subtitle">Your timesheet has been submitted. Awaiting John Smith's review.</div>
+          <div class="completion-stats">
+            <div>Total: <strong id="completionHours">32h</strong></div>
+            <div>Billable: <strong id="completionBillable">100%</strong></div>
+            <div>Projects: <strong id="completionProjects">2</strong></div>
+          </div>
+        </div>
+
         <!-- Rejection reason callout (shown if timesheet was rejected) -->
         <div id="tsRejectionCallout" style="display:none;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
           <svg data-lucide="alert-circle" width="18" height="18" style="color:var(--color-error);flex-shrink:0;margin-top:1px;"></svg>
@@ -858,7 +1014,7 @@
         <!-- Pre-populated notice -->
         <div id="tsPrefilledNotice" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-primary);">
           <svg data-lucide="sparkles" width="14" height="14" style="flex-shrink:0;"></svg>
-          <span>Pre-filled from your active assignments. Add more rows if needed.</span>
+          <span>Pre-filled from your active assignments and last week's pattern. Hours distributed based on your typical split. Review and adjust as needed.</span>
         </div>
 
         <!-- Auto-save indicator -->
@@ -898,10 +1054,10 @@
               <!-- Row 1: Acme Web Redesign (pre-populated) -->
               <tr class="ts-data-row" data-project="acme">
                 <td><a href="projects.html#acme-web-redesign" class="ts-project-link">Acme Web Redesign</a></td>
-                <td class="ts-cell" data-day="0"><span class="ts-cell-value">6</span></td>
-                <td class="ts-cell" data-day="1"><span class="ts-cell-value">7</span></td>
-                <td class="ts-cell" data-day="2"><span class="ts-cell-value">8</span></td>
-                <td class="ts-cell" data-day="3"><span class="ts-cell-value">6</span></td>
+                <td class="ts-cell" data-day="0" data-tooltip="Acme Web Redesign -- 6 hours"><span class="ts-cell-value">6</span></td>
+                <td class="ts-cell" data-day="1" data-tooltip="Acme Web Redesign -- 7 hours"><span class="ts-cell-value">7</span></td>
+                <td class="ts-cell" data-day="2" data-tooltip="Acme Web Redesign -- 8 hours"><span class="ts-cell-value">8</span></td>
+                <td class="ts-cell" data-day="3" data-tooltip="Acme Web Redesign -- 6 hours"><span class="ts-cell-value">6</span></td>
                 <td class="ts-cell ts-holiday-cell" data-day="4" title="Public Holiday: Good Friday" style="background:var(--color-surface-2);cursor:not-allowed;"><span class="ts-cell-value" style="color:var(--color-text-3);font-size:var(--text-caption);font-family:var(--font-sans);">Holiday</span></td>
                 <td class="ts-cell weekend" data-day="5"><span class="ts-cell-value">&#8212;</span></td>
                 <td class="ts-cell weekend" data-day="6"><span class="ts-cell-value">&#8212;</span></td>
@@ -910,10 +1066,10 @@
               <!-- Row 2: Internal — GammaHR Dev (pre-populated) -->
               <tr class="ts-data-row" data-project="internal-gamahr">
                 <td><a href="projects.html#internal-gammaHR-dev" class="ts-project-link">Internal — GammaHR Dev</a></td>
-                <td class="ts-cell" data-day="0"><span class="ts-cell-value">2</span></td>
-                <td class="ts-cell" data-day="1"><span class="ts-cell-value">1</span></td>
-                <td class="ts-cell" data-day="2"><span class="ts-cell-value">&#8212;</span></td>
-                <td class="ts-cell" data-day="3"><span class="ts-cell-value">2</span></td>
+                <td class="ts-cell" data-day="0" data-tooltip="Internal -- 2 hours"><span class="ts-cell-value">2</span></td>
+                <td class="ts-cell" data-day="1" data-tooltip="Internal -- 1 hour"><span class="ts-cell-value">1</span></td>
+                <td class="ts-cell" data-day="2" data-tooltip="Internal -- 0 hours"><span class="ts-cell-value">&#8212;</span></td>
+                <td class="ts-cell" data-day="3" data-tooltip="Internal -- 2 hours"><span class="ts-cell-value">2</span></td>
                 <td class="ts-cell ts-holiday-cell" data-day="4" title="Public Holiday: Good Friday" style="background:var(--color-surface-2);cursor:not-allowed;"><span class="ts-cell-value" style="color:var(--color-text-3);font-size:var(--text-caption);font-family:var(--font-sans);">Holiday</span></td>
                 <td class="ts-cell weekend" data-day="5"><span class="ts-cell-value">&#8212;</span></td>
                 <td class="ts-cell weekend" data-day="6"><span class="ts-cell-value">&#8212;</span></td>
@@ -973,7 +1129,7 @@
         <!-- Quick-entry tip -->
         <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-text-3);">
           <svg data-lucide="info" width="14" height="14" style="flex-shrink:0;color:var(--color-primary);"></svg>
-          <span>Tip: Type <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:3px;padding:0 4px;font-family:var(--font-mono);">8</kbd> to fill a full day, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:3px;padding:0 4px;font-family:var(--font-mono);">4/4</kbd> to split between projects, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:3px;padding:0 4px;font-family:var(--font-mono);">0</kbd> to clear.</span>
+          <span>Tip: Type <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 4px;font-family:var(--font-mono);">8</kbd> to fill a full day, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 4px;font-family:var(--font-mono);">4/4</kbd> to split between projects, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 4px;font-family:var(--font-mono);">0</kbd> to clear.</span>
         </div>
 
         <!-- Mobile Timesheet (visible <640px) -->
@@ -1082,10 +1238,23 @@
             <div style="font-size:var(--text-body-sm);color:var(--color-text-3);">33h remaining to meet target</div>
           </div>
           <div style="display:flex;gap:var(--space-3);margin-top:var(--space-3);flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:3px;background:var(--color-success);"></div> &gt;6h — Full day</div>
-            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:3px;background:var(--color-warning);"></div> 3–6h — Partial</div>
-            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:3px;background:var(--color-error);"></div> &lt;3h — Low</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-success);"></div> &gt;6h — Full day</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-warning);"></div> 3–6h — Partial</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-error);"></div> &lt;3h — Low</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Month View Empty State (for new employees) -->
+      <div class="tab-content empty-content" id="tab-month-empty" style="display:none;">
+        <div class="empty-state" style="display:flex;">
+          <svg data-lucide="calendar" width="48" height="48"></svg>
+          <h3>No timesheet data for this month yet</h3>
+          <p>Start logging time in the Week View tab. As you submit timesheets, the monthly heatmap will build up to show your work patterns.</p>
+          <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=week]').click()">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            Go to Week View
+          </button>
         </div>
       </div>
 
@@ -1186,15 +1355,21 @@
             <svg data-lucide="x" width="14" height="14"></svg>
             Clear Filters
           </button>
+          <div style="margin-left:auto;">
+            <button class="btn btn-primary btn-sm" id="approveAllBtn" onclick="openApproveAllModal()">
+              <svg data-lucide="check-check" width="14" height="14"></svg>
+              Approve All
+            </button>
+          </div>
         </div>
 
-        <!-- Approval Queue Empty State (shown when filters return 0 results) -->
+        <!-- Approval Queue Empty State (shown when filters return 0 or all approved) -->
         <div id="aqEmptyState" style="display:none;">
           <div class="empty-state" style="display:flex;">
             <svg data-lucide="clipboard-check" width="48" height="48"></svg>
-            <h3>No timesheets match your filters</h3>
-            <p>Try adjusting your filters to see more results.</p>
-            <button class="btn btn-secondary btn-sm" onclick="clearApprovalFilters()">
+            <h3 id="aqEmptyTitle">No timesheets match your filters</h3>
+            <p id="aqEmptyMessage">Try adjusting your filters to see more results.</p>
+            <button class="btn btn-secondary btn-sm" id="aqEmptyClearBtn" onclick="clearApprovalFilters()">
               <svg data-lucide="x" width="16" height="16"></svg>
               Clear Filters
             </button>
@@ -1236,7 +1411,7 @@
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-warning), var(--color-accent));">BT</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
+            <div class="aq-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
             <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#internal">Internal</a> (8h)</div>
             <div style="margin-top: var(--space-1);"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Only 8h logged</span></div>
@@ -1263,10 +1438,10 @@
         <!-- Approval 3: Carol Williams -->
         <div class="approval-card" id="aq-3">
           <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-primary));">CK</div>
+            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-primary));">CW</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#carol-williams">Carol Williams</a></div>
+            <div class="aq-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></div>
             <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#initech-api">Initech API</a> (36h), <a href="projects.html#internal">Internal</a> (4h)</div>
           </div>
@@ -1295,7 +1470,7 @@
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-accent), var(--color-error));">MR</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#marco-rossi">Marco Rossi</a></div>
+            <div class="aq-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a></div>
             <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#acme-web-redesign">Acme Web</a> (40h), <a href="projects.html#internal">Internal</a> (4h)</div>
             <div style="margin-top: var(--space-1);"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Overtime</span></div>
@@ -1325,7 +1500,7 @@
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-success));">EL</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#emma-laurent">Emma Laurent</a></div>
+            <div class="aq-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent">Emma Laurent</a></div>
             <div class="aq-period">Mar 30 &ndash; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#internal">Internal</a> (16h), <a href="projects.html#hr-project">HR Operations</a> (24h)</div>
           </div>
@@ -1354,7 +1529,7 @@
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-accent), var(--color-info));">AW</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#alice-wang">Alice Wang</a></div>
+            <div class="aq-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></div>
             <div class="aq-period">Mar 30 &ndash; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#acme-web-redesign">Acme Web</a> (38h), <a href="projects.html#internal">Internal</a> (2h)</div>
           </div>
@@ -1383,7 +1558,7 @@
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-error), var(--color-accent));">DP</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#david-park">David Park</a></div>
+            <div class="aq-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a></div>
             <div class="aq-period">Mar 23 &#8211; 29, 2026</div>
             <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex</a> (30h), <a href="projects.html#internal">Internal</a> (5h)</div>
             <div style="margin-top: var(--space-1);"><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> OVERDUE: 3 days</span></div>
@@ -1467,7 +1642,7 @@
           <div class="item-subtitle">Command center overview</div>
         </div>
       </div>
-      <div class="cmd-palette-item">
+      <div class="cmd-palette-item" data-min-role="pm">
         <div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div>
         <div class="item-text">
           <div class="item-title">Invoices</div>
@@ -1504,6 +1679,36 @@
       <button class="btn btn-destructive btn-sm" id="rejectConfirmBtn">
         <svg data-lucide="x" width="14" height="14"></svg>
         Reject Timesheet
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ APPROVE ALL MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="approveAllModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">Approve All Timesheets</h3>
+      <button class="modal-close" onclick="closeApproveAllModal()">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align:center;padding:var(--space-4) 0;">
+        <svg data-lucide="check-circle" width="48" height="48" style="color:var(--color-success);margin-bottom:var(--space-3);"></svg>
+        <h3 style="font-size:var(--text-heading-3);color:var(--color-text-1);margin-bottom:var(--space-2);">Batch Approve <span id="approveAllCount">7</span> Timesheets?</h3>
+        <p style="color:var(--color-text-2);font-size:var(--text-body-sm);">This will approve all pending timesheets in the queue. Each employee will be notified.</p>
+      </div>
+      <div style="background:var(--color-surface-1);border-radius:var(--radius-md);padding:var(--space-3);margin-top:var(--space-2);">
+        <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.5px;font-weight:var(--weight-medium);">Includes:</div>
+        <div id="approveAllList" style="display:flex;flex-direction:column;gap:var(--space-1);font-size:var(--text-body-sm);color:var(--color-text-2);"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeApproveAllModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="approveAllConfirmBtn" onclick="confirmApproveAll()">
+        <svg data-lucide="check-check" width="14" height="14"></svg>
+        Approve All
       </button>
     </div>
   </div>
@@ -1723,6 +1928,8 @@
         });
         recalculate();
         showToast('info', 'Template Applied', 'Standard 8h/day template has been applied. Review before submitting.');
+      } else if (action === 'save-template') {
+        showToast('success', 'Template Saved', 'This week\'s pattern has been saved as "My Template". Apply it to future weeks via Copy → Start from Template.');
       }
     });
   });
@@ -1823,22 +2030,35 @@
     });
   }
 
-  // ── Auto-save indicator (debounced) ──
+  // ── Auto-save: every 30 seconds + on edit (debounced) ──
   var autoSaveTimer = null;
+  var autoSaveIntervalId = null;
   var autoSaveEl = document.getElementById('tsAutoSave');
+
+  function showAutoSaveIndicator() {
+    if (autoSaveEl && !isSubmitted) {
+      autoSaveEl.style.display = 'block';
+      autoSaveEl.classList.add('visible');
+      setTimeout(function() {
+        autoSaveEl.classList.remove('visible');
+        setTimeout(function() { autoSaveEl.style.display = 'none'; }, 500);
+      }, 2000);
+    }
+  }
+
   function triggerAutoSave() {
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(function() {
-      if (autoSaveEl) {
-        autoSaveEl.style.display = 'block';
-        autoSaveEl.classList.add('visible');
-        setTimeout(function() {
-          autoSaveEl.classList.remove('visible');
-          setTimeout(function() { autoSaveEl.style.display = 'none'; }, 500);
-        }, 2000);
-      }
+      showAutoSaveIndicator();
     }, 2000);
   }
+
+  // 30-second periodic auto-save (spec: auto-save every 30 seconds as draft)
+  autoSaveIntervalId = setInterval(function() {
+    if (!isSubmitted) {
+      showAutoSaveIndicator();
+    }
+  }, 30000);
 
   // ── Approval Queue Filters ──
   window.filterApprovalQueue = function() {
@@ -1847,9 +2067,23 @@
     var cards = document.querySelectorAll('.approval-card');
     var visibleCount = 0;
     cards.forEach(function(card) {
-      // For demo: always show all (real impl would check data attrs)
-      card.style.display = '';
-      visibleCount++;
+      var show = true;
+      var cardText = card.textContent.toLowerCase();
+      // Status filter
+      if (statusFilter === 'overdue' && cardText.indexOf('overdue') < 0) show = false;
+      if (statusFilter === 'overtime' && cardText.indexOf('overtime') < 0) show = false;
+      if (statusFilter === 'pending' && (cardText.indexOf('overdue') >= 0 || cardText.indexOf('overtime') >= 0)) show = false;
+      // Department filter
+      if (deptFilter) {
+        var deptMap = {
+          'aq-1': 'Engineering', 'aq-2': 'Engineering', 'aq-3': 'Design',
+          'aq-4': 'Operations', 'aq-5b': 'HR', 'aq-6': 'Engineering', 'aq-5': 'Finance'
+        };
+        var cardDept = deptMap[card.id] || '';
+        if (cardDept !== deptFilter) show = false;
+      }
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
     });
     var emptyState = document.getElementById('aqEmptyState');
     if (emptyState) emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
@@ -1864,10 +2098,21 @@
     if (emptyState) emptyState.style.display = 'none';
   };
 
-  // Click to edit cells
+  // Click to edit cells (including weekend warning)
   document.getElementById('tsBody').addEventListener('click', function(e) {
     var cell = e.target.closest('.ts-cell');
-    if (!cell || cell.classList.contains('weekend')) return;
+    if (!cell) return;
+    if (cell.classList.contains('ts-holiday-cell')) return;
+    // Weekend warning
+    if (cell.classList.contains('weekend')) {
+      if (!cell.dataset.weekendConfirmed) {
+        showToast('warning', 'Weekend Entry', 'You are entering hours on a weekend. Are you sure this is correct?');
+        cell.dataset.weekendConfirmed = 'true';
+        cell.style.cursor = 'pointer';
+        // Allow editing after warning
+      }
+      // Allow editing to proceed after warning
+    }
     if (cell.querySelector('.ts-cell-input')) return;
 
     var val = getCellValue(cell);
@@ -1933,7 +2178,7 @@
   // ════════════════════════════════════════
   var projectOptions = [
     'Globex Phase 2',
-    'Contoso Ltd',
+    'Umbrella Corp',
     'Internal',
     'Training',
     'Overhead',
@@ -2023,6 +2268,17 @@
       isSubmitted = true;
       // Show submitted banner
       document.getElementById('tsSubmittedBanner').style.display = 'flex';
+      // Show completion card with stats
+      var completionCard = document.getElementById('tsCompletionCard');
+      if (completionCard) {
+        var gt = parseInt(document.getElementById('grandTotal').textContent) || 0;
+        var projCount = document.querySelectorAll('.ts-data-row').length;
+        document.getElementById('completionHours').textContent = gt + 'h';
+        document.getElementById('completionBillable').textContent = gt > 0 ? '100%' : '0%';
+        document.getElementById('completionProjects').textContent = projCount;
+        completionCard.style.display = 'flex';
+        lucide.createIcons({ nodes: [completionCard] });
+      }
       // Disable all cell inputs
       document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = 'none'; });
       document.getElementById('tsGridWrapper').classList.add('submitted-state');
@@ -2051,6 +2307,8 @@
       btn.classList.remove('btn-loading');
       isSubmitted = false;
       document.getElementById('tsSubmittedBanner').style.display = 'none';
+      var completionCard = document.getElementById('tsCompletionCard');
+      if (completionCard) completionCard.style.display = 'none';
       document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = ''; });
       document.getElementById('tsGridWrapper').classList.remove('submitted-state');
       btn.innerHTML = '<svg data-lucide="send" width="16" height="16"></svg> Submit for Review';
@@ -2131,10 +2389,73 @@
   });
 
   function updateApprovalCount() {
-    var remaining = document.querySelectorAll('.approval-card').length;
+    var remaining = document.querySelectorAll('.approval-card:not(.fading)').length;
     var countEl = document.querySelector('.tab[data-tab="approval"] .tab-count');
     if (countEl) countEl.textContent = remaining;
+    // Update Approve All button visibility
+    var approveAllBtn = document.getElementById('approveAllBtn');
+    if (approveAllBtn) approveAllBtn.style.display = remaining > 0 ? '' : 'none';
+    // Show "All approved" state when queue is fully cleared
+    if (remaining === 0) {
+      var emptyState = document.getElementById('aqEmptyState');
+      if (emptyState) {
+        emptyState.style.display = 'block';
+        var titleEl = document.getElementById('aqEmptyTitle');
+        var msgEl = document.getElementById('aqEmptyMessage');
+        var clearBtn = document.getElementById('aqEmptyClearBtn');
+        if (titleEl) titleEl.textContent = 'All timesheets approved!';
+        if (msgEl) msgEl.textContent = 'Great job! All team timesheets have been reviewed. New submissions will appear here automatically.';
+        if (clearBtn) clearBtn.style.display = 'none';
+      }
+    }
   }
+
+  // ── Approve All Modal ──
+  window.openApproveAllModal = function() {
+    var cards = document.querySelectorAll('.approval-card:not(.fading)');
+    if (cards.length === 0) return;
+    var countEl = document.getElementById('approveAllCount');
+    if (countEl) countEl.textContent = cards.length;
+    var listEl = document.getElementById('approveAllList');
+    if (listEl) {
+      listEl.innerHTML = '';
+      cards.forEach(function(card) {
+        var name = card.querySelector('.aq-name a') ? card.querySelector('.aq-name a').textContent : 'Unknown';
+        var hours = card.querySelector('.aq-hours-value') ? card.querySelector('.aq-hours-value').textContent : '';
+        var item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:var(--space-1) 0;';
+        item.innerHTML = '<span>' + name + '</span><span style="font-family:var(--font-mono);color:var(--color-text-1);font-weight:var(--weight-semibold);">' + hours + '</span>';
+        listEl.appendChild(item);
+      });
+    }
+    document.getElementById('approveAllModal').classList.add('active');
+    lucide.createIcons({ nodes: [document.getElementById('approveAllModal')] });
+  };
+
+  window.closeApproveAllModal = function() {
+    document.getElementById('approveAllModal').classList.remove('active');
+  };
+
+  window.confirmApproveAll = function() {
+    var btn = document.getElementById('approveAllConfirmBtn');
+    btn.classList.add('btn-loading');
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      var cards = document.querySelectorAll('.approval-card:not(.fading)');
+      var count = cards.length;
+      cards.forEach(function(card, i) {
+        setTimeout(function() {
+          card.classList.add('fading');
+          setTimeout(function() {
+            if (card.parentNode) card.parentNode.removeChild(card);
+            updateApprovalCount();
+          }, 400);
+        }, i * 100);
+      });
+      closeApproveAllModal();
+      showToast('success', 'All Approved', count + ' timesheets have been approved. Team members have been notified.');
+    }, 1000);
+  };
 
   // ════════════════════════════════════════
   //  MOBILE TIMESHEET
@@ -2429,7 +2750,7 @@
 </script>
 
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item active"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

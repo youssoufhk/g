@@ -87,7 +87,7 @@
   </style>
 </head>
 <body>
-  <div class="portal-auth">
+  <main class="portal-auth">
     <div class="portal-auth-card">
       <div class="portal-logo">
         <div class="client-logo">AC</div>
@@ -104,7 +104,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" class="form-input" placeholder="Enter your password" value="password123" id="portal-pass">
+          <input type="password" class="form-input" placeholder="Enter your password" id="portal-pass">
         </div>
         <div style="text-align: right; margin-top: calc(-1 * var(--space-2));">
           <a href="#" style="font-size: var(--text-body-sm); color: var(--color-text-2);" onclick="showForgotPassword(event)">Forgot password?</a>
@@ -132,8 +132,9 @@
         Need access? Contact your project team.
       </div>
     </div>
-  </div>
+  </main>
 
+  <div id="notifPanel"></div>
   <div class="toast-container" id="toast-container"></div>
   <script src="../_shared.js"></script>
   <script>

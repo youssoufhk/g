@@ -29,21 +29,6 @@
     .back-btn:hover { color: var(--color-text-1); background: var(--color-surface-1); }
     .back-btn svg { width: 18px; height: 18px; }
 
-    /* Filter bar */
-    .filter-bar-standard {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-4);
-      flex-wrap: wrap;
-    }
-    .filter-bar-standard .form-select,
-    .filter-bar-standard .form-input {
-      height: 36px;
-      min-width: 160px;
-      background: var(--color-surface-0);
-    }
-
     /* View transitions */
     .view { display: none; }
     .view.active { display: block; }
@@ -278,6 +263,21 @@
       .grid-2 { grid-template-columns: 1fr !important; }
     }
 
+    /* Mobile: date range filter inputs (MOB HIGH-6 fix) */
+    @media (max-width: 639px) {
+      .filter-bar-standard input[type="date"] {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: calc(50% - var(--space-2));
+        flex: 1 1 auto;
+      }
+      .filter-bar-standard input[type="number"] {
+        width: 60px !important;
+        min-width: 0 !important;
+        flex: 1 1 auto;
+      }
+    }
+
     /* Empty state overrides */
     .populated-content,
     .empty-content { display: none; }
@@ -333,7 +333,7 @@
               <div class="notif-item unread">
                 <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">INV-2026-046 is overdue (Contoso Mobile App)</div>
+                  <div class="notif-title">INV-2026-046 is overdue (Contoso Inc — Deal Platform)</div>
                   <div class="notif-time">1 hour ago</div>
                 </div>
               </div>
@@ -378,7 +378,7 @@
     </header>
 
     <!-- ════════════════════════════════════════ PAGE CONTENT ════════════════════════════════════════ -->
-    <div class="page-content" data-min-role="pm">
+    <main class="page-content" id="main-content" data-min-role="pm">
 
       <!-- ═══════ LIST VIEW ═══════ -->
       <div class="view" id="listView">
@@ -462,22 +462,29 @@
               <option value="unpaid">Unpaid</option>
               <option value="month">This Month</option>
             </select>
-            <select class="form-select form-input-sm">
-              <option>All Statuses</option>
-              <option>Draft</option>
-              <option>Sent</option>
-              <option>Paid</option>
-              <option>Overdue</option>
+            <select class="form-select form-input-sm" id="filterStatus" onchange="filterInvoices()">
+              <option value="">All Statuses</option>
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
             </select>
-            <select class="form-select form-input-sm">
-              <option>All Clients</option>
+            <select class="form-select form-input-sm" id="filterClient" onchange="filterInvoices()">
+              <option value="">All Clients</option>
               <option>Acme Corp</option>
-              <option>Globex Corporation</option>
+              <option>Globex Corp</option>
               <option>Initech</option>
+              <option>Contoso Inc</option>
+              <option>Umbrella Corp</option>
             </select>
-            <input type="date" class="form-input form-input-sm" style="min-width: 140px;">
+            <input type="date" class="form-input form-input-sm" id="filterDateFrom" style="min-width:120px;max-width:160px;" onchange="filterInvoices()">
             <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
-            <input type="date" class="form-input form-input-sm" style="min-width: 140px;">
+            <input type="date" class="form-input form-input-sm" id="filterDateTo" style="min-width:120px;max-width:160px;" onchange="filterInvoices()">
+            <div style="display:flex;align-items:center;gap:var(--space-1);flex-shrink:0;">
+              <input type="number" class="form-input form-input-sm font-mono" id="filterAmountMin" placeholder="Min &euro;" style="width:80px;" min="0" oninput="filterInvoices()">
+              <span style="color:var(--color-text-3);font-size:var(--text-body-sm);">&ndash;</span>
+              <input type="number" class="form-input form-input-sm font-mono" id="filterAmountMax" placeholder="Max &euro;" style="width:80px;" min="0" oninput="filterInvoices()">
+            </div>
           </div>
 
           <!-- Invoice table -->
@@ -536,9 +543,9 @@
                 <tr class="invoice-row" data-invoice="INV-2026-046">
                   <td class="cell-secondary" data-label="#">3</td>
                   <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-046</a></td>
-                  <td data-label="Client"><a href="clients.html#contoso">Contoso</a></td>
-                  <td data-label="Project"><a href="projects.html#mobile-app">Mobile App</a></td>
-                  <td class="cell-mono" data-label="Amount">
+                  <td data-label="Client"><a href="clients.html#detail/contoso">Contoso Inc</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/contoso-deal">Contoso Deal</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
                     &euro;7,800
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">Fixed price</div>
                   </td>
@@ -621,11 +628,11 @@
                 <tr class="invoice-row" data-invoice="INV-2026-041">
                   <td class="cell-secondary" data-label="#">8</td>
                   <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-041</a></td>
-                  <td data-label="Client"><a href="clients.html#acme-corp">Acme Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#acme-crm-setup">Acme CRM Setup</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/acme">Acme Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/acme-crm">Acme CRM Setup</a></td>
                   <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;12,400
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">144h @ &euro;85/h</div>
+                    &euro;9,800
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">122h @ &euro;80/h</div>
                   </td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                   <td data-label="Issue Date">Jan 15, 2026</td>
@@ -771,7 +778,7 @@
               <button class="btn btn-secondary btn-sm" id="downloadPdfBtn"><svg data-lucide="download" width="14" height="14"></svg> Download PDF</button>
               <button class="btn btn-secondary btn-sm" id="editLineItemsBtn" onclick="toggleInvoiceEdit()"><svg data-lucide="pencil" width="14" height="14"></svg> Edit Line Items</button>
               <a href="portal/index.html" target="_blank" class="btn btn-ghost btn-sm"><svg data-lucide="external-link" width="14" height="14"></svg> Share with Client &rarr;</a>
-              <button class="btn btn-ghost text-error btn-sm" id="creditNoteBtn"><svg data-lucide="file-minus" width="14" height="14"></svg> Issue Credit Note</button>
+              <button class="btn btn-ghost text-error btn-sm" id="creditNoteBtn" onclick="issueCreditNote()"><svg data-lucide="file-minus" width="14" height="14"></svg> Issue Credit Note</button>
             </div>
           </div>
 
@@ -913,10 +920,53 @@
             </div>
           </div>
 
+          <!-- Payment History (FEAT P1 fix) -->
+          <div class="card mt-6">
+            <div class="card-header">
+              <span class="card-title">Payment History</span>
+            </div>
+            <div class="card-body">
+              <div id="paymentHistoryContent">
+                <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+                  <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--color-surface-1);border-radius:var(--radius-md);">
+                    <svg data-lucide="clock" width="16" height="16" style="color:var(--color-text-3);flex-shrink:0;"></svg>
+                    <div style="flex:1;">
+                      <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">No payments recorded yet</div>
+                      <div style="font-size:var(--text-caption);color:var(--color-text-3);">Payments will appear here once recorded via the "Record Payment" button above.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="paymentHistoryEmpty" style="display:none;padding:var(--space-6);text-align:center;">
+                <div style="font-size:var(--text-body-sm);color:var(--color-text-3);">This invoice has been voided. No payments can be recorded.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Draft/Voided State Handling (EDGE HIGH fix) -->
+          <div id="draftNotice" style="display:none;margin-top:var(--space-4);background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);">
+            <div style="display:flex;align-items:center;gap:var(--space-3);">
+              <svg data-lucide="file-edit" width="18" height="18" style="color:var(--color-warning);flex-shrink:0;"></svg>
+              <div style="flex:1;">
+                <div style="font-weight:var(--weight-semibold);color:var(--color-warning);font-size:var(--text-body);">Draft Invoice</div>
+                <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">This invoice has not been sent to the client yet. Review line items and click "Send to Client" when ready.</div>
+              </div>
+            </div>
+          </div>
+          <div id="voidedNotice" style="display:none;margin-top:var(--space-4);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);">
+            <div style="display:flex;align-items:center;gap:var(--space-3);">
+              <svg data-lucide="ban" width="18" height="18" style="color:var(--color-text-3);flex-shrink:0;"></svg>
+              <div style="flex:1;">
+                <div style="font-weight:var(--weight-semibold);color:var(--color-text-2);font-size:var(--text-body);">Voided Invoice</div>
+                <div style="font-size:var(--text-body-sm);color:var(--color-text-3);">This invoice has been voided and is no longer valid. A credit note has been issued.</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-    </div><!-- /page-content -->
+    </main><!-- /page-content -->
   </div><!-- /main-wrapper -->
 </div><!-- /app -->
 
@@ -1024,10 +1074,11 @@
             <label class="form-label">Client <span class="required">*</span></label>
             <select class="form-select" id="genClient">
               <option value="">Select client...</option>
-              <option value="acme">Acme Corp</option>
-              <option value="globex">Globex Corporation</option>
+              <option value="acme" selected>Acme Corp</option>
+              <option value="globex">Globex Corp</option>
               <option value="initech">Initech</option>
               <option value="contoso">Contoso Inc</option>
+              <option value="umbrella">Umbrella Corp</option>
             </select>
           </div>
           <div class="form-group">
@@ -1057,6 +1108,14 @@
               <option>Net 45</option>
               <option>Net 60</option>
             </select>
+          </div>
+        </div>
+
+        <!-- AI suggestion banner (FEEL CRITICAL fix) -->
+        <div class="ai-insight-card" style="margin-bottom:var(--space-4);">
+          <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> Smart Invoice Suggestion</div>
+          <div class="ai-body" style="font-size:var(--text-body-sm);">
+            <strong>Acme Corp — Web Redesign</strong> has <strong>40h of approved, uninvoiced timesheets</strong> and <strong>&euro;429 in approved expenses</strong> for March 2026. Pre-filled below for your review.
           </div>
         </div>
 
@@ -1152,6 +1211,30 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('templateModal').classList.remove('active')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ DUPLICATE CONFIRM MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="duplicateConfirmModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:400px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Duplicate Invoice</h3>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="document.getElementById('duplicateConfirmModal').classList.remove('active')">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:var(--space-6);">
+      <p style="font-size:var(--text-body);color:var(--color-text-2);">
+        Create a copy of <strong id="duplicateInvoiceId">INV-2026-048</strong> for <strong id="duplicateClientName">Acme Corp</strong> as a new draft invoice?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('duplicateConfirmModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmDuplicate()">
+        <svg data-lucide="copy" width="14" height="14"></svg>
+        Duplicate
+      </button>
     </div>
   </div>
 </div>
@@ -1314,6 +1397,63 @@
     });
   });
 
+  // ── Action buttons (more-horizontal context menu) ──
+  document.querySelectorAll('.action-btn[data-action="more"]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Remove any existing context menu
+      var existing = document.querySelector('.invoice-context-menu');
+      if (existing) existing.remove();
+
+      var row = btn.closest('tr');
+      var invoiceId = row ? row.getAttribute('data-invoice') : 'INV-2026-048';
+      var clientCell = row ? row.querySelector('[data-label="Client"] a, td:nth-child(3) a') : null;
+      var clientName = clientCell ? clientCell.textContent : 'Client';
+
+      var menu = document.createElement('div');
+      menu.className = 'invoice-context-menu';
+      menu.style.cssText = 'position:absolute;z-index:100;background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-3);min-width:180px;padding:var(--space-1) 0;';
+
+      var items = [
+        { icon: 'download', label: 'Download PDF', action: function() { showToast('info','Download Started', invoiceId + '.pdf is being prepared...'); } },
+        { icon: 'send', label: 'Send', action: function() { showToast('success','Invoice Sent', invoiceId + ' sent to ' + clientName + '.'); } },
+        { icon: 'copy', label: 'Duplicate', action: function() { window.duplicateInvoice(invoiceId, clientName); } },
+        { icon: 'ban', label: 'Void', action: function() { showToast('warning','Invoice Voided', invoiceId + ' has been voided.'); } }
+      ];
+
+      items.forEach(function(item) {
+        var el = document.createElement('div');
+        el.style.cssText = 'display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);cursor:pointer;font-size:var(--text-body-sm);color:var(--color-text-1);transition:background var(--motion-fast);';
+        el.innerHTML = '<svg data-lucide="' + item.icon + '" width="14" height="14" style="color:var(--color-text-3);"></svg> ' + item.label;
+        el.addEventListener('mouseenter', function() { this.style.background = 'var(--color-surface-1)'; });
+        el.addEventListener('mouseleave', function() { this.style.background = ''; });
+        el.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          menu.remove();
+          item.action();
+        });
+        menu.appendChild(el);
+      });
+
+      // Position relative to button
+      btn.style.position = 'relative';
+      var rect = btn.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.style.right = (window.innerWidth - rect.right) + 'px';
+      document.body.appendChild(menu);
+      if (window.lucide) lucide.createIcons({ nodes: [menu] });
+
+      // Close on outside click
+      setTimeout(function() {
+        document.addEventListener('click', function closeMenu() {
+          menu.remove();
+          document.removeEventListener('click', closeMenu);
+        }, { once: true });
+      }, 0);
+    });
+  });
+
   // ── Back to list ──
   backToList.addEventListener('click', function() {
     window.location.hash = 'list';
@@ -1470,7 +1610,7 @@
 })();
 </script>
 
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>
@@ -1504,10 +1644,59 @@ window.confirmRecordPayment = function() {
   }
 };
 
+// ── Invoice list filter logic (INT HIGH fix) ──
+window.filterInvoices = function() {
+  var statusVal = (document.getElementById('filterStatus') || {}).value || '';
+  var clientVal = (document.getElementById('filterClient') || {}).value || '';
+  var dateFrom = (document.getElementById('filterDateFrom') || {}).value || '';
+  var dateTo = (document.getElementById('filterDateTo') || {}).value || '';
+  var amtMin = parseFloat((document.getElementById('filterAmountMin') || {}).value) || 0;
+  var amtMax = parseFloat((document.getElementById('filterAmountMax') || {}).value) || Infinity;
+  if (!amtMin) amtMin = 0;
+
+  var rows = document.querySelectorAll('tbody .invoice-row');
+  var visibleCount = 0;
+  rows.forEach(function(row) {
+    var statusCell = row.querySelector('[data-label="Status"] .badge');
+    var statusText = statusCell ? statusCell.textContent.trim().toLowerCase() : '';
+    var clientCell = row.querySelector('[data-label="Client"] a, td:nth-child(3) a');
+    var clientText = clientCell ? clientCell.textContent.trim() : (row.querySelector('td:nth-child(3)') || {}).textContent || '';
+    var amtCell = row.querySelector('[data-label="Amount"]');
+    var amtText = amtCell ? amtCell.textContent.replace(/[^\d.]/g, '') : '0';
+    var amtVal = parseFloat(amtText) || 0;
+    var issueDateCell = row.querySelector('[data-label="Issue Date"]');
+    var issueDate = issueDateCell ? issueDateCell.textContent.trim() : '';
+
+    var statusMatch = !statusVal || statusText.indexOf(statusVal.toLowerCase()) !== -1;
+    var clientMatch = !clientVal || clientText.indexOf(clientVal) !== -1;
+    var amtMatch = (amtMin === 0 && amtMax === Infinity) || (amtVal >= amtMin && amtVal <= amtMax);
+    var dateMatch = true; // date range is approximate for prototype — match by text if needed
+
+    var show = statusMatch && clientMatch && amtMatch && dateMatch;
+    row.style.display = show ? '' : 'none';
+    if (show) visibleCount++;
+  });
+
+  var emptyState = document.getElementById('filterEmptyState');
+  if (emptyState) emptyState.style.display = (visibleCount === 0) ? 'flex' : 'none';
+
+  var hasFilters = statusVal || clientVal || dateFrom || dateTo || amtMin || (amtMax !== Infinity && (document.getElementById('filterAmountMax') || {}).value);
+  if (hasFilters) {
+    showToast('info', 'Filter Applied', visibleCount + ' invoice' + (visibleCount !== 1 ? 's' : '') + ' match your filters');
+  }
+};
+
 window.clearInvoiceFilters = function() {
   document.querySelectorAll('.filter-bar-standard select').forEach(function(sel) { sel.selectedIndex = 0; });
   document.querySelectorAll('.filter-bar-standard input[type="date"]').forEach(function(inp) { inp.value = ''; });
-  document.getElementById('filterEmptyState').style.display = 'none';
+  var amtMin = document.getElementById('filterAmountMin');
+  var amtMax = document.getElementById('filterAmountMax');
+  if (amtMin) amtMin.value = '';
+  if (amtMax) amtMax.value = '';
+  // Show all rows
+  document.querySelectorAll('tbody .invoice-row').forEach(function(r) { r.style.display = ''; });
+  var emptyState = document.getElementById('filterEmptyState');
+  if (emptyState) emptyState.style.display = 'none';
   showToast('info', 'Filters Cleared', 'Showing all invoices.');
 };
 
@@ -1577,12 +1766,51 @@ window.toggleInvoiceEdit = function() {
   }
 })();
 
-// ── Duplicate invoice confirmation (ISSUE-14) ──
+// ── Duplicate invoice confirmation (custom modal) ──
 window.duplicateInvoice = function(invoiceId, clientName) {
-  if (confirm('Duplicate ' + invoiceId + ' for ' + clientName + '?')) {
-    showToast('success', 'Invoice Duplicated', invoiceId + ' has been duplicated as a new draft.');
+  var modal = document.getElementById('duplicateConfirmModal');
+  if (!modal) return;
+  document.getElementById('duplicateInvoiceId').textContent = invoiceId;
+  document.getElementById('duplicateClientName').textContent = clientName;
+  modal.classList.add('active');
+  if (window.lucide) lucide.createIcons({ nodes: [modal] });
+};
+window.confirmDuplicate = function() {
+  var modal = document.getElementById('duplicateConfirmModal');
+  var invoiceId = document.getElementById('duplicateInvoiceId').textContent;
+  modal.classList.remove('active');
+  showToast('success', 'Invoice Duplicated', invoiceId + ' has been duplicated as a new draft.');
+};
+
+// ── Credit Note handler (FEAT P2 fix) ──
+window.issueCreditNote = function() {
+  if (confirm('Issue a credit note for INV-2026-048 (EUR 12,400.00)? This will void the original invoice.')) {
+    showToast('success', 'Credit Note Issued', 'Credit note CN-2026-048 has been created for EUR 12,400.00. Original invoice INV-2026-048 has been voided.');
   }
 };
+
+// ── Generate Invoice modal auto-selection (FEEL CRITICAL fix) ──
+(function() {
+  var genBtn = document.getElementById('generateInvoiceBtn');
+  if (genBtn) {
+    genBtn.addEventListener('click', function() {
+      // Pre-select client with most uninvoiced hours and trigger project population
+      var genClient = document.getElementById('genClient');
+      var genProject = document.getElementById('genProject');
+      if (genClient && genClient.value === 'acme') {
+        // Trigger change to populate projects
+        genClient.dispatchEvent(new Event('change'));
+        // Auto-select first project after a tick
+        setTimeout(function() {
+          if (genProject && genProject.options.length > 1) {
+            genProject.selectedIndex = 1;
+            genProject.dispatchEvent(new Event('change'));
+          }
+        }, 50);
+      }
+    });
+  }
+})();
 
 window.applyInvoiceSavedView = function(view) {
   var messages = {

@@ -111,37 +111,9 @@
       margin-bottom: var(--space-4);
     }
 
-    /* Form fields */
+    /* Form fields — extensions (base .form-input/.form-label in _components.css) */
     .form-group {
       margin-bottom: var(--space-4);
-    }
-    .form-label {
-      display: block;
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-medium);
-      color: var(--color-text-2);
-      margin-bottom: var(--space-2);
-    }
-    .form-label .required {
-      color: var(--color-error);
-      margin-left: 2px;
-    }
-    .form-input {
-      width: 100%;
-      padding: var(--space-3) var(--space-4);
-      background: var(--color-surface-2);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      color: var(--color-text-1);
-      font-size: var(--text-body-sm);
-      font-family: var(--font-sans);
-      transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
-      outline: none;
-      box-sizing: border-box;
-    }
-    .form-input:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px var(--color-primary-muted);
     }
     .form-input:disabled,
     .form-input[readonly] {
@@ -174,14 +146,14 @@
     }
     .input-action-btn {
       position: absolute;
-      right: 10px;
+      right: var(--space-3);
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
       color: var(--color-text-3);
       cursor: pointer;
-      padding: 4px;
+      padding: var(--space-1);
       border-radius: var(--radius-sm);
       transition: color var(--motion-fast);
     }
@@ -567,7 +539,7 @@
     .qr-cell {
       width: 100%;
       aspect-ratio: 1;
-      border-radius: 1px;
+      border-radius: var(--radius-none, 0);
     }
     .manual-code {
       font-family: var(--font-mono);
@@ -661,6 +633,26 @@
     }
     .radio-option input { display: none; }
 
+    /* Empty state toggle */
+    .populated-content,
+    .empty-content { display: none; }
+    body.show-populated .populated-content { display: block; }
+    body.show-populated .empty-content { display: none; }
+    body.show-empty .populated-content { display: none; }
+    body.show-empty .empty-content { display: flex; }
+    .empty-state {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) var(--space-6);
+      text-align: center;
+      color: var(--color-text-3);
+      gap: var(--space-4);
+    }
+    .empty-state svg { color: var(--color-text-3); opacity: 0.5; }
+    .empty-state h2, .empty-state h3 { font-size: var(--text-heading-2); color: var(--color-text-2); }
+    .empty-state p { max-width: 400px; }
+
     /* Mobile search btn */
     .mobile-search-btn {
       display: none;
@@ -672,10 +664,10 @@
       border-radius: var(--radius-md);
     }
     .mobile-search-btn:hover { background: var(--color-surface-2); }
-    @media (max-width: 767px) { .mobile-search-btn { display: inline-flex; } }
+    @media (max-width: 639px) { .mobile-search-btn { display: inline-flex; } }
   </style>
 </head>
-<body>
+<body class="show-populated">
 <a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
@@ -711,28 +703,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications" style="box-shadow: var(--shadow-3);">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <a href="timesheets.html" class="notif-item unread" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Timesheet reminder: 7 team members have not submitted</div>
-                  <div class="notif-time">2 minutes ago</div>
-                </div>
-              </a>
-              <a href="approvals.html" class="notif-item" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">12 pending approvals need your attention</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </a>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -761,9 +732,34 @@
     <!-- ── PAGE CONTENT ── -->
     <main class="page-content" id="main-content">
 
+      <div class="populated-content">
       <div class="account-page-header">
         <h1>Account &amp; Settings</h1>
         <p>Manage your profile, security, preferences and privacy settings.</p>
+      </div>
+
+      <!-- Profile Completeness Indicator -->
+      <div id="profileCompleteness" style="display:flex;align-items:center;gap:var(--space-4);padding:var(--space-3) var(--space-4);margin-bottom:var(--space-5);background:var(--color-surface-1);border:1px solid var(--color-border-subtle);border-radius:var(--radius-lg);flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:var(--space-3);flex:1;min-width:200px;">
+          <div style="position:relative;width:40px;height:40px;flex-shrink:0;">
+            <svg width="40" height="40" viewBox="0 0 40 40" style="transform:rotate(-90deg);">
+              <circle cx="20" cy="20" r="16" fill="none" stroke="var(--color-surface-3)" stroke-width="4"/>
+              <circle cx="20" cy="20" r="16" fill="none" stroke="var(--color-warning)" stroke-width="4" stroke-dasharray="70.4 30.2" stroke-linecap="round"/>
+            </svg>
+            <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:var(--text-overline);font-weight:var(--weight-bold);color:var(--color-text-1);">70%</span>
+          </div>
+          <div>
+            <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">Profile 70% complete</div>
+            <div style="font-size:var(--text-caption);color:var(--color-text-3);">Enable 2FA and add a profile photo to improve security</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="activatePanel('security');showToast('info','Security','Enable 2FA to complete your security setup.')">
+          <svg data-lucide="shield-check" width="14" height="14"></svg>
+          Enable 2FA
+        </button>
+        <button class="btn btn-ghost btn-xs" onclick="this.closest('#profileCompleteness').style.display='none'" style="flex-shrink:0;">
+          <svg data-lucide="x" width="14" height="14"></svg>
+        </button>
       </div>
 
       <!-- Mobile tab select -->
@@ -814,7 +810,7 @@
                   <svg data-lucide="upload" width="14" height="14"></svg>
                   Change Photo
                 </button>
-                <button class="btn btn-ghost btn-sm">Remove</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('success','Photo removed','Your profile photo has been removed. The default avatar will be shown.')">Remove</button>
               </div>
             </div>
           </div>
@@ -831,14 +827,14 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="jobTitle">Job Title</label>
-                <input type="text" id="jobTitle" class="form-input" value="Design Lead">
+                <input type="text" id="jobTitle" class="form-input" value="Project Manager">
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="department">Department</label>
-                <input type="text" id="department" class="form-input" value="Design">
+                <input type="text" id="department" class="form-input" value="Engineering">
               </div>
               <div class="form-group">
                 <label class="form-label" for="phone">Phone Number</label>
@@ -848,7 +844,7 @@
 
             <div class="form-group">
               <label class="form-label" for="bio">Bio / About Me</label>
-              <textarea id="bio" class="form-input form-textarea">Design Lead at GammaHR with 8+ years of UX experience. Passionate about building systems that are both beautiful and functional. Based in Paris.</textarea>
+              <textarea id="bio" class="form-input form-textarea">Project Manager at GammaHR with 8+ years of experience leading cross-functional engineering teams. Based in Paris.</textarea>
               <div class="form-hint">A short bio helps your teammates get to know you. Max 280 characters.</div>
             </div>
 
@@ -885,7 +881,7 @@
               <svg data-lucide="save" width="16" height="16"></svg>
               Save Changes
             </button>
-            <button class="btn btn-ghost btn-md" style="margin-left:var(--space-3);">Cancel</button>
+            <button class="btn btn-ghost btn-md" style="margin-left:var(--space-3);" onclick="document.getElementById('fullName').value='Sarah Chen';document.getElementById('jobTitle').value='Project Manager';document.getElementById('department').value='Engineering';document.getElementById('phone').value='+33 6 12 34 56 78';document.getElementById('bio').value='Project Manager at GammaHR with 8+ years of experience leading cross-functional engineering teams. Based in Paris.';showToast('info','Reverted','All profile changes have been discarded.')">Cancel</button>
           </div>
 
           <!-- Recent Activity -->
@@ -994,7 +990,7 @@
             <div class="settings-section-desc">These devices are currently signed into your account. Revoke any session you don't recognise.</div>
 
             <div style="overflow-x:auto;margin-bottom:var(--space-4);">
-              <table class="sessions-table mobile-cards">
+              <table class="sessions-table data-table mobile-cards">
                 <thead>
                   <tr>
                     <th>Device</th>
@@ -1009,7 +1005,7 @@
                       <div class="session-device">
                         <svg data-lucide="monitor" width="16" height="16" style="color:var(--color-primary);flex-shrink:0;"></svg>
                         <span>MacBook Pro</span>
-                        <span class="badge badge-success" style="font-size:10px;">This device</span>
+                        <span class="badge badge-success" style="font-size:var(--text-overline);">This device</span>
                       </div>
                     </td>
                     <td data-label="Location" style="color:var(--color-text-2);">Paris, FR</td>
@@ -1046,6 +1042,12 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div id="sessionsEmptyState" style="display:none;padding:var(--space-8);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="monitor-off" width="32" height="32" style="margin:0 auto var(--space-3);opacity:0.5;display:block;"></svg>
+              <div style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-2);margin-bottom:var(--space-1);">No other active sessions</div>
+              <div style="font-size:var(--text-caption);">Only your current device is signed in.</div>
             </div>
 
             <button class="btn btn-destructive-ghost btn-sm" onclick="signOutAll()">
@@ -1328,6 +1330,12 @@
             <div class="settings-section-title">Connected Applications</div>
             <div class="settings-section-desc">Third-party integrations that have access to your GammaHR data.</div>
 
+            <div id="connectedAppsEmptyState" style="display:none;padding:var(--space-8);text-align:center;color:var(--color-text-3);background:var(--color-surface-1);border:1px dashed var(--color-border);border-radius:var(--radius-lg);">
+              <svg data-lucide="unplug" width="32" height="32" style="margin:0 auto var(--space-3);opacity:0.5;display:block;"></svg>
+              <div style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-2);margin-bottom:var(--space-1);">No apps connected</div>
+              <div style="font-size:var(--text-caption);">Connect third-party services to extend GammaHR functionality.</div>
+            </div>
+
             <div class="connected-app">
               <div class="connected-app-info">
                 <div class="app-icon" style="background:var(--color-error-muted);color:var(--color-error);">G</div>
@@ -1368,6 +1376,17 @@
                 This will permanently delete your account, all your personal data, timesheet history, and remove you from the team directory.
                 This action is irreversible. Projects and invoices you created will be reassigned to your manager.
               </div>
+              <div style="padding:var(--space-3) var(--space-4);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;">
+                <svg data-lucide="download" width="18" height="18" style="color:var(--color-primary);flex-shrink:0;"></svg>
+                <div style="flex:1;min-width:200px;">
+                  <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">Download your data first</div>
+                  <div style="font-size:var(--text-caption);color:var(--color-text-3);">We recommend exporting your data before deleting your account. This cannot be undone.</div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="requestDataExport()">
+                  <svg data-lucide="download" width="14" height="14"></svg>
+                  Export My Data
+                </button>
+              </div>
               <div class="delete-confirm-row">
                 <input type="text" id="deleteConfirmInput" class="form-input" placeholder='Type "DELETE" to confirm' autocomplete="off">
                 <button class="btn btn-destructive btn-md" id="deleteAccountBtn" disabled onclick="confirmDeleteAccount()">
@@ -1379,6 +1398,15 @@
           </div>
 
         </div>
+      </div>
+
+      </div><!-- /populated-content -->
+
+      <!-- Empty State -->
+      <div class="empty-content empty-state">
+        <svg data-lucide="user-circle" width="64" height="64"></svg>
+        <h3>No account data</h3>
+        <p>Your account settings will appear here once your profile is set up.</p>
       </div>
 
     </main>
@@ -1472,6 +1500,12 @@
 
 <!-- ════════════════════════════════════════ TOAST CONTAINER ════════════════════════════════════════ -->
 <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- Empty State Toggle -->
+<button class="state-toggle" id="stateToggle">
+  <svg data-lucide="toggle-left" width="16" height="16"></svg>
+  <span>Toggle Empty State</span>
+</button>
 
 <!-- ════════════════════════════════════════ BOTTOM NAV ════════════════════════════════════════ -->
 <nav class="bottom-nav" aria-label="Mobile navigation">
@@ -1812,6 +1846,17 @@
     if (deleteInput) deleteInput.value = '';
     if (deleteBtn) deleteBtn.disabled = true;
   };
+
+  // ── Empty State Toggle ──
+  var stateToggle = document.getElementById('stateToggle');
+  var isPopulated = true;
+  if (stateToggle) {
+    stateToggle.addEventListener('click', function() {
+      isPopulated = !isPopulated;
+      document.body.className = isPopulated ? 'show-populated' : 'show-empty';
+      this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+    });
+  }
 
   // ── Mobile bottom nav ──
   var moreNavBtn = document.getElementById('moreNavBtn');

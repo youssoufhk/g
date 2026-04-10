@@ -68,6 +68,9 @@
       gap: var(--space-1);
       min-width: 140px;
     }
+    .filter-group-search {
+      min-width: 200px;
+    }
     .filter-group label {
       font-size: var(--text-caption);
       color: var(--color-text-3);
@@ -198,7 +201,7 @@
       color: var(--color-text-1);
     }
 
-    /* ── GANTT CHART CONTAINER ── */
+    /* ── GANTT CHART CONTAINER — UNIFIED STICKY-COLUMN LAYOUT ── */
     .gantt-wrapper {
       background: var(--color-surface-0);
       border: 1px solid var(--color-border);
@@ -206,127 +209,112 @@
       overflow: hidden;
       position: relative;
     }
+
+    /* Single scrollable container — scrolls horizontally, page scrolls vertically */
     .gantt-container {
-      display: flex;
-      overflow: hidden;
-      max-height: 620px;
+      overflow-x: auto;
+      overflow-y: visible;
+      width: 100%;
     }
 
-    /* Left (sticky) employee panel */
-    .gantt-left {
-      width: 240px;
-      min-width: 240px;
-      flex-shrink: 0;
-      border-right: 2px solid var(--color-border-strong);
-      z-index: 10;
-      background: var(--color-surface-0);
-      display: flex;
-      flex-direction: column;
+    /* Inner min-width forces horizontal scroll when needed */
+    .gantt-inner {
+      min-width: 900px;
+      position: relative;
     }
-    .gantt-left-header {
-      height: 56px;
+
+    /* ── UNIFIED HEADER ROW ── */
+    .gantt-header-row {
+      display: flex;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--color-surface-1);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ── UNIFIED DATA ROWS ── */
+    .gantt-row {
+      display: flex;
+      border-bottom: 1px solid var(--color-border-subtle);
+      position: relative;
+    }
+    .gantt-row:nth-child(even) {
+      background: var(--color-surface-0);
+    }
+    .gantt-row:nth-child(odd) {
+      background: color-mix(in srgb, var(--color-surface-1) 40%, var(--color-surface-0));
+    }
+    .gantt-row:hover {
+      background: var(--color-row-hover, var(--color-surface-1));
+    }
+
+    /* ── DEPT HEADER ROWS — span full width ── */
+    .gantt-dept-row {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .gantt-dept-name-col {
+      width: 220px;
+      min-width: 220px;
+      flex-shrink: 0;
+      position: sticky;
+      left: 0;
+      z-index: 4;
+    }
+    .gantt-dept-timeline-col {
+      flex: 1;
+    }
+
+    /* ── STICKY NAME COLUMN ── */
+    .gantt-name-col {
+      width: 220px;
+      min-width: 220px;
+      flex-shrink: 0;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: inherit;
+      border-right: 2px solid var(--color-border-strong);
       display: flex;
       align-items: center;
-      padding: 0 var(--space-4);
-      border-bottom: 1px solid var(--color-border);
+      gap: var(--space-2);
+      padding: 0 var(--space-3);
+    }
+    /* Header name col needs higher z-index */
+    .gantt-header-row .gantt-name-col {
+      z-index: 11;
       background: var(--color-surface-1);
+      height: 56px;
       font-size: var(--text-body-sm);
       font-weight: var(--weight-semibold);
       color: var(--color-text-2);
     }
-    .gantt-left-body {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-    .gantt-employee-row {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: var(--space-3) var(--space-4);
-      height: 52px;
-      border-bottom: 1px solid var(--color-border-subtle);
-      transition: background var(--motion-fast);
-    }
-    .gantt-employee-row:hover {
-      background: var(--color-surface-1);
-    }
-    .employee-info {
+
+    /* Employee info inside name col */
+    .gantt-name-col .employee-info {
       flex: 1;
       min-width: 0;
     }
-    .employee-name {
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-semibold);
-      color: var(--color-primary);
-      cursor: pointer;
-      text-decoration: none;
-      display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .employee-name:hover {
-      color: var(--color-primary-hover);
-      text-decoration: underline;
-    }
-    .employee-role {
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .worktime-badge {
-      font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: var(--weight-semibold);
-      padding: 2px var(--space-2);
-      border-radius: var(--radius-sm);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .worktime-high {
-      background: var(--color-success-muted);
-      color: var(--color-success);
-    }
-    .worktime-mid {
-      background: var(--color-warning-muted);
-      color: var(--color-warning);
-    }
-    .worktime-low {
-      background: var(--color-error-muted);
-      color: var(--color-error);
-    }
-    .worktime-over {
-      background: var(--color-error-muted);
-      color: var(--color-error);
-    }
 
-    /* Right (scrollable) timeline */
-    .gantt-right {
+    /* ── BARS COLUMN ── */
+    .gantt-bars-col {
       flex: 1;
-      overflow-x: auto;
-      overflow-y: auto;
       position: relative;
-    }
-    .gantt-timeline {
-      min-width: max-content;
-      position: relative;
+      height: 52px;
+      overflow: visible;
     }
 
-    /* Timeline header with dates */
-    .gantt-timeline-header {
-      display: grid;
-      grid-template-columns: repeat(30, 40px);
+    /* ── TIMELINE HEADER CELLS ── */
+    .gantt-timeline-cells {
+      flex: 1;
+      display: flex;
       height: 56px;
-      border-bottom: 1px solid var(--color-border);
-      background: var(--color-surface-1);
-      position: sticky;
-      top: 0;
-      z-index: 5;
     }
     .gantt-day-header {
+      width: 30px;
+      min-width: 30px;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -361,46 +349,38 @@
       color: var(--color-primary);
     }
 
-    /* Timeline body (rows) */
-    .gantt-timeline-body {
-      position: relative;
-    }
-    .gantt-timeline-row {
-      display: grid;
-      grid-template-columns: repeat(30, 40px);
-      height: 52px;
-      border-bottom: 1px solid var(--color-border-subtle);
-      position: relative;
-      align-items: center;
-    }
-    .gantt-timeline-row:hover {
-      background: var(--color-row-hover);
-    }
-
-    /* Day cell background for weekends */
-    .gantt-day-cell {
-      height: 100%;
+    /* Day cell background for weekends — in the bars area */
+    .gantt-day-bg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 30px;
       border-right: 1px solid var(--color-border-subtle);
+      pointer-events: none;
     }
-    .gantt-day-cell.weekend {
-      background: var(--color-surface-weekend);
+    .gantt-day-bg.weekend {
+      background: var(--color-surface-weekend, rgba(0,0,0,0.025));
+    }
+    .gantt-day-bg.today-col {
+      background: color-mix(in srgb, var(--color-primary) 6%, transparent);
     }
 
-    /* Today line */
+    /* Today line — rendered once in header's bars area, spans all rows via height:100vh */
     .today-line {
       position: absolute;
       top: 0;
       bottom: 0;
       width: 2px;
       background: var(--color-primary);
-      z-index: 4;
+      z-index: 5;
       pointer-events: none;
       box-shadow: 0 0 6px var(--color-primary);
     }
-    .today-line::before {
+    /* Today label shown only in the header row's today-line */
+    .gantt-header-row .today-line::before {
       content: 'Today';
       position: absolute;
-      top: -20px;
+      top: 4px;
       left: 50%;
       transform: translateX(-50%);
       background: var(--color-primary);
@@ -412,10 +392,10 @@
       white-space: nowrap;
       font-family: var(--font-sans);
     }
-    .today-line::after {
+    .gantt-header-row .today-line::after {
       content: '';
       position: absolute;
-      top: 0;
+      bottom: 0;
       left: -3px;
       width: 8px;
       height: 8px;
@@ -423,21 +403,9 @@
       border-radius: 50%;
     }
 
-    /* Gantt bars */
-    .gantt-bar-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: grid;
-      grid-template-columns: repeat(30, 40px);
-      align-items: center;
-      pointer-events: none;
-      padding: var(--space-1-5) 0;
-    }
+    /* Gantt bars — absolutely positioned within .gantt-bars-col */
     .gantt-bar {
-      height: 32px;
+      height: 28px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
@@ -450,8 +418,9 @@
       text-overflow: ellipsis;
       cursor: grab;
       pointer-events: all;
-      position: relative;
-      transition: filter var(--motion-fast), transform var(--motion-fast), left var(--motion-fast), width var(--motion-fast);
+      position: absolute;
+      top: 12px;
+      transition: filter var(--motion-fast), transform var(--motion-fast);
       z-index: 2;
     }
     .gantt-bar::before {
@@ -534,13 +503,11 @@
       color: var(--color-error);
     }
 
-    /* Stacked bars (second row) */
+    /* Stacked bars (second row — shown below primary bar) */
     .gantt-bar.bar-row-2 {
       height: 14px;
       font-size: var(--text-overline);
-      margin-top: 34px;
-      position: absolute;
-      top: 6px;
+      top: 30px;
     }
 
     /* Warning badge on unassigned gap */
@@ -557,6 +524,7 @@
       z-index: 3;
       pointer-events: all;
       cursor: pointer;
+      margin-left: 6px;
     }
     .gap-warning svg {
       width: 12px; height: 12px;
@@ -616,7 +584,7 @@
     .legend-swatch {
       width: 16px;
       height: 10px;
-      border-radius: 2px;
+      border-radius: var(--radius-sm);
       flex-shrink: 0;
     }
     .legend-swatch.billable {
@@ -645,7 +613,7 @@
       height: 14px;
       background: var(--color-primary);
       border: none;
-      border-radius: 1px;
+      border-radius: var(--radius-sm);
     }
 
     /* Summary Bar */
@@ -757,9 +725,51 @@
       color: var(--color-text-2);
     }
 
-    /* Sync scroll between left and right panels */
-    .gantt-left-body::-webkit-scrollbar { display: none; }
-    .gantt-left-body { scrollbar-width: none; }
+    /* Smooth scrollbar on gantt container */
+    .gantt-container::-webkit-scrollbar { height: 8px; }
+    .gantt-container::-webkit-scrollbar-track { background: var(--color-surface-1); }
+    .gantt-container::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+
+    /* Employee info styles — used inside gantt-name-col */
+    .employee-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .employee-name {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-primary);
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .employee-name:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
+    .employee-role {
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .worktime-badge {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-semibold);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .worktime-high { background: var(--color-success-muted); color: var(--color-success); }
+    .worktime-mid  { background: var(--color-warning-muted); color: var(--color-warning); }
+    .worktime-low  { background: var(--color-error-muted);   color: var(--color-error);   }
+    .worktime-over { background: var(--color-error-muted);   color: var(--color-error);   }
 
     /* ── Avatar color variants ── */
     .avatar-1 { background: var(--color-primary); color: var(--color-white); }
@@ -876,35 +886,7 @@
               <svg data-lucide="bell"></svg>
               <span class="notif-dot"></span>
             </button>
-            <div class="notif-panel" id="notifPanel">
-              <div class="notif-panel-header">
-                <span style="font-weight:var(--weight-semibold); color:var(--color-text-1); font-size:var(--text-body);">Notifications</span>
-                <button class="btn btn-ghost btn-xs">Mark all read</button>
-              </div>
-              <div class="notif-panel-list">
-                <div class="notif-item unread">
-                  <div class="notif-icon"><svg data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--color-warning);"></svg></div>
-                  <div class="notif-text">
-                    <div class="notif-title">Bob Taylor has been on bench for 2 weeks</div>
-                    <div class="notif-time">10 min ago</div>
-                  </div>
-                </div>
-                <div class="notif-item unread">
-                  <div class="notif-icon"><svg data-lucide="calendar-check" style="width:16px;height:16px;color:var(--color-info);"></svg></div>
-                  <div class="notif-text">
-                    <div class="notif-title">Alice Wang's leave approved (Apr 1-11)</div>
-                    <div class="notif-time">1 hour ago</div>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-icon"><svg data-lucide="check-circle" style="width:16px;height:16px;color:var(--color-success);"></svg></div>
-                  <div class="notif-text">
-                    <div class="notif-title">Acme Web Redesign phase complete</div>
-                    <div class="notif-time">3 hours ago</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div id="notifPanel"></div>
           </div>
           <div class="relative">
             <div class="header-user" id="userBtn">
@@ -929,7 +911,7 @@
       </header>
 
       <!-- ── PAGE CONTENT ── -->
-      <div class="page-content" id="mainContent">
+      <main class="page-content" id="main-content">
 
         <!-- Breadcrumb -->
         <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:var(--space-3);">
@@ -958,7 +940,7 @@
         </div>
 
         <!-- ── FILTER PANEL ── -->
-        <div class="filter-panel" id="filterPanel">
+        <div class="filter-panel card-interactive" id="filterPanel" data-animate>
           <div class="filter-panel-header" id="filterToggle">
             <div class="filter-title">
               <svg data-lucide="sliders-horizontal"></svg>
@@ -970,7 +952,7 @@
           <div class="filter-panel-body">
             <!-- Search + Dropdowns -->
             <div class="filter-row">
-              <div class="filter-group" style="min-width:200px;">
+              <div class="filter-group filter-group-search">
                 <label>Search</label>
                 <input type="text" class="form-input form-input-sm" placeholder="Search team members...">
               </div>
@@ -1023,7 +1005,7 @@
               </div>
               <div class="filter-group">
                 <label class="filter-label">Skills</label>
-                <select class="form-select form-input-sm" multiple id="ganttSkillsFilter" style="min-width:160px;height:auto;">
+                <select class="form-select form-input-sm" multiple id="ganttSkillsFilter" style="height:auto;">
                   <option>React</option>
                   <option>TypeScript</option>
                   <option>Figma</option>
@@ -1088,7 +1070,7 @@
         </div>
 
         <!-- ── ZOOM CONTROLS ── -->
-        <div class="gantt-controls">
+        <div class="gantt-controls card-interactive" data-animate>
           <div style="display:flex;align-items:center;gap:var(--space-4);">
             <div class="zoom-group">
               <button class="zoom-btn" data-zoom="day">Day</button>
@@ -1111,139 +1093,11 @@
         </div>
 
         <!-- ═══ GANTT CHART ═══ -->
-        <div class="gantt-wrapper" id="ganttChart" data-min-role="pm">
-          <div class="gantt-container">
-
-            <!-- LEFT: Employee Panel -->
-            <div class="gantt-left">
-              <div class="gantt-left-header">
-                <span>Team Member</span>
-              </div>
-              <div class="gantt-left-body" id="ganttLeftBody">
-                <!-- Department header: Design -->
-                <div style="padding:var(--space-2) var(--space-4);background:var(--color-accent-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-accent);text-transform:uppercase;letter-spacing:0.5px;">Design</div>
-                <!-- Row 1: Sarah Chen -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-accent);" data-skills="react typescript figma css-tailwind nodejs">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-1">SC</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-sarah" class="employee-name" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
-                    <div class="employee-role">Project Manager</div>
-                  </div>
-                  <span class="worktime-badge worktime-high font-mono">87%</span>
-                </div>
-
-                <!-- Department header: Engineering -->
-                <div style="padding:var(--space-2) var(--space-4);background:var(--color-primary-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-primary);text-transform:uppercase;letter-spacing:0.5px;">Engineering</div>
-                <!-- Row 2: John Smith -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-primary);" data-skills="react typescript nodejs sql">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-2">JS</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-john" class="employee-name" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#profile-john">John Smith</a>
-                    <div class="employee-role">Senior Developer</div>
-                  </div>
-                  <span class="worktime-badge worktime-high font-mono">82%</span>
-                </div>
-                <!-- Row 3: Alice Wang -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-primary);" data-skills="figma react typescript">
-                  <span class="avatar-status presence-leave"><div class="avatar avatar-sm avatar-3">AW</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-alice" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a>
-                    <div class="employee-role">Software Engineer — On Leave Apr 14-18</div>
-                  </div>
-                  <span class="worktime-badge worktime-low font-mono">45%</span>
-                </div>
-                <!-- Row 4: Bob Taylor -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-primary);" data-skills="nodejs python sql react">
-                  <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-4">BT</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-bob" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
-                    <div class="employee-role">Backend Developer — Bench</div>
-                  </div>
-                  <span class="worktime-badge worktime-low font-mono">0%</span>
-                </div>
-
-                <!-- Department header: HR -->
-                <div style="padding:var(--space-2) var(--space-4);background:var(--color-info-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-info);text-transform:uppercase;letter-spacing:0.5px;">HR</div>
-                <!-- Row 5: Carol Williams -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-info);" data-skills="project-management sql figma">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-5">CW</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-carol" class="employee-name" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#profile-carol">Carol Williams</a>
-                    <div class="employee-role">Design Lead</div>
-                  </div>
-                  <span class="worktime-badge worktime-high font-mono">90%</span>
-                </div>
-                <!-- Row 7: Emma Laurent -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-info);" data-skills="project-management">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-7">EL</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-emma" class="employee-name" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#profile-emma">Emma Laurent</a>
-                    <div class="employee-role">HR Specialist</div>
-                  </div>
-                  <span class="worktime-badge worktime-mid font-mono">78%</span>
-                </div>
-
-                <!-- Department header: Finance -->
-                <div style="padding:var(--space-2) var(--space-4);background:var(--color-gold-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-gold);text-transform:uppercase;letter-spacing:0.5px;">Finance</div>
-                <!-- Row 6: David Park -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-gold);" data-skills="sql project-management python">
-                  <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-6">DP</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-david" class="employee-name" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">David Park</a>
-                    <div class="employee-role">Finance Lead</div>
-                  </div>
-                  <span class="worktime-badge worktime-low font-mono">45%</span>
-                </div>
-
-                <!-- Department header: Operations -->
-                <div style="padding:var(--space-2) var(--space-4);background:var(--color-warning-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);text-transform:uppercase;letter-spacing:0.5px;">Operations</div>
-                <!-- Row 8: Marco Rossi -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-warning);" data-skills="project-management sql">
-                  <span class="avatar-status presence-away"><div class="avatar avatar-sm avatar-8">MR</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-marco" class="employee-name" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a>
-                    <div class="employee-role">Operations Lead</div>
-                  </div>
-                  <span class="worktime-badge worktime-high font-mono">88%</span>
-                </div>
-                <!-- Row 9: Sophie Dubois -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-warning);" data-skills="project-management">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-9">SD</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-sophie" class="employee-name">Sophie Dubois</a>
-                    <div class="employee-role">Operations Manager</div>
-                  </div>
-                  <span class="worktime-badge worktime-high font-mono">82%</span>
-                </div>
-                <!-- Row 10: James Wilson -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-primary);" data-skills="typescript react sql">
-                  <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-10">JW</div></span>
-                  <div class="employee-info">
-                    <a href="employees.html#profile-james" class="employee-name">James Wilson</a>
-                    <div class="employee-role">QA Engineer</div>
-                  </div>
-                  <span class="worktime-badge worktime-mid font-mono">70%</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- RIGHT: Timeline -->
-            <div class="gantt-right" id="ganttRight">
-              <div class="gantt-timeline" id="ganttTimeline">
-
-                <!-- Timeline Header (Apr 1 - Apr 30) -->
-                <div class="gantt-timeline-header" id="timelineHeader">
-                  <!-- Generated by JS -->
-                </div>
-
-                <!-- Timeline Body -->
-                <div class="gantt-timeline-body" id="timelineBody">
-                  <!-- Generated by JS -->
-                </div>
-
-                <!-- Today Line -->
-                <div class="today-line" id="todayLine" style="left: 220px;"></div>
-              </div>
+        <div class="gantt-wrapper card-interactive" id="ganttChart" data-min-role="pm" data-animate>
+          <!-- Single unified container: horizontal scroll, page vertical scroll -->
+          <div class="gantt-container" id="ganttContainer">
+            <div class="gantt-inner" id="ganttInner">
+              <!-- Header row + employee rows are built by JS into ganttInner -->
             </div>
           </div>
 
@@ -1290,9 +1144,9 @@
         </div>
 
         <!-- ── MOBILE GANTT VIEW ── -->
-        <div class="gantt-mobile-view">
+        <div class="gantt-mobile-view stagger-reveal">
           <!-- Sarah Chen -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-1">SC</div></span>
@@ -1312,7 +1166,7 @@
             </div>
           </div>
           <!-- John Smith -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-2">JS</div></span>
@@ -1329,7 +1183,7 @@
             </div>
           </div>
           <!-- Alice Wang -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-leave"><div class="avatar avatar-sm avatar-3">AW</div></span>
@@ -1343,13 +1197,13 @@
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">45%</span>
               </div>
               <div class="text-caption text-2">
-                <div>Annual Leave — Apr 1 to Apr 13</div>
-                <div>Acme Web Redesign — Apr 14 to Apr 30</div>
+                <div>Annual Leave — Apr 14 to Apr 18</div>
+                <div>Acme Web Redesign — Apr 21 to Apr 30</div>
               </div>
             </div>
           </div>
           <!-- Bob Taylor -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-4">BT</div></span>
@@ -1362,11 +1216,11 @@
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:0%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">0%</span>
               </div>
-              <div class="text-caption text-2"><div>Globex Phase 2 — Apr 1 to Apr 30</div></div>
+              <div class="text-caption text-2"><div>Bench / Unassigned — Mar 20 to May 30</div></div>
             </div>
           </div>
           <!-- Carol Williams -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-5">CW</div></span>
@@ -1383,7 +1237,7 @@
             </div>
           </div>
           <!-- David Park -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-6">DP</div></span>
@@ -1404,7 +1258,7 @@
             </div>
           </div>
           <!-- Emma Laurent -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-7">EL</div></span>
@@ -1421,7 +1275,7 @@
             </div>
           </div>
           <!-- Marco Rossi -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-away"><div class="avatar avatar-sm avatar-8">MR</div></span>
@@ -1438,13 +1292,13 @@
             </div>
           </div>
           <!-- Sophie Dubois -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-9">SD</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-sophie" class="employee-name">Sophie Dubois</a>
-                  <div class="employee-role">Operations Manager</div>
+                  <a href="employees.html#profile-sophie" class="employee-name" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-worktime="82" data-href="employees.html#profile-sophie">Sophie Dubois</a>
+                  <div class="employee-role">Business Analyst</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
@@ -1455,13 +1309,13 @@
             </div>
           </div>
           <!-- James Wilson -->
-          <div class="card mb-3">
+          <div class="card card-interactive mb-3" data-animate>
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-10">JW</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-james" class="employee-name">James Wilson</a>
-                  <div class="employee-role">QA Engineer</div>
+                  <a href="employees.html#profile-james" class="employee-name" data-hovercard data-name="James Wilson" data-role="DevOps Engineer" data-dept="Engineering" data-worktime="70" data-href="employees.html#profile-james">James Wilson</a>
+                  <div class="employee-role">DevOps Engineer</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
@@ -1486,7 +1340,7 @@
           </div>
         </div>
 
-      </div><!-- end page-content -->
+      </main><!-- end page-content -->
     </div><!-- end main-wrapper -->
   </div><!-- end app -->
 
@@ -1633,11 +1487,11 @@
   <!-- ═══ CONTEXT MENU ═══ -->
   <div id="ganttContextMenu" style="display:none; position:fixed; z-index:1000; background:var(--color-surface-2); border:1px solid var(--color-border-strong); border-radius:var(--radius-md); box-shadow:var(--shadow-4); min-width:180px; overflow:hidden;">
     <button class="gantt-ctx-item" onclick="ctxAction('view')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">View Details</button>
-    <button class="gantt-ctx-item" onclick="ctxAction('edit')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Edit Assignment</button>
-    <button class="gantt-ctx-item" onclick="ctxAction('extend')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Extend Duration</button>
-    <button class="gantt-ctx-item" onclick="ctxAction('reassign')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Reassign</button>
-    <hr style="margin:4px 0; border-color:var(--color-border); border-style:solid; border-width:1px 0 0 0;">
-    <button class="gantt-ctx-item" onclick="ctxAction('remove')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-error);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-error-muted)'" onmouseout="this.style.background=''">Remove</button>
+    <button class="gantt-ctx-item" data-min-role="pm" onclick="ctxAction('edit')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Edit Assignment</button>
+    <button class="gantt-ctx-item" data-min-role="pm" onclick="ctxAction('extend')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Extend Duration</button>
+    <button class="gantt-ctx-item" data-min-role="pm" onclick="ctxAction('reassign')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Reassign</button>
+    <hr style="margin:var(--space-1) 0; border-color:var(--color-border); border-style:solid; border-width:1px 0 0 0;">
+    <button class="gantt-ctx-item" data-min-role="pm" onclick="ctxAction('remove')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-error);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-error-muted)'" onmouseout="this.style.background=''">Remove</button>
   </div>
 
   <!-- ═══ QUICK-ASSIGN MODAL ═══ -->
@@ -1743,11 +1597,11 @@
         team: [
           { initials: 'SC', name: 'Sarah Chen', role: 'Project Manager', hours: '48h' },
           { initials: 'CW', name: 'Carol Williams', role: 'Design Lead', hours: '96h' },
-          { initials: 'JW', name: 'James Wilson', role: 'QA Engineer', hours: '54h' }
+          { initials: 'JW', name: 'James Wilson', role: 'DevOps Engineer', hours: '54h' }
         ]
       },
       'Contoso Deal': {
-        client: 'Contoso Ltd', status: 'Active', start: 'Apr 1, 2026', end: 'Jul 31, 2026',
+        client: 'Contoso Inc', status: 'Active', start: 'Apr 1, 2026', end: 'Jul 31, 2026',
         budget: '€156,000', hours: '64 / 540h', billing: 'Time & Materials', progress: 12,
         team: [
           { initials: 'SD', name: 'Sophie Dubois', role: 'Business Analyst', hours: '64h' }
@@ -1761,14 +1615,14 @@
         ]
       },
       'Annual Leave': {
-        client: 'N/A', status: 'Approved', start: 'Apr 1, 2026', end: 'Apr 11, 2026',
+        client: 'N/A', status: 'Approved', start: 'Apr 14, 2026', end: 'Apr 18, 2026',
         budget: 'N/A', hours: 'N/A', billing: 'N/A', progress: 0,
         team: [
           { initials: 'AW', name: 'Alice Wang', role: 'Software Engineer', hours: '—' }
         ]
       },
       'BENCH': {
-        client: 'Unassigned', status: 'Bench', start: 'Mar 20, 2026', end: 'TBD',
+        client: 'Unassigned', status: 'Bench', start: 'Mar 20, 2026', end: 'May 30, 2026',
         budget: 'N/A', hours: 'N/A', billing: 'N/A', progress: 0,
         team: [
           { initials: 'BT', name: 'Bob Taylor', role: 'Backend Developer', hours: '—' }
@@ -1789,8 +1643,9 @@
       ],
       // Alice Wang - 45%
       [
-        { label: 'Annual Leave', type: 'leave', start: 1, end: 11, project: 'Annual Leave' },
-        { label: 'Acme Web Redesign', type: 'billable', start: 14, end: 30, project: 'Acme Web Redesign' },
+        { label: 'Acme Web Redesign', type: 'billable', start: 1, end: 11, project: 'Acme Web Redesign' },
+        { label: 'Annual Leave', type: 'leave', start: 14, end: 18, project: 'Annual Leave' },
+        { label: 'Acme Web Redesign', type: 'billable', start: 21, end: 30, project: 'Acme Web Redesign' },
         { label: '__gap_warning', type: 'gap', start: 12, end: 13 }
       ],
       // Bob Taylor - 0%
@@ -1868,7 +1723,7 @@
             warn.style.gridColumn = `${bar.start} / ${bar.end + 1}`;
             warn.style.justifySelf = 'center';
             warn.innerHTML = '<svg data-lucide="alert-triangle"></svg>';
-            warn.title = 'Unassigned gap - Apr 12-13';
+            warn.title = 'Unassigned gap - Apr 12-13 (between assignments)';
             barContainer.appendChild(warn);
             return;
           }
@@ -2134,6 +1989,15 @@
     const ctxMenu = document.getElementById('ganttContextMenu');
     function showCtxMenu(x, y) {
       ctxMenu.style.display = 'block';
+      // Viewport boundary detection
+      var menuW = ctxMenu.offsetWidth || 180;
+      var menuH = ctxMenu.offsetHeight || 200;
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      if (x + menuW > vw) x = vw - menuW - 8;
+      if (y + menuH > vh) y = vh - menuH - 8;
+      if (x < 0) x = 8;
+      if (y < 0) y = 8;
       ctxMenu.style.left = x + 'px';
       ctxMenu.style.top = y + 'px';
     }
@@ -2215,6 +2079,34 @@
       });
     }
 
+    // ── FILTER SEARCH: No results message ──
+    (function() {
+      var searchInput = document.querySelector('.filter-group-search input');
+      if (!searchInput) return;
+      // Create no-results message
+      var noResultsMsg = document.createElement('div');
+      noResultsMsg.id = 'filterNoResults';
+      noResultsMsg.style.cssText = 'display:none;padding:var(--space-4);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);';
+      noResultsMsg.innerHTML = '<svg data-lucide="search-x" width="24" height="24" style="margin:0 auto var(--space-2);display:block;opacity:0.4;"></svg>No team members match your search.';
+      var ganttBody = document.getElementById('employeeList');
+      if (ganttBody) ganttBody.parentNode.insertBefore(noResultsMsg, ganttBody.nextSibling);
+
+      searchInput.addEventListener('input', function() {
+        var q = this.value.trim().toLowerCase();
+        var visibleCount = 0;
+        document.querySelectorAll('.gantt-employee-row').forEach(function(row, idx) {
+          var name = (row.querySelector('.employee-name') || {}).textContent || '';
+          var match = !q || name.toLowerCase().includes(q);
+          row.style.display = match ? '' : 'none';
+          var timelineRows = document.querySelectorAll('.gantt-timeline-row');
+          if (timelineRows[idx]) timelineRows[idx].style.display = match ? '' : 'none';
+          if (match) visibleCount++;
+        });
+        noResultsMsg.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+        if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [noResultsMsg] });
+      });
+    })();
+
     // ── SAVED VIEWS ──
     function toggleSavedViews() {
       var menu = document.getElementById('savedViewsMenu');
@@ -2268,10 +2160,10 @@
       'Acme Web Redesign': 'Acme Web Redesign · Sarah Chen · Mar 1 – Apr 30 · 87% capacity',
       'Globex Phase 2': 'Globex Phase 2 · John Smith · Feb 1 – Jun 15 · 82% capacity',
       'Initech API': 'Initech API · Carol Williams · Mar 1 – May 15 · 90% capacity',
-      'Contoso Deal': 'Contoso Deal · Sophie Dubois · Apr 1 – Jul 31 · 82% capacity',
+      'Contoso Deal': 'Contoso Deal · Contoso Inc · Apr 1 – Jul 31 · 82% capacity',
       'Internal': 'Internal · Emma Laurent · Jan 1 – Dec 31 · 78% capacity',
-      'Annual Leave': 'Annual Leave · Alice Wang · Apr 1 – Apr 11',
-      'BENCH': 'Bench / Unassigned · Bob Taylor · Since Mar 20'
+      'Annual Leave': 'Annual Leave · Alice Wang · Apr 14 – Apr 18',
+      'BENCH': 'Bench / Unassigned · Bob Taylor · Mar 20 – May 30, 2026'
     };
     document.querySelectorAll('.gantt-bar').forEach(function(bar) {
       var proj = bar.dataset.project;
@@ -2293,7 +2185,7 @@
     });
   </script>
 
-  <nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+  <nav class="bottom-nav" aria-label="Mobile navigation">
     <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
     <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
     <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

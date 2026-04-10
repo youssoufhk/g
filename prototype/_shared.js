@@ -97,11 +97,14 @@ GHR.initHoverCard = function() {
           '<span>Work Time</span>' +
           '<span id="hcWorktimePct" class="worktime-pct"></span>' +
         '</div>' +
-        '<div class="worktime-bar" style="margin-top:4px;">' +
+        '<div class="worktime-bar" style="margin-top:var(--space-1);">' +
           '<div class="worktime-fill" id="hcWorktimeFill" style="width:0%"></div>' +
         '</div>' +
       '</div>' +
-      '<a class="hc-link btn btn-ghost btn-sm" id="hcLink" style="margin-top:12px;width:100%;justify-content:center;">View Profile →</a>';
+      '<div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);">' +
+        '<a class="hc-link btn btn-ghost btn-sm" id="hcLink" style="flex:1;justify-content:center;">View Profile</a>' +
+        '<button class="btn btn-ghost btn-sm" id="hcMessage" style="flex:1;justify-content:center;" onclick="GHR.showToast(\'info\',\'Message\',\'Chat would open here.\');">Send Message</button>' +
+      '</div>';
     document.body.appendChild(card);
   }
 
@@ -136,7 +139,7 @@ GHR.initHoverCard = function() {
       var projEl = document.getElementById('hcProject');
       if (project) {
         projEl.style.display = '';
-        projEl.innerHTML = '<span style="font-size:0.75rem;color:var(--color-text-3);">Project: </span><span style="font-size:0.75rem;color:var(--color-text-2);">' + project + '</span>';
+        projEl.innerHTML = '<span style="font-size:var(--text-caption);color:var(--color-text-3);">Project: </span><span style="font-size:var(--text-caption);color:var(--color-text-2);">' + project + '</span>';
       } else {
         projEl.style.display = 'none';
       }
@@ -235,56 +238,6 @@ GHR.initPresence = function() {
   var firstRotate = 15000 + Math.random() * 30000;
   setTimeout(rotateStatuses, firstRotate);
 
-  // "Currently viewing" banner
-  var activeViewers = Object.keys(employees).filter(function(id) {
-    return employees[id].status !== 'on-leave';
-  });
-
-  var bannerDismissed = false;
-  var currentBannerEmployee = null;
-
-  function showViewerBanner() {
-    if (bannerDismissed) return;
-    var existing = document.getElementById('ghrPresenceBanner');
-    if (existing) existing.remove();
-
-    var idx = Math.floor(Math.random() * activeViewers.length);
-    var empId = activeViewers[idx];
-    var emp = employees[empId];
-    currentBannerEmployee = emp;
-
-    var main = document.querySelector('main') || document.querySelector('.page-content') || document.querySelector('.main-wrapper');
-    if (!main) return;
-
-    var banner = document.createElement('div');
-    banner.id = 'ghrPresenceBanner';
-    banner.className = 'presence-banner';
-    banner.innerHTML =
-      '<div class="avatar avatar-sm" style="background:' + GHR.avatarColor(emp.name) + ';flex-shrink:0;">' +
-        GHR.avatarInitials(emp.name) +
-      '</div>' +
-      '<span style="flex:1;color:var(--color-text-2);font-size:0.8125rem;">' +
-        '<strong style="color:var(--color-text-1);">' + emp.name + '</strong> is also viewing this page' +
-      '</span>' +
-      '<button style="background:none;border:none;color:var(--color-text-3);cursor:pointer;padding:4px;line-height:1;" aria-label="Dismiss">' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-      '</button>';
-
-    banner.querySelector('button').addEventListener('click', function() {
-      banner.remove();
-      bannerDismissed = true;
-    });
-
-    main.insertBefore(banner, main.firstChild);
-  }
-
-  // Show after 3s initial delay, then rotate every 30s
-  setTimeout(function() {
-    showViewerBanner();
-    setInterval(function() {
-      if (!bannerDismissed) showViewerBanner();
-    }, 30000);
-  }, 3000);
 };
 
 
@@ -297,6 +250,8 @@ GHR.setRole = function(role) {
   document.body.setAttribute('data-role', role);
   GHR._applyRoleVisibility(role);
   document.dispatchEvent(new CustomEvent('rolechange', { detail: { role: role } }));
+  // Re-render notifications to apply role filtering
+  if (typeof GHR.renderNotifications === 'function') GHR.renderNotifications();
 };
 
 GHR._applyRoleVisibility = function(role) {
@@ -311,7 +266,8 @@ GHR._applyRoleVisibility = function(role) {
   }
 
   // Employee role: hide sensitive data
-  var sensitiveTypes = ['financials', 'billing', 'salary'];
+  // 'hr' added to support HR-specific gating (pipeline, salary history, onboarding details)
+  var sensitiveTypes = ['financials', 'billing', 'salary', 'hr'];
   for (var s = 0; s < sensitiveTypes.length; s++) {
     var els = document.querySelectorAll('[data-sensitive="' + sensitiveTypes[s] + '"]');
     for (var j = 0; j < els.length; j++) {
@@ -334,7 +290,7 @@ GHR.initRoleSwitcher = function() {
 
   var widget = document.createElement('div');
   widget.id = 'ghrRoleSwitcher';
-  widget.style.padding = '8px';
+  widget.style.padding = 'var(--space-2)';
 
   function renderWidget() {
     widget.innerHTML =
@@ -345,13 +301,13 @@ GHR.initRoleSwitcher = function() {
         '</span>' +
         '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
-      '<div id="ghrRoleMenu" style="display:none;margin-top:4px;background:var(--color-surface-3);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;">' +
+      '<div id="ghrRoleMenu" style="display:none;margin-top:var(--space-1);background:var(--color-surface-3);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;">' +
         ['admin', 'pm', 'employee'].map(function(r) {
-          return '<button style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:' +
+          return '<button style="display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2) var(--space-3);background:' +
             (GHR.currentRole === r ? 'var(--color-primary-muted)' : 'none') +
             ';border:none;color:' +
             (GHR.currentRole === r ? 'var(--color-primary)' : 'var(--color-text-1)') +
-            ';font-size:0.75rem;font-family:var(--font-sans);cursor:pointer;text-align:left;" data-role-opt="' + r + '">' +
+            ';font-size:var(--text-caption);font-family:var(--font-sans);cursor:pointer;text-align:left;" data-role-opt="' + r + '">' +
             roleLabels[r] +
           '</button>';
         }).join('') +
@@ -442,20 +398,20 @@ GHR.initKeyboardShortcuts = function() {
       return arr.map(function(s) {
         return '<div class="shortcut-row">' +
           '<kbd class="shortcut-key">' + s.key + '</kbd>' +
-          '<span style="font-size:0.8125rem;color:var(--color-text-2);">' + s.desc + '</span>' +
+          '<span style="font-size:var(--text-body-sm);color:var(--color-text-2);">' + s.desc + '</span>' +
         '</div>';
       }).join('');
     }
 
     panel.innerHTML =
       '<div class="shortcuts-modal">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">' +
-          '<h3 style="font-size:1rem;font-weight:600;color:var(--color-text-1);">Keyboard Shortcuts</h3>' +
-          '<button id="shortcutsPanelClose" style="background:none;border:none;color:var(--color-text-3);cursor:pointer;padding:4px;" aria-label="Close">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);">' +
+          '<h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);">Keyboard Shortcuts</h3>' +
+          '<button id="shortcutsPanelClose" style="background:none;border:none;color:var(--color-text-3);cursor:pointer;padding:var(--space-1);" aria-label="Close">' +
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
           '</button>' +
         '</div>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;">' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 var(--space-8);">' +
           '<div>' + renderCol(col1) + '</div>' +
           '<div>' + renderCol(col2) + '</div>' +
         '</div>' +
@@ -482,9 +438,13 @@ GHR.initKeyboardShortcuts = function() {
     var slidePanel = document.querySelector('.slide-panel-backdrop.active');
     if (slidePanel) { slidePanel.classList.remove('active'); return; }
 
-    // Close command palette
+    // Close command palette (with exit animation)
     var palette = document.querySelector('.cmd-palette-backdrop.active, [class*="cmd-palette"].active');
-    if (palette) { palette.classList.remove('active'); return; }
+    if (palette) {
+      palette.classList.add('removing');
+      setTimeout(function() { palette.classList.remove('active', 'removing'); }, 200);
+      return;
+    }
 
     // Close shortcuts panel
     var sp = document.getElementById('shortcutsPanel');
@@ -563,7 +523,7 @@ GHR.initKeyboardShortcuts = function() {
       if (gKeyMap[key]) {
         e.preventDefault();
         // Role-based navigation guard
-        var restrictedForEmployee = { 's': true, 'i': true };
+        var restrictedForEmployee = { 's': true, 'i': true, 'a': true, 'c': true, 'r': true, 'h': true, 'g': true, 'n': true, 'p': true };
         if (GHR.currentRole === 'employee' && restrictedForEmployee[key]) {
           GHR.showToast('error', 'Access Denied', 'You do not have permission to access that page.');
           return;
@@ -628,7 +588,7 @@ GHR.animateCounters = function() {
 
     var start = 0;
     var end = raw;
-    var duration = 800;
+    var duration = 300;
     var startTime = null;
     var isInt = Number.isInteger(raw);
 
@@ -713,22 +673,36 @@ GHR.initCommandPalette = function(items) {
   // Canonical employees and clients data entities
   var employeeIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 018 0v2"/></svg>';
   var clientIcon   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg>';
-  var dataEntities = [
-    { label: 'Sarah Chen',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'John Smith',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'Marco Rossi',    href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'Carol Williams', href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'Alice Wang',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'David Park',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'Emma Laurent',   href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'Bob Taylor',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
-    { label: 'Acme Corp',      href: 'clients.html', icon: clientIcon, category: 'client' },
-    { label: 'Globex Corp',    href: 'clients.html', icon: clientIcon, category: 'client' },
-    { label: 'Initech',        href: 'clients.html', icon: clientIcon, category: 'client' },
-    { label: 'Umbrella Corp',  href: 'clients.html', icon: clientIcon, category: 'client' }
+  var allDataEntities = [
+    { label: 'Sarah Chen',     href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'John Smith',     href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'Marco Rossi',    href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'Carol Williams', href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'Alice Wang',     href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'David Park',     href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'Emma Laurent',   href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'Bob Taylor',     href: 'hr.html',       icon: employeeIcon, category: 'employee', minRole: null },
+    { label: 'Acme Corp',      href: 'clients.html',  icon: clientIcon,   category: 'client',   minRole: 'pm' },
+    { label: 'Globex Corp',    href: 'clients.html',  icon: clientIcon,   category: 'client',   minRole: 'pm' },
+    { label: 'Initech',        href: 'clients.html',  icon: clientIcon,   category: 'client',   minRole: 'pm' },
+    { label: 'Umbrella Corp',  href: 'clients.html',  icon: clientIcon,   category: 'client',   minRole: 'pm' }
   ];
 
-  var filtered = (items ? items.slice() : []).concat(dataEntities);
+  // Filter entities by current role
+  var roleLevel = { employee: 0, pm: 1, admin: 2 };
+  var currentRoleLevel = roleLevel[GHR.currentRole] || 0;
+  var dataEntities = allDataEntities.filter(function(e) {
+    if (!e.minRole) return true;
+    return currentRoleLevel >= (roleLevel[e.minRole] || 0);
+  });
+
+  // Filter page-specific items by current role too
+  var pageItems = (items ? items.slice() : []).filter(function(item) {
+    if (!item.minRole) return true;
+    return currentRoleLevel >= (roleLevel[item.minRole] || 0);
+  });
+
+  var filtered = pageItems.concat(dataEntities);
 
   function renderItems(list) {
     // Clear existing dynamic items (keep static group labels if present)
@@ -736,7 +710,7 @@ GHR.initCommandPalette = function(items) {
     existing.forEach(function(el) { el.remove(); });
 
     if (list.length === 0) {
-      results.innerHTML = '<div style="padding:32px;text-align:center;color:var(--color-text-3);font-size:0.8125rem;">No results</div>';
+      results.innerHTML = '<div style="padding:var(--space-8);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);">No results</div>';
       return;
     }
 
@@ -810,21 +784,187 @@ GHR.avatarInitials = function(name) {
   return name.split(' ').filter(Boolean).map(function(n) { return n[0]; }).join('').toUpperCase().slice(0, 2);
 };
 
-GHR.avatarColor = function(name) {
-  if (!name) return 'linear-gradient(135deg, var(--color-primary), var(--color-accent))';
-  var colors = [
-    'linear-gradient(135deg, hsl(155,26%,46%), hsl(155,26%,32%))',
-    'linear-gradient(135deg, hsl(30,58%,50%), hsl(30,58%,36%))',
-    'linear-gradient(135deg, hsl(200,40%,52%), hsl(200,40%,38%))',
-    'linear-gradient(135deg, hsl(270,45%,58%), hsl(270,45%,44%))',
-    'linear-gradient(135deg, hsl(38,60%,48%), hsl(38,60%,34%))',
-    'linear-gradient(135deg, hsl(5,65%,52%), hsl(5,65%,38%))'
-  ];
+GHR._avatarColors = [
+  'linear-gradient(135deg, hsl(155,26%,46%), hsl(155,26%,32%))',  /* sage */
+  'linear-gradient(135deg, hsl(30,58%,50%), hsl(30,58%,36%))',   /* terracotta */
+  'linear-gradient(135deg, hsl(200,40%,52%), hsl(200,40%,38%))', /* ocean */
+  'linear-gradient(135deg, hsl(270,45%,58%), hsl(270,45%,44%))', /* purple */
+  'linear-gradient(135deg, hsl(38,60%,48%), hsl(38,60%,34%))',   /* gold */
+  'linear-gradient(135deg, hsl(5,65%,52%), hsl(5,65%,38%))',     /* red */
+  'linear-gradient(135deg, hsl(175,35%,45%), hsl(175,35%,32%))', /* teal */
+  'linear-gradient(135deg, hsl(340,45%,52%), hsl(340,45%,38%))' /* rose */
+];
+
+GHR._avatarHash = function(name) {
+  if (!name) return 0;
   var hash = 0;
   for (var i = 0; i < name.length; i++) {
     hash = (hash * 31 + name.charCodeAt(i)) | 0;
   }
-  return colors[Math.abs(hash) % colors.length];
+  return Math.abs(hash);
+};
+
+GHR.avatarColor = function(name) {
+  if (!name) return 'linear-gradient(135deg, var(--color-primary), var(--color-accent))';
+  return GHR._avatarColors[GHR._avatarHash(name) % GHR._avatarColors.length];
+};
+
+/* Returns a CSS class name (avatar-color-0 through avatar-color-7) for deterministic avatar coloring */
+GHR.avatarColorClass = function(name) {
+  return 'avatar-color-' + (GHR._avatarHash(name) % 8);
+};
+
+
+/* ── K-0. NOTIFICATION PANEL RENDERER (single source of truth) ── */
+GHR.notificationItems = [
+  { icon: 'clock',       color: 'var(--color-primary)', title: 'Sarah Chen submitted 40h timesheet for review',             time: '10 min ago',  unread: true,  href: 'timesheets.html' },
+  { icon: 'check-circle',color: 'var(--color-success)', title: 'Expense report #1847 approved by Finance',                  time: '25 min ago',  unread: true,  href: 'expenses.html' },
+  { icon: 'calendar',    color: 'var(--color-info)',     title: 'Marco Rossi requested annual leave (Jun 15-22)',            time: '1 hour ago',  unread: true,  href: 'leaves.html' },
+  { icon: 'alert-circle',color: 'var(--color-warning)',  title: 'Invoice INV-2026-048 overdue — Acme Corp (EUR 12,400)',   time: '2 hours ago', unread: false, href: 'invoices.html', minRole: 'pm' },
+  { icon: 'users',       color: 'var(--color-primary)',  title: 'New hire onboarding: Emma Laurent starts Monday',          time: '3 hours ago', unread: false, href: 'hr.html', minRole: 'pm' },
+  { icon: 'trending-up', color: 'var(--color-success)',  title: 'Monthly Insights report is ready to view',                 time: '5 hours ago', unread: false, href: 'insights.html' }
+];
+
+GHR.renderNotifications = function(filter) {
+  var panel = document.getElementById('notifPanel');
+  if (!panel) return;
+
+  filter = filter || 'all';
+
+  // Filter items by role visibility
+  var role = GHR.currentRole || 'admin';
+  var roleLevel = { employee: 0, pm: 1, admin: 2 };
+  var items = GHR.notificationItems.filter(function(n) {
+    if (!n.minRole) return true;
+    return (roleLevel[role] || 0) >= (roleLevel[n.minRole] || 0);
+  });
+
+  // Filter by tab
+  var filtered = items;
+  if (filter === 'unread') {
+    filtered = items.filter(function(n) { return n.unread; });
+  } else if (filter === 'mentions') {
+    filtered = items.filter(function(n) { return n.mention; });
+  }
+
+  var unreadCount = items.filter(function(n) { return n.unread; }).length;
+
+  var headerHtml =
+    '<div class="notif-panel-header">' +
+      '<span style="font-weight:var(--weight-semibold);font-size:var(--text-body);">Notifications</span>' +
+      '<div style="display:flex;align-items:center;gap:var(--space-2);">' +
+        '<button class="btn btn-ghost btn-xs" id="markAllReadBtn">Mark all read</button>' +
+        '<button id="notifPanelCloseBtn" aria-label="Close notifications" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;background:transparent;border:none;border-radius:var(--radius-md);color:var(--color-text-3);cursor:pointer;transition:all var(--motion-fast);" onmouseover="this.style.background=\'var(--color-surface-1)\';this.style.color=\'var(--color-text-1)\';" onmouseout="this.style.background=\'transparent\';this.style.color=\'var(--color-text-3)\';">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="notif-tabs" style="display:flex;gap:0;border-bottom:1px solid var(--color-border-subtle);">' +
+      '<button class="notif-tab' + (filter === 'all' ? ' active' : '') + '" data-notif-filter="all" style="flex:1;padding:var(--space-2) var(--space-3);background:none;border:none;border-bottom:2px solid ' + (filter === 'all' ? 'var(--color-primary)' : 'transparent') + ';color:' + (filter === 'all' ? 'var(--color-primary)' : 'var(--color-text-2)') + ';font-size:var(--text-caption);font-weight:var(--weight-medium);cursor:pointer;font-family:var(--font-sans);">All</button>' +
+      '<button class="notif-tab' + (filter === 'unread' ? ' active' : '') + '" data-notif-filter="unread" style="flex:1;padding:var(--space-2) var(--space-3);background:none;border:none;border-bottom:2px solid ' + (filter === 'unread' ? 'var(--color-primary)' : 'transparent') + ';color:' + (filter === 'unread' ? 'var(--color-primary)' : 'var(--color-text-2)') + ';font-size:var(--text-caption);font-weight:var(--weight-medium);cursor:pointer;font-family:var(--font-sans);">Unread (' + unreadCount + ')</button>' +
+      '<button class="notif-tab' + (filter === 'mentions' ? ' active' : '') + '" data-notif-filter="mentions" style="flex:1;padding:var(--space-2) var(--space-3);background:none;border:none;border-bottom:2px solid ' + (filter === 'mentions' ? 'var(--color-primary)' : 'transparent') + ';color:' + (filter === 'mentions' ? 'var(--color-primary)' : 'var(--color-text-2)') + ';font-size:var(--text-caption);font-weight:var(--weight-medium);cursor:pointer;font-family:var(--font-sans);">Mentions</button>' +
+    '</div>';
+
+  var listHtml = '<div class="notif-panel-list">';
+  if (filtered.length === 0) {
+    listHtml += '<div style="padding:var(--space-8);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);">No ' + (filter === 'all' ? '' : filter + ' ') + 'notifications</div>';
+  } else {
+    for (var i = 0; i < filtered.length; i++) {
+      var n = filtered[i];
+      listHtml +=
+        '<a href="' + n.href + '" class="notif-item' + (n.unread ? ' unread' : '') + '" style="text-decoration:none;color:inherit;">' +
+          '<div class="notif-icon"><svg data-lucide="' + n.icon + '" width="16" height="16" style="color:' + n.color + ';"></svg></div>' +
+          '<div class="notif-text">' +
+            '<div class="notif-title">' + n.title + '</div>' +
+            '<div class="notif-time">' + n.time + '</div>' +
+          '</div>' +
+        '</a>';
+    }
+  }
+  listHtml += '</div>';
+
+  panel.innerHTML = headerHtml + listHtml;
+
+  // Wire × close button (re-wired every render since innerHTML is replaced)
+  var closeBtn = panel.querySelector('#notifPanelCloseBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      panel.classList.remove('active');
+    });
+  }
+
+  // Wire tab clicks
+  var tabs = panel.querySelectorAll('[data-notif-filter]');
+  for (var t = 0; t < tabs.length; t++) {
+    tabs[t].addEventListener('click', function(e) {
+      e.stopPropagation();
+      GHR.renderNotifications(this.getAttribute('data-notif-filter'));
+    });
+  }
+
+  // Re-render Lucide icons inside the panel
+  if (window.lucide) {
+    lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide', nodes: panel.querySelectorAll('[data-lucide]') });
+  }
+};
+
+/* ── K-0b. NOTIFICATION PANEL + HEADER WIRING ── */
+GHR.initNotifications = function() {
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var userDropdown = document.querySelector('.user-dropdown');
+  if (!notifBtn || !notifPanel) return;
+
+  // Render notification items from single source of truth
+  GHR.renderNotifications();
+
+  // Toggle panel — clicking bell opens OR closes (true toggle)
+  notifBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = notifPanel.classList.contains('active');
+    if (isOpen) {
+      notifPanel.classList.remove('active');
+    } else {
+      notifPanel.classList.add('active');
+      if (userDropdown) userDropdown.classList.remove('active');
+    }
+  });
+
+  // Close on outside click — checks that click is not inside panel or bell button
+  document.addEventListener('click', function(e) {
+    if (notifPanel.classList.contains('active') &&
+        !notifPanel.contains(e.target) &&
+        !notifBtn.contains(e.target)) {
+      notifPanel.classList.remove('active');
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && notifPanel.classList.contains('active')) {
+      notifPanel.classList.remove('active');
+      notifBtn.focus();
+    }
+  });
+};
+
+/* ── K-0c. "MARK ALL READ" EVENT DELEGATION ── */
+GHR.initMarkAllRead = function() {
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('#markAllReadBtn');
+    if (!btn) return;
+    e.preventDefault();
+    // Clear unread state from all notification items
+    var unreads = document.querySelectorAll('.notif-item.unread');
+    for (var i = 0; i < unreads.length; i++) {
+      unreads[i].classList.remove('unread');
+    }
+    // Remove the notification dot indicator
+    var dot = document.querySelector('.notif-dot');
+    if (dot) dot.remove();
+    GHR.showToast('success', 'Done', 'All notifications marked as read.');
+  });
 };
 
 
@@ -867,41 +1007,53 @@ GHR.renderSidebar = function() {
       '<div class="nav-section">' +
         '<div class="nav-section-label">Main</div>' +
         navItem('index.html', 'layout-dashboard', 'Dashboard') +
+        navItem('calendar.html', 'calendar', 'Calendar') +
         navItem('timesheets.html', 'clock', 'Timesheets', '7') +
-        navItem('expenses.html', 'receipt', 'Expenses', '2') +
-        navItem('leaves.html', 'palm-tree', 'Leaves', '3') +
-      '</div>' +
-      '<div class="nav-section">' +
-        '<div class="nav-section-label">HR</div>' +
-        navItem('hr.html', 'briefcase', 'Recruitment', '5') +
-        navItem('employees.html', 'users', 'Team Directory') +
+        navItem('leaves.html', 'umbrella', 'Leaves', '3') +
       '</div>' +
       '<div class="nav-section">' +
         '<div class="nav-section-label">Work</div>' +
-        navItem('projects.html', 'folder-kanban', 'Projects') +
-        navItem('gantt.html', 'gantt-chart-square', 'Gantt Chart') +
-        navItem('clients.html', 'building-2', 'Clients') +
-        navItem('planning.html', 'calendar-range', 'Resource Planning') +
-        navItem('calendar.html', 'calendar', 'Calendar') +
+        navItem('expenses.html', 'receipt', 'Expenses', '2') +
+        '<span data-min-role="pm">' +
+          navItem('projects.html', 'folder', 'Projects') +
+          navItem('gantt.html', 'bar-chart-2', 'Gantt Chart') +
+          navItem('planning.html', 'calendar', 'Resource Planning') +
+          navItem('clients.html', 'building-2', 'Clients') +
+          navItem('invoices.html', 'file-text', 'Invoices') +
+        '</span>' +
       '</div>' +
       '<div class="nav-section">' +
-        '<div class="nav-section-label">Finance</div>' +
-        navItem('invoices.html', 'file-text', 'Invoices') +
-        navItem('insights.html', 'sparkles', 'Insights') +
+        '<div class="nav-section-label">HR</div>' +
+        navItem('employees.html', 'users', 'Team Directory') +
+        '<span data-min-role="pm">' +
+          navItem('hr.html', 'briefcase', 'Human Resources', '5') +
+        '</span>' +
+      '</div>' +
+      '<div class="nav-section" data-min-role="pm">' +
+        '<div class="nav-section-label">AI</div>' +
+        navItem('insights.html', 'lightbulb', 'AI Insights') +
       '</div>' +
       '<div class="nav-section" data-min-role="admin">' +
         '<div class="nav-section-label">Admin</div>' +
-        navItem('approvals.html', 'check-square', 'Approvals', '12') +
-        navItem('admin.html', 'settings', 'Settings') +
+        navItem('admin.html', 'settings', 'Administration') +
       '</div>' +
     '</nav>' +
     '<div class="sidebar-footer">' +
-      '<a href="account.html" class="nav-item' + (active === 'account.html' ? ' active' : '') + '" style="margin-bottom:var(--space-2);">' +
+      '<a href="approvals.html" class="nav-item' + (active === 'approvals.html' ? ' active' : '') + ' " data-min-role="pm" style="margin-bottom:var(--space-1);">' +
+        '<svg data-lucide="check-square"></svg>' +
+        '<span class="nav-label">Approvals</span>' +
+        '<span class="nav-badge">12</span>' +
+      '</a>' +
+      '<a href="account.html" class="nav-item' + (active === 'account.html' ? ' active' : '') + '" style="margin-bottom:var(--space-1);">' +
         '<svg data-lucide="user-circle"></svg>' +
         '<span class="nav-label">Account</span>' +
       '</a>' +
+      '<a href="#" class="nav-item" id="helpShortcutsLink" style="margin-bottom:var(--space-2);">' +
+        '<svg data-lucide="keyboard"></svg>' +
+        '<span class="nav-label">Help & Shortcuts</span>' +
+      '</a>' +
       '<button class="sidebar-collapse-btn" id="sidebarCollapseBtn">' +
-        '<svg data-lucide="panel-left-close"></svg>' +
+        '<svg data-lucide="chevrons-left"></svg>' +
         '<span>Collapse</span>' +
       '</button>' +
     '</div>';
@@ -917,6 +1069,22 @@ GHR.renderSidebar = function() {
     collapseBtn.addEventListener('click', function() {
       sidebar.classList.toggle('collapsed');
       localStorage.setItem('ghr-sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+    });
+  }
+
+  // Wire up Help & Shortcuts link
+  var helpLink = document.getElementById('helpShortcutsLink');
+  if (helpLink) {
+    helpLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Trigger the ? key shortcut panel
+      var panel = document.getElementById('shortcutsPanel');
+      if (!panel) {
+        // Dispatch a synthetic ? keydown to build the panel via initKeyboardShortcuts
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
+      } else {
+        panel.classList.toggle('open');
+      }
     });
   }
 
@@ -943,13 +1111,101 @@ GHR.renderSidebar = function() {
 };
 
 
+/* ── L. FEEL: AI ALERTS COLLAPSE (dashboard — show top 2 only) ─────── */
+GHR.initAiAlertsCollapse = function() {
+  var containers = document.querySelectorAll('.ai-alerts-list, [class*="ai-alerts"]');
+  containers.forEach(function(container) {
+    var items = container.querySelectorAll('.ai-insight-card, .ai-alert-item');
+    if (items.length <= 2) return; // Nothing to collapse
+
+    var hiddenCount = items.length - 2;
+    // Remove any existing expand button to avoid duplicates
+    var existingBtn = container.querySelector('.ai-alerts-expand-btn');
+    if (existingBtn) existingBtn.remove();
+
+    var btn = document.createElement('button');
+    btn.className = 'ai-alerts-expand-btn';
+    btn.innerHTML =
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+      'View ' + hiddenCount + ' more alert' + (hiddenCount === 1 ? '' : 's');
+    btn.addEventListener('click', function() {
+      container.classList.add('alerts-expanded');
+    });
+    container.appendChild(btn);
+  });
+};
+
+
+/* ── M. FEEL: ADMIN INVITE ROLE DEFAULT ─────────────────────────────── */
+/* Ensures the invite modal pre-selects "Employee" as the default role */
+GHR.initInviteModalDefaults = function() {
+  var inviteModal = document.getElementById('inviteUserModal') || document.querySelector('[id*="invite"]');
+  if (!inviteModal) return;
+
+  // When invite modal opens, default role to employee
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        var el = mutation.target;
+        if (el.classList.contains('active') || el.classList.contains('open')) {
+          var roleSelect = el.querySelector('[name="role"], #inviteRole, select[id*="role"]');
+          if (roleSelect && !roleSelect.value) {
+            roleSelect.value = 'employee';
+          }
+          var deptSelect = el.querySelector('[name="department"], #inviteDept, select[id*="dept"]');
+          if (deptSelect && !deptSelect.value && deptSelect.options.length > 1) {
+            // Pre-select first non-empty option
+            deptSelect.selectedIndex = 1;
+          }
+        }
+      }
+    });
+  });
+
+  observer.observe(inviteModal, { attributes: true });
+};
+
+
+/* ── N. FEEL: EXPENSES AI AUTO-FILL ─────────────────────────────────── */
+/* Makes AI scan results auto-fill the form immediately on detection */
+GHR.initExpenseAutoFill = function() {
+  // Wire up the aiAutoFilledBanner to be shown automatically when AI scan completes
+  // The expenses page uses applyAiResults() — we wrap it to auto-trigger on scan complete
+  var bannerEl = document.getElementById('aiAutoFilledBanner');
+  if (!bannerEl) return;
+
+  // Watch for when AI results appear (the ai-results div becomes visible)
+  var aiResultsEl = document.getElementById('aiResults') || document.querySelector('[id*="aiResults"]');
+  if (!aiResultsEl) return;
+
+  var observer = new MutationObserver(function() {
+    var isVisible = aiResultsEl.style.display !== 'none' && !aiResultsEl.classList.contains('hidden');
+    if (isVisible) {
+      // Auto-apply the AI results if the applyAiResults function exists
+      if (typeof window.applyAiResults === 'function') {
+        window.applyAiResults();
+      }
+      // Show the autofill banner
+      bannerEl.style.display = 'flex';
+    }
+  });
+
+  observer.observe(aiResultsEl, { attributes: true, attributeFilter: ['style', 'class'] });
+};
+
+
 /* ── AUTO-INIT ────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   GHR.renderSidebar();
+  GHR.initNotifications();
+  GHR.initMarkAllRead();
   GHR.initHoverCard();
   GHR.initPresence();
   GHR.initRoleSwitcher();
   GHR.initKeyboardShortcuts();
   GHR.animateCharts();
+  GHR.initAiAlertsCollapse();
+  GHR.initInviteModalDefaults();
+  GHR.initExpenseAutoFill();
   // GHR.initSkeletons();  — opt-in per page
 });

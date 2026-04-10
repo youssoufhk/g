@@ -111,28 +111,7 @@
     .type-personal .balance-bar-fill { background: var(--color-accent); }
     .type-wfh .balance-bar-fill     { background: var(--color-wfh); }
 
-    /* Filter bar */
-    .filter-bar-standard {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-4);
-      flex-wrap: wrap;
-    }
-    .filter-bar-standard .form-select {
-      width: auto;
-      min-width: 140px;
-      height: 32px;
-      font-size: var(--text-body-sm);
-      background: var(--color-surface-1);
-    }
-    .filter-bar-standard .form-input {
-      width: auto;
-      min-width: 140px;
-      height: 32px;
-      font-size: var(--text-body-sm);
-      background: var(--color-surface-1);
-    }
+    /* Filter bar — uses canonical .filter-bar-standard from _layout.css */
 
     /* Leave request cards */
     .leave-request-list {
@@ -240,7 +219,7 @@
     .heatmap-cell {
       width: 100%;
       aspect-ratio: 1;
-      border-radius: 2px;
+      border-radius: var(--radius-sm);
       background: var(--color-surface-1);
       min-width: 0;
     }
@@ -266,7 +245,7 @@
     .heatmap-legend-dot {
       width: 10px;
       height: 10px;
-      border-radius: 2px;
+      border-radius: var(--radius-sm);
     }
     .heatmap-legend-dot.annual  { background: var(--color-info); }
     .heatmap-legend-dot.sick    { background: var(--color-chart-5); }
@@ -372,6 +351,9 @@
       min-width: 160px;
       text-align: center;
     }
+    @media (max-width: 639px) {
+      .calendar-nav .month-label { min-width: 120px; font-size: var(--text-heading-3); }
+    }
     .calendar-view-toggle {
       display: flex;
       background: var(--color-surface-1);
@@ -457,9 +439,9 @@
       height: 24px;
     }
     .calendar-event {
-      font-size: 10px;
+      font-size: var(--text-overline);
       padding: 1px var(--space-1);
-      border-radius: 3px;
+      border-radius: var(--radius-sm);
       margin-bottom: 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -486,6 +468,9 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--space-4);
+    }
+    @media (max-width: 639px) {
+      .form-row { grid-template-columns: 1fr; }
     }
     .form-calc {
       display: flex;
@@ -541,7 +526,7 @@
     }
     .empty-state svg { width: 64px; height: 64px; margin-bottom: var(--space-4); opacity: 0.3; }
     .empty-state h3 {
-      font-size: var(--text-heading-2);
+      font-size: var(--text-heading-3);
       color: var(--color-text-2);
       margin-bottom: var(--space-2);
     }
@@ -562,6 +547,11 @@
     }
     .confirm-body svg { color: var(--color-warning); margin-bottom: var(--space-3); }
     .confirm-body p { color: var(--color-text-2); margin-top: var(--space-2); }
+
+    /* ── Saved Views dropdown ── */
+    .saved-views-menu.active { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; }
+    .saved-view-item { padding: var(--space-2) var(--space-3); font-size: var(--text-body-sm); color: var(--color-text-1); cursor: pointer; }
+    .saved-view-item:hover { background: var(--color-surface-2); }
   </style>
 </head>
 <body class="show-populated">
@@ -597,35 +587,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="palm-tree" width="16" height="16" style="color: var(--color-info);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Leave approved: Your annual leave (Mar 22-26) was approved by John Smith</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Pending request: Alice Wang requested annual leave (Apr 1-11)</div>
-                  <div class="notif-time">3 hours ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Leave balance reset: Your 2026 balances have been updated</div>
-                  <div class="notif-time">Jan 1, 2026</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -666,6 +628,20 @@
           <p class="page-subtitle">Manage leave requests, balances, and team availability</p>
         </div>
         <div class="page-header-actions">
+          <div style="position:relative;display:inline-block;">
+            <button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.classList.toggle('active')" style="gap:var(--space-1-5);">
+              <svg data-lucide="bookmark" width="14" height="14"></svg>
+              Saved Views
+              <svg data-lucide="chevron-down" width="12" height="12"></svg>
+            </button>
+            <div class="saved-views-menu" style="position:absolute;top:calc(100% + 4px);right:0;min-width:180px;background:var(--color-surface-3);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-3);z-index:500;padding:var(--space-1) 0;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all var(--motion-fast) var(--ease-out);">
+              <div class="saved-view-item" onclick="showToast('info','View','All Requests view applied');this.closest('.saved-views-menu').classList.remove('active');">All Requests</div>
+              <div class="saved-view-item" onclick="showToast('info','View','Pending view applied');this.closest('.saved-views-menu').classList.remove('active');">Pending</div>
+              <div class="saved-view-item" onclick="showToast('info','View','Annual Leave view applied');this.closest('.saved-views-menu').classList.remove('active');">Annual Leave</div>
+              <div class="saved-view-item" onclick="showToast('info','View','This Month view applied');this.closest('.saved-views-menu').classList.remove('active');">This Month</div>
+              <div class="saved-view-item" onclick="showToast('info','View','Team Leaves view applied');activateTab('team');this.closest('.saved-views-menu').classList.remove('active');" data-min-role="pm">Team Leaves</div>
+            </div>
+          </div>
           <button class="btn btn-secondary btn-md" id="exportBtn">
             <svg data-lucide="download" width="16" height="16"></svg>
             Export
@@ -676,6 +652,59 @@
           </button>
         </div>
       </div>
+
+      <!-- Stat Cards -->
+      <div class="leave-stats-grid perspective-container stagger-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-4);">
+        <!-- Team Absences This Month -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Team Absences This Month</div>
+          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">8 <span style="font-size:var(--text-body-sm);font-weight:var(--weight-regular);color:var(--color-text-3);">days</span></div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
+            <svg data-lucide="trending-down" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+            -3 days vs last month
+          </div>
+        </div>
+        <!-- Approval Rate -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Approval Rate</div>
+          <div style="display:flex;align-items:flex-end;gap:var(--space-3);">
+            <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">94%</div>
+            <svg width="80" height="28" viewBox="0 0 80 28" style="margin-bottom:2px;" data-animate="draw-line">
+              <polyline points="0,20 12,18 24,22 36,14 48,12 60,10 72,8 80,6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="0,20 12,18 24,22 36,14 48,12 60,10 72,8 80,6 80,28 0,28" fill="url(#leaveSparkFill)" stroke="none"/>
+              <defs><linearGradient id="leaveSparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-success)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-success)" stop-opacity="0"/></linearGradient></defs>
+            </svg>
+          </div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-2);">
+            <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;color:var(--color-success);"></svg>
+            Consistent over 6 months
+          </div>
+        </div>
+        <!-- Upcoming -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Upcoming (Next 2 Weeks)</div>
+          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">3</div>
+          <div style="display:flex;gap:var(--space-1);margin-top:var(--space-2);">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--color-info);display:inline-block;" title="Alice Wang - Apr 14-18"></span>
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent);display:inline-block;" title="Bob Taylor - Apr 21-25"></span>
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent);display:inline-block;" title="Yuki Tanaka - Apr 10"></span>
+          </div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-1);">Alice, Bob, Yuki</div>
+        </div>
+        <!-- Avg Response Time -->
+        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Avg Response Time</div>
+          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">4h</div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
+            <svg data-lucide="trending-down" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+            -2h vs last month (faster)
+          </div>
+        </div>
+      </div>
+      <style>
+        @media (max-width: 1023px) { .leave-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 639px) { .leave-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+      </style>
 
       <!-- Tabs -->
       <div class="tabs mb-6">
@@ -699,8 +728,8 @@
         <div class="populated-content">
 
           <!-- Leave Balance Cards -->
-          <div class="leave-balance-grid">
-            <div class="balance-card type-annual">
+          <div class="leave-balance-grid perspective-container stagger-reveal">
+            <div class="balance-card type-annual card-3d card-interactive" style="cursor:pointer;" onclick="openLeaveModalWithType('annual')">
               <div class="balance-card-header">
                 <div class="balance-card-type">
                   <svg data-lucide="sun"></svg>
@@ -724,9 +753,13 @@
                 <svg data-lucide="alert-triangle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
                 8 days expire on Dec 31, 2026
               </div>
+              <!-- Year-over-year comparison -->
+              <div style="margin-top:var(--space-1);font-size:var(--text-caption);color:var(--color-text-3);">
+                Last year at this point: 10 used
+              </div>
             </div>
 
-            <div class="balance-card type-sick">
+            <div class="balance-card type-sick card-3d card-interactive" style="cursor:pointer;" onclick="openLeaveModalWithType('sick')">
               <div class="balance-card-header">
                 <div class="balance-card-type">
                   <svg data-lucide="thermometer"></svg>
@@ -744,9 +777,12 @@
               <div class="balance-bar">
                 <div class="balance-bar-fill" style="width: 83%; background: var(--color-success);"></div>
               </div>
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
+                Last year at this point: 4 used
+              </div>
             </div>
 
-            <div class="balance-card type-personal">
+            <div class="balance-card type-personal card-3d card-interactive" style="cursor:pointer;" onclick="openLeaveModalWithType('personal')">
               <div class="balance-card-header">
                 <div class="balance-card-type">
                   <svg data-lucide="heart"></svg>
@@ -764,9 +800,12 @@
               <div class="balance-bar">
                 <div class="balance-bar-fill" style="width: 100%; background: var(--color-success);"></div>
               </div>
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
+                Last year at this point: 1 used
+              </div>
             </div>
 
-            <div class="balance-card type-wfh">
+            <div class="balance-card type-wfh card-3d card-interactive" style="cursor:pointer;" onclick="openLeaveModalWithType('wfh')">
               <div class="balance-card-header">
                 <div class="balance-card-type">
                   <svg data-lucide="home"></svg>
@@ -784,6 +823,9 @@
               <div class="balance-bar">
                 <div class="balance-bar-fill" style="width: 100%; background: var(--color-success);"></div>
               </div>
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
+                Last year at this point: 2 used
+              </div>
             </div>
           </div>
 
@@ -799,23 +841,40 @@
 
           <!-- Filters (issue 22: default to current year) -->
           <div class="filter-bar-standard">
-            <select class="form-select form-input-sm">
+            <div class="filter-search">
+              <svg data-lucide="search" width="16" height="16"></svg>
+              <input type="text" placeholder="Search leaves..." id="myLeavesSearch" oninput="filterMyLeaves()">
+            </div>
+            <select class="form-select form-input-sm" id="myLeavesStatus" onchange="filterMyLeaves()">
               <option value="">All Statuses</option>
               <option>Approved</option>
               <option>Pending</option>
               <option>Rejected</option>
               <option>Cancelled</option>
             </select>
-            <select class="form-select form-input-sm">
+            <select class="form-select form-input-sm" id="myLeavesType" onchange="filterMyLeaves()">
               <option value="">All Types</option>
               <option>Annual Leave</option>
               <option>Sick Leave</option>
               <option>Personal</option>
               <option>Remote Work</option>
             </select>
-            <input type="date" class="form-input form-input-sm" id="myLeavesFrom" value="2026-01-01" title="From date">
+            <input type="date" class="form-input form-input-sm" id="myLeavesFrom" value="2026-01-01" title="From date" onchange="filterMyLeaves()">
             <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
-            <input type="date" class="form-input form-input-sm" id="myLeavesTo" value="2026-12-31" title="To date">
+            <input type="date" class="form-input form-input-sm" id="myLeavesTo" value="2026-12-31" title="To date" onchange="filterMyLeaves()">
+          </div>
+
+          <!-- No-results state -->
+          <div id="myLeavesEmpty" style="display:none;">
+            <div class="empty-state" style="display:flex;">
+              <svg data-lucide="search" width="48" height="48" style="opacity:0.3;"></svg>
+              <h3 style="font-size:var(--text-heading-3);color:var(--color-text-2);margin-bottom:var(--space-2);">No leave requests match your filters</h3>
+              <p style="font-size:var(--text-body);max-width:400px;">Try adjusting your search or filter criteria.</p>
+              <button class="btn btn-secondary btn-sm" style="margin-top:var(--space-4);" onclick="clearMyLeavesFilters()">
+                <svg data-lucide="x" width="16" height="16"></svg>
+                Clear Filters
+              </button>
+            </div>
           </div>
 
           <!-- My Leave Requests -->
@@ -1007,12 +1066,12 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">AW</div>
-                      <a href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
+                      <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">Apr 1 &ndash; 11</td>
-                  <td data-label="Days" class="cell-mono">9</td>
+                  <td data-label="Dates">Apr 14 &ndash; 18</td>
+                  <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
                   <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
@@ -1028,11 +1087,11 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">BT</div>
-                      <a href="employees.html#bob-taylor" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Bob Taylor</a>
+                      <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Bob Taylor</a>
                     </div>
                   </td>
-                  <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">Apr 14 &ndash; 18</td>
+                  <td data-label="Type"><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
+                  <td data-label="Dates">Apr 21 &ndash; 25</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
@@ -1044,7 +1103,7 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">EL</div>
-                      <a href="employees.html#emma-laurent" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
+                      <a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
@@ -1052,7 +1111,7 @@
                   <td data-label="Days" class="cell-mono">2</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
-                  <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> Alice also off</span></td>
+                  <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
                   <td data-label="Actions"></td>
                 </tr>
                 <tr class="team-leave-row">
@@ -1187,7 +1246,7 @@
           <!-- Calendar Grid (month view) — wrapped for mobile overflow -->
           <div id="leaveCalMonth">
           <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-          <div class="calendar-grid" style="min-width: 480px;">
+          <div class="calendar-grid" style="min-width: 308px;">
             <div class="calendar-weekdays">
               <div class="calendar-weekday">Mon</div>
               <div class="calendar-weekday">Tue</div>
@@ -1215,9 +1274,9 @@
                   <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
                   <span></span><span></span><span>1</span><span>2</span><span style="background:var(--color-primary);color:var(--color-white);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;">3</span><span>4</span><span>5</span>
                   <span style="background:var(--color-primary);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);">6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
-                  <span>13</span><span style="background:var(--color-warning);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">14</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">15</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">16</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">17</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">18</span><span>19</span>
+                  <span>13</span><span style="background:var(--color-warning);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">14</span><span style="background:var(--color-warning);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">15</span><span style="background:var(--color-warning);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">16</span><span style="background:var(--color-warning);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">17</span><span style="background:var(--color-warning);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">18</span><span>19</span>
                   <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
-                  <span>27</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">28</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">29</span><span>30</span><span></span><span></span><span></span>
+                  <span>27</span><span style="background:var(--color-chart-1);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">28</span><span style="background:var(--color-chart-1);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">29</span><span>30</span><span></span><span></span><span></span>
                 </div>
               </div>
               <!-- May -->
@@ -1229,7 +1288,7 @@
                   <span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                   <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
                   <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span>
-                  <span>25</span><span>26</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">27</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">28</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">29</span><span>30</span><span>31</span>
+                  <span>25</span><span>26</span><span style="background:var(--color-chart-4);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">27</span><span style="background:var(--color-chart-4);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">28</span><span style="background:var(--color-chart-4);border-radius:var(--radius-sm);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">29</span><span>30</span><span>31</span>
                 </div>
               </div>
               <!-- June -->
@@ -1248,16 +1307,16 @@
             <!-- Quarter legend -->
             <div style="display:flex;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-primary);display:inline-block;"></span> Today
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-primary);display:inline-block;"></span> Today
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-warning);display:inline-block;"></span> Alice Wang — On Leave
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-warning);display:inline-block;"></span> Alice Wang — On Leave
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-chart-1);display:inline-block;opacity:0.7;"></span> Your Annual Leave (pending)
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-chart-1);display:inline-block;opacity:0.7;"></span> Your Annual Leave (pending)
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:2px;background:var(--color-chart-4);display:inline-block;opacity:0.7;"></span> Bob Taylor — Bank Holiday
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-chart-4);display:inline-block;opacity:0.7;"></span> Bob Taylor — Bank Holiday
               </div>
             </div>
           </div>
@@ -1274,7 +1333,7 @@
                   <script>
                     // Jan 2026 leave: none
                     var jan = '';
-                    for(var i=1;i<=31;i++){jan+='<span style="width:12px;height:12px;border-radius:2px;background:var(--color-surface-2);display:inline-block;" title="Jan '+i+'"></span>';}
+                    for(var i=1;i<=31;i++){jan+='<span style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-surface-2);display:inline-block;" title="Jan '+i+'"></span>';}
                     document.write(jan);
                   </script>
                 </div>
@@ -1331,16 +1390,16 @@
             <!-- Legend -->
             <div style="display:flex;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-1);display:inline-block;"></span> Annual Leave (approved)
+                <span style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-chart-1);display:inline-block;"></span> Annual Leave (approved)
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-1);display:inline-block;opacity:0.5;"></span> Annual Leave (pending)
+                <span style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-chart-1);display:inline-block;opacity:0.5;"></span> Annual Leave (pending)
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-6);display:inline-block;"></span> Sick Leave
+                <span style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-chart-6);display:inline-block;"></span> Sick Leave
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:12px;height:12px;border-radius:2px;background:var(--color-success);display:inline-block;"></span> Public Holiday
+                <span style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-success);display:inline-block;"></span> Public Holiday
               </div>
             </div>
           </div>
@@ -1368,9 +1427,29 @@
     </div>
     <div class="modal-body">
       <div class="flex-col gap-4">
+        <!-- Balance summary at top of modal (FEEL fix) -->
+        <div id="modalBalanceSummary" style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-2);">
+          <div id="modalBalAnnual" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-info-muted);border:2px solid var(--color-info);text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='annual';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+            <div style="font-size:var(--text-caption);color:var(--color-info);font-weight:var(--weight-medium);">Annual</div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">18<span style="font-size:var(--text-caption);color:var(--color-text-3);">/25</span></div>
+          </div>
+          <div id="modalBalSick" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='sick';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+            <div style="font-size:var(--text-caption);color:var(--color-chart-5);font-weight:var(--weight-medium);">Sick</div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">10<span style="font-size:var(--text-caption);color:var(--color-text-3);">/12</span></div>
+          </div>
+          <div id="modalBalPersonal" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='personal';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+            <div style="font-size:var(--text-caption);color:var(--color-accent);font-weight:var(--weight-medium);">Personal</div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">3<span style="font-size:var(--text-caption);color:var(--color-text-3);">/3</span></div>
+          </div>
+          <div id="modalBalWfh" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='wfh';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+            <div style="font-size:var(--text-caption);color:var(--color-wfh, var(--color-text-2));font-weight:var(--weight-medium);">WFH</div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">5<span style="font-size:var(--text-caption);color:var(--color-text-3);">/5</span></div>
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="form-label">Leave Type <span class="required">*</span></label>
-          <select class="form-select" id="modalLeaveType" id="leaveType">
+          <select class="form-select" id="modalLeaveType">
             <option value="annual">Annual Leave</option>
             <option value="sick">Sick Leave</option>
             <option value="personal">Personal</option>
@@ -1385,6 +1464,12 @@
             <span style="font-size:var(--text-body-sm);color:var(--color-text-3);">Upload medical certificate (PDF, JPG)</span>
           </div>
         </div>
+        <!-- Suggested dates chip (FEEL fix) -->
+        <div id="suggestedDatesChip" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-md);margin-bottom:var(--space-1);font-size:var(--text-caption);color:var(--color-primary);cursor:pointer;" onclick="applySuggestedDates()">
+          <svg data-lucide="sparkles" width="14" height="14" style="flex-shrink:0;"></svg>
+          <span>Suggested: <strong>Apr 21-25</strong> -- no team conflicts, no holidays</span>
+          <button class="btn btn-xs btn-primary" style="margin-left:auto;">Apply</button>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Start Date <span class="required">*</span></label>
@@ -1397,12 +1482,19 @@
         </div>
         <!-- Conflict warning -->
         <div id="leaveConflictWarning" style="display:none;background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-md);padding:var(--space-3);margin-top:var(--space-2);font-size:var(--text-body-sm);color:var(--color-warning);"></div>
-        <div class="form-group">
+        <div class="form-group" id="halfDayGroup">
           <label class="form-label">Duration</label>
-          <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+          <!-- Single-day options -->
+          <div id="halfDaySingle" style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
             <label class="form-check"><input type="radio" name="halfDay" value="full" checked id="halfDayFull"><span>Full day</span></label>
             <label class="form-check"><input type="radio" name="halfDay" value="morning" id="halfDayMorning"><span>Half day (morning)</span></label>
             <label class="form-check"><input type="radio" name="halfDay" value="afternoon" id="halfDayAfternoon"><span>Half day (afternoon)</span></label>
+          </div>
+          <!-- Multi-day options (shown when range > 1 day) -->
+          <div id="halfDayMulti" style="display:none;flex-direction:column;gap:var(--space-2);">
+            <label class="form-check"><input type="radio" name="halfDay" value="full" checked><span>Full days</span></label>
+            <label class="form-check"><input type="radio" name="halfDay" value="half-first"><span>Half day on first day (start afternoon)</span></label>
+            <label class="form-check"><input type="radio" name="halfDay" value="half-last"><span>Half day on last day (end at noon)</span></label>
           </div>
         </div>
         <div class="form-calc" id="modalCalcInfo">
@@ -1483,7 +1575,7 @@
         <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Team Directory</div></div>
       </a>
-      <a href="invoices.html" class="cmd-palette-item">
+      <a href="invoices.html" class="cmd-palette-item" data-min-role="pm">
         <div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Invoices</div></div>
       </a>
@@ -1492,7 +1584,7 @@
         <div class="item-icon"><svg data-lucide="plus" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Request Leave</div><div class="item-subtitle">Submit a new leave request</div></div>
       </div>
-      <div class="cmd-palette-item" onclick="activateTab('team'); closeCmdPalette();">
+      <div class="cmd-palette-item" data-min-role="pm" onclick="activateTab('team'); closeCmdPalette();">
         <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">View Team Leaves</div><div class="item-subtitle">Switch to team leave view</div></div>
       </div>
@@ -1711,9 +1803,67 @@
   }
 
   requestLeaveBtn.addEventListener('click', function() { openLeaveModal(); });
+
+  // Open modal with pre-selected leave type (from balance card click)
+  window.openLeaveModalWithType = function(type) {
+    openLeaveModal();
+    if (modalLeaveType) {
+      modalLeaveType.value = type;
+      // Trigger change to update calculations and med cert visibility
+      modalLeaveType.dispatchEvent(new Event('change'));
+    }
+    updateModalCalc();
+  };
   leaveModalClose.addEventListener('click', closeLeaveModal);
   leaveModalCancel.addEventListener('click', closeLeaveModal);
   leaveModal.addEventListener('click', function(e) { if (e.target === leaveModal) closeLeaveModal(); });
+
+  // ── Suggested dates ──
+  window.applySuggestedDates = function() {
+    modalStartDate.value = '2026-04-21';
+    modalEndDate.value = '2026-04-25';
+    updateModalCalc();
+    checkLeaveConflicts('2026-04-21', '2026-04-25');
+    var chip = document.getElementById('suggestedDatesChip');
+    if (chip) chip.style.display = 'none';
+  };
+
+  // ── Balance highlight in modal ──
+  window.updateModalBalanceHighlight = function() {
+    var typeMap = { annual: 'modalBalAnnual', sick: 'modalBalSick', personal: 'modalBalPersonal', wfh: 'modalBalWfh' };
+    var colorMap = { annual: 'var(--color-info)', sick: 'var(--color-chart-5)', personal: 'var(--color-accent)', wfh: 'var(--color-wfh, var(--color-text-2))' };
+    var type = modalLeaveType ? modalLeaveType.value : 'annual';
+    Object.keys(typeMap).forEach(function(key) {
+      var el = document.getElementById(typeMap[key]);
+      if (el) {
+        if (key === type) {
+          el.style.borderColor = colorMap[key];
+          el.style.background = key === 'annual' ? 'var(--color-info-muted)' :
+                                key === 'sick' ? 'var(--color-chart-5-muted)' :
+                                key === 'personal' ? 'var(--color-accent-muted)' :
+                                'var(--color-surface-2)';
+        } else {
+          el.style.borderColor = 'transparent';
+          el.style.background = 'var(--color-surface-1)';
+        }
+      }
+    });
+    updateModalCalc();
+  };
+
+  // ── Multi-day half-day toggle ──
+  function updateHalfDayUI() {
+    var days = getWorkingDays(modalStartDate.value, modalEndDate.value);
+    var singleEl = document.getElementById('halfDaySingle');
+    var multiEl = document.getElementById('halfDayMulti');
+    if (days > 1) {
+      if (singleEl) singleEl.style.display = 'none';
+      if (multiEl) multiEl.style.display = 'flex';
+    } else {
+      if (singleEl) singleEl.style.display = 'flex';
+      if (multiEl) multiEl.style.display = 'none';
+    }
+  }
 
   // Calculate working days
   function getWorkingDays(start, end) {
@@ -1761,14 +1911,14 @@
       modalBalanceAfter.style.color = '';
     }
 
-    // Conflict check (fake: warn if Apr 7-11 overlaps)
+    // Conflict check (fake: warn if Apr 14-18 overlaps — Alice Wang on leave)
     var startD = new Date(modalStartDate.value);
     var endD = new Date(modalEndDate.value);
-    var conflictStart = new Date('2026-04-07');
-    var conflictEnd = new Date('2026-04-11');
+    var conflictStart = new Date('2026-04-14');
+    var conflictEnd = new Date('2026-04-18');
     if (startD <= conflictEnd && endD >= conflictStart) {
       modalConflict.className = 'conflict-check has-conflict';
-      modalConflict.innerHTML = '<svg data-lucide="alert-triangle"></svg><span>2 others off that week (Alice Wang, Emma Laurent)</span>';
+      modalConflict.innerHTML = '<svg data-lucide="alert-triangle"></svg><span>1 other off that week (Alice Wang — Annual Leave Apr 14–18)</span>';
     } else {
       modalConflict.className = 'conflict-check no-conflict';
       modalConflict.innerHTML = '<svg data-lucide="check-circle"></svg><span>No conflicts detected</span>';
@@ -1776,16 +1926,16 @@
     lucide.createIcons({ nodes: [modalConflict] });
   }
 
-  modalStartDate.addEventListener('change', updateModalCalc);
-  modalEndDate.addEventListener('change', updateModalCalc);
-  modalLeaveType.addEventListener('change', updateModalCalc);
+  modalStartDate.addEventListener('change', function() { updateModalCalc(); updateHalfDayUI(); });
+  modalEndDate.addEventListener('change', function() { updateModalCalc(); updateHalfDayUI(); });
+  modalLeaveType.addEventListener('change', function() { updateModalCalc(); updateModalBalanceHighlight(); });
 
   // ── Leave Conflict Detection ──
   window.checkLeaveConflicts = function(startDate, endDate) {
     var conflictDiv = document.getElementById('leaveConflictWarning');
     if (!conflictDiv || !startDate || !endDate) return;
     var conflicts = [
-      { name: 'Alice Wang', dates: 'Apr 14-18', type: 'Annual Leave', start: '2026-04-14', end: '2026-04-18' },
+      { name: 'Alice Wang', dates: 'Apr 14\u201318', type: 'Annual Leave', start: '2026-04-14', end: '2026-04-18' },
       { name: 'Marco Rossi', dates: 'Apr 20-21', type: 'Personal', start: '2026-04-20', end: '2026-04-21' }
     ];
     var s = new Date(startDate);
@@ -1802,6 +1952,34 @@
     } else {
       conflictDiv.style.display = 'none';
     }
+  };
+
+  // ── My Leaves Filtering ──
+  window.filterMyLeaves = function() {
+    var search = (document.getElementById('myLeavesSearch') || {}).value || '';
+    search = search.toLowerCase();
+    var cards = document.querySelectorAll('.leave-request-list .leave-request-card');
+    var visible = 0;
+    cards.forEach(function(card) {
+      var text = card.textContent.toLowerCase();
+      var match = !search || text.indexOf(search) >= 0;
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    var emptyEl = document.getElementById('myLeavesEmpty');
+    var listEl = document.querySelector('.leave-request-list');
+    if (emptyEl) emptyEl.style.display = visible === 0 ? 'block' : 'none';
+    if (listEl) listEl.style.display = visible === 0 ? 'none' : '';
+  };
+
+  window.clearMyLeavesFilters = function() {
+    var searchEl = document.getElementById('myLeavesSearch');
+    var statusEl = document.getElementById('myLeavesStatus');
+    var typeEl = document.getElementById('myLeavesType');
+    if (searchEl) searchEl.value = '';
+    if (statusEl) statusEl.value = '';
+    if (typeEl) typeEl.value = '';
+    filterMyLeaves();
   };
 
   // ── Medical Certificate for sick leave ──
@@ -2102,11 +2280,11 @@
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
   var leaveEvents = [
-    { name: 'Alice Wang', type: 'annual', startDay: 1, endDay: 11, month: 3, pending: false },
+    { name: 'Alice Wang', type: 'annual', startDay: 14, endDay: 18, month: 3, pending: false },
     { name: 'Sarah Chen', type: 'annual', startDay: 28, endDay: 29, month: 3, pending: true },
     { name: 'Emma Laurent', type: 'sick', startDay: 7, endDay: 8, month: 3, pending: false },
     { name: 'Yuki Tanaka', type: 'personal', startDay: 10, endDay: 10, month: 3, pending: false },
-    { name: 'Bob Taylor', type: 'annual', startDay: 14, endDay: 18, month: 3, pending: false },
+    { name: 'Bob Taylor', type: 'personal', startDay: 21, endDay: 25, month: 3, pending: false },
     { name: 'Maria Rodriguez', type: 'wfh', startDay: 15, endDay: 15, month: 3, pending: false },
     { name: 'James Kim', type: 'annual', startDay: 21, endDay: 25, month: 3, pending: true },
   ];
@@ -2246,7 +2424,7 @@
         else if (m.teamLeaveDays && m.teamLeaveDays.indexOf(d) >= 0) bg = 'var(--color-warning)';
         else if (m.pendingDays && m.pendingDays.indexOf(d) >= 0) { bg = 'var(--color-chart-1)'; opacity = '0.5'; }
         else if (m.holidayDays && m.holidayDays.indexOf(d) >= 0) bg = 'var(--color-success)';
-        html += '<span style="width:12px;height:12px;border-radius:2px;background:' + bg + ';display:inline-block;opacity:' + opacity + ';cursor:pointer;" title="' + d + '"></span>';
+        html += '<span style="width:12px;height:12px;border-radius:var(--radius-sm);background:' + bg + ';display:inline-block;opacity:' + opacity + ';cursor:pointer;" title="' + d + '"></span>';
       }
       el.innerHTML = html;
     });
@@ -2330,7 +2508,7 @@
 </script>
 
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Bottom navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

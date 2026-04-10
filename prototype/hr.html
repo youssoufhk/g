@@ -20,12 +20,12 @@
       scrollbar-width: thin;
     }
     .kanban::-webkit-scrollbar { height: 6px; }
-    .kanban::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+    .kanban::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: var(--radius-sm); }
 
     .kanban-column {
-      min-width: 280px;
+      min-width: 200px;
       max-width: 320px;
-      flex: 1;
+      flex: 1 1 0;
       display: flex;
       flex-direction: column;
     }
@@ -333,6 +333,8 @@
       justify-content: space-between;
       margin-bottom: var(--space-4);
       margin-top: var(--space-6);
+      flex-wrap: wrap;
+      gap: var(--space-2);
     }
     .section-heading h3 {
       font-size: var(--text-heading-3);
@@ -361,13 +363,50 @@
     .empty-state p { max-width: 400px; }
 
     /* ── Responsive ── */
+    @media (min-width: 640px) and (max-width: 1400px) {
+      .kanban-column { min-width: 180px; max-width: none; }
+    }
     @media (max-width: 1023px) {
       .kanban { flex-wrap: nowrap; }
-      .kanban-column { min-width: 260px; }
+      .kanban-column { min-width: 160px; }
     }
     @media (max-width: 639px) {
       .kanban { flex-direction: column; }
-      .kanban-column { min-width: auto; width: 100%; }
+      .kanban-column { min-width: auto; width: 100%; display: none; }
+      .kanban-column.mobile-active { display: flex; }
+      .kanban-stage-tabs { display: flex; }
+    }
+
+    /* ── Kanban mobile stage tabs ── */
+    .kanban-stage-tabs {
+      display: none;
+      gap: var(--space-1);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .kanban-stage-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1-5) var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-0);
+      font-size: var(--text-caption);
+      font-family: var(--font-sans);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-2);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .kanban-stage-tab:hover { border-color: var(--color-border-strong); }
+    .kanban-stage-tab.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-text-on-primary);
     }
 
     /* ── Tab bar scroll (mobile) ── */
@@ -494,35 +533,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="briefcase" width="16" height="16" style="color: var(--color-primary);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">5 new applications received for open positions</div>
-                  <div class="notif-time">Just now</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="user-plus" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Yuki Tanaka's onboarding started today</div>
-                  <div class="notif-time">2 hours ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="calendar" width="16" height="16" style="color: var(--color-accent);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Elena Kowalski's 2nd round interview at 2pm</div>
-                  <div class="notif-time">3 hours ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -607,8 +618,8 @@
         <div class="tab-content active" id="tab-recruitment">
 
           <!-- KPI Cards (original 3-col) -->
-          <div class="grid-3 mb-4" class="mt-4">
-            <div class="stat-card">
+          <div class="grid-3 mb-4 mt-4 perspective-container stagger-reveal">
+            <div class="stat-card card-3d">
               <div class="stat-label">Open Positions</div>
               <div class="stat-value">8</div>
               <div class="stat-trend up">
@@ -616,7 +627,7 @@
                 +2 this month
               </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Active Candidates</div>
               <div class="stat-value">47</div>
               <div class="stat-trend" style="color: var(--color-info);">
@@ -624,7 +635,7 @@
                 12 in interview stage
               </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Avg. Time to Hire</div>
               <div class="stat-value">28<span style="font-size: var(--text-body); font-weight: var(--weight-medium); color: var(--color-text-2);"> days</span></div>
               <div class="stat-trend up">
@@ -635,37 +646,53 @@
           </div>
 
           <!-- Pipeline KPI Summary Row -->
-          <div class="grid-4 mb-6">
-            <div class="stat-card">
+          <div class="grid-4 mb-6 perspective-container stagger-reveal">
+            <div class="stat-card card-3d">
               <div class="stat-label">Open Roles</div>
               <div class="stat-value">3</div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Open roles trend">
+                <polyline points="0,18 13,14 27,16 40,12 53,10 67,8 80,6" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,18 13,14 27,16 40,12 53,10 67,8 80,6 80,24 0,24" fill="var(--color-primary-muted)" stroke="none"/>
+              </svg>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Total Candidates</div>
               <div class="stat-value">12</div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Candidates trend">
+                <polyline points="0,20 13,18 27,14 40,16 53,10 67,8 80,4" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,20 13,18 27,14 40,16 53,10 67,8 80,4 80,24 0,24" fill="var(--color-info-muted)" stroke="none"/>
+              </svg>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Offers Pending</div>
               <div class="stat-value">2</div>
               <div class="stat-trend" style="color:var(--color-warning);">
                 <svg data-lucide="clock" width="14" height="14"></svg>
                 Awaiting response
               </div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Offers trend">
+                <polyline points="0,12 13,16 27,10 40,14 53,8 67,12 80,10" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,12 13,16 27,10 40,14 53,8 67,12 80,10 80,24 0,24" fill="var(--color-warning-muted)" stroke="none"/>
+              </svg>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Avg Time-to-Hire</div>
               <div class="stat-value">18<span style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);"> days</span></div>
               <div class="stat-trend up">
                 <svg data-lucide="trending-down" width="14" height="14"></svg>
                 -4 days vs Q1
               </div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Time-to-hire trend">
+                <polyline points="0,4 13,8 27,6 40,10 53,12 67,16 80,18" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,4 13,8 27,6 40,10 53,12 67,16 80,18 80,24 0,24" fill="var(--color-success-muted)" stroke="none"/>
+              </svg>
             </div>
           </div>
 
           <!-- Kanban Pipeline -->
-          <div class="section-heading">
+          <div class="section-heading" style="flex-wrap:wrap;">
             <h3>Recruitment Pipeline</h3>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2" style="flex-wrap:wrap;">
               <button class="btn btn-secondary btn-sm" id="filterCandidatesBtn">
                 <svg data-lucide="filter" width="14" height="14"></svg>
                 Filter
@@ -681,7 +708,37 @@
             </div>
           </div>
 
-          <div class="kanban">
+          <!-- Kanban search -->
+          <div style="position:relative;margin-bottom:var(--space-3);max-width:360px;">
+            <svg data-lucide="search" width="16" height="16" style="position:absolute;left:var(--space-3);top:50%;transform:translateY(-50%);color:var(--color-text-3);pointer-events:none;"></svg>
+            <input type="text" id="kanbanSearch" placeholder="Search candidates by name..." style="width:100%;min-height:40px;padding:0 var(--space-3) 0 36px;background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-size:var(--text-body-sm);font-family:var(--font-sans);" />
+          </div>
+
+          <!-- Mobile stage selector tabs (visible < 640px) -->
+          <div class="kanban-stage-tabs" id="kanbanStageTabs">
+            <button class="kanban-stage-tab active" data-stage-idx="0">Applied (3)</button>
+            <button class="kanban-stage-tab" data-stage-idx="1">Screening (2)</button>
+            <button class="kanban-stage-tab" data-stage-idx="2">Interview (3)</button>
+            <button class="kanban-stage-tab" data-stage-idx="3">Offer (2)</button>
+            <button class="kanban-stage-tab" data-stage-idx="4">Hired (2)</button>
+          </div>
+
+          <!-- Candidate count summary bar -->
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-md);margin-bottom:var(--space-4);flex-wrap:wrap;font-size:var(--text-body-sm);color:var(--color-text-2);" id="kanbanSummaryBar">
+            <span style="font-weight:var(--weight-semibold);color:var(--color-text-1);">Pipeline:</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-info);margin-right:var(--space-1);"></span>Applied: <strong>3</strong></span>
+            <span style="color:var(--color-border-strong);">|</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-warning);margin-right:var(--space-1);"></span>Screening: <strong>2</strong></span>
+            <span style="color:var(--color-border-strong);">|</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-accent);margin-right:var(--space-1);"></span>Interview: <strong>3</strong></span>
+            <span style="color:var(--color-border-strong);">|</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-chart-5);margin-right:var(--space-1);"></span>Offer: <strong>2</strong></span>
+            <span style="color:var(--color-border-strong);">|</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-success);margin-right:var(--space-1);"></span>Hired: <strong>2</strong></span>
+          </div>
+
+          <div style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+          <div class="kanban stagger-reveal">
 
             <!-- APPLIED Column -->
             <div class="kanban-column stage-applied">
@@ -690,7 +747,7 @@
                 <span class="col-count">15</span>
               </div>
               <div class="kanban-body" data-stage="Applied">
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">MS</div>
                     <div>
@@ -706,7 +763,7 @@
                   <div class="days-in-stage">In stage: 5 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">JW</div>
                     <div>
@@ -722,7 +779,7 @@
                   <div class="days-in-stage">In stage: 9 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">AP</div>
                     <div>
@@ -747,7 +804,7 @@
                 <span class="col-count">8</span>
               </div>
               <div class="kanban-body" data-stage="Screening">
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">TM</div>
                     <div>
@@ -766,7 +823,7 @@
                   <div class="days-in-stage">In stage: 15 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">LS</div>
                     <div>
@@ -794,7 +851,7 @@
                 <span class="col-count">12</span>
               </div>
               <div class="kanban-body" data-stage="Interview">
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">EK</div>
                     <div>
@@ -812,7 +869,7 @@
                   <div class="days-in-stage">In stage: 21 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">NK</div>
                     <div>
@@ -830,7 +887,7 @@
                   <div class="days-in-stage">In stage: 14 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">PM</div>
                     <div>
@@ -857,7 +914,7 @@
                 <span class="col-count">4</span>
               </div>
               <div class="kanban-body" data-stage="Offer">
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">RK</div>
                     <div>
@@ -872,7 +929,7 @@
                   <div class="days-in-stage">In stage: 4 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">SO</div>
                     <div>
@@ -896,7 +953,7 @@
                 <span class="col-count">8</span>
               </div>
               <div class="kanban-body" data-stage="Hired">
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">YT</div>
                     <div>
@@ -912,7 +969,7 @@
                   <div class="days-in-stage">In stage: 11 days</div>
                 </div>
 
-                <div class="candidate-card" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">AH</div>
                     <div>
@@ -931,17 +988,25 @@
             </div>
 
           </div><!-- /kanban -->
+          </div><!-- /kanban-scroll-wrapper -->
         </div><!-- /tab-recruitment -->
 
         <!-- ══════════════════ TAB 2: ONBOARDING ══════════════════ -->
         <div class="tab-content" id="tab-onboarding">
 
-          <div class="section-heading" class="mt-4">
+          <div class="section-heading mt-4">
             <h3>Active Onboardings</h3>
-            <button class="btn btn-secondary btn-sm">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('info','Start Onboarding','Onboarding wizard would open here — select a new hire to begin.')">
               <svg data-lucide="plus" width="14" height="14"></svg>
               Start Onboarding
             </button>
+          </div>
+
+          <!-- All-complete empty state (shown when no active onboardings) -->
+          <div id="onboardingAllComplete" class="hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+            <svg data-lucide="party-popper" style="width:48px;height:48px;margin:0 auto var(--space-4);display:block;opacity:0.5;color:var(--color-success);"></svg>
+            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">All onboardings complete!</div>
+            <div style="font-size:var(--text-body);max-width:400px;margin:0 auto;">Every new hire has been fully onboarded. Start a new onboarding when your next team member joins.</div>
           </div>
 
           <div class="grid-3 mb-6">
@@ -967,14 +1032,14 @@
                   <div class="progress-fill" style="width: 62.5%;"></div>
                 </div>
                 <div class="checklist">
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Contract signed</label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment ordered</label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> IT access created</label>
-                  <label class="checklist-item"><input type="checkbox"> Welcome email sent</label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Buddy assigned: <span class="buddy-name">Sophie Dubois</span></label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> First day orientation scheduled</label>
-                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled</label>
-                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled</label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Contract signed <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-verified from DocuSign">Auto-verified</span></label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment ordered <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-tracked from procurement system">Auto-tracked</span></label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> IT access created <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-detected from admin user creation">Auto-detected</span></label>
+                  <label class="checklist-item"><input type="checkbox"> Welcome email sent <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Yuki Tanaka'):showToast('Welcome email sent')">Send now</button></label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> Buddy assigned: <span class="buddy-name">Sophie Dubois</span> <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="AI-suggested based on department and availability">AI-suggested</span></label>
+                  <label class="checklist-item done"><input type="checkbox" checked disabled> First day orientation scheduled <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-scheduled from calendar">Auto-scheduled</span></label>
+                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
+                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
                 </div>
               </div>
             </div>
@@ -1033,15 +1098,20 @@
                 <div class="progress-bar">
                   <div class="progress-fill" style="width: 0%;"></div>
                 </div>
+                <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--color-info-muted);border-radius:var(--radius-md);margin-bottom:var(--space-3);">
+                  <svg data-lucide="sparkles" width="16" height="16" style="color:var(--color-info);flex-shrink:0;"></svg>
+                  <span style="font-size:var(--text-body-sm);color:var(--color-info);flex:1;">AI can auto-complete 5 of 8 tasks based on your workflow settings.</span>
+                  <button class="btn btn-primary btn-xs" onclick="var items=this.closest('.onboard-card-body').querySelectorAll('.checklist-item:not(.done)');var count=0;items.forEach(function(it){var btn=it.querySelector('.btn');if(btn){btn.click();count++;}});GHR&&GHR.showToast?GHR.showToast('success','Auto-completed',count+' tasks processed automatically'):showToast(count+' tasks auto-completed')">Auto-complete all</button>
+                </div>
                 <div class="checklist">
-                  <label class="checklist-item"><input type="checkbox"> Contract signed</label>
-                  <label class="checklist-item"><input type="checkbox"> Equipment ordered</label>
-                  <label class="checklist-item"><input type="checkbox"> IT access created</label>
-                  <label class="checklist-item"><input type="checkbox"> Welcome email sent</label>
-                  <label class="checklist-item"><input type="checkbox"> Buddy assigned</label>
-                  <label class="checklist-item"><input type="checkbox"> First day orientation scheduled</label>
-                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled</label>
-                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled</label>
+                  <label class="checklist-item"><input type="checkbox"> Contract signed <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Sent','DocuSign request sent to Clara Bergmann'):showToast('DocuSign sent')">Send DocuSign</button></label>
+                  <label class="checklist-item"><input type="checkbox"> Equipment ordered <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Ordered','Standard dev kit ordered via procurement'):showToast('Equipment ordered')">Order standard kit</button></label>
+                  <label class="checklist-item"><input type="checkbox"> IT access created <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Engineering template'):showToast('IT access created')">Provision from template</button></label>
+                  <label class="checklist-item"><input type="checkbox"> Welcome email sent <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Clara Bergmann'):showToast('Welcome email sent')">Send now</button></label>
+                  <label class="checklist-item"><input type="checkbox"> Buddy assigned <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests John Smith (Engineering, available)'):showToast('Buddy assigned')">AI suggest</button></label>
+                  <label class="checklist-item"><input type="checkbox"> First day orientation scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 21 calendar'):showToast('Scheduled')">Auto-schedule</button></label>
+                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
+                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
                 </div>
               </div>
             </div>
@@ -1050,24 +1120,24 @@
           <!-- Onboarding Templates -->
           <div class="section-heading">
             <h3>Onboarding Templates</h3>
-            <button class="btn btn-ghost btn-sm">
+            <button class="btn btn-ghost btn-sm" onclick="showToast('info','New Template','Template builder would open here — define tasks, timelines, and assignees.')">
               <svg data-lucide="plus" width="14" height="14"></svg>
               New Template
             </button>
           </div>
 
           <div class="grid-3">
-            <div class="template-card">
+            <div class="template-card card-interactive">
               <div class="tpl-icon"><svg data-lucide="code" width="20" height="20"></svg></div>
               <div class="tpl-name">Engineering Onboarding</div>
               <div class="tpl-meta">12 tasks &middot; Used 23 times</div>
             </div>
-            <div class="template-card">
+            <div class="template-card card-interactive">
               <div class="tpl-icon"><svg data-lucide="megaphone" width="20" height="20"></svg></div>
               <div class="tpl-name">Sales Onboarding</div>
               <div class="tpl-meta">10 tasks &middot; Used 15 times</div>
             </div>
-            <div class="template-card">
+            <div class="template-card card-interactive">
               <div class="tpl-icon"><svg data-lucide="building" width="20" height="20"></svg></div>
               <div class="tpl-name">General Onboarding</div>
               <div class="tpl-meta">8 tasks &middot; Used 45 times</div>
@@ -1077,6 +1147,13 @@
 
         <!-- ══════════════════ TAB 3: OFFBOARDING ══════════════════ -->
         <div class="tab-content" id="tab-offboarding">
+
+          <!-- All-complete empty state (shown when no active offboardings) -->
+          <div id="offboardingAllComplete" class="hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+            <svg data-lucide="check-circle" style="width:48px;height:48px;margin:0 auto var(--space-4);display:block;opacity:0.5;color:var(--color-success);"></svg>
+            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No active offboardings</div>
+            <div style="font-size:var(--text-body);max-width:400px;margin:0 auto;">All offboarding processes have been completed. When a team member departs, start an offboarding from here.</div>
+          </div>
 
           <div class="offboarding-view">
             <div class="card" style="margin-bottom:var(--space-4)">
@@ -1244,45 +1321,61 @@
         <div class="tab-content" id="tab-records">
 
           <!-- Stat Cards -->
-          <div class="grid-4 mb-6" class="mt-4">
-            <div class="stat-card">
+          <div class="grid-4 mb-6 perspective-container stagger-reveal" class="mt-4">
+            <div class="stat-card card-3d">
               <div class="stat-label">Total Employees</div>
               <div class="stat-value">48</div>
               <div class="stat-trend up">
                 <svg data-lucide="trending-up" width="14" height="14"></svg>
                 +3 this quarter
               </div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Headcount trend">
+                <polyline points="0,20 13,18 27,16 40,14 53,10 67,8 80,4" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,20 13,18 27,16 40,14 53,10 67,8 80,4 80,24 0,24" fill="var(--color-primary-muted)" stroke="none"/>
+              </svg>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Active Contracts</div>
               <div class="stat-value">45</div>
               <div class="stat-trend" class="text-3">
                 <svg data-lucide="file-check" width="14" height="14"></svg>
                 93.8% of total
               </div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Active contracts trend">
+                <polyline points="0,16 13,14 27,14 40,12 53,10 67,8 80,6" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,16 13,14 27,14 40,12 53,10 67,8 80,6 80,24 0,24" fill="var(--color-success-muted)" stroke="none"/>
+              </svg>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">On Probation</div>
               <div class="stat-value">3</div>
               <div class="stat-trend" style="color: var(--color-warning);">
                 <svg data-lucide="clock" width="14" height="14"></svg>
                 1 ending this month
               </div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Probation trend">
+                <polyline points="0,8 13,12 27,10 40,14 53,12 67,16 80,14" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,8 13,12 27,10 40,14 53,12 67,16 80,14 80,24 0,24" fill="var(--color-warning-muted)" stroke="none"/>
+              </svg>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Upcoming Renewals</div>
               <div class="stat-value">2</div>
               <div class="stat-trend" style="color: var(--color-info);">
                 <svg data-lucide="calendar" width="14" height="14"></svg>
                 Within 30 days
               </div>
+              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Renewals trend">
+                <polyline points="0,10 13,14 27,8 40,12 53,16 67,10 80,12" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <polyline points="0,10 13,14 27,8 40,12 53,16 67,10 80,12 80,24 0,24" fill="var(--color-info-muted)" stroke="none"/>
+              </svg>
             </div>
           </div>
 
           <!-- Lifecycle Events -->
           <div class="section-heading">
             <h3>Recent Lifecycle Events</h3>
-            <button class="btn btn-secondary btn-sm">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('info','Filter','Filter by event type, date range, or department — coming soon.')">
               <svg data-lucide="filter" width="14" height="14"></svg>
               Filter
             </button>
@@ -1368,7 +1461,7 @@
                   <td data-label="Date">Apr 30, 2026</td>
                   <td data-label="Status"><span class="badge badge-warning "><svg data-lucide="clock" width="12" height="12"></svg> Pending Review</span></td>
                 </tr>
-                <tr>
+                <tr data-sensitive="salary">
                   <td data-label="Employee">
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">MR</div>
@@ -1419,7 +1512,7 @@
         <svg data-lucide="briefcase" width="64" height="64"></svg>
         <h3>No HR data yet</h3>
         <p>Start building your HR pipeline by creating a new job posting or initiating an onboarding process.</p>
-        <button class="btn btn-primary btn-md">
+        <button class="btn btn-primary btn-md" onclick="var m=document.getElementById('newJobModal');if(m){m.classList.add('active');if(window.lucide)lucide.createIcons({nodes:[m]});}">
           <svg data-lucide="plus" width="16" height="16"></svg>
           Create Job Posting
         </button>
@@ -1624,7 +1717,11 @@
 
   // ── New Job Posting Button ──
   document.getElementById('newJobBtn').addEventListener('click', function() {
-    showToast('info', 'New Job Posting', 'The job posting form would open here in the full application.');
+    var modal = document.getElementById('newJobModal');
+    if (modal) {
+      modal.classList.add('active');
+      if (window.lucide) lucide.createIcons({ nodes: [modal] });
+    }
   });
 
   // ── Empty State Toggle ──
@@ -1864,6 +1961,62 @@
   }
   updateKanbanEmptyStates();
 
+  // ── Mobile Stage Tab Switching ──
+  (function() {
+    var stageTabs = document.querySelectorAll('.kanban-stage-tab');
+    var kanbanColumns = document.querySelectorAll('.kanban-column');
+
+    // Set first column as mobile-active on load
+    if (kanbanColumns.length > 0) kanbanColumns[0].classList.add('mobile-active');
+
+    stageTabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-stage-idx'));
+        stageTabs.forEach(function(t) { t.classList.remove('active'); });
+        this.classList.add('active');
+        kanbanColumns.forEach(function(col, i) {
+          col.classList.toggle('mobile-active', i === idx);
+        });
+      });
+    });
+  })();
+
+  // ── Kanban Candidate Search ──
+  (function() {
+    var searchInput = document.getElementById('kanbanSearch');
+    if (!searchInput) return;
+    searchInput.addEventListener('input', function() {
+      var q = this.value.toLowerCase().trim();
+      var visibleCount = 0;
+      document.querySelectorAll('.candidate-card').forEach(function(card) {
+        var name = card.querySelector('.cand-name');
+        var text = name ? name.textContent.toLowerCase() : '';
+        var show = text.includes(q) || q === '';
+        card.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+      // Show/hide per-column empty states based on search
+      document.querySelectorAll('.kanban-column').forEach(function(col) {
+        var body = col.querySelector('.kanban-body');
+        if (!body) return;
+        var hasVisible = Array.from(body.querySelectorAll('.candidate-card')).some(function(c) { return c.style.display !== 'none'; });
+        var noResults = body.querySelector('.kanban-search-empty');
+        if (!hasVisible && q !== '') {
+          if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.className = 'kanban-empty kanban-search-empty';
+            noResults.innerHTML = '<svg data-lucide="search-x" width="20" height="20"></svg><span>No candidates match your search</span>';
+            body.appendChild(noResults);
+            if (window.lucide) lucide.createIcons({ nodes: [noResults] });
+          }
+          noResults.style.display = '';
+        } else if (noResults) {
+          noResults.style.display = 'none';
+        }
+      });
+    });
+  })();
+
   // ── Initialize Lucide Icons ──
   lucide.createIcons();
 
@@ -1932,8 +2085,74 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- New Job Posting Modal -->
+<div class="modal-backdrop" id="newJobModal">
+  <div class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="newJobTitle">
+    <div class="modal-header">
+      <span class="modal-title" id="newJobTitle">New Job Posting</span>
+      <button class="modal-close" onclick="document.getElementById('newJobModal').classList.remove('active')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <form onsubmit="event.preventDefault();document.getElementById('newJobModal').classList.remove('active');GHR&&GHR.showToast?GHR.showToast('success','Job Posted','Senior Frontend Developer posting is now live.'):showToast('Job posting created')">
+      <div class="modal-body">
+        <div class="form-group mb-4">
+          <label class="form-label">Job Title <span class="required">*</span></label>
+          <input type="text" class="form-input" placeholder="e.g. Senior Frontend Developer" required value="Senior Frontend Developer">
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Department <span class="required">*</span></label>
+          <select class="form-select" required>
+            <option value="Engineering" selected>Engineering</option>
+            <option value="Operations">Operations</option>
+            <option value="Design">Design</option>
+            <option value="Finance">Finance</option>
+            <option value="HR">HR</option>
+            <option value="Sales">Sales</option>
+          </select>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Location</label>
+          <select class="form-select">
+            <option value="remote">Remote</option>
+            <option value="paris" selected>Paris, France</option>
+            <option value="london">London, UK</option>
+            <option value="berlin">Berlin, Germany</option>
+          </select>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Employment Type</label>
+          <select class="form-select">
+            <option value="full-time" selected>Full-time</option>
+            <option value="part-time">Part-time</option>
+            <option value="contract">Contract</option>
+          </select>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Salary Range</label>
+          <div style="display:flex;gap:var(--space-2);align-items:center;">
+            <input type="text" class="form-input" placeholder="Min" value="55,000" style="flex:1;">
+            <span style="color:var(--color-text-3);">to</span>
+            <input type="text" class="form-input" placeholder="Max" value="75,000" style="flex:1;">
+            <span style="color:var(--color-text-3);">EUR/yr</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input" rows="3" placeholder="Job description...">We are looking for an experienced Frontend Developer to join our Engineering team...</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-md" onclick="document.getElementById('newJobModal').classList.remove('active')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-md">
+          <svg data-lucide="send" width="14" height="14"></svg>
+          Publish Posting
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Bottom Navigation Bar -->
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>
   <a href="timesheets.html" class="bottom-nav-item"><svg data-lucide="clock" width="22" height="22"></svg><span>Time</span></a>
   <a href="expenses.html" class="bottom-nav-item"><svg data-lucide="receipt" width="22" height="22"></svg><span>Expenses</span></a>

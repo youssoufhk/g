@@ -11,29 +11,18 @@
     /* ── Approvals-specific styles ── */
     .approval-tabs { margin-bottom: var(--space-4); }
 
-    .filter-bar-standard {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-      flex-wrap: wrap;
-    }
-    .filter-bar-standard label {
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
-      font-weight: var(--weight-medium);
-    }
-
     .section-label {
       display: flex;
       align-items: center;
       gap: var(--space-2);
-      padding: var(--space-2) 0;
-      margin-bottom: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: 0;
       font-size: var(--text-overline);
       font-weight: var(--weight-semibold);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      background: var(--color-surface-1);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
     .section-label.urgent { color: var(--color-error); }
     .section-label.pending { color: var(--color-text-3); }
@@ -44,104 +33,46 @@
     .section-label.urgent .section-dot { background: var(--color-error); }
     .section-label.pending .section-dot { background: var(--color-text-3); }
 
-    .approval-list { display: flex; flex-direction: column; gap: var(--space-2); }
-
+    /* approval-card is now an action-row — keep class for JS targeting */
     .approval-card {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--space-3);
-      padding: var(--space-4);
-      background: var(--color-surface-0);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      transition: all var(--motion-fast);
+      /* layout handled by .action-row */
     }
-    .approval-card:hover { border-color: var(--color-border-strong); }
-    .approval-card.urgent-card { border-left: 3px solid var(--color-error); }
-    .approval-card[data-type="timesheet"] { border-left: 3px solid var(--color-info); }
-    .approval-card[data-type="leave"] { border-left: 3px solid var(--color-success); }
-    .approval-card[data-type="expense"] { border-left: 3px solid var(--color-gold); }
-    .approval-card.urgent-card[data-type="timesheet"],
-    .approval-card.urgent-card[data-type="leave"],
-    .approval-card.urgent-card[data-type="expense"] { border-left: 3px solid var(--color-error); }
     .approval-card.removing-item {
       opacity: 0;
       transform: translateX(20px);
       transition: all var(--motion-slow) var(--ease-out);
     }
-
-    .approval-card .card-check {
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .approval-card .card-check input {
-      width: 16px; height: 16px;
-      accent-color: var(--color-primary);
-      cursor: pointer;
+    /* Urgent left-border override on action-row */
+    .approval-card.urgent-card {
+      border-left: 3px solid var(--color-error) !important;
     }
 
-    .card-type-icon {
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: var(--radius-md);
-      flex-shrink: 0;
-    }
-    .card-type-icon.timesheet { background: var(--color-info-muted); color: var(--color-info); }
-    .card-type-icon.leave { background: var(--color-success-muted); color: var(--color-success); }
-    .card-type-icon.expense { background: var(--color-gold-muted); color: var(--color-gold); }
-
-    .card-body { flex: 1; min-width: 0; }
-    .card-main-row {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-1);
-      flex-wrap: wrap;
-    }
+    /* card-employee lives inside action-row-employee */
     .card-employee {
       display: flex;
       align-items: center;
       gap: var(--space-2);
     }
     .card-employee a {
-      font-weight: var(--weight-semibold);
+      font-weight: var(--weight-medium);
       color: var(--color-text-1);
-      font-size: var(--text-body);
+      font-size: var(--text-body-sm);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .card-employee a:hover { color: var(--color-primary); }
 
+    /* card-details is the action-row-detail text */
     .card-details {
       display: flex;
       align-items: center;
-      gap: var(--space-3);
+      gap: var(--space-2);
       flex-wrap: wrap;
       font-size: var(--text-body-sm);
       color: var(--color-text-2);
     }
     .card-details .detail-sep { color: var(--color-text-3); }
-
-    .card-context {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-top: var(--space-2);
-      flex-wrap: wrap;
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
-    }
-    .card-context .context-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-1);
-    }
-
-    .card-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      flex-shrink: 0;
-      margin-top: var(--space-1);
-    }
 
     .warning-tag {
       display: inline-flex;
@@ -156,9 +87,14 @@
     }
     .warning-tag svg { width: 12px; height: 12px; }
 
-    .submitted-time {
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
+    /* filter bar: always horizontal row */
+    .filter-bar-approvals {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
     }
 
     .sla-tag {
@@ -213,9 +149,8 @@
 
     @media (max-width: 639px) {
       #bulkBar, .bulk-actions { bottom: calc(56px + var(--space-4) + env(safe-area-inset-bottom, 0)) !important; }
-      .card-actions { flex-direction: column; width: 100%; }
-      .approval-card { flex-direction: column; }
       .kpi-grid-approvals { grid-template-columns: repeat(2, 1fr) !important; }
+      .filter-bar-approvals { flex-wrap: wrap; }
     }
 
     /* Empty state */
@@ -235,8 +170,19 @@
       gap: var(--space-4);
     }
     .empty-state svg { color: var(--color-text-3); opacity: 0.5; }
-    .empty-state h3 { font-size: var(--text-heading-2); color: var(--color-text-2); }
+    .empty-state h2, .empty-state h3 { font-size: var(--text-heading-2); color: var(--color-text-2); }
     .empty-state p { max-width: 400px; }
+
+    @media (max-width: 639px) {
+      .bulk-bar { left: var(--space-3); right: var(--space-3); transform: translateY(80px); max-width: none; width: auto; }
+      .bulk-bar.visible { transform: translateY(0); }
+    }
+
+    @keyframes celebratePulse {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body class="show-populated">
@@ -272,35 +218,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs" onclick="document.querySelectorAll('.notif-item.unread').forEach(function(n){n.classList.remove('unread')});document.querySelector('.notif-dot') && document.querySelector('.notif-dot').remove();showToast('success','Done','All notifications marked as read.')">Mark all read</button>
-            </div>
-            <div class="notif-panel-list">
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">2 overdue timesheets need your approval</div>
-                  <div class="notif-time">Just now</div>
-                </div>
-              </div>
-              <div class="notif-item unread">
-                <div class="notif-icon"><svg data-lucide="palm-tree" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Alice Wang submitted a leave request for Apr 28-29</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-              <div class="notif-item">
-                <div class="notif-icon"><svg data-lucide="receipt" width="16" height="16" style="color: var(--color-gold);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Bob Taylor submitted an expense claim for &euro;340</div>
-                  <div class="notif-time">3 hours ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -360,8 +278,8 @@
       </div>
 
       <!-- KPI Summary Row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);perspective:1200px;" class="kpi-grid-approvals">
-        <div class="card" style="padding:var(--space-4);text-align:center;">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);perspective:1200px;" class="kpi-grid-approvals stagger-reveal" data-min-role="pm">
+        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Total Pending</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-text-1);font-family:var(--font-mono);">12</div>
           <!-- Mini donut: 7 timesheets, 3 leaves, 2 expenses -->
@@ -379,25 +297,38 @@
           </svg>
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">7 timesheets &middot; 3 leaves &middot; 2 expenses</div>
           <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">2 overdue</div>
-        </div>
-        <div class="card" style="padding:var(--space-4);text-align:center;">
+          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
+            <polyline points="0,16 10,12 20,14 30,8 40,10 50,6 60,4" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div style="font-size:var(--text-caption);color:var(--color-error);margin-top:2px;">+3 vs last week</div>
+        </div></div>
+        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Timesheets</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-info);font-family:var(--font-mono);">7</div>
+          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
+            <polyline points="0,14 10,10 20,12 30,8 40,6 50,9 60,4" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">294h total logged</div>
-          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">2 with overtime</div>
-        </div>
-        <div class="card" style="padding:var(--space-4);text-align:center;">
+          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">+2 vs last week</div>
+        </div></div>
+        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Leaves</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-success);font-family:var(--font-mono);">3</div>
+          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
+            <polyline points="0,8 10,10 20,6 30,12 40,8 50,14 60,10" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">8 days requested</div>
-          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">1 overlap detected</div>
-        </div>
-        <div class="card" style="padding:var(--space-4);text-align:center;">
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">-1 vs last week</div>
+        </div></div>
+        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Expenses</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-gold);font-family:var(--font-mono);">2</div>
+          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
+            <polyline points="0,12 10,14 20,10 30,16 40,12 50,8 60,6" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">€425.50 total</div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">Both within policy</div>
-        </div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">Same as last week</div>
+        </div></div>
       </div>
 
       <!-- Populated content -->
@@ -411,26 +342,33 @@
           <button class="tab" data-tab="expenses" data-filter="expense">Expenses <span class="tab-count">2</span></button>
         </div>
 
-        <!-- Filter Bar -->
-        <div class="filter-bar-standard">
-          <label>Sort by</label>
-          <select class="form-select form-input-sm" id="sortSelect" style="min-width:120px;max-width:180px;">
-            <option value="urgency">Urgency</option>
-            <option value="date">Date Submitted</option>
-            <option value="name">Employee Name</option>
-            <option value="type">Request Type</option>
+        <!-- AI Recommendation Banner -->
+        <div class="card" style="padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-lg);flex-wrap:wrap;" id="aiRecommendationBanner" data-min-role="pm">
+          <svg data-lucide="sparkles" width="20" height="20" style="color:var(--color-primary);flex-shrink:0;"></svg>
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-1);">4 routine timesheets from Carol Williams, Marco Rossi, Liam O'Brien, and Sophie Dubois match last week's pattern and can be bulk-approved.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="this.closest('#aiRecommendationBanner').style.display='none';showToast('success','Bulk Approved','4 routine timesheets approved.')">Bulk-Approve Routine</button>
+          <button class="btn btn-ghost btn-xs" onclick="this.closest('#aiRecommendationBanner').style.display='none'" style="flex-shrink:0;">Dismiss</button>
+        </div>
+
+        <!-- Filter Bar — horizontal row (UI20) -->
+        <div class="filter-bar-approvals">
+          <select class="form-select form-input-sm" id="sortSelect" aria-label="Sort by">
+            <option value="urgency">Sort: Urgency</option>
+            <option value="date">Sort: Date Submitted</option>
+            <option value="name">Sort: Employee Name</option>
+            <option value="type">Sort: Request Type</option>
           </select>
-          <label>Department</label>
-          <select class="form-select form-input-sm" id="deptFilter" style="min-width:120px;max-width:180px;">
-            <option value="all">All</option>
+          <select class="form-select form-input-sm" id="deptFilter" aria-label="All Departments">
+            <option value="all">All Departments</option>
             <option value="engineering">Engineering</option>
             <option value="operations">Operations</option>
             <option value="design">Design</option>
             <option value="finance">Finance</option>
           </select>
-          <label>Employee</label>
-          <select class="form-select form-input-sm" id="empFilter" style="min-width:140px;max-width:200px;">
-            <option value="all">All</option>
+          <select class="form-select form-input-sm" id="empFilter" aria-label="All Employees">
+            <option value="all">All Employees</option>
             <option value="john-smith">John Smith</option>
             <option value="david-park">David Park</option>
             <option value="alice-wang">Alice Wang</option>
@@ -440,6 +378,21 @@
             <option value="carol-williams">Carol Williams</option>
             <option value="sophie-dubois">Sophie Dubois</option>
           </select>
+          <!-- Saved Views -->
+          <div class="dropdown" style="margin-left:auto;">
+            <button class="btn btn-ghost btn-sm" id="savedViewsBtn">
+              <svg data-lucide="bookmark" width="14" height="14"></svg>
+              Views
+              <svg data-lucide="chevron-down" width="12" height="12"></svg>
+            </button>
+            <div class="dropdown-menu right" id="savedViewsMenu">
+              <button class="dropdown-item" onclick="showToast('info','View loaded','Showing all pending approvals.');this.closest('.dropdown-menu').classList.remove('active');">All Pending</button>
+              <button class="dropdown-item" onclick="showToast('info','View loaded','Showing urgent items only.');this.closest('.dropdown-menu').classList.remove('active');">Urgent Only</button>
+              <button class="dropdown-item" onclick="showToast('info','View loaded','Showing timesheets only.');this.closest('.dropdown-menu').classList.remove('active');">Timesheets This Week</button>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item" onclick="showToast('info','Save View','Current filter saved as a new view.');this.closest('.dropdown-menu').classList.remove('active');"><svg data-lucide="plus" width="14" height="14"></svg> Save Current View</button>
+            </div>
+          </div>
         </div>
 
         <!-- URGENT Section -->
@@ -467,7 +420,7 @@
               <div class="card-details">
                 <span>Mar 23 - 29, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">42h</span>
+                <span class="font-mono font-semibold">42h</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Acme Corp (32h), Internal (10h)</span>
               </div>
@@ -508,7 +461,7 @@
               <div class="card-details">
                 <span>Mar 23 - 29, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">35h</span>
+                <span class="font-mono font-semibold">35h</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Globex Corp (30h), Internal (5h)</span>
               </div>
@@ -533,7 +486,7 @@
           </div>
 
           <!-- PENDING Section Label -->
-          <div class="section-label pending" id="pendingLabel" class="mt-4">
+          <div class="section-label pending mt-4" id="pendingLabel">
             <span class="section-dot"></span>
             PENDING
             <span class="badge badge-default" style="margin-left: var(--space-1);"><svg data-lucide="clock" width="12" height="12"></svg> 10</span>
@@ -614,7 +567,7 @@
                 <span class="badge badge-success"><svg data-lucide="palm-tree" width="12" height="12"></svg> Leave</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">LO</div>
-                  <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Frontend Developer" data-dept="Engineering" data-worktime="82%" data-href="employees.html#liam-obrien">Liam O'Brien</a>
+                  <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a>
                 </div>
               </div>
               <div class="card-details">
@@ -644,12 +597,12 @@
                 <span class="badge badge-gold"><svg data-lucide="receipt" width="12" height="12"></svg> Expense</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">BT</div>
-                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
+                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                 </div>
                 <span class="badge badge-primary"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
               </div>
               <div class="card-details">
-                <span class="font-mono" class="font-semibold">&euro;340.00</span>
+                <span class="font-mono font-semibold">&euro;340.00</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Hotel</span>
                 <span class="detail-sep">&middot;</span>
@@ -684,7 +637,7 @@
                 <span class="badge badge-primary"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
               </div>
               <div class="card-details">
-                <span class="font-mono" class="font-semibold">&euro;85.50</span>
+                <span class="font-mono font-semibold">&euro;85.50</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Meals</span>
                 <span class="detail-sep">&middot;</span>
@@ -720,7 +673,7 @@
               <div class="card-details">
                 <span>Mar 30 - Apr 5, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">40h</span>
+                <span class="font-mono font-semibold">40h</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Initech (36h), Internal (4h)</span>
               </div>
@@ -759,7 +712,7 @@
               <div class="card-details">
                 <span>Mar 30 - Apr 5, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">44h</span>
+                <span class="font-mono font-semibold">44h</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Acme Corp (40h), Internal (4h)</span>
               </div>
@@ -791,14 +744,14 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">BT</div>
-                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
+                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                 </div>
                 <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Only 8h</span>
               </div>
               <div class="card-details">
                 <span>Mar 30 - Apr 5, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">8h</span>
+                <span class="font-mono font-semibold">8h</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Internal (8h)</span>
               </div>
@@ -836,13 +789,13 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">LO</div>
-                  <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Frontend Developer" data-dept="Engineering" data-worktime="82%" data-href="employees.html#liam-obrien">Liam O'Brien</a>
+                  <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a>
                 </div>
               </div>
               <div class="card-details">
                 <span>Mar 30 - Apr 5, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">40h</span>
+                <span class="font-mono font-semibold">40h</span>
                 <span class="detail-sep">&middot;</span>
                 <span>Acme Corp (40h)</span>
               </div>
@@ -874,15 +827,15 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">SD</div>
-                  <a href="employees.html#sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-worktime="79%" data-href="employees.html#sophie-dubois">Sophie Dubois</a>
+                  <a href="employees.html#sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-worktime="82" data-href="employees.html#sophie-dubois">Sophie Dubois</a>
                 </div>
               </div>
               <div class="card-details">
                 <span>Mar 30 - Apr 5, 2026</span>
                 <span class="detail-sep">&middot;</span>
-                <span class="font-mono" class="font-semibold">38h</span>
+                <span class="font-mono font-semibold">38h</span>
                 <span class="detail-sep">&middot;</span>
-                <span>Contoso Ltd (34h), Internal (4h)</span>
+                <span>Contoso Inc (34h), Internal (4h)</span>
               </div>
               <div style="margin-top:var(--space-2);">
                 <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
@@ -907,9 +860,11 @@
 
         <!-- Per-tab empty states (shown when filter yields no items) -->
         <div id="filterEmptyState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;color:var(--color-text-3);">
-          <svg id="filterEmptyIcon" data-lucide="check-circle-2" width="48" height="48" style="color:var(--color-success);opacity:0.6;margin-bottom:var(--space-4);"></svg>
-          <h3 style="font-size:var(--text-heading-2);color:var(--color-text-2);margin-bottom:var(--space-2);">All caught up!</h3>
-          <p id="filterEmptyMsg" style="max-width:360px;">No pending requests in this category.</p>
+          <div id="filterEmptyCheckmark" style="width:80px;height:80px;border-radius:50%;background:var(--color-success-muted);display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-4);animation:celebratePulse 1.5s ease-in-out;box-shadow:0 0 0 8px color-mix(in srgb, var(--color-success) 10%, transparent);">
+            <svg data-lucide="check-circle-2" width="48" height="48" style="color:var(--color-success);"></svg>
+          </div>
+          <h2 id="filterEmptyTitle" style="font-size:var(--text-heading-2);color:var(--color-success);margin-bottom:var(--space-2);">All approvals cleared</h2>
+          <p id="filterEmptyMsg" style="max-width:360px;color:var(--color-text-2);">No pending requests in this category. Great work keeping things moving!</p>
           <div id="filterEmptyCta" style="margin-top:var(--space-3);"></div>
         </div>
 
@@ -917,9 +872,15 @@
 
       <!-- Empty State -->
       <div class="empty-content empty-state">
-        <svg data-lucide="check-circle-2" width="64" height="64"></svg>
-        <h3>All caught up!</h3>
-        <p>There are no pending approvals right now. New requests will appear here.</p>
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--color-success-muted);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 8px color-mix(in srgb, var(--color-success) 10%, transparent);animation:celebratePulse 1.5s ease-in-out;">
+          <svg data-lucide="check-circle-2" width="48" height="48" style="color:var(--color-success);opacity:1;"></svg>
+        </div>
+        <h2 style="color:var(--color-success);">All caught up!</h2>
+        <p>No pending approvals right now. Your team is running smoothly. New requests will appear here automatically.</p>
+        <div style="display:flex;gap:var(--space-3);margin-top:var(--space-2);">
+          <a href="timesheets.html" class="btn btn-secondary btn-sm"><svg data-lucide="clock" width="14" height="14"></svg> View Timesheets</a>
+          <a href="leaves.html" class="btn btn-secondary btn-sm"><svg data-lucide="palm-tree" width="14" height="14"></svg> View Leaves</a>
+        </div>
       </div>
 
     </main>
@@ -1204,11 +1165,24 @@
     var pendingLabel = document.getElementById('pendingLabel');
     var hasUrgent = false;
     var hasPending = false;
+    var deptF = document.getElementById('deptFilter');
+    var empF  = document.getElementById('empFilter');
+    var dept  = deptF ? deptF.value : 'all';
+    var emp   = empF  ? empF.value  : 'all';
 
     cards.forEach(function(card) {
       var type = card.getAttribute('data-type');
       var isUrgent = card.classList.contains('urgent-card');
-      if (currentFilter === 'all' || type === currentFilter) {
+      var nameEl = card.querySelector('.card-employee a');
+      var deptVal = nameEl ? (nameEl.getAttribute('data-dept') || '').toLowerCase() : '';
+      var name    = nameEl ? nameEl.getAttribute('data-name') || nameEl.textContent.trim() : '';
+      var empKey  = name.toLowerCase().replace(/\s+/g, '-').replace(/['']/g, '');
+
+      var showType = currentFilter === 'all' || type === currentFilter;
+      var showDept = dept === 'all' || deptVal === dept;
+      var showEmp  = emp  === 'all' || (empKey.indexOf(emp) !== -1) || (emp === empKey);
+
+      if (showType && showDept && showEmp) {
         card.style.display = '';
         if (isUrgent) hasUrgent = true;
         else hasPending = true;
@@ -1270,14 +1244,21 @@
     var emptyCta = document.getElementById('filterEmptyCta');
     if (emptyState) {
       if (visibleCount === 0) {
+        var totalCards = document.querySelectorAll('.approval-card').length;
+        var hiddenCards = document.querySelectorAll('.approval-card[style*="display: none"]').length;
+        var clearedCount = hiddenCards;
+        var emptyTitle = document.getElementById('filterEmptyTitle');
+        var checkmark = document.getElementById('filterEmptyCheckmark');
         var configs = {
-          'all': { msg: 'No pending approvals right now. Great work!', cta: '' },
-          'timesheet': { msg: 'No timesheet approvals match your filters.', cta: '<a href="timesheets.html" class="btn btn-secondary btn-sm"><svg data-lucide="clock" width="14" height="14"></svg> Go to Timesheets</a>' },
-          'leave': { msg: 'No leave approvals match your filters.', cta: '<a href="leaves.html" class="btn btn-secondary btn-sm"><svg data-lucide="palm-tree" width="14" height="14"></svg> Go to Leaves</a>' },
-          'expense': { msg: 'No expense approvals match your filters.', cta: '<a href="expenses.html" class="btn btn-secondary btn-sm"><svg data-lucide="receipt" width="14" height="14"></svg> Go to Expenses</a>' }
+          'all': { title: clearedCount > 0 ? 'You cleared ' + clearedCount + ' approval' + (clearedCount > 1 ? 's' : '') + ' \u2014 great work, Sarah!' : 'All approvals cleared', msg: 'No pending approvals right now.', cta: '' },
+          'timesheet': { title: 'Timesheets clear!', msg: 'No timesheet approvals match your filters.', cta: '<a href="timesheets.html" class="btn btn-secondary btn-sm"><svg data-lucide="clock" width="14" height="14"></svg> Go to Timesheets</a>' },
+          'leave': { title: 'Leaves clear!', msg: 'No leave approvals match your filters.', cta: '<a href="leaves.html" class="btn btn-secondary btn-sm"><svg data-lucide="palm-tree" width="14" height="14"></svg> Go to Leaves</a>' },
+          'expense': { title: 'Expenses clear!', msg: 'No expense approvals match your filters.', cta: '<a href="expenses.html" class="btn btn-secondary btn-sm"><svg data-lucide="receipt" width="14" height="14"></svg> Go to Expenses</a>' }
         };
         var cfg = configs[currentFilter] || configs['all'];
+        if (emptyTitle) emptyTitle.textContent = cfg.title;
         emptyMsg.textContent = cfg.msg;
+        if (checkmark) checkmark.style.animation = 'none'; checkmark.offsetHeight; checkmark.style.animation = 'celebratePulse 1.5s ease-in-out';
         if (emptyCta) emptyCta.innerHTML = cfg.cta;
         emptyState.style.display = 'flex';
         lucide.createIcons({ nodes: [emptyState] });
@@ -1598,6 +1579,50 @@
 
   // ── Per-tab empty states with contextual CTAs ──
   var originalCheckFilterEmptyState = checkFilterEmptyState;
+
+  // ── Sort & Filter Selects ──
+  var sortSelect = document.getElementById('sortSelect');
+  var deptFilter = document.getElementById('deptFilter');
+  var empFilter  = document.getElementById('empFilter');
+
+  function applyFiltersAndSort() {
+    var sortBy = sortSelect ? sortSelect.value : 'urgency';
+    // Apply combined filter (type + dept + emp)
+    applyFilter();
+    // Sort visible cards
+    var list = document.getElementById('approvalList');
+    if (list && sortBy !== 'urgency') {
+      var sortedCards = Array.from(list.querySelectorAll('.approval-card')).sort(function(a, b) {
+        if (sortBy === 'name') {
+          var nA = (a.querySelector('.card-employee a') || {}).textContent || '';
+          var nB = (b.querySelector('.card-employee a') || {}).textContent || '';
+          return nA.localeCompare(nB);
+        }
+        if (sortBy === 'type') {
+          return (a.getAttribute('data-type') || '').localeCompare(b.getAttribute('data-type') || '');
+        }
+        return 0;
+      });
+      sortedCards.forEach(function(c) { list.appendChild(c); });
+    }
+  }
+
+  if (deptFilter) deptFilter.addEventListener('change', applyFiltersAndSort);
+  if (empFilter)  empFilter.addEventListener('change', applyFiltersAndSort);
+  if (sortSelect) sortSelect.addEventListener('change', applyFiltersAndSort);
+
+  // ── Saved Views Dropdown ──
+  var savedViewsBtn = document.getElementById('savedViewsBtn');
+  var savedViewsMenu = document.getElementById('savedViewsMenu');
+  if (savedViewsBtn && savedViewsMenu) {
+    savedViewsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      savedViewsMenu.classList.toggle('active');
+    });
+    document.addEventListener('click', function(e) {
+      if (!savedViewsMenu.contains(e.target) && !savedViewsBtn.contains(e.target)) savedViewsMenu.classList.remove('active');
+    });
+  }
 
   // ── GHR shared init ──
   if (window.GHR) {

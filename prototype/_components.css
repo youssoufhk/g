@@ -352,6 +352,22 @@
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
+/* Semantic stat-card accent variants */
+.stat-card--success::before { background: var(--color-success); }
+.stat-card--warning::before { background: var(--color-warning); }
+.stat-card--error::before   { background: var(--color-error); }
+.stat-card--info::before    { background: var(--color-info); }
+.stat-card--primary::before { background: var(--color-primary); }
+.stat-card--accent::before  { background: var(--color-accent); }
+.stat-card--gold::before    { background: var(--color-gold); }
+/* data-accent attribute driven variant */
+.stat-card[data-accent="success"]::before { background: var(--color-success); }
+.stat-card[data-accent="warning"]::before { background: var(--color-warning); }
+.stat-card[data-accent="error"]::before   { background: var(--color-error); }
+.stat-card[data-accent="info"]::before    { background: var(--color-info); }
+.stat-card[data-accent="primary"]::before { background: var(--color-primary); }
+.stat-card[data-accent="accent"]::before  { background: var(--color-accent); }
+.stat-card[data-accent="gold"]::before    { background: var(--color-gold); }
 .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-2);
@@ -420,6 +436,7 @@
 .badge-info     { background: var(--color-info-muted); color: var(--color-info); }
 .badge-gold     { background: var(--color-gold-muted); color: var(--color-gold); }
 .badge-accent   { background: var(--color-accent-muted); color: var(--color-accent); }
+.badge-ghost    { background: transparent; color: var(--color-text-2); border: 1px solid var(--color-border); }
 
 .badge-lg {
   padding: var(--space-1) var(--space-3);
@@ -567,7 +584,7 @@
   font-size: var(--text-body-sm);
 }
 .pagination-buttons button:hover { background: var(--color-surface-1); color: var(--color-text-1); }
-.pagination-buttons button.active { background: var(--color-primary); color: var(--color-text-inv); border-color: var(--color-primary); }
+.pagination-buttons button.active { background: var(--color-primary); color: var(--color-text-on-primary); border-color: var(--color-primary); }
 
 /* Active Filters */
 .active-filters {
@@ -628,7 +645,7 @@
   max-height: calc(100vh - 64px);
   overflow-y: auto;
   transform: scale(0.95);
-  transition: transform var(--motion-normal) var(--ease-out);
+  transition: transform var(--motion-slow) var(--ease-out);
 }
 .modal-backdrop.active .modal { transform: scale(1); }
 .modal-backdrop.removing .modal { animation: modalOut 200ms var(--ease-in-out) forwards; }
@@ -698,8 +715,8 @@
 }
 .toast.removing { animation: toastOut 0.2s var(--ease-in-out) forwards; }
 @keyframes toastIn {
-  from { transform: translateY(-16px) translateX(16px); opacity: 0; }
-  to { transform: translateY(0) translateX(0); opacity: 1; }
+  from { transform: translateY(-16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 @keyframes toastOut {
   to { transform: translateY(-8px); opacity: 0; }
@@ -784,6 +801,16 @@
 .avatar-lg.avatar-status::after,
 .avatar-xl.avatar-status::after,
 .avatar-2xl.avatar-status::after { width: 12px; height: 12px; border-width: 3px; }
+
+/* Avatar Color Variants (deterministic, 8 classes) */
+.avatar-color-0 { background: linear-gradient(135deg, hsl(155,26%,46%), hsl(155,26%,32%)); }
+.avatar-color-1 { background: linear-gradient(135deg, hsl(30,58%,50%), hsl(30,58%,36%)); }
+.avatar-color-2 { background: linear-gradient(135deg, hsl(200,40%,52%), hsl(200,40%,38%)); }
+.avatar-color-3 { background: linear-gradient(135deg, hsl(270,45%,58%), hsl(270,45%,44%)); }
+.avatar-color-4 { background: linear-gradient(135deg, hsl(38,60%,48%), hsl(38,60%,34%)); }
+.avatar-color-5 { background: linear-gradient(135deg, hsl(5,65%,52%), hsl(5,65%,38%)); }
+.avatar-color-6 { background: linear-gradient(135deg, hsl(175,35%,45%), hsl(175,35%,32%)); }
+.avatar-color-7 { background: linear-gradient(135deg, hsl(340,45%,52%), hsl(340,45%,38%)); }
 
 /* Avatar Group */
 .avatar-group {
@@ -876,14 +903,14 @@
   padding: var(--space-1) 0;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(0.95);
   transition: all var(--motion-fast) var(--ease-out);
 }
 .dropdown-menu.right { left: auto; right: 0; }
 .dropdown-menu.active {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .dropdown-item {
@@ -937,6 +964,14 @@
 .cmd-palette-backdrop.active {
   opacity: 1;
   visibility: visible;
+}
+/* Issue 7: Symmetric exit animation for command palette */
+.cmd-palette-backdrop.removing .cmd-palette {
+  animation: cmdPaletteOut var(--motion-normal) var(--ease-in-out) forwards;
+}
+@keyframes cmdPaletteOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 .cmd-palette {
@@ -1034,8 +1069,8 @@
   padding: 1px 4px;
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
-  border-radius: 3px;
-  font-size: 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-overline);
   font-family: var(--font-sans);
 }
 
@@ -1076,16 +1111,24 @@
   color: var(--color-primary);
 }
 .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
-.nav-item .nav-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-item .nav-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity var(--motion-normal), width var(--motion-normal); }
 .nav-item .nav-badge {
   background: var(--color-error);
   color: var(--color-white);
-  font-size: 10px;
+  font-size: var(--text-overline);
   font-weight: var(--weight-bold);
   min-width: 18px; height: 18px;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-full);
   padding: 0 4px;
+}
+.nav-badge.badge-pulse {
+  animation: badgePulse 400ms var(--ease-out);
+}
+@keyframes badgePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 
@@ -1353,7 +1396,7 @@
   position: absolute;
   bottom: calc(100% + 6px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(4px);
   padding: var(--space-1-5) var(--space-2);
   background: var(--color-surface-3);
   border: 1px solid var(--color-border);
@@ -1364,13 +1407,14 @@
   box-shadow: var(--shadow-3);
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--motion-fast), visibility var(--motion-fast);
+  transition: opacity var(--motion-fast), visibility var(--motion-fast), transform var(--motion-fast);
   pointer-events: none;
   z-index: 600;
 }
 .tooltip:hover::after {
   opacity: 1;
   visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 
@@ -1390,7 +1434,7 @@
     var(--color-surface-2) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 2s infinite;
   border-radius: var(--radius-md);
   color: transparent !important;
 }
@@ -1406,7 +1450,7 @@
   inset: 0;
   background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 2s infinite;
   border-radius: inherit;
   z-index: 1;
 }
@@ -1462,12 +1506,13 @@
   border-left: 1px solid var(--color-border);
   box-shadow: var(--shadow-4);
   z-index: 901;
+  opacity: 0;
   transform: translateX(100%);
-  transition: transform var(--motion-slow) var(--ease-out);
+  transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-slow) var(--ease-out);
   display: flex;
   flex-direction: column;
 }
-.slide-panel-backdrop.active .slide-panel { transform: translateX(0); }
+.slide-panel-backdrop.active .slide-panel { transform: translateX(0); opacity: 1; }
 
 
 /* ── DIVIDER ── */
@@ -1578,13 +1623,14 @@
   box-shadow: var(--shadow-5);
   opacity: 0;
   transform: translateY(8px) scale(0.96);
-  transition: opacity var(--motion-normal) var(--ease-out), transform var(--motion-normal) var(--ease-out);
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
   pointer-events: none;
 }
 #ghrHoverCard.visible {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
 }
 #ghrHoverCard .hc-header {
   display: flex;
@@ -1776,21 +1822,7 @@
 .role-badge-employee { color: var(--color-info);    font-weight: var(--weight-semibold); }
 
 
-/* ── CURRENTLY-VIEWING PRESENCE BANNER ── */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-100%); }
-  to   { opacity: 1; transform: none; }
-}
-.presence-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-primary-muted);
-  border-bottom: 1px solid var(--color-primary);
-  font-size: var(--text-body-sm);
-  animation: slideDown var(--motion-normal) var(--ease-out);
-}
+/* ── CURRENTLY-VIEWING PRESENCE BANNER — REMOVED (AT-1 Anti-Tempolia) ── */
 
 
 /* ── SIDEBAR LOGO FLOAT ANIMATION ── */
@@ -1844,11 +1876,47 @@ svg circle[data-animate].chart-animate-in {
 }
 
 
+/* ── STAGGERED CARD REVEAL ── */
+.stagger-reveal > * {
+  opacity: 0;
+  animation: fadeSlideIn var(--motion-slow) var(--ease-out) forwards;
+}
+.stagger-reveal > *:nth-child(1)  { animation-delay: calc(1 * 50ms); }
+.stagger-reveal > *:nth-child(2)  { animation-delay: calc(2 * 50ms); }
+.stagger-reveal > *:nth-child(3)  { animation-delay: calc(3 * 50ms); }
+.stagger-reveal > *:nth-child(4)  { animation-delay: calc(4 * 50ms); }
+.stagger-reveal > *:nth-child(5)  { animation-delay: calc(5 * 50ms); }
+.stagger-reveal > *:nth-child(6)  { animation-delay: calc(6 * 50ms); }
+.stagger-reveal > *:nth-child(7)  { animation-delay: calc(7 * 50ms); }
+.stagger-reveal > *:nth-child(8)  { animation-delay: calc(8 * 50ms); }
+.stagger-reveal > *:nth-child(9)  { animation-delay: calc(9 * 50ms); }
+.stagger-reveal > *:nth-child(10) { animation-delay: calc(10 * 50ms); }
+.stagger-reveal > *:nth-child(11) { animation-delay: calc(11 * 50ms); }
+.stagger-reveal > *:nth-child(12) { animation-delay: calc(12 * 50ms); }
+
+
+/* ── BREADCRUMB (singular alias) ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-2);
+}
+.breadcrumb a { color: var(--color-text-2); }
+.breadcrumb a:hover { color: var(--color-primary); }
+.breadcrumb > *:not(:last-child)::after {
+  content: '>';
+  margin-left: var(--space-2);
+  color: var(--color-text-3);
+}
+.breadcrumb > *:last-child { color: var(--color-text-1); font-weight: var(--weight-medium); }
+
+
 /* ── REDUCED MOTION — DECORATIVE ANIMATIONS ONLY ── */
 @media (prefers-reduced-motion: reduce) {
   /* Disable decorative keyframe animations */
   .page-content { animation: none; }
-  .presence-banner { animation: none; }
   .sidebar-logo .logo-icon,
   .nav-logo,
   [class*="sidebar"] .logo { animation: none; }
@@ -1878,6 +1946,419 @@ svg circle[data-animate].chart-animate-in {
   .slide-panel-backdrop,
   .cmd-palette-backdrop,
   .cmd-palette { transition-duration: var(--motion-fast) !important; }
+  /* Disable 3D transforms under reduced motion */
+  .card-3d:hover,
+  .stat-card:hover {
+    transform: none !important;
+  }
+  .card-interactive:hover {
+    transform: none !important;
+  }
   /* Keep modal exit animation disabled (not needed for a11y) */
   .modal-backdrop.removing .modal { animation: none; }
+  .cmd-palette-backdrop.removing .cmd-palette { animation: none; }
+  .stagger-reveal > * { opacity: 1; animation: none; }
+}
+
+
+/* ============================================================
+   FEEL / UX IMPROVEMENTS
+   ============================================================ */
+
+/* ── AI Alerts: Collapse beyond 2nd item (FEEL MED: dashboard alert fatigue) ── */
+/* The 3rd+ .ai-insight-card or .ai-alert-item in an alerts container is hidden by default */
+/* A JS or user action to expand adds .alerts-expanded to the container to reveal all */
+.ai-alerts-list .ai-insight-card:nth-child(n+3),
+.ai-alerts-list .ai-alert-item:nth-child(n+3),
+[class*="ai-alerts"] .ai-insight-card:nth-child(n+3) {
+  display: none;
+}
+.ai-alerts-list.alerts-expanded .ai-insight-card,
+.ai-alerts-list.alerts-expanded .ai-alert-item,
+[class*="ai-alerts"].alerts-expanded .ai-insight-card {
+  display: block;
+}
+
+/* ── "View more alerts" expand button ── */
+.ai-alerts-expand-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-3);
+  font-size: var(--text-body-sm);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  margin-top: var(--space-2);
+  justify-content: center;
+}
+.ai-alerts-expand-btn:hover {
+  background: var(--color-surface-1);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-2);
+}
+.ai-alerts-list.alerts-expanded .ai-alerts-expand-btn {
+  display: none;
+}
+
+/* ── Submitted state completion card (FEEL HIGH: timesheets flat state) ── */
+.submission-complete-card {
+  background: var(--color-success-muted);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.submission-complete-card .complete-icon {
+  width: 48px; height: 48px;
+  background: var(--color-success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+}
+.submission-complete-card .complete-title {
+  font-size: var(--text-heading-2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-success);
+}
+.submission-complete-card .complete-stats {
+  display: flex;
+  gap: var(--space-6);
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+.submission-complete-card .complete-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+.submission-complete-card .complete-stat-value {
+  font-size: var(--text-heading-2);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-mono);
+  color: var(--color-text-1);
+}
+.submission-complete-card .complete-stat-label {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+}
+
+/* ── Profile completeness indicator (FEEL MED: account.html) ── */
+.profile-completeness {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-info-muted);
+  border: 1px solid var(--color-info);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+.profile-completeness .pc-label {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-2);
+  flex: 1;
+}
+.profile-completeness .pc-label strong {
+  color: var(--color-text-1);
+}
+.profile-completeness .pc-bar-wrap {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* ── All-caught-up empty state (FEEL MED: approvals completion) ── */
+.all-caught-up {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+}
+.all-caught-up .caught-up-icon {
+  width: 64px; height: 64px;
+  background: var(--color-success-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-success);
+  margin-bottom: var(--space-4);
+}
+.all-caught-up .caught-up-title {
+  font-size: var(--text-heading-2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  margin-bottom: var(--space-2);
+}
+.all-caught-up .caught-up-subtitle {
+  font-size: var(--text-body);
+  color: var(--color-text-2);
+  max-width: 300px;
+}
+
+/* ── AI recommendation banner (FEEL HIGH: approvals bulk suggestion) ── */
+.ai-bulk-recommendation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-primary-muted);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+.ai-bulk-recommendation .ai-rec-icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+.ai-bulk-recommendation .ai-rec-text {
+  flex: 1;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-1);
+}
+.ai-bulk-recommendation .ai-rec-text strong {
+  color: var(--color-primary);
+}
+
+/* ── Suggested dates chip (FEEL CRITICAL: leave request form) ── */
+.suggested-dates-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1-5) var(--space-3);
+  background: var(--color-primary-muted);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-body-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  margin-bottom: var(--space-3);
+}
+.suggested-dates-chip:hover {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+.suggested-dates-chip svg {
+  width: 14px; height: 14px;
+}
+
+/* ── Auto-filled banner (FEEL CRITICAL: expenses AI auto-fill) ── */
+.ai-autofill-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-success-muted);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-1);
+}
+.ai-autofill-banner .autofill-icon {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+
+/* ── ACTION TABLE / ACTION ROW (UI15: compact inbox-row pattern) ──────────────
+   Replaces stacked full-width cards for approval queues, expense lists,
+   leave requests, timesheet approval queues, and AI alert lists.
+   Rule: if an item has < 5 data points and fits on one line, use a row not a card.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Wrapper: replaces card-styled container — no border, no card padding */
+.action-table {
+  width: 100%;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface-0);
+}
+
+/* Optional column header row */
+.action-table-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  height: 36px;
+  background: var(--color-surface-1);
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: var(--text-overline);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* One horizontal row per item — 48–52px tall, full width, never becomes a card */
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  min-height: 48px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: transparent;
+  transition: background var(--motion-fast);
+  cursor: default;
+  width: 100%;
+  box-sizing: border-box;
+}
+.action-row:last-child {
+  border-bottom: none;
+}
+.action-row:hover {
+  background: var(--color-surface-1);
+}
+.action-row.selected {
+  background: var(--color-primary-muted);
+}
+
+/* Leading checkbox */
+.action-row-checkbox {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+}
+.action-row-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  width: 14px;
+  height: 14px;
+}
+
+/* Type icon — 32×32 circle, flex-shrink: 0 */
+.action-row-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-2);
+}
+.action-row-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Employee name + avatar — fixed width ~180px, flex-shrink: 0 */
+.action-row-employee {
+  flex-shrink: 0;
+  width: 180px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.action-row-employee .employee-name {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Main detail text — grows to fill remaining space */
+.action-row-detail {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Secondary info: date, hours, amount — muted, monospace numbers */
+.action-row-meta {
+  flex-shrink: 0;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status badge slot */
+.action-row-status {
+  flex-shrink: 0;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Action buttons — right-aligned, visible on hover for cleaner look */
+.action-row-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  opacity: 0;
+  transition: opacity var(--motion-fast);
+}
+.action-row:hover .action-row-actions {
+  opacity: 1;
+}
+/* Keep actions always visible on touch/mobile (no hover state) */
+@media (hover: none) {
+  .action-row-actions { opacity: 1; }
+}
+/* Force always-visible variant */
+.action-row-actions.always-visible {
+  opacity: 1;
+}
+
+/* Mobile: allow 2-line wrap but NOT become a full card */
+@media (max-width: 639px) {
+  .action-row {
+    flex-wrap: wrap;
+    min-height: auto;
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+  .action-row-employee {
+    width: auto;
+    flex: 1;
+    min-width: 120px;
+  }
+  .action-row-detail {
+    flex-basis: 100%;
+    order: 3;
+  }
+  .action-row-meta {
+    order: 4;
+  }
+  .action-row-status {
+    order: 5;
+    min-width: auto;
+  }
+  .action-row-actions {
+    order: 6;
+    opacity: 1;
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
 }

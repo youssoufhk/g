@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="_layout.css">
   <style>
     /* ── Dashboard-specific styles ── */
-    .greeting { margin-bottom: var(--space-6); }
+    .greeting { margin-bottom: var(--space-8); }
     .greeting h1 {
       font-size: var(--text-display-xl, var(--text-display-lg));
       font-weight: var(--weight-bold);
@@ -26,8 +26,8 @@
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-4);
-      margin-bottom: var(--space-6);
+      gap: var(--space-5);
+      margin-bottom: var(--space-10);
     }
     @media (max-width: 1023px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 639px)  { .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); } }
@@ -126,7 +126,7 @@
     }
     .presence-status.online { background: var(--color-success); }
     .presence-status.away { background: var(--color-warning); }
-    .presence-status.on-leave { background: var(--color-error); }
+    .presence-status.on-leave { background: var(--color-info); }
     .presence-status.offline { background: var(--color-text-3); }
 
     /* Approval items */
@@ -247,7 +247,7 @@
       border-radius: var(--radius-md);
     }
     .mobile-search-btn:hover { background: var(--color-surface-2); }
-    @media (max-width: 767px) { .mobile-search-btn { display: inline-flex; } }
+    @media (max-width: 639px) { .mobile-search-btn { display: inline-flex; } }
 
     /* Donut chart section */
     .donut-section {
@@ -310,8 +310,8 @@
       visibility: visible;
     }
 
-    /* ── Utilization Heatmap ── */
-    .utilization-heatmap-section { margin-bottom: var(--space-6); }
+    /* ── Work Time Heatmap ── */
+    .worktime-heatmap-section { margin-bottom: var(--space-8); }
     .heatmap-grid {
       display: grid;
       grid-template-columns: 72px repeat(5, 1fr);
@@ -336,15 +336,36 @@
     }
     .heatmap-cell {
       height: 20px;
-      border-radius: 3px;
+      border-radius: var(--radius-sm);
       cursor: default;
       transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+    }
+    .heatmap-cell {
+      position: relative;
     }
     .heatmap-cell:hover {
       transform: scale(1.25);
       box-shadow: var(--shadow-2);
       z-index: 10;
-      position: relative;
+    }
+    .heatmap-cell:hover::after {
+      content: attr(data-hours);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-surface-3);
+      color: var(--color-text-1);
+      font-size: var(--text-overline);
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: var(--shadow-2);
+    }
+    .heatmap-cell.off:hover::after {
+      content: 'Off';
     }
     .heatmap-cell.high  { background: var(--color-success); opacity: 0.75; }
     .heatmap-cell.mid   { background: var(--color-warning); opacity: 0.75; }
@@ -367,7 +388,7 @@
     .heatmap-legend-dot {
       width: 12px;
       height: 12px;
-      border-radius: 2px;
+      border-radius: var(--radius-sm);
       flex-shrink: 0;
     }
     @media (max-width: 639px) {
@@ -381,7 +402,7 @@
       display: flex;
       align-items: flex-end;
       gap: var(--space-1);
-      height: 64px;
+      height: 120px;
       margin-top: var(--space-4);
     }
     .rev-bar-col {
@@ -395,7 +416,7 @@
     }
     .rev-bar {
       width: 100%;
-      border-radius: 3px 3px 0 0;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
       min-height: 4px;
       transition: filter var(--motion-fast);
     }
@@ -490,7 +511,89 @@
 
     /* Donut segment hover enhancement */
     .donut-segment:hover {
-      stroke-width: 22;
+      stroke-width: 14;
+    }
+
+    /* Collapsible section */
+    .collapsible-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: var(--color-text-2);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+    }
+    .collapsible-toggle:hover { color: var(--color-text-1); }
+    .collapsible-toggle svg { transition: transform var(--motion-fast); }
+    .collapsible-toggle.collapsed svg { transform: rotate(-90deg); }
+    .collapsible-body { transition: max-height var(--motion-slow), opacity var(--motion-fast); overflow: hidden; }
+    .collapsible-body.collapsed { max-height: 0 !important; opacity: 0; pointer-events: none; }
+
+    /* Revenue goal line */
+    .revenue-bars { position: relative; }
+    .revenue-goal-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      border-top: 2px dashed var(--color-error);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .revenue-goal-label {
+      position: absolute;
+      right: 0;
+      transform: translateY(-100%);
+      font-size: var(--text-overline);
+      color: var(--color-error);
+      opacity: 0.7;
+    }
+
+    /* Page transition animation */
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page-content { animation: pageFadeIn 0.3s ease-out; }
+
+    /* Dashboard section grouping */
+    .dashboard-section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      margin-top: var(--space-8);
+    }
+    .dashboard-section-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-1) var(--space-2);
+      color: var(--color-text-2);
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
+      border-radius: var(--radius-md);
+      transition: color var(--motion-fast), background var(--motion-fast);
+    }
+    .dashboard-section-toggle:hover { color: var(--color-text-1); background: var(--color-surface-1); }
+    .dashboard-section-toggle svg { transition: transform var(--motion-fast); }
+    .dashboard-section-toggle.collapsed svg { transform: rotate(-90deg); }
+    .dashboard-section-body { transition: max-height var(--motion-slow), opacity var(--motion-fast); overflow: hidden; }
+    .dashboard-section-body.collapsed { max-height: 0 !important; opacity: 0; pointer-events: none; }
+
+    /* Week-at-a-Glance today highlight */
+    .week-day-today {
+      background: var(--color-primary-muted, rgba(99,102,241,0.08));
+      border-radius: var(--radius-md);
+      padding: var(--space-2);
+      border: 1px solid var(--color-primary);
+      border-opacity: 0.2;
     }
   </style>
 </head>
@@ -530,55 +633,7 @@
             <svg data-lucide="bell" width="20" height="20"></svg>
             <span class="notif-dot"></span>
           </button>
-          <!-- Notification panel -->
-          <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications" style="box-shadow: var(--shadow-3);">
-            <div class="notif-panel-header">
-              <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs" id="markAllReadBtn">Mark all read</button>
-            </div>
-            <div id="notifAllCaughtUp" style="display:none; padding: var(--space-8) var(--space-4); text-align:center;">
-              <svg data-lucide="check-circle" width="32" height="32" style="color:var(--color-success);margin:0 auto var(--space-3);display:block;"></svg>
-              <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">All caught up</div>
-              <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">No new notifications</div>
-            </div>
-            <div class="notif-panel-list" id="notifPanelList">
-              <a href="timesheets.html" class="notif-item unread" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Timesheet reminder: 7 team members have not submitted this week</div>
-                  <div class="notif-time">2 minutes ago</div>
-                </div>
-              </a>
-              <a href="expenses.html" class="notif-item unread" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Expense flagged: Bob Taylor submitted a duplicate hotel receipt</div>
-                  <div class="notif-time">18 minutes ago</div>
-                </div>
-              </a>
-              <a href="leaves.html" class="notif-item" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Leave approved: Emma Laurent's vacation (Apr 14-18) approved</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </a>
-              <a href="invoices.html" class="notif-item" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="file-text" width="16" height="16" style="color: var(--color-info);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">Invoice INV-2026-041 generated for Acme Corp (&#8364;12,400)</div>
-                  <div class="notif-time">3 hours ago</div>
-                </div>
-              </a>
-              <a href="employees.html#yuki-tanaka" class="notif-item" style="text-decoration:none;color:inherit;">
-                <div class="notif-icon"><svg data-lucide="user-plus" width="16" height="16" style="color: var(--color-primary);"></svg></div>
-                <div class="notif-text">
-                  <div class="notif-title">New employee onboarded: Yuki Tanaka joined Engineering</div>
-                  <div class="notif-time">Yesterday</div>
-                </div>
-              </a>
-            </div>
-          </div>
+          <div id="notifPanel"></div>
         </div>
 
         <div class="relative">
@@ -611,14 +666,14 @@
       <!-- Greeting -->
       <div class="greeting">
         <h1 id="greetingHeading">Good morning, Sarah</h1>
-        <div class="greeting-date" id="greetingDate">Monday, April 6, 2026</div>
+        <div class="greeting-date" id="greetingDate">Thursday, 10 April 2026</div>
       </div>
 
       <!-- ── KPI STAT CARDS ── -->
-      <div class="kpi-grid populated-content ghtr-loading" id="kpiGrid">
+      <div class="kpi-grid populated-content ghtr-loading perspective-container stagger-reveal" id="kpiGrid">
 
         <!-- Active Employees -->
-        <a href="employees.html" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+        <a href="employees.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Active Employees</div>
           <div class="stat-row">
             <div>
@@ -629,7 +684,7 @@
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline points="0,28 20,24 40,26 60,20 80,18 100,14 120,10" stroke="var(--color-success)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,28 20,24 40,26 60,20 80,18 100,14 120,10" stroke="var(--color-success)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkGreen" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-success)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-success)" stop-opacity="0"/>
@@ -640,7 +695,7 @@
         </a>
 
         <!-- Hours This Week -->
-        <a href="timesheets.html" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+        <a href="timesheets.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Hours This Week</div>
           <div class="stat-row">
             <div>
@@ -650,7 +705,7 @@
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline points="0,22 20,26 40,20 60,24 80,16 100,12 120,8" stroke="var(--color-primary)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,22 20,26 40,20 60,24 80,16 100,12 120,8" stroke="var(--color-primary)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkPrimary" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/>
@@ -661,12 +716,12 @@
         </a>
 
         <!-- Pending Approvals -->
-        <a href="approvals.html" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+        <a href="approvals.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Pending Approvals</div>
           <div class="stat-row">
             <div>
               <div class="stat-value font-mono">12</div>
-              <div class="stat-trend down"><svg data-lucide="trending-up" width="14" height="14"></svg> +4 vs last week</div>
+              <div class="stat-trend" style="color:var(--color-warning);"><svg data-lucide="trending-up" width="14" height="14"></svg> +4 vs last week</div>
               <div class="stat-meta" style="margin-top:var(--space-1);">
                 <span class="stat-warning-indicator">
                   <svg data-lucide="alert-triangle" width="12" height="12"></svg>
@@ -677,7 +732,7 @@
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline points="0,24 20,20 40,22 60,18 80,20 100,16 120,12" stroke="var(--color-warning)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,24 20,20 40,22 60,18 80,20 100,16 120,12" stroke="var(--color-warning)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkWarning" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-warning)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-warning)" stop-opacity="0"/>
@@ -688,7 +743,7 @@
         </a>
 
         <!-- Billable Hours % -->
-        <a href="insights.html" class="stat-card" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+        <a href="insights.html" class="stat-card card-interactive card-3d" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Billable Hours %</div>
           <div class="stat-row">
             <div>
@@ -698,7 +753,7 @@
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline points="0,20 20,22 40,18 60,16 80,14 100,12 120,10" stroke="var(--color-gold)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,20 20,22 40,18 60,16 80,14 100,12 120,10" stroke="var(--color-gold)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkGold" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-gold)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-gold)" stop-opacity="0"/>
@@ -709,7 +764,7 @@
         </a>
 
         <!-- Open Projects -->
-        <a href="projects.html" class="stat-card" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+        <a href="projects.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Open Projects</div>
           <div class="stat-row">
             <div>
@@ -724,7 +779,7 @@
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline points="0,18 20,16 40,20 60,14 80,12 100,16 120,10" stroke="var(--color-info)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,18 20,16 40,20 60,14 80,12 100,16 120,10" stroke="var(--color-info)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkInfo" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-info)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-info)" stop-opacity="0"/>
@@ -735,7 +790,7 @@
         </a>
 
         <!-- Expenses This Month -->
-        <a href="expenses.html" class="stat-card" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+        <a href="expenses.html" class="stat-card card-interactive card-3d" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Expenses This Month</div>
           <div class="stat-row">
             <div>
@@ -745,7 +800,7 @@
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline points="0,12 20,14 40,10 60,18 80,20 100,22 120,24" stroke="var(--color-accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,12 20,14 40,10 60,18 80,20 100,22 120,24" stroke="var(--color-accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkAccent" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"/>
@@ -756,8 +811,17 @@
         </a>
       </div>
 
+      <!-- ══ OVERVIEW SECTION (visible by default) ══ -->
+      <div class="dashboard-section-header populated-content">
+        <button class="dashboard-section-toggle" onclick="toggleDashSection('overviewSection')" aria-expanded="true">
+          <svg data-lucide="chevron-down" width="16" height="16"></svg>
+          Overview
+        </button>
+      </div>
+      <div class="dashboard-section-body populated-content" id="overviewSection" style="max-height:4000px;">
+
       <!-- ── WEEK AT A GLANCE HERO ── -->
-      <div class="card populated-content" style="margin-bottom: var(--space-6);">
+      <div class="card" style="margin-bottom: var(--space-10);">
         <div class="card-header">
           <span class="card-title">Your Week at a Glance</span>
           <a href="timesheets.html" class="btn btn-primary btn-sm">
@@ -767,40 +831,40 @@
         </div>
         <div class="card-body">
           <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-3);">
-            <!-- Monday (today) -->
+            <!-- Monday (logged) -->
             <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Mon')">
-              <div style="font-size:var(--text-caption);color:var(--color-primary);font-weight:var(--weight-semibold);margin-bottom:var(--space-1);">Mon</div>
-              <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-1);margin-bottom:var(--space-2);">8h</div>
+              <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Mon</div>
+              <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">8h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
-                <div style="width:100%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);"></div>
+                <div style="width:100%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
               </div>
-              <div style="font-size:var(--text-overline);color:var(--color-primary);margin-top:var(--space-1);">Today</div>
             </div>
-            <!-- Tuesday -->
+            <!-- Tuesday (logged) -->
             <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Tue')">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Tue</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">8h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
-                <div style="width:100%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);"></div>
+                <div style="width:100%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
               </div>
             </div>
-            <!-- Wednesday -->
+            <!-- Wednesday (logged) -->
             <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Wed')">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Wed</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">7h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
-                <div style="width:87%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);"></div>
+                <div style="width:87%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
               </div>
             </div>
-            <!-- Thursday -->
-            <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Thu')">
-              <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Thu</div>
-              <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">5h</div>
+            <!-- Thursday (today — in progress) -->
+            <div class="week-day-today" style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Thu')">
+              <div style="font-size:var(--text-caption);color:var(--color-primary);font-weight:var(--weight-semibold);margin-bottom:var(--space-1);">Thu</div>
+              <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-1);margin-bottom:var(--space-2);">5h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                 <div style="width:62%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);"></div>
               </div>
+              <div style="font-size:var(--text-overline);color:var(--color-primary);margin-top:var(--space-1);">Today</div>
             </div>
-            <!-- Friday -->
+            <!-- Friday (upcoming) -->
             <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Fri')">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Fri</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">--</div>
@@ -831,6 +895,281 @@
         </div>
       </div>
 
+      <!-- AI Alerts Widget (PM+) -->
+      <div class="card" data-min-role="pm" style="margin-bottom: var(--space-10);">
+        <div class="card-header">
+          <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg data-lucide="sparkles" width="18" height="18" style="color: var(--color-accent);"></svg>
+            AI Alerts
+          </span>
+          <span class="badge badge-accent">3 new</span>
+        </div>
+        <div class="card-body">
+          <div class="ai-alert">
+            <div class="ai-alert-icon"><svg data-lucide="alert-triangle" width="18" height="18" style="color: var(--color-error);"></svg></div>
+            <div class="ai-alert-body">
+              <div class="ai-alert-text">
+                <span class="badge badge-error" style="margin-right: var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overwork Alert</span>
+                <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#sarah-chen">Sarah Chen</a> has averaged 47h/week for 3 consecutive weeks. Recommend manager check-in and workload redistribution.
+              </div>
+              <div class="ai-alert-actions">
+                <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
+                <button class="btn btn-secondary btn-xs investigate-alert-btn" data-href="employees.html#sarah-chen">Investigate</button>
+              </div>
+            </div>
+          </div>
+          <div class="ai-alert">
+            <div class="ai-alert-icon"><svg data-lucide="file-warning" width="18" height="18" style="color: var(--color-warning);"></svg></div>
+            <div class="ai-alert-body">
+              <div class="ai-alert-text">
+                <span class="badge badge-warning" style="margin-right: var(--space-1);"><svg data-lucide="file-warning" width="12" height="12"></svg> Contract Expiry</span>
+                <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a>'s contract expires in 14 days (Apr 20). Renew before she returns from leave.
+              </div>
+              <div class="ai-alert-actions">
+                <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
+                <button class="btn btn-primary btn-xs" data-min-role="admin" onclick="GHR&&GHR.showToast('success','Contract renewal initiated','Draft renewal sent to Alice Wang for review.')">Renew Contract</button>
+              </div>
+            </div>
+          </div>
+          <div id="moreAlertsContainer" style="display:none;">
+            <div class="ai-alert">
+              <div class="ai-alert-icon"><svg data-lucide="briefcase" width="18" height="18" style="color: var(--color-info);"></svg></div>
+              <div class="ai-alert-body">
+                <div class="ai-alert-text">
+                  <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="briefcase" width="12" height="12"></svg> Bench Alert</span>
+                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a> has been on bench for 3 weeks with 0% work time. Available capacity: 40h/week.
+                </div>
+                <div class="ai-alert-actions">
+                  <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
+                  <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="GHR&&GHR.showToast('info','Opening project assignment','Select a project to assign Bob Taylor to.')">Assign to Project</button>
+                </div>
+              </div>
+            </div>
+            <div class="ai-alert">
+              <div class="ai-alert-icon"><svg data-lucide="receipt" width="18" height="18" style="color: var(--color-info);"></svg></div>
+              <div class="ai-alert-body">
+                <div class="ai-alert-text">
+                  <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="receipt" width="12" height="12"></svg> Expense Pattern</span>
+                  Unusual hotel expense for <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a> &mdash; EUR 340 Marriott Lyon on Apr 2. May need policy review.
+                </div>
+                <div class="ai-alert-actions">
+                  <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
+                  <button class="btn btn-secondary btn-xs investigate-alert-btn" data-href="expenses.html">Investigate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-xs" id="showMoreAlertsBtn" style="width:100%;margin-top:var(--space-2);" onclick="document.getElementById('moreAlertsContainer').style.display='block';this.style.display='none';if(typeof lucide!=='undefined')lucide.createIcons();">
+            <svg data-lucide="chevron-down" width="12" height="12"></svg>
+            View 2 more alerts
+          </button>
+        </div>
+      </div>
+
+      <!-- Pending Approvals inside Overview -->
+      <div class="grid-60-40" style="margin-bottom:var(--space-10);">
+        <div>
+          <!-- Pending Approvals Widget -->
+          <div class="card" data-min-role="pm" id="overviewApprovals">
+            <div class="card-header" style="padding-bottom: 0; border-bottom: none;">
+              <span class="card-title">Pending Approvals</span>
+            </div>
+            <div class="tabs" style="padding: 0 var(--space-4);" role="tablist">
+              <button class="tab active" data-tab="tab-timesheets" role="tab" aria-selected="true">Timesheets <span class="tab-count">7</span></button>
+              <button class="tab" data-tab="tab-leaves" role="tab" aria-selected="false">Leaves <span class="tab-count">3</span></button>
+              <button class="tab" data-tab="tab-expenses" role="tab" aria-selected="false">Expenses <span class="tab-count">2</span></button>
+            </div>
+
+            <!-- Timesheets Tab (capped at 4 items for readability) -->
+            <div class="tab-content active" id="tab-timesheets" role="tabpanel">
+              <div class="approval-item">
+                <div class="avatar avatar-xs">JS</div>
+                <div class="approval-info">
+                  <div class="approval-title">John Smith - Week 13</div>
+                  <div class="approval-sub">40h logged - Globex Phase 2 - <span class="font-mono" data-sensitive="billing">&#8364;3,200</span></div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for John Smith">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for John Smith">Reject</button>
+                </div>
+              </div>
+              <div class="approval-item">
+                <div class="avatar avatar-xs">CW</div>
+                <div class="approval-info">
+                  <div class="approval-title">Carol Williams - Week 13</div>
+                  <div class="approval-sub">38h logged - Umbrella Corp Portal - <span class="font-mono" data-sensitive="billing">&#8364;2,850</span></div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for Carol Williams">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for Carol Williams">Reject</button>
+                </div>
+              </div>
+              <div class="approval-item">
+                <div class="avatar avatar-xs">MR</div>
+                <div class="approval-info">
+                  <div class="approval-title">Marco Rossi - Week 13</div>
+                  <div class="approval-sub">42h logged - Acme Web Redesign - <span class="font-mono" data-sensitive="billing">&#8364;3,360</span></div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for Marco Rossi">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for Marco Rossi">Reject</button>
+                </div>
+              </div>
+              <div class="approval-item">
+                <div class="avatar avatar-xs">DP</div>
+                <div class="approval-info">
+                  <div class="approval-title">David Park - Week 13</div>
+                  <div class="approval-sub">36h logged - Initech API - <span class="font-mono" data-sensitive="billing">&#8364;2,880</span></div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for David Park">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for David Park">Reject</button>
+                </div>
+              </div>
+              <div style="padding: var(--space-2) var(--space-4);text-align:center;">
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);">+3 more pending</span>
+              </div>
+            </div>
+
+            <!-- Leaves Tab -->
+            <div class="tab-content" id="tab-leaves" role="tabpanel">
+              <div class="approval-item">
+                <div class="avatar avatar-xs">AW</div>
+                <div class="approval-info">
+                  <div class="approval-title">Alice Wang - Annual Leave</div>
+                  <div class="approval-sub">Apr 14-18, 2026 (5 days)</div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Alice Wang">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Alice Wang">Reject</button>
+                </div>
+              </div>
+              <div class="approval-item">
+                <div class="avatar avatar-xs">BT</div>
+                <div class="approval-info">
+                  <div class="approval-title">Bob Taylor - Personal</div>
+                  <div class="approval-sub">Apr 10, 2026 (1 day)</div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Bob Taylor">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Bob Taylor">Reject</button>
+                </div>
+              </div>
+              <div class="approval-item">
+                <div class="avatar avatar-xs">LO</div>
+                <div class="approval-info">
+                  <div class="approval-title">Liam O'Brien - Sick Leave</div>
+                  <div class="approval-sub">Apr 6-7, 2026 (2 days)</div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Liam O'Brien">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Liam O'Brien">Reject</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expenses Tab -->
+            <div class="tab-content" id="tab-expenses" role="tabpanel">
+              <div class="approval-item">
+                <div class="avatar avatar-xs">BT</div>
+                <div class="approval-info">
+                  <div class="approval-title">Bob Taylor - Client Dinner</div>
+                  <div class="approval-sub">Mar 30 - Helix Corp - <span class="font-mono">&#8364;186.50</span></div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve expense for Bob Taylor">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject expense for Bob Taylor">Reject</button>
+                </div>
+              </div>
+              <div class="approval-item">
+                <div class="avatar avatar-xs">EL</div>
+                <div class="approval-info">
+                  <div class="approval-title">Emma Laurent - Conference Fee</div>
+                  <div class="approval-sub">Apr 2 - QA Summit 2026 - <span class="font-mono">&#8364;450.00</span></div>
+                </div>
+                <div class="approval-actions">
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve expense for Emma Laurent">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject expense for Emma Laurent">Reject</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer" style="text-align: center;">
+              <a href="approvals.html" class="btn btn-ghost btn-xs">View all approvals</a>
+            </div>
+          </div>
+        </div>
+        <div>
+          <!-- Upcoming Events -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Upcoming 7 Days</span>
+              <span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> This week</span>
+            </div>
+            <div class="card-body" style="padding-top:0;">
+              <div style="display:flex;flex-direction:column;gap:0;">
+                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
+                  <div style="flex-shrink:0;min-width:56px;">
+                    <span style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-primary);">Today</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm text-1">
+                      <svg data-lucide="video" width="14" height="14" style="color:var(--color-text-3);vertical-align:-2px;margin-right:var(--space-1);"></svg>
+                      Sprint review <span style="color:var(--color-text-3);">2:00 PM</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
+                  <div style="flex-shrink:0;min-width:56px;">
+                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Mon Apr 14</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm text-1">
+                      <svg data-lucide="palm-tree" width="14" height="14" style="color:var(--color-warning);vertical-align:-2px;margin-right:var(--space-1);"></svg>
+                      <a href="employees.html#alice-wang" class="text-primary">Alice Wang</a> OOO (Apr 14–18)
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
+                  <div style="flex-shrink:0;min-width:56px;">
+                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Wed</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm text-1">
+                      <svg data-lucide="file-text" width="14" height="14" style="color:var(--color-gold);vertical-align:-2px;margin-right:var(--space-1);"></svg>
+                      Invoice due -- <a href="clients.html#acme-corp" style="color:var(--color-gold);">Acme Corp</a>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
+                  <div style="flex-shrink:0;min-width:56px;">
+                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Thu</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm text-1">
+                      <svg data-lucide="flag" width="14" height="14" style="color:var(--color-info);vertical-align:-2px;margin-right:var(--space-1);"></svg>
+                      Project milestone -- <a href="projects.html#globex-phase-2" style="color:var(--color-info);">Globex Phase 2</a>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;">
+                  <div style="flex-shrink:0;min-width:56px;">
+                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Fri</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-sm text-1">
+                      <svg data-lucide="alert-circle" width="14" height="14" style="color:var(--color-error);vertical-align:-2px;margin-right:var(--space-1);"></svg>
+                      Timesheet submission deadline
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div><!-- end overviewSection body -->
+
       <!-- Empty state KPI placeholder -->
       <div class="kpi-grid empty-content" style="grid-template-columns: 1fr;">
         <div class="card">
@@ -843,13 +1182,27 @@
         </div>
       </div>
 
-      <!-- ── UTILIZATION HEATMAP ── -->
-      <section class="card populated-content utilization-heatmap-section">
+      <!-- ══ DETAILS SECTION (collapsed by default) ══ -->
+      <div class="dashboard-section-header populated-content">
+        <button class="dashboard-section-toggle collapsed" onclick="toggleDashSection('detailsSection')" aria-expanded="false">
+          <svg data-lucide="chevron-down" width="16" height="16"></svg>
+          Details
+        </button>
+      </div>
+      <div class="dashboard-section-body populated-content collapsed" id="detailsSection" style="max-height:8000px;">
+
+      <!-- ── WORK TIME HEATMAP (collapsible) ── -->
+      <section class="card worktime-heatmap-section" id="heatmapSection">
         <div class="card-header">
-          <h3 class="card-title">Team Work Time — Last 12 Weeks</h3>
+          <div style="display:flex;align-items:center;gap:var(--space-3);">
+            <button class="collapsible-toggle" onclick="toggleCollapsible('heatmapSection')" aria-expanded="true" aria-controls="heatmapBody">
+              <svg data-lucide="chevron-down" width="16" height="16"></svg>
+            </button>
+            <h3 class="card-title">Team Work Time — Last 12 Weeks</h3>
+          </div>
           <a href="insights.html" class="btn btn-ghost btn-xs">Insights</a>
         </div>
-        <div class="card-body">
+        <div class="card-body collapsible-body" id="heatmapBody" style="max-height:600px;">
           <div class="heatmap-grid" id="heatmapGrid">
             <!-- headers filled by JS -->
           </div>
@@ -874,13 +1227,18 @@
         </div>
       </section>
 
-      <!-- ── REVENUE SNAPSHOT ── -->
-      <section class="card populated-content" data-sensitive="financials" style="margin-bottom: var(--space-6);">
+      <!-- ── REVENUE SNAPSHOT (collapsible) ── -->
+      <section class="card" data-sensitive="financials" style="margin-bottom: var(--space-8);" id="revSnapshotSection">
         <div class="card-header">
-          <h3 class="card-title">Revenue Snapshot — April 2026</h3>
+          <div style="display:flex;align-items:center;gap:var(--space-3);">
+            <button class="collapsible-toggle" onclick="toggleCollapsible('revSnapshotSection')" aria-expanded="true" aria-controls="revSnapshotBody">
+              <svg data-lucide="chevron-down" width="16" height="16"></svg>
+            </button>
+            <h3 class="card-title">Revenue Snapshot — April 2026</h3>
+          </div>
           <a href="insights.html" class="btn btn-ghost btn-xs">Details</a>
         </div>
-        <div class="card-body">
+        <div class="card-body collapsible-body" id="revSnapshotBody" style="max-height:600px;">
           <div style="display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
             <span style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-primary);" data-sensitive="financials">&#8364;68,400</span>
             <span style="font-size:var(--text-body);color:var(--color-text-2);">of <span data-sensitive="financials">&#8364;80,000</span> target</span>
@@ -896,260 +1254,20 @@
             <!-- filled by JS -->
           </div>
           <div style="display:flex;gap:var(--space-4);margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
-            <span style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;background:var(--color-gold);border-radius:2px;"></span>Actual</span>
-            <span style="display:flex;align-items:center;gap:4px;opacity:0.6;"><span style="display:inline-block;width:10px;height:10px;background:var(--color-gold);border-radius:2px;border:1px dashed var(--color-gold);opacity:0.5;"></span>Projected</span>
+            <span style="display:flex;align-items:center;gap:var(--space-1);"><span style="display:inline-block;width:10px;height:10px;background:var(--color-gold);border-radius:var(--radius-sm);"></span>Actual</span>
+            <span style="display:flex;align-items:center;gap:var(--space-1);opacity:0.6;"><span style="display:inline-block;width:10px;height:10px;background:var(--color-gold);border-radius:var(--radius-sm);border:1px dashed var(--color-gold);opacity:0.5;"></span>Projected</span>
           </div>
         </div>
       </section>
 
       <!-- ── TWO COLUMN LAYOUT ── -->
-      <div class="grid-60-40 populated-content">
+      <div class="grid-60-40">
 
         <!-- ═══ LEFT COLUMN (60%) ═══ -->
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-8">
 
-          <!-- Team Work Time Table -->
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <span class="card-title">Team Work Time: 82%</span>
-                <div style="font-size:var(--text-overline);color:var(--color-text-3);margin-top:2px;">6 above target · 2 below · 1 bench</div>
-              </div>
-              <a href="employees.html" class="btn btn-ghost btn-xs">View all</a>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="data-table mobile-cards">
-                <thead>
-                  <tr>
-                    <th class="sortable" data-sort="name" aria-sort="none">Name <span class="sort-icon">&#8597;</span></th>
-                    <th class="sortable" data-sort="role" aria-sort="none">Role <span class="sort-icon">&#8597;</span></th>
-                    <th class="sortable" data-sort="project" aria-sort="none">Current Project <span class="sort-icon">&#8597;</span></th>
-                    <th class="sortable" data-sort="worktime" aria-sort="none">Work Time <span class="sort-icon">&#8597;</span></th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">SC</span>
-                      </span>
-                      <a href="employees.html#profile-sarah" data-hovercard
-                         data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering"
-                         data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Project Manager</td>
-                    <td data-label="Current Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:87%; background: var(--color-success);"></div></div>
-                        <span class="worktime-pct">87%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">JS</span>
-                      </span>
-                      <a href="employees.html#john-smith" data-hovercard
-                         data-name="John Smith" data-role="Senior Developer" data-dept="Engineering"
-                         data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Senior Developer</td>
-                    <td data-label="Current Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:82%; background: var(--color-success);"></div></div>
-                        <span class="worktime-pct">82%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-leave" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">AW</span>
-                      </span>
-                      <a href="employees.html#alice-wang" data-hovercard
-                         data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering"
-                         data-project="" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Software Engineer</td>
-                    <td data-label="Current Project"><span class="text-3">On Leave</span></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:45%; background: var(--color-error);"></div></div>
-                        <span class="worktime-pct">45%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> On Leave Apr 14-18</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-away" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">BT</span>
-                      </span>
-                      <a href="employees.html#bob-taylor" data-hovercard
-                         data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering"
-                         data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Backend Developer</td>
-                    <td data-label="Current Project"><span class="text-3">Bench</span></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:0%; background: var(--color-error);"></div></div>
-                        <span class="worktime-pct">0%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-ghost"><svg data-lucide="minus-circle" width="12" height="12"></svg> Bench</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">CW</span>
-                      </span>
-                      <a href="employees.html#carol-williams" data-hovercard
-                         data-name="Carol Williams" data-role="Design Lead" data-dept="Design"
-                         data-project="Umbrella Corp Portal" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Design Lead</td>
-                    <td data-label="Current Project"><a href="projects.html#umbrella-portal">Umbrella Corp Portal</a></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:90%; background: var(--color-success);"></div></div>
-                        <span class="worktime-pct">90%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">DP</span>
-                      </span>
-                      <a href="employees.html#david-park" data-hovercard
-                         data-name="David Park" data-role="Finance Lead" data-dept="Finance"
-                         data-project="Initech API" data-worktime="45" data-href="employees.html#david-park">David Park</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Finance Lead</td>
-                    <td data-label="Current Project"><a href="projects.html#initech-api">Initech API</a></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:45%; background: var(--color-error);"></div></div>
-                        <span class="worktime-pct">45%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Low</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">EL</span>
-                      </span>
-                      <a href="employees.html#emma-laurent" data-hovercard
-                         data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR"
-                         data-project="Globex Phase 2" data-worktime="78" data-href="employees.html#emma-laurent">Emma Laurent</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">HR Specialist</td>
-                    <td data-label="Current Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:78%; background: var(--color-warning);"></div></div>
-                        <span class="worktime-pct">78%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Leave soon</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <span class="avatar-status presence-away" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">MR</span>
-                      </span>
-                      <a href="employees.html#marco-rossi" data-hovercard
-                         data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations"
-                         data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a>
-                    </td>
-                    <td data-label="Role" class="cell-secondary">Operations Lead</td>
-                    <td data-label="Current Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
-                    <td data-label="Work Time">
-                      <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:88%; background: var(--color-success);"></div></div>
-                        <span class="worktime-pct">88%</span>
-                      </div>
-                    </td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- AI Alerts Widget -->
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
-                <svg data-lucide="sparkles" width="18" height="18" style="color: var(--color-accent);"></svg>
-                AI Alerts
-              </span>
-              <span class="badge badge-accent">3 new</span>
-            </div>
-            <div class="card-body">
-              <div class="ai-alert">
-                <div class="ai-alert-icon"><svg data-lucide="alert-triangle" width="18" height="18" style="color: var(--color-error);"></svg></div>
-                <div class="ai-alert-body">
-                  <div class="ai-alert-text">
-                    <span class="badge badge-error" style="margin-right: var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overwork Alert</span>
-                    <a href="employees.html#sarah-chen">Sarah Chen</a> has averaged 47h/week for 3 consecutive weeks. Recommend manager check-in and workload redistribution.
-                  </div>
-                  <div class="ai-alert-actions">
-                    <button class="btn btn-ghost btn-xs">Dismiss</button>
-                    <button class="btn btn-secondary btn-xs">Investigate</button>
-                  </div>
-                </div>
-              </div>
-              <div class="ai-alert">
-                <div class="ai-alert-icon"><svg data-lucide="file-warning" width="18" height="18" style="color: var(--color-warning);"></svg></div>
-                <div class="ai-alert-body">
-                  <div class="ai-alert-text">
-                    <span class="badge badge-warning" style="margin-right: var(--space-1);"><svg data-lucide="file-warning" width="12" height="12"></svg> Contract Expiry</span>
-                    <a href="employees.html#alice-wang">Alice Wang</a>'s contract expires in 14 days (Apr 20). Renew before she returns from leave.
-                  </div>
-                  <div class="ai-alert-actions">
-                    <button class="btn btn-ghost btn-xs">Dismiss</button>
-                    <button class="btn btn-primary btn-xs" onclick="GHR&&GHR.showToast('success','Contract renewal initiated','Draft renewal sent to Alice Wang for review.')">Renew Contract</button>
-                  </div>
-                </div>
-              </div>
-              <div class="ai-alert">
-                <div class="ai-alert-icon"><svg data-lucide="briefcase" width="18" height="18" style="color: var(--color-info);"></svg></div>
-                <div class="ai-alert-body">
-                  <div class="ai-alert-text">
-                    <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="briefcase" width="12" height="12"></svg> Bench Alert</span>
-                    <a href="employees.html#bob-taylor">Bob Taylor</a> has been on bench for 3 weeks with 0% work time. Available capacity: 40h/week.
-                  </div>
-                  <div class="ai-alert-actions">
-                    <button class="btn btn-ghost btn-xs">Dismiss</button>
-                    <button class="btn btn-primary btn-xs" onclick="GHR&&GHR.showToast('info','Opening project assignment','Select a project to assign Bob Taylor to.')">Assign to Project</button>
-                  </div>
-                </div>
-              </div>
-              <div class="ai-alert">
-                <div class="ai-alert-icon"><svg data-lucide="receipt" width="18" height="18" style="color: var(--color-info);"></svg></div>
-                <div class="ai-alert-body">
-                  <div class="ai-alert-text">
-                    <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="receipt" width="12" height="12"></svg> Expense Pattern</span>
-                    Unusual hotel expense for <a href="employees.html#bob-taylor">Bob Taylor</a> &mdash; EUR 340 Marriott Lyon on Apr 2. May need policy review.
-                  </div>
-                  <div class="ai-alert-actions">
-                    <button class="btn btn-ghost btn-xs">Dismiss</button>
-                    <button class="btn btn-secondary btn-xs">Investigate</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Team Work Time Table — REMOVED for information density (Issue 1) -->
+          <!-- Kept code commented for reference; table was redundant with heatmap + employee page -->
 
           <!-- Mini Gantt Preview -->
           <div class="card">
@@ -1163,7 +1281,7 @@
                   <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#sarah-chen" class="text-2">Sarah Chen</a></span>
+                  <span class="gantt-name"><a href="employees.html#sarah-chen" class="text-2" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#sarah-chen">Sarah Chen</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-1); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">ACM</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
@@ -1173,7 +1291,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#john-smith" class="text-2">John Smith</a></span>
+                  <span class="gantt-name"><a href="employees.html#john-smith" class="text-2" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-2); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">GLX</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-2);"></div>
@@ -1183,7 +1301,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#alice-wang" class="text-2">Alice Wang</a></span>
+                  <span class="gantt-name"><a href="employees.html#alice-wang" class="text-2" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
@@ -1193,7 +1311,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#carol-williams" class="text-2">Carol Williams</a></span>
+                  <span class="gantt-name"><a href="employees.html#carol-williams" class="text-2" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-3); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">UMB</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
@@ -1203,7 +1321,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#marco-rossi" class="text-2">Marco Rossi</a></span>
+                  <span class="gantt-name"><a href="employees.html#marco-rossi" class="text-2" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background:var(--color-surface-2);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">ACM</span></div>
@@ -1237,7 +1355,7 @@
                     <div class="text-sm text-1">
                       <a href="employees.html#emma-laurent" data-hovercard
                          data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR"
-                         data-project="Globex Phase 2" data-worktime="78" data-href="employees.html#emma-laurent"
+                         data-project="Internal" data-worktime="78" data-href="employees.html#emma-laurent"
                          class="text-primary" onclick="event.stopPropagation()">Emma Laurent</a> submitted timesheet (<span class="font-mono">40h</span>)
                     </div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:2px;">10 min ago</div>
@@ -1305,7 +1423,13 @@
                   <div class="activity-arrow"><svg data-lucide="chevron-right" width="14" height="14"></svg></div>
                 </div>
               </div>
-              <div style="padding:var(--space-3) 0 0;text-align:center;border-top:1px solid var(--color-border-subtle);margin-top:var(--space-1);">
+              <div style="padding:var(--space-3) 0;text-align:center;border-top:1px solid var(--color-border-subtle);margin-top:var(--space-1);">
+                <button class="btn btn-ghost btn-xs" style="width:100%;margin-bottom:var(--space-2);" onclick="this.textContent='No more activity';this.disabled=true;this.style.opacity='0.5';">
+                  <svg data-lucide="chevron-down" width="12" height="12"></svg>
+                  Load more
+                </button>
+              </div>
+              <div style="text-align:center;">
                 <a href="timesheets.html" class="btn btn-ghost btn-xs" style="width:100%;">
                   <svg data-lucide="activity" width="12" height="12"></svg>
                   View all activity
@@ -1316,301 +1440,7 @@
         </div>
 
         <!-- ═══ RIGHT COLUMN (40%) ═══ -->
-        <div class="flex flex-col gap-6">
-
-          <!-- Billable vs Internal Hours Donut Chart -->
-          <div class="card donut-section">
-            <div class="card-header">
-              <span class="card-title">Billable vs Internal Hours</span>
-              <a href="insights.html" class="btn btn-ghost btn-xs">Details</a>
-            </div>
-            <div class="card-body">
-              <div class="donut-wrap">
-                <div style="position:relative;width:120px;height:120px;flex-shrink:0;">
-                  <svg viewBox="0 0 42 42" width="120" height="120" style="transform:rotate(-90deg);">
-                    <!-- Internal (13%) -->
-                    <circle class="donut-segment" data-label="Internal" data-pct="13%" data-hours="240h"
-                      cx="21" cy="21" r="15.915"
-                      fill="transparent"
-                      stroke="var(--color-info)"
-                      stroke-width="18"
-                      stroke-dasharray="13 87"
-                      stroke-dashoffset="0"
-                      style="transition:stroke-width var(--motion-fast);cursor:pointer;"
-                    />
-                    <!-- Billable (87%) -->
-                    <circle class="donut-segment" data-label="Billable" data-pct="87%" data-hours="1,602h"
-                      cx="21" cy="21" r="15.915"
-                      fill="transparent"
-                      stroke="var(--color-gold)"
-                      stroke-width="18"
-                      stroke-dasharray="87 13"
-                      stroke-dashoffset="-13"
-                      style="transition:stroke-width var(--motion-fast);cursor:pointer;"
-                    />
-                  </svg>
-                  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
-                    <div id="donutCenterPct" style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);">87%</div>
-                    <div id="donutCenterLabel" style="font-size:var(--text-overline);color:var(--color-text-3);text-transform:lowercase;">billable</div>
-                    <div id="donutCenterTotal" style="font-family:var(--font-mono);font-size:var(--text-overline);color:var(--color-text-3);margin-top:1px;">1,842h total</div>
-                  </div>
-                  <div id="donutTooltip" style="display:none;position:absolute;background:var(--color-surface-3);color:var(--color-text-1);font-size:var(--text-caption);padding:var(--space-1) var(--space-2);border-radius:var(--radius-sm);white-space:nowrap;pointer-events:none;z-index:10;"></div>
-                </div>
-                <div class="donut-legend">
-                  <div class="donut-legend-item">
-                    <span class="donut-legend-dot" style="background:var(--color-gold);"></span>
-                    <span class="donut-legend-label">Billable</span>
-                    <span class="donut-legend-value">1,602h</span>
-                  </div>
-                  <div class="donut-legend-item">
-                    <span class="donut-legend-dot" style="background:var(--color-info);"></span>
-                    <span class="donut-legend-label">Internal</span>
-                    <span class="donut-legend-value">240h</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Live Presence Panel -->
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Live Presence</span>
-              <span class="badge badge-success"><svg data-lucide="circle" width="12" height="12"></svg> 7 online</span>
-            </div>
-            <div class="card-body" style="padding-top: 0;">
-              <div class="presence-item">
-                <span class="presence-status online"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#sarah-chen">Sarah Chen</a></div>
-                  <div class="presence-detail">Working on <a href="projects.html#acme-web-redesign" style="color:var(--color-text-3);">Acme Web Redesign</a></div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status online"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#john-smith">John Smith</a></div>
-                  <div class="presence-detail">Code review - <a href="projects.html#globex-phase-2" style="color:var(--color-text-3);">Globex Phase 2</a></div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status online"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#carol-williams">Carol Williams</a></div>
-                  <div class="presence-detail">Sprint planning meeting</div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status away"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#marco-rossi">Marco Rossi</a></div>
-                  <div class="presence-detail"><a href="projects.html#acme-web-redesign" style="color:var(--color-text-3);">Acme Web Redesign</a> - frontend</div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status on-leave"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#alice-wang">Alice Wang</a></div>
-                  <div class="presence-detail">On Leave — Apr 14–18</div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status offline"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
-                  <div class="presence-detail">Offline — on bench</div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status offline"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#david-park">David Park</a></div>
-                  <div class="presence-detail">Offline</div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status online"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#emma-laurent">Emma Laurent</a></div>
-                  <div class="presence-detail">QA testing - <a href="projects.html#globex-phase-2" style="color:var(--color-text-3);">Globex Phase 2</a></div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status offline"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#yuki-tanaka">Yuki Tanaka</a></div>
-                  <div class="presence-detail">Offline - last seen yesterday</div>
-                </div>
-              </div>
-              <div class="presence-item">
-                <span class="presence-status online"></span>
-                <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#liam-obrien">Liam O'Brien</a></div>
-                  <div class="presence-detail"><a href="projects.html#acme-web-redesign" style="color:var(--color-text-3);">Acme Web Redesign</a> - API work</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pending Approvals Widget -->
-          <div class="card" data-min-role="pm">
-            <div class="card-header" style="padding-bottom: 0; border-bottom: none;">
-              <span class="card-title">Pending Approvals</span>
-            </div>
-            <div class="tabs" style="padding: 0 var(--space-4);" role="tablist">
-              <button class="tab active" data-tab="tab-timesheets" role="tab" aria-selected="true">Timesheets <span class="tab-count">7</span></button>
-              <button class="tab" data-tab="tab-leaves" role="tab" aria-selected="false">Leaves <span class="tab-count">3</span></button>
-              <button class="tab" data-tab="tab-expenses" role="tab" aria-selected="false">Expenses <span class="tab-count">2</span></button>
-            </div>
-
-            <!-- Timesheets Tab -->
-            <div class="tab-content active" id="tab-timesheets" role="tabpanel">
-              <div class="approval-item">
-                <div class="avatar avatar-xs">JS</div>
-                <div class="approval-info">
-                  <div class="approval-title">John Smith - Week 13</div>
-                  <div class="approval-sub">40h logged - Globex Phase 2 - <span class="font-mono" data-sensitive="billing">&#8364;3,200</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for John Smith">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for John Smith">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">CW</div>
-                <div class="approval-info">
-                  <div class="approval-title">Carol Williams - Week 13</div>
-                  <div class="approval-sub">38h logged - Umbrella Corp Portal - <span class="font-mono" data-sensitive="billing">&#8364;2,850</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Carol Williams">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Carol Williams">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">MR</div>
-                <div class="approval-info">
-                  <div class="approval-title">Marco Rossi - Week 13</div>
-                  <div class="approval-sub">42h logged - Acme Web Redesign - <span class="font-mono" data-sensitive="billing">&#8364;3,360</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Marco Rossi">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Marco Rossi">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">DP</div>
-                <div class="approval-info">
-                  <div class="approval-title">David Park - Week 13</div>
-                  <div class="approval-sub">36h logged - Initech API - <span class="font-mono" data-sensitive="billing">&#8364;2,880</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for David Park">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for David Park">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">EL</div>
-                <div class="approval-info">
-                  <div class="approval-title">Emma Laurent - Week 13</div>
-                  <div class="approval-sub">40h logged - Globex Phase 2 - <span class="font-mono" data-sensitive="billing">&#8364;3,200</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Emma Laurent">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Emma Laurent">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">BT</div>
-                <div class="approval-info">
-                  <div class="approval-title">Bob Taylor - Week 13</div>
-                  <div class="approval-sub">34h logged - Globex Phase 2 - <span class="font-mono" data-sensitive="billing">&#8364;2,720</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Bob Taylor">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Bob Taylor">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">AW</div>
-                <div class="approval-info">
-                  <div class="approval-title">Alice Wang - Week 13</div>
-                  <div class="approval-sub">30h logged - Acme Web Redesign - <span class="font-mono" data-sensitive="billing">&#8364;2,400</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Alice Wang">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Alice Wang">Reject</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Leaves Tab -->
-            <div class="tab-content" id="tab-leaves" role="tabpanel">
-              <div class="approval-item">
-                <div class="avatar avatar-xs">AW</div>
-                <div class="approval-info">
-                  <div class="approval-title">Alice Wang - Vacation</div>
-                  <div class="approval-sub">Apr 21-25, 2026 (5 days)</div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve leave for Alice Wang">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject leave for Alice Wang">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">BT</div>
-                <div class="approval-info">
-                  <div class="approval-title">Bob Taylor - Personal</div>
-                  <div class="approval-sub">Apr 10, 2026 (1 day)</div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve leave for Bob Taylor">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject leave for Bob Taylor">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">LO</div>
-                <div class="approval-info">
-                  <div class="approval-title">Liam O'Brien - Sick Leave</div>
-                  <div class="approval-sub">Apr 6-7, 2026 (2 days)</div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve leave for Liam O'Brien">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject leave for Liam O'Brien">Reject</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Expenses Tab -->
-            <div class="tab-content" id="tab-expenses" role="tabpanel">
-              <div class="approval-item">
-                <div class="avatar avatar-xs">BT</div>
-                <div class="approval-info">
-                  <div class="approval-title">Bob Taylor - Client Dinner</div>
-                  <div class="approval-sub">Mar 30 - Helix Corp - <span class="font-mono">&#8364;186.50</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve expense for Bob Taylor">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject expense for Bob Taylor">Reject</button>
-                </div>
-              </div>
-              <div class="approval-item">
-                <div class="avatar avatar-xs">EL</div>
-                <div class="approval-info">
-                  <div class="approval-title">Emma Laurent - Conference Fee</div>
-                  <div class="approval-sub">Apr 2 - QA Summit 2026 - <span class="font-mono">&#8364;450.00</span></div>
-                </div>
-                <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve expense for Emma Laurent">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject expense for Emma Laurent">Reject</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-footer" style="text-align: center;">
-              <a href="approvals.html" class="btn btn-ghost btn-xs">View all approvals</a>
-            </div>
-          </div>
+        <div class="flex flex-col gap-8">
 
           <!-- Revenue Trend -->
           <div class="card">
@@ -1664,74 +1494,9 @@
             </div>
           </div>
 
-          <!-- Upcoming Events -->
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Upcoming 7 Days</span>
-              <span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> This week</span>
-            </div>
-            <div class="card-body" style="padding-top:0;">
-              <div style="display:flex;flex-direction:column;gap:0;">
-                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
-                  <div style="flex-shrink:0;min-width:56px;">
-                    <span style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-primary);">Today</span>
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-sm text-1">
-                      <svg data-lucide="video" width="14" height="14" style="color:var(--color-text-3);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      Sprint review <span style="color:var(--color-text-3);">2:00 PM</span>
-                    </div>
-                  </div>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
-                  <div style="flex-shrink:0;min-width:56px;">
-                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Tomorrow</span>
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-sm text-1">
-                      <svg data-lucide="palm-tree" width="14" height="14" style="color:var(--color-warning);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      <a href="employees.html#alice-wang" class="text-primary">Alice Wang</a> OOO
-                    </div>
-                  </div>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
-                  <div style="flex-shrink:0;min-width:56px;">
-                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Wed</span>
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-sm text-1">
-                      <svg data-lucide="file-text" width="14" height="14" style="color:var(--color-gold);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      Invoice due -- <a href="clients.html#acme-corp" style="color:var(--color-gold);">Acme Corp</a>
-                    </div>
-                  </div>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-border-subtle);">
-                  <div style="flex-shrink:0;min-width:56px;">
-                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Thu</span>
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-sm text-1">
-                      <svg data-lucide="flag" width="14" height="14" style="color:var(--color-info);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      Project milestone -- <a href="projects.html#globex-phase-2" style="color:var(--color-info);">Globex Phase 2</a>
-                    </div>
-                  </div>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) 0;">
-                  <div style="flex-shrink:0;min-width:56px;">
-                    <span style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-2);">Fri</span>
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-sm text-1">
-                      <svg data-lucide="alert-circle" width="14" height="14" style="color:var(--color-error);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      Timesheet submission deadline
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
+      </div><!-- end detailsSection body -->
 
       <!-- Empty state for two-column -->
       <div class="grid-60-40 empty-content" style="grid-template-columns: 1fr;">
@@ -1807,7 +1572,7 @@
           <div class="item-subtitle">Command center overview</div>
         </div>
       </div>
-      <div class="cmd-palette-item">
+      <div class="cmd-palette-item" data-min-role="pm">
         <div class="item-icon"><svg data-lucide="file-text" width="16" height="16"></svg></div>
         <div class="item-text">
           <div class="item-title">Invoices</div>
@@ -1925,30 +1690,8 @@
     }
   });
 
-  // ── Notification Panel ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
-  // Mark all notifications as read
-  var markAllBtn = document.getElementById('markAllReadBtn');
-  if (markAllBtn) {
-    markAllBtn.addEventListener('click', function() {
-      notifPanel.querySelectorAll('.notif-item.unread').forEach(function(item) {
-        item.classList.remove('unread');
-      });
-      var dot = notifBtn.querySelector('.notif-dot');
-      if (dot) dot.style.display = 'none';
-      // Show "all caught up" empty state
-      var list = document.getElementById('notifPanelList');
-      var caughtUp = document.getElementById('notifAllCaughtUp');
-      if (list) list.style.display = 'none';
-      if (caughtUp) { caughtUp.style.display = 'block'; lucide.createIcons({ nodes: [caughtUp] }); }
-      showToast('success', 'Done', 'All notifications marked as read.');
-    });
-  }
+  // ── Notification Panel (handled by GHR.renderNotifications in _shared.js) ──
+  // Panel toggle wired via GHR.initNotifications()
 
   // ── User Dropdown ──
   userMenuBtn.addEventListener('click', function(e) {
@@ -1959,8 +1702,9 @@
 
   // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
-      notifPanel.classList.remove('active');
+    var np = document.getElementById('notifPanel');
+    if (np && !np.contains(e.target) && !notifBtn.contains(e.target)) {
+      np.classList.remove('active');
     }
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
       userDropdown.classList.remove('active');
@@ -2096,13 +1840,8 @@
     var h = new Date().getHours();
     var greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
     var el = document.getElementById('greetingHeading');
-    // Read state from page: 12 pending approvals, invoice due Wed, 3 urgent items
-    var pendingApprovals = 12;
-    var urgentCount = 3;
-    var context = pendingApprovals + ' approvals waiting';
-    if (urgentCount > 0) context += ' (' + urgentCount + ' urgent)';
-    context += ' and an invoice due Wednesday';
-    if (el) el.textContent = greeting + ', Sarah — you have ' + context + '.';
+    // Contextual summary: timesheets to approve + expense flagged
+    if (el) el.textContent = greeting + ', Sarah — 3 timesheets to approve, 1 expense flagged.';
     // ── Dynamic date ──
     var dateEl = document.getElementById('greetingDate');
     if (dateEl) {
@@ -2137,7 +1876,7 @@
     }
   })();
 
-  // ── Build Utilization Heatmap ──
+  // ── Build Work Time Heatmap ──
   (function() {
     var grid = document.getElementById('heatmapGrid');
     if (!grid) return;
@@ -2185,15 +1924,18 @@
         if (val === null) {
           cell.className = 'heatmap-cell off';
           cell.title = 'Holiday / Off';
-        } else if (val > 85) {
-          cell.className = 'heatmap-cell high';
-          cell.title = 'Week of ' + months[start.getMonth()] + ' ' + start.getDate() + ': ' + val + '%';
-        } else if (val >= 60) {
-          cell.className = 'heatmap-cell mid';
-          cell.title = 'Week of ' + months[start.getMonth()] + ' ' + start.getDate() + ': ' + val + '%';
+          cell.setAttribute('data-hours', 'Off');
         } else {
-          cell.className = 'heatmap-cell low';
-          cell.title = 'Week of ' + months[start.getMonth()] + ' ' + start.getDate() + ': ' + val + '%';
+          var hours = Math.round(val * 8 / 100) + 'h';
+          if (val > 85) {
+            cell.className = 'heatmap-cell high';
+          } else if (val >= 60) {
+            cell.className = 'heatmap-cell mid';
+          } else {
+            cell.className = 'heatmap-cell low';
+          }
+          cell.title = 'Week of ' + months[start.getMonth()] + ' ' + start.getDate() + ': ' + val + '% (' + hours + ')';
+          cell.setAttribute('data-hours', val + '% ' + hours);
         }
         grid.appendChild(cell);
       }
@@ -2219,7 +1961,8 @@
       col.className = 'rev-bar-col';
       var pct = Math.round((d.value / maxVal) * 100);
       col.innerHTML =
-        '<div class="rev-bar ' + (d.projected ? 'projected' : 'actual') + '" style="height:' + pct + '%;" title="' + d.label + ': €' + (d.value / 1000).toFixed(0) + 'k' + (d.projected ? ' (projected)' : '') + '"></div>' +
+        '<div style="font-family:var(--font-mono);font-size:var(--text-overline);color:var(--color-text-2);">\u20AC' + (d.value / 1000).toFixed(0) + 'k</div>' +
+        '<div class="rev-bar ' + (d.projected ? 'projected' : 'actual') + '" style="height:' + pct + '%;" title="' + d.label + ': \u20AC' + (d.value / 1000).toFixed(0) + 'k' + (d.projected ? ' (projected)' : '') + '"></div>' +
         '<div class="rev-label">' + d.label + '</div>';
       chart.appendChild(col);
     });
@@ -2236,7 +1979,7 @@
       var label = this.getAttribute('data-label');
       var pct = this.getAttribute('data-pct');
       var hours = this.getAttribute('data-hours');
-      this.style.strokeWidth = '22';
+      this.style.strokeWidth = '14';
       if (donutCenterPct) donutCenterPct.textContent = pct;
       if (donutCenterLabel) donutCenterLabel.textContent = label.toLowerCase();
       if (donutTooltip) {
@@ -2248,18 +1991,129 @@
       }
     });
     seg.addEventListener('mouseleave', function() {
-      this.style.strokeWidth = '18';
+      this.style.strokeWidth = '10';
       if (donutCenterPct) donutCenterPct.textContent = '87%';
       if (donutCenterLabel) donutCenterLabel.textContent = 'billable';
       if (donutTooltip) donutTooltip.style.display = 'none';
     });
   });
 
+  // ── AI Alert Dismiss buttons (Issue 4) ──
+  document.querySelectorAll('.dismiss-alert-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var card = this.closest('.ai-alert');
+      if (card) {
+        card.style.transition = 'opacity var(--motion-fast), max-height var(--motion-slow)';
+        card.style.opacity = '0';
+        card.style.maxHeight = card.scrollHeight + 'px';
+        setTimeout(function() {
+          card.style.maxHeight = '0';
+          card.style.padding = '0';
+          card.style.marginBottom = '0';
+          card.style.overflow = 'hidden';
+        }, 150);
+        setTimeout(function() { if (card.parentNode) card.parentNode.removeChild(card); }, 500);
+      }
+      showToast('info', 'Alert dismissed', 'This insight has been dismissed.');
+    });
+  });
+
+  // ── AI Alert Investigate buttons (Issue 5) ──
+  document.querySelectorAll('.investigate-alert-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var href = this.getAttribute('data-href');
+      showToast('info', 'Investigating', 'Opening relevant page for investigation...');
+      if (href) {
+        setTimeout(function() { window.location.href = href; }, 800);
+      }
+    });
+  });
+
+  // ── Reject Buttons on Approval Items (Issue 5) ──
+  document.querySelectorAll('.btn-destructive-ghost').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = this.closest('.approval-item');
+      var name = item ? item.querySelector('.approval-title').textContent.split(' - ')[0] : 'Item';
+      showToast('warning', 'Rejected', name + '\'s submission has been rejected.');
+      if (item) {
+        item.style.transition = 'opacity var(--motion-fast), max-height var(--motion-slow)';
+        item.style.opacity = '0';
+        item.style.maxHeight = item.scrollHeight + 'px';
+        item.style.pointerEvents = 'none';
+        setTimeout(function() {
+          item.style.maxHeight = '0';
+          item.style.padding = '0';
+          item.style.marginBottom = '0';
+          item.style.borderBottom = 'none';
+          item.style.overflow = 'hidden';
+        }, 150);
+        setTimeout(function() { if (item.parentNode) item.parentNode.removeChild(item); }, 500);
+      }
+    });
+  });
+
+  // ── Revenue chart goal line (Issue 14) ──
+  (function() {
+    var revBars = document.querySelector('.revenue-bars');
+    if (revBars) {
+      // Y-axis max is EUR 80k. Goal at EUR 50k. 50/80 = 62.5% from bottom.
+      var goalLine = document.createElement('div');
+      goalLine.className = 'revenue-goal-line';
+      goalLine.style.bottom = '62.5%';
+      var goalLabel = document.createElement('span');
+      goalLabel.className = 'revenue-goal-label';
+      goalLabel.textContent = 'Goal: \u20AC50k';
+      goalLabel.style.bottom = '62.5%';
+      goalLabel.style.position = 'absolute';
+      goalLabel.style.right = '0';
+      revBars.style.position = 'relative';
+      revBars.appendChild(goalLine);
+      revBars.appendChild(goalLabel);
+    }
+  })();
+
 })();
+
+// ── Dashboard section toggle (Overview / Details) ──
+function toggleDashSection(sectionId) {
+  var body = document.getElementById(sectionId);
+  if (!body) return;
+  var header = body.previousElementSibling;
+  var toggle = header ? header.querySelector('.dashboard-section-toggle') : null;
+  var isCollapsed = body.classList.contains('collapsed');
+  if (isCollapsed) {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = body.dataset.maxH || '4000px';
+    if (toggle) { toggle.classList.remove('collapsed'); toggle.setAttribute('aria-expanded', 'true'); }
+  } else {
+    body.classList.add('collapsed');
+    if (toggle) { toggle.classList.add('collapsed'); toggle.setAttribute('aria-expanded', 'false'); }
+  }
+}
+
+// ── Collapsible section toggle (global, used by onclick) ──
+function toggleCollapsible(sectionId) {
+  var section = document.getElementById(sectionId);
+  if (!section) return;
+  var toggle = section.querySelector('.collapsible-toggle');
+  var body = section.querySelector('.collapsible-body');
+  if (!toggle || !body) return;
+  var isCollapsed = body.classList.contains('collapsed');
+  if (isCollapsed) {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = '600px';
+    toggle.classList.remove('collapsed');
+    toggle.setAttribute('aria-expanded', 'true');
+  } else {
+    body.classList.add('collapsed');
+    toggle.classList.add('collapsed');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+}
 </script>
 
 <!-- ════════════════════════════════════════ BOTTOM NAV BAR ════════════════════════════════════════ -->
-<nav class="bottom-nav" aria-label="Bottom navigation" aria-label="Mobile navigation">
+<nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item active">
     <svg data-lucide="layout-dashboard" width="22" height="22"></svg>
     <span>Home</span>
@@ -2276,7 +2130,7 @@
     <svg data-lucide="palm-tree" width="22" height="22"></svg>
     <span>Leaves</span>
   </a>
-  <a href="#" class="bottom-nav-item" id="moreNavBtn">
+  <a href="javascript:void(0)" class="bottom-nav-item" id="moreNavBtn">
     <svg data-lucide="menu" width="22" height="22"></svg>
     <span>More</span>
   </a>

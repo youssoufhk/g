@@ -15,10 +15,10 @@
   height: 100vh;
   position: fixed;
   top: 0; left: 0;
-  background: var(--color-surface-0);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-right: 1px solid var(--color-border-strong);
+  background: var(--glass-bg, rgba(30, 26, 22, 0.85));
+  backdrop-filter: var(--glass-blur, blur(20px) saturate(1.2));
+  -webkit-backdrop-filter: var(--glass-blur, blur(20px) saturate(1.2));
+  border-right: 1px solid var(--glass-border, var(--color-border-strong));
   box-shadow: 2px 0 8px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
@@ -68,7 +68,7 @@
   scrollbar-width: thin;
 }
 .sidebar-nav::-webkit-scrollbar { width: 4px; }
-.sidebar-nav::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
 
 /* Collapsed sidebar adjustments */
 .sidebar.collapsed .nav-section-label { display: none; }
@@ -77,7 +77,7 @@
   padding: var(--space-2) 0;
   margin: 0 var(--space-2);
 }
-.sidebar.collapsed .nav-item .nav-label { display: none; }
+.sidebar.collapsed .nav-item .nav-label { opacity: 0; width: 0; overflow: hidden; transition: opacity var(--motion-normal), width var(--motion-normal); }
 .sidebar.collapsed .nav-item .nav-badge {
   position: absolute;
   top: 2px; right: 2px;
@@ -167,7 +167,9 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--motion-fast);
-  min-width: 240px;
+  flex: 1;
+  max-width: 240px;
+  min-width: 0;
 }
 .header-search:hover { border-color: var(--color-border-strong); background: var(--color-surface-2); }
 .header-search svg { color: var(--color-text-3); width: 16px; height: 16px; }
@@ -280,6 +282,39 @@
 .grid-60-40 { display: grid; grid-template-columns: 3fr 2fr; gap: var(--space-6); }
 .grid-70-30 { display: grid; grid-template-columns: 7fr 3fr; gap: var(--space-6); }
 
+/* ── KPI / STAT CARD GRIDS (UI11: FOUC prevention — desktop-first base rules) ──
+   These classes must have their full-width desktop grid as the BASE rule so the
+   browser renders them correctly on first paint at desktop widths. Mobile overrides
+   are applied only via media queries below. Never define these as block/flex at base
+   and then upgrade to grid in a media query — that causes FOUC. */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+/* 3-column variant — used where 3 KPIs are shown */
+.kpi-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+/* 2-column variant */
+.kpi-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
 /* Flex helpers */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
@@ -352,7 +387,7 @@ body.dev-mode .state-toggle { display: flex; }
     padding: var(--space-2) 0;
     margin: 0 var(--space-2);
   }
-  .sidebar .nav-item .nav-label { display: none; }
+  .sidebar .nav-item .nav-label { opacity: 0; width: 0; overflow: hidden; transition: opacity 200ms, width 200ms; }
   .sidebar .nav-item .nav-badge {
     position: absolute;
     top: 2px; right: 2px;
@@ -369,6 +404,9 @@ body.dev-mode .state-toggle { display: flex; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
   .grid-60-40, .grid-70-30 { grid-template-columns: 1fr; }
+  .kpi-grid, .stat-grid, .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .kpi-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .header-icon-btn { min-width: 44px; min-height: 44px; }
 }
 
 /* Mobile (<640) */
@@ -399,6 +437,9 @@ body.dev-mode .state-toggle { display: flex; }
   .grid-6 { grid-template-columns: repeat(3, 1fr); }
   /* Asymmetric layouts stack to 1 col on mobile */
   .grid-60-40, .grid-70-30 { grid-template-columns: 1fr; }
+  /* KPI / stat grids stay 2-col on mobile (never collapse to 1) */
+  .kpi-grid, .stat-grid, .stats-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+  .kpi-grid-3, .kpi-grid-2 { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
 
   .header-search { display: none; }
   .header-user .user-name,
@@ -703,12 +744,12 @@ body.dev-mode .state-toggle { display: flex; }
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-4);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .filter-bar-standard .filter-search {
   position: relative;
   flex: 1;
-  min-width: 180px;
+  min-width: 120px;
 }
 .filter-bar-standard .filter-search svg {
   position: absolute;
@@ -741,14 +782,217 @@ body.dev-mode .state-toggle { display: flex; }
   height: 36px;
   font-size: var(--text-body-sm);
   background: var(--color-surface-1);
-  min-width: 130px;
+  min-width: 0;
+  flex-shrink: 1;
 }
-@media (max-width: 639px) {
-  .filter-bar-standard { padding: var(--space-2) var(--space-3); }
-  .filter-bar-standard .filter-search { min-width: 100%; }
-  .filter-bar-standard .form-select { flex: 1; min-width: calc(50% - var(--space-2)); }
+@media (max-width: 768px) {
+  .filter-bar-standard { flex-wrap: wrap; padding: var(--space-2) var(--space-3); }
+  .filter-bar-standard .filter-search { min-width: 100%; order: -1; }
+  .filter-bar-standard .form-select { flex: 1; min-width: calc(50% - var(--space-2)); min-height: 44px; }
 }
 
+/* ── UI6: Guarantee filter-bar NEVER stacks on desktop ── */
+@media (min-width: 769px) {
+  .filter-bar-standard {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+}
+
+/* ── UI7: Consistent page content alignment across all pages ── */
+.page-content {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+
+/* ── MOBILE: Extended mobile-cards support (CRIT-1: sessions-table) ── */
+@media (max-width: 639px) {
+  /* Allow .sessions-table.mobile-cards to work without .data-table class */
+  .sessions-table.mobile-cards thead { display: none; }
+  .sessions-table.mobile-cards,
+  .sessions-table.mobile-cards tbody,
+  .sessions-table.mobile-cards tr,
+  .sessions-table.mobile-cards td {
+    display: block;
+    width: 100%;
+  }
+  .sessions-table.mobile-cards tr {
+    background: var(--color-surface-0);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+    box-shadow: var(--shadow-1);
+  }
+  .sessions-table.mobile-cards td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-1-5) 0;
+    border: none;
+    font-size: var(--text-body-sm);
+  }
+  .sessions-table.mobile-cards td::before {
+    content: attr(data-label);
+    font-weight: var(--weight-semibold);
+    color: var(--color-text-2);
+    font-size: var(--text-caption);
+    margin-right: var(--space-3);
+    flex-shrink: 0;
+  }
+  .sessions-table.mobile-cards td:first-child {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-body);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border-subtle);
+    margin-bottom: var(--space-1);
+  }
+  .sessions-table.mobile-cards td:first-child::before { display: none; }
+}
+
+/* ── MOBILE: Form-row collapse on mobile (CRIT-3: leaves modal) ── */
+@media (max-width: 639px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── MOBILE: Timesheet status bar wrapping (MED-15) ── */
+.ts-status-bar {
+  flex-wrap: wrap;
+}
+
+/* ── MOBILE: Calendar grid overflow prevention (CRIT-4) ── */
+@media (max-width: 400px) {
+  .cal-grid {
+    overflow-x: auto !important;
+  }
+  .cal-day {
+    min-width: 38px !important;
+  }
+}
+
+/* ── MOBILE: Calendar nav label min-width (HIGH-9, MED-18) ── */
+@media (max-width: 639px) {
+  .cal-nav .month-label,
+  .month-label {
+    min-width: 120px !important;
+  }
+}
+
+/* ── MOBILE: Client revenue column (MED-12) ── */
+@media (max-width: 639px) {
+  .client-revenue {
+    min-width: 80px !important;
+  }
+}
+
+/* ── MOBILE: Approvals bulk action bar (MED-11) ── */
+@media (max-width: 639px) {
+  .bulk-action-bar,
+  [class*="bulk-bar"] {
+    left: 0 !important;
+    transform: none !important;
+    width: calc(100% - var(--space-6)) !important;
+    margin: 0 var(--space-3) !important;
+  }
+}
+
+/* ── MOBILE: Override inline min-width on filter selects (CRIT-2: employees) ── */
+@media (max-width: 639px) {
+  /* Employees page inline width overrides on selects inside filter-bar-standard */
+  .filter-bar-standard select[style*="width"],
+  .filter-bar-standard .form-select[style*="width"] {
+    width: auto !important;
+    min-width: calc(50% - var(--space-2)) !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+  }
+}
+
+/* ── MOBILE: Invoice date range inputs (HIGH-6) ── */
+@media (max-width: 639px) {
+  /* Date inputs in filter bars shouldn't force wide widths on mobile */
+  .filter-bar-standard input[type="date"][style*="min-width"],
+  .filter-bar-standard input[type="date"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+  }
+}
+
+/* ── MOBILE: Planning scenario chart SVG (HIGH-7) ── */
+@media (max-width: 400px) {
+  /* Override inline min-width on scenario chart SVG containers */
+  [style*="min-width:320px"],
+  [style*="min-width: 320px"] {
+    min-width: 280px !important;
+  }
+}
+
+/* ── MOBILE: Gantt skills multi-select inline min-width (HIGH-8) ── */
+@media (max-width: 639px) {
+  .filter-group select[style*="min-width"],
+  .filter-group [style*="min-width:160px"],
+  .filter-group [style*="min-width: 160px"] {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* ── MOBILE: Leaves calendar min-width (HIGH-10) ── */
+@media (max-width: 639px) {
+  /* Leave calendar grid — reduce from 480px to 308px to allow minimal fit */
+  [style*="min-width:480px"],
+  [style*="min-width: 480px"] {
+    min-width: 308px !important;
+  }
+}
+
+/* ── MOBILE: Insights employee link min-width (MED-13) ── */
+@media (max-width: 639px) {
+  #tab-team-performance a,
+  .tab-content a[style*="min-width:100px"],
+  .tab-content a[style*="min-width: 100px"] {
+    min-width: 0 !important;
+  }
+}
+
+/* ── MOBILE: Employees view toggle — force card view on mobile (MED-17) ── */
+@media (max-width: 639px) {
+  /* Hide list and org views on mobile — only card view works */
+  .view-list, .view-org, [data-view="list"], [data-view="org"] {
+    display: none !important;
+  }
+  /* Ensure card view is always shown */
+  .view-card, [data-view="card"] {
+    display: block !important;
+  }
+}
+
+/* ── MOBILE: Approvals filter bar label chaos (CRIT-5) ── */
+@media (max-width: 639px) {
+  /* Hide standalone <label> elements inside filter-bar-standard on mobile */
+  /* to prevent chaotic wrapping alongside selects */
+  .filter-bar-standard > label {
+    display: none !important;
+  }
+  /* Ensure selects use placeholder text instead of separate labels */
+  .filter-bar-standard .form-select {
+    flex: 1 !important;
+    min-width: calc(50% - var(--space-2)) !important;
+  }
+}
+
+/* ── MOBILE: Modal overflow protection ── */
+@media (max-width: 639px) {
+  .modal {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
 
 /* ============================================================
    PRINT STYLESHEET

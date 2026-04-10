@@ -10,46 +10,6 @@
   <style>
     /* ── Page-specific styles ── */
 
-    /* Filter bar */
-    .filter-bar-standard {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-      flex-wrap: wrap;
-    }
-    .filter-bar-standard .filter-search {
-      position: relative;
-      flex: 1;
-      min-width: 220px;
-    }
-    .filter-bar-standard .filter-search svg {
-      position: absolute;
-      left: var(--space-3);
-      top: 50%;
-      transform: translateY(-50%);
-      width: 16px; height: 16px;
-      color: var(--color-text-3);
-      pointer-events: none;
-    }
-    .filter-bar-standard .filter-search input {
-      width: 100%;
-      min-height: 44px;
-      padding: 0 var(--space-3) 0 36px;
-      background: var(--color-surface-0);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      color: var(--color-text-1);
-      font-size: var(--text-body);
-      font-family: var(--font-sans);
-    }
-    .filter-bar-standard .filter-search input::placeholder { color: var(--color-text-3); }
-    .filter-bar-standard .filter-search input:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px var(--color-primary-muted);
-    }
-
     /* View toggle buttons */
     .view-toggle {
       display: inline-flex;
@@ -691,7 +651,7 @@
     }
     .pagination-buttons button.active {
       background: var(--color-primary);
-      color: #fff;
+      color: var(--color-text-on-primary);
       border-color: var(--color-primary);
     }
     .pagination-buttons button:disabled {
@@ -716,6 +676,7 @@
     .mobile-search-btn svg { width: 20px; height: 20px; }
     @media (max-width: 639px) {
       .mobile-search-btn { display: flex; }
+      .view-toggle { display: none !important; }
     }
 
     /* Badge with icon (replacing badge-dot) */
@@ -816,7 +777,7 @@
       color: var(--color-text-1);
       font-size: var(--text-caption);
       white-space: nowrap;
-      padding: 4px 8px;
+      padding: var(--space-1) var(--space-2);
       border-radius: var(--radius-sm);
       border: 1px solid var(--color-border);
       z-index: 10;
@@ -923,35 +884,7 @@
               <svg data-lucide="bell"></svg>
               <span class="notif-dot"></span>
             </button>
-            <div class="notif-panel" id="notifPanel">
-              <div class="notif-panel-header">
-                <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-                <button class="btn btn-ghost btn-xs">Mark all read</button>
-              </div>
-              <div class="notif-panel-list">
-                <div class="notif-item unread">
-                  <div class="notif-icon"><svg data-lucide="clock" style="width:16px;height:16px;color:var(--color-info)"></svg></div>
-                  <div class="notif-text">
-                    <div class="notif-title">Timesheet approved for March W14</div>
-                    <div class="notif-time">2 hours ago</div>
-                  </div>
-                </div>
-                <div class="notif-item unread">
-                  <div class="notif-icon"><svg data-lucide="user-plus" style="width:16px;height:16px;color:var(--color-success)"></svg></div>
-                  <div class="notif-text">
-                    <div class="notif-title">Liam O'Brien joined Operations</div>
-                    <div class="notif-time">5 hours ago</div>
-                  </div>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-icon"><svg data-lucide="file-check" style="width:16px;height:16px;color:var(--color-primary)"></svg></div>
-                  <div class="notif-text">
-                    <div class="notif-title">Expense report #EXP-041 approved</div>
-                    <div class="notif-time">1 day ago</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div id="notifPanel"></div>
           </div>
           <div class="relative">
             <div class="header-user" id="userBtn">
@@ -991,7 +924,7 @@
                 <svg data-lucide="download" style="width:16px;height:16px;"></svg>
                 Export
               </button>
-              <button class="btn btn-primary btn-md" id="inviteBtn">
+              <button class="btn btn-primary btn-md" id="inviteBtn" data-min-role="admin">
                 <svg data-lucide="user-plus" style="width:16px;height:16px;"></svg>
                 Invite
               </button>
@@ -1012,7 +945,7 @@
               <svg data-lucide="search"></svg>
               <input type="text" placeholder="Search by name, title, or department..." id="employeeSearch">
             </div>
-            <select class="form-select form-input-sm" style="width: 160px;">
+            <select class="form-select form-input-sm">
               <option value="">All Departments</option>
               <option>Engineering</option>
               <option>Operations</option>
@@ -1021,21 +954,25 @@
               <option>Human Resources</option>
               <option>Executive</option>
             </select>
-            <select class="form-select form-input-sm" style="width: 140px;">
+            <select class="form-select form-input-sm">
               <option value="">All Roles</option>
               <option>Developer</option>
               <option>Designer</option>
               <option>Manager</option>
               <option>Analyst</option>
             </select>
-            <select class="form-select form-input-sm" style="width: 130px;">
+            <select class="form-select form-input-sm">
               <option value="">All Status</option>
               <option>Online</option>
               <option>Away</option>
               <option>Offline</option>
               <option>On Leave</option>
             </select>
-            <div class="view-toggle">
+            <button class="btn btn-secondary btn-sm" id="saveViewBtn" title="Save current filter combination as a named view">
+              <svg data-lucide="bookmark" style="width:14px;height:14px;"></svg>
+              Save View
+            </button>
+            <div class="view-toggle" id="viewToggle">
               <button class="view-toggle-btn active" data-view="grid" title="Grid view">
                 <svg data-lucide="layout-grid" style="width:16px;height:16px;"></svg>
               </button>
@@ -1061,7 +998,7 @@
           </div>
 
           <!-- ===== GRID VIEW ===== -->
-          <div id="empRealGrid"><div id="gridView" class="employee-grid">
+          <div id="empRealGrid"><div id="gridView" class="employee-grid stagger-reveal">
 
             <!-- 1. Sarah Chen -->
             <div class="card card-interactive employee-card">
@@ -1262,8 +1199,8 @@
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">SD</div>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Operations Manager" data-dept="Operations" data-project="Contoso Deal" data-worktime="82" data-href="employees.html">Sophie Dubois</a>
-                  <div class="employee-card-title">Operations Manager</div>
+                  <a class="employee-card-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-project="Contoso Deal" data-worktime="82" data-href="employees.html">Sophie Dubois</a>
+                  <div class="employee-card-title">Business Analyst</div>
                   <div class="employee-card-dept">Operations</div>
                 </div>
               </div>
@@ -1334,9 +1271,9 @@
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">LO</div>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Logistics Coordinator" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a>
-                  <div class="employee-card-title">Logistics Coordinator</div>
-                  <div class="employee-card-dept">Operations</div>
+                  <a class="employee-card-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a>
+                  <div class="employee-card-title">Junior Developer</div>
+                  <div class="employee-card-dept">Engineering</div>
                 </div>
               </div>
               <div class="employee-card-projects">
@@ -1452,8 +1389,8 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Operations Manager" data-dept="Operations" data-project="Contoso Deal" data-worktime="82" data-href="employees.html">Sophie Dubois</a></div></td>
-                  <td data-label="Job Title">Operations Manager</td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-project="Contoso Deal" data-worktime="82" data-href="employees.html">Sophie Dubois</a></div></td>
+                  <td data-label="Job Title">Business Analyst</td>
                   <td data-label="Department" class="cell-secondary">Operations</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Contoso Deal</a></td>
                   <td data-label="Work Time"><span class="font-mono text-success font-semibold">82%</span></td>
@@ -1482,9 +1419,9 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Logistics Coordinator" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a></div></td>
-                  <td data-label="Job Title">Logistics Coordinator</td>
-                  <td data-label="Department" class="cell-secondary">Operations</td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a></div></td>
+                  <td data-label="Job Title">Junior Developer</td>
+                  <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
                   <td data-label="Work Time"><span class="font-mono text-success font-semibold">88%</span></td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
@@ -1598,17 +1535,21 @@
                         <div class="org-node-name">David Park</div>
                         <div class="org-node-role">Finance Lead</div>
                         <div class="org-node-dept">Finance</div>
-                        <div class="org-direct-reports">1 direct report</div>
+                        <div class="org-direct-reports">No direct reports</div>
                       </div>
                     </a>
-                    <div class="org-connector-down"></div>
-                    <!-- Carol Williams (reports to David) -->
-                    <a href="employees.html#profile-carol" class="org-node" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="90" data-href="employees.html#profile-carol" style="max-width:185px;">
+                  </div>
+
+                  <!-- Design Branch -->
+                  <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
+                    <div class="org-connector-up"></div>
+                    <a href="employees.html#profile-carol" class="org-node org-node-dept-lead" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="90" data-href="employees.html#profile-carol">
                       <span class="avatar-status presence-online"><div class="avatar">CW</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">Carol Williams</div>
                         <div class="org-node-role">Design Lead</div>
                         <div class="org-node-dept">Design</div>
+                        <div class="org-direct-reports">No direct reports</div>
                       </div>
                     </a>
                   </div>
@@ -1634,19 +1575,19 @@
             <!-- Legend -->
             <div style="display:flex; align-items:center; gap:var(--space-6); padding:var(--space-4) var(--space-4) 0; flex-wrap:wrap;">
               <div style="font-size:var(--text-caption); color:var(--color-text-3);">
-                <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--color-primary-muted); border:1px solid var(--color-primary); margin-right:4px; vertical-align:middle;"></span>
+                <span style="display:inline-block; width:12px; height:12px; border-radius:var(--radius-sm); background:var(--color-primary-muted); border:1px solid var(--color-primary); margin-right:var(--space-1); vertical-align:middle;"></span>
                 Executive
               </div>
               <div style="font-size:var(--text-caption); color:var(--color-text-3);">
-                <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--color-surface-1); border:1px solid var(--color-border-strong); margin-right:4px; vertical-align:middle;"></span>
+                <span style="display:inline-block; width:12px; height:12px; border-radius:var(--radius-sm); background:var(--color-surface-1); border:1px solid var(--color-border-strong); margin-right:var(--space-1); vertical-align:middle;"></span>
                 Department Lead
               </div>
               <div style="font-size:var(--text-caption); color:var(--color-text-3);">
-                <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:var(--color-surface-0); border:1px solid var(--color-border); margin-right:4px; vertical-align:middle;"></span>
+                <span style="display:inline-block; width:12px; height:12px; border-radius:var(--radius-sm); background:var(--color-surface-0); border:1px solid var(--color-border); margin-right:var(--space-1); vertical-align:middle;"></span>
                 Team Member
               </div>
               <div style="margin-left:auto; font-size:var(--text-caption); color:var(--color-text-3);">
-                12 employees · 5 departments
+                12 employees · 6 departments
               </div>
             </div>
           </div><!-- /orgView -->
@@ -1669,7 +1610,7 @@
             <svg data-lucide="users" class="empty-icon"></svg>
             <div class="empty-title">No team members found</div>
             <div class="empty-desc">Invite your first team member to get started with GammaHR.</div>
-            <button class="btn btn-primary btn-md">
+            <button class="btn btn-primary btn-md" data-min-role="admin">
               <svg data-lucide="user-plus" style="width:16px;height:16px;"></svg>
               Invite Team Member
             </button>
@@ -1695,9 +1636,28 @@
               <div class="avatar avatar-2xl avatar-status online">SC</div>
             </div>
             <div class="profile-hero-info">
-              <div class="profile-hero-name">
-                Sarah Chen
-                <span class="online-dot"></span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);flex-wrap:wrap;">
+                <div class="profile-hero-name">
+                  Sarah Chen
+                  <span class="online-dot"></span>
+                </div>
+                <div style="display:flex;gap:var(--space-2);" data-min-role="pm">
+                  <button class="btn btn-secondary btn-sm" onclick="GHR && GHR.showToast ? GHR.showToast('info','Edit Profile','Profile editor would open here.') : showToast('Edit profile')">
+                    <svg data-lucide="pencil" style="width:14px;height:14px;"></svg>
+                    Edit
+                  </button>
+                  <div class="relative">
+                    <button class="btn btn-secondary btn-sm" id="profileMoreBtn" onclick="document.getElementById('profileMoreDropdown').classList.toggle('active')">
+                      <svg data-lucide="more-horizontal" style="width:14px;height:14px;"></svg>
+                    </button>
+                    <div class="user-dropdown" id="profileMoreDropdown" style="right:0;left:auto;top:100%;min-width:180px;">
+                      <a href="#" class="dropdown-item" onclick="event.preventDefault();GHR && GHR.showToast ? GHR.showToast('info','Export','Exporting profile data...') : showToast('Exporting...');document.getElementById('profileMoreDropdown').classList.remove('active')"><svg data-lucide="download" width="16" height="16"></svg> Export Profile</a>
+                      <a href="#" class="dropdown-item" onclick="event.preventDefault();GHR && GHR.showToast ? GHR.showToast('info','Message','Opening message composer...') : showToast('Opening...');document.getElementById('profileMoreDropdown').classList.remove('active')"><svg data-lucide="mail" width="16" height="16"></svg> Send Message</a>
+                      <div class="dropdown-divider"></div>
+                      <a href="#" class="dropdown-item destructive" data-min-role="admin" onclick="event.preventDefault();GHR && GHR.showToast ? GHR.showToast('warning','Deactivate','This would deactivate the employee account.') : showToast('Deactivating...');document.getElementById('profileMoreDropdown').classList.remove('active')"><svg data-lucide="user-x" width="16" height="16"></svg> Deactivate</a>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="profile-hero-role">Project Manager &middot; Engineering</div>
               <div class="profile-reports-to">
@@ -1726,8 +1686,8 @@
           </div>
 
           <!-- Mini Stats -->
-          <div class="profile-stats">
-            <div class="stat-card">
+          <div class="profile-stats perspective-container stagger-reveal">
+            <div class="stat-card card-3d">
               <div class="stat-label">Work Time This Month</div>
               <div class="stat-value">87%</div>
               <div class="stat-trend up">
@@ -1746,7 +1706,7 @@
                 <span>8 wks ago</span><span>Now</span>
               </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Billable This Month</div>
               <div class="stat-value">134h</div>
               <div class="stat-trend up">
@@ -1765,7 +1725,7 @@
                 <span>8 wks ago</span><span>Now</span>
               </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-3d">
               <div class="stat-label">Leave Remaining</div>
               <div class="stat-value">18d</div>
               <div class="stat-trend" style="color:var(--color-text-2);">
@@ -1819,7 +1779,12 @@
           </div>
 
           <!-- Tab Content: Timeline -->
-          <div class="tab-content active" id="tab-timeline" class="pt-6">
+          <div class="tab-content active pt-6" id="tab-timeline">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="clock" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No activity yet</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Timeline events will appear here as activity occurs.</div>
+            </div>
             <!-- Mini Gantt — Project History -->
             <div class="profile-timeline-gantt">
               <div class="pt-header">Jan 2025 ─────────────────────────────────── Apr 2026</div>
@@ -1929,7 +1894,12 @@
           </div>
 
           <!-- Tab Content: Projects -->
-          <div class="tab-content" id="tab-projects" class="pt-6">
+          <div class="tab-content pt-6" id="tab-projects">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="folder-kanban" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No project assignments yet</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Projects will appear here once assigned.</div>
+            </div>
             <div class="section-header">
               <h3 class="section-title">Active Projects</h3>
             </div>
@@ -2001,7 +1971,12 @@
           </div>
 
           <!-- Tab Content: Leaves -->
-          <div class="tab-content" id="tab-leaves" class="pt-6">
+          <div class="tab-content pt-6" id="tab-leaves">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="palm-tree" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No leave history</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Leave requests and balances will appear here.</div>
+            </div>
 
             <!-- 52-week heatmap -->
             <div class="section-header" style="margin-bottom:var(--space-2);">
@@ -2012,13 +1987,13 @@
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-2);">Jan 2026 ─────────────────────────────────── Dec 2026</div>
                 <div id="leaveHeatmapGrid" style="display:flex;flex-wrap:nowrap;gap:2px;"></div>
                 <div style="display:flex;align-items:center;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
-                  <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                  <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                     <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--color-warning);"></span> Approved leave
                   </div>
-                  <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                  <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                     <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--color-warning-muted);border:1px solid var(--color-warning);"></span> Pending leave
                   </div>
-                  <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                  <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                     <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--color-primary);"></span> Today
                   </div>
                 </div>
@@ -2123,14 +2098,21 @@
           </div>
 
           <!-- Tab Content: Timesheets -->
-          <div class="tab-content" id="tab-timesheets" class="pt-6">
+          <div class="tab-content pt-6" id="tab-timesheets">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="clock" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No timesheets submitted yet</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Timesheet summaries will appear once submitted.</div>
+            </div>
             <div class="section-header">
               <h3 class="section-title">Monthly Timesheet Summary</h3>
             </div>
+            <p style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-3);">Click any month row to expand daily breakdown by project.</p>
             <div class="data-table-wrapper">
-              <table class="data-table mobile-cards">
+              <table class="data-table mobile-cards" id="timesheetSummaryTable">
                 <thead>
                   <tr>
+                    <th style="width:32px;"></th>
                     <th>Month</th>
                     <th>Billable</th>
                     <th>Non-Billable</th>
@@ -2140,53 +2122,155 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <!-- April 2026 -->
+                  <tr class="ts-month-row" data-month="apr-2026" style="cursor:pointer;" title="Click to expand daily breakdown">
+                    <td><svg data-lucide="chevron-right" style="width:14px;height:14px;color:var(--color-text-3);transition:transform var(--motion-fast);" class="ts-chevron"></svg></td>
                     <td>April 2026 <span class="badge badge-warning" style="margin-left:var(--space-1)">In progress</span></td>
                     <td data-label="Billable" class="cell-mono">134.0h</td>
                     <td data-label="Non-Billable" class="cell-mono">8.5h</td>
-                    <td data-label="Total" class="cell-mono" class="font-semibold">142.5h</td>
+                    <td data-label="Total" class="cell-mono font-semibold">142.5h</td>
                     <td data-label="Target" class="cell-mono">160.0h</td>
                     <td data-label="Gap" class="cell-mono text-warning">-17.5h</td>
                   </tr>
-                  <tr>
+                  <tr class="ts-breakdown-row hidden" id="breakdown-apr-2026">
+                    <td colspan="7" style="padding:0;">
+                      <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — April 2026</div>
+                        <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                          <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
+                          <tbody>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 1</td><td style="padding:var(--space-1) var(--space-2);">Initech API</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 2</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">6.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 2</td><td style="padding:var(--space-1) var(--space-2);">Internal — Team meeting</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">2.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 3</td><td style="padding:var(--space-1) var(--space-2);">Initech API</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">7.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 14 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- March 2026 -->
+                  <tr class="ts-month-row" data-month="mar-2026" style="cursor:pointer;" title="Click to expand daily breakdown">
+                    <td><svg data-lucide="chevron-right" style="width:14px;height:14px;color:var(--color-text-3);transition:transform var(--motion-fast);" class="ts-chevron"></svg></td>
                     <td>March 2026</td>
                     <td data-label="Billable" class="cell-mono">148.0h</td>
                     <td data-label="Non-Billable" class="cell-mono">12.0h</td>
-                    <td data-label="Total" class="cell-mono" class="font-semibold">160.0h</td>
+                    <td data-label="Total" class="cell-mono font-semibold">160.0h</td>
                     <td data-label="Target" class="cell-mono">160.0h</td>
                     <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
-                  <tr>
+                  <tr class="ts-breakdown-row hidden" id="breakdown-mar-2026">
+                    <td colspan="7" style="padding:0;">
+                      <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — March 2026</div>
+                        <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                          <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
+                          <tbody>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 3</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 4</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">7.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 4</td><td style="padding:var(--space-1) var(--space-2);">Internal — Planning</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">0.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 19 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- February 2026 -->
+                  <tr class="ts-month-row" data-month="feb-2026" style="cursor:pointer;" title="Click to expand daily breakdown">
+                    <td><svg data-lucide="chevron-right" style="width:14px;height:14px;color:var(--color-text-3);transition:transform var(--motion-fast);" class="ts-chevron"></svg></td>
                     <td>February 2026</td>
                     <td data-label="Billable" class="cell-mono">136.5h</td>
                     <td data-label="Non-Billable" class="cell-mono">15.5h</td>
-                    <td data-label="Total" class="cell-mono" class="font-semibold">152.0h</td>
+                    <td data-label="Total" class="cell-mono font-semibold">152.0h</td>
                     <td data-label="Target" class="cell-mono">152.0h</td>
                     <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
-                  <tr>
+                  <tr class="ts-breakdown-row hidden" id="breakdown-feb-2026">
+                    <td colspan="7" style="padding:0;">
+                      <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — February 2026</div>
+                        <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                          <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
+                          <tbody>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Feb 2</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 19 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- January 2026 -->
+                  <tr class="ts-month-row" data-month="jan-2026" style="cursor:pointer;" title="Click to expand daily breakdown">
+                    <td><svg data-lucide="chevron-right" style="width:14px;height:14px;color:var(--color-text-3);transition:transform var(--motion-fast);" class="ts-chevron"></svg></td>
                     <td>January 2026</td>
                     <td data-label="Billable" class="cell-mono">128.0h</td>
                     <td data-label="Non-Billable" class="cell-mono">16.0h</td>
-                    <td data-label="Total" class="cell-mono" class="font-semibold">144.0h</td>
+                    <td data-label="Total" class="cell-mono font-semibold">144.0h</td>
                     <td data-label="Target" class="cell-mono">160.0h</td>
                     <td data-label="Gap" class="cell-mono text-error">-16.0h</td>
                   </tr>
-                  <tr>
+                  <tr class="ts-breakdown-row hidden" id="breakdown-jan-2026">
+                    <td colspan="7" style="padding:0;">
+                      <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — January 2026</div>
+                        <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                          <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
+                          <tbody>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Jan 5</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">6.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Jan 5</td><td style="padding:var(--space-1) var(--space-2);">Internal — Strategy</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">2.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 20 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- December 2025 -->
+                  <tr class="ts-month-row" data-month="dec-2025" style="cursor:pointer;" title="Click to expand daily breakdown">
+                    <td><svg data-lucide="chevron-right" style="width:14px;height:14px;color:var(--color-text-3);transition:transform var(--motion-fast);" class="ts-chevron"></svg></td>
                     <td>December 2025</td>
                     <td data-label="Billable" class="cell-mono">112.0h</td>
                     <td data-label="Non-Billable" class="cell-mono">8.0h</td>
-                    <td data-label="Total" class="cell-mono" class="font-semibold">120.0h</td>
+                    <td data-label="Total" class="cell-mono font-semibold">120.0h</td>
                     <td data-label="Target" class="cell-mono">120.0h</td>
                     <td data-label="Gap" class="cell-mono text-success">0.0h</td>
                   </tr>
-                  <tr>
+                  <tr class="ts-breakdown-row hidden" id="breakdown-dec-2025">
+                    <td colspan="7" style="padding:0;">
+                      <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — December 2025</div>
+                        <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                          <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
+                          <tbody>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Dec 1</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 14 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- November 2025 -->
+                  <tr class="ts-month-row" data-month="nov-2025" style="cursor:pointer;" title="Click to expand daily breakdown">
+                    <td><svg data-lucide="chevron-right" style="width:14px;height:14px;color:var(--color-text-3);transition:transform var(--motion-fast);" class="ts-chevron"></svg></td>
                     <td>November 2025</td>
                     <td data-label="Billable" class="cell-mono">152.5h</td>
                     <td data-label="Non-Billable" class="cell-mono">7.5h</td>
-                    <td data-label="Total" class="cell-mono" class="font-semibold">160.0h</td>
+                    <td data-label="Total" class="cell-mono font-semibold">160.0h</td>
                     <td data-label="Target" class="cell-mono">160.0h</td>
                     <td data-label="Gap" class="cell-mono text-success">0.0h</td>
+                  </tr>
+                  <tr class="ts-breakdown-row hidden" id="breakdown-nov-2025">
+                    <td colspan="7" style="padding:0;">
+                      <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — November 2025</div>
+                        <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                          <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
+                          <tbody>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Nov 3</td><td style="padding:var(--space-1) var(--space-2);">Vanguard Dashboard</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 19 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -2194,7 +2278,12 @@
           </div>
 
           <!-- Tab Content: Expenses -->
-          <div class="tab-content" id="tab-expenses" class="pt-6">
+          <div class="tab-content pt-6" id="tab-expenses">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="receipt" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No expenses submitted yet</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Expense reports will appear here once filed.</div>
+            </div>
             <div class="section-header">
               <h3 class="section-title">Expense History</h3>
             </div>
@@ -2258,10 +2347,15 @@
           </div>
 
           <!-- Tab Content: Skills -->
-          <div class="tab-content" id="tab-skills" class="pt-6">
+          <div class="tab-content pt-6" id="tab-skills">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="star" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No skills added yet</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Add skills and competencies to build this employee's profile.</div>
+            </div>
             <div class="section-header">
               <h3 class="section-title">Skills &amp; Competencies</h3>
-              <button class="btn btn-primary btn-sm">
+              <button class="btn btn-primary btn-sm" onclick="GHR.showToast('info','Coming Soon','Skill management will be available in the next release.')">
                 <svg data-lucide="plus" style="width:14px;height:14px;"></svg>
                 Add Skill
               </button>
@@ -2270,7 +2364,7 @@
               <div class="skill-items-list">
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> React</span>
+                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> React</span>
                     <span class="skill-level">Expert</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2280,7 +2374,7 @@
                 </div>
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> TypeScript</span>
+                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> TypeScript</span>
                     <span class="skill-level">Advanced</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2290,7 +2384,7 @@
                 </div>
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="pen-tool" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> Figma</span>
+                    <span class="skill-name"><svg data-lucide="pen-tool" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> Figma</span>
                     <span class="skill-level">Intermediate</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2300,7 +2394,7 @@
                 </div>
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> CSS/Tailwind</span>
+                    <span class="skill-name"><svg data-lucide="code" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> CSS/Tailwind</span>
                     <span class="skill-level">Expert</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2310,7 +2404,7 @@
                 </div>
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="server" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> Node.js</span>
+                    <span class="skill-name"><svg data-lucide="server" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> Node.js</span>
                     <span class="skill-level">Intermediate</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2320,7 +2414,7 @@
                 </div>
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="container" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> Docker</span>
+                    <span class="skill-name"><svg data-lucide="container" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> Docker</span>
                     <span class="skill-level">Advanced</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2330,7 +2424,7 @@
                 </div>
                 <div class="skill-item">
                   <div class="skill-item-header">
-                    <span class="skill-name"><svg data-lucide="cloud" style="width:14px;height:14px;display:inline;margin-right:4px;"></svg> AWS</span>
+                    <span class="skill-name"><svg data-lucide="cloud" style="width:14px;height:14px;display:inline;margin-right:var(--space-1);"></svg> AWS</span>
                     <span class="skill-level">Advanced</span>
                   </div>
                   <div class="skill-proficiency">
@@ -2343,10 +2437,15 @@
           </div>
 
           <!-- Tab Content: Documents -->
-          <div class="tab-content" id="tab-documents" class="pt-6">
+          <div class="tab-content pt-6" id="tab-documents">
+            <div class="profile-tab-empty hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="file" style="width:40px;height:40px;margin:0 auto var(--space-3);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No documents uploaded yet</div>
+              <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Upload contracts, IDs, or certifications to get started.</div>
+            </div>
             <div class="section-header">
               <h3 class="section-title">Documents</h3>
-              <button class="btn btn-primary btn-sm">
+              <button class="btn btn-primary btn-sm" onclick="GHR.showToast('info','Upload Document','File picker would open — upload PDF, DOC, or image files.')">
                 <svg data-lucide="upload" style="width:14px;height:14px;"></svg>
                 Upload Document
               </button>
@@ -2358,7 +2457,7 @@
                   <div class="doc-name">Employment_Contract_SChen.pdf</div>
                   <div class="doc-meta">Uploaded Mar 15, 2023 &middot; 245 KB</div>
                 </div>
-                <button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
+                <button class="btn btn-ghost btn-icon btn-xs" onclick="GHR.showToast('success','Download Started','Downloading Employment_Contract_SChen.pdf...')"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
               </div>
               <div class="doc-item">
                 <div class="doc-icon"><svg data-lucide="file-check"></svg></div>
@@ -2366,7 +2465,7 @@
                   <div class="doc-name">NDA_GammaHR_2023.pdf</div>
                   <div class="doc-meta">Uploaded Mar 15, 2023 &middot; 128 KB</div>
                 </div>
-                <button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
+                <button class="btn btn-ghost btn-icon btn-xs" onclick="GHR.showToast('success','Download Started','Downloading NDA_GammaHR_2023.pdf...')"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
               </div>
               <div class="doc-item">
                 <div class="doc-icon"><svg data-lucide="file-spreadsheet"></svg></div>
@@ -2374,7 +2473,7 @@
                   <div class="doc-name">Performance_Review_2025.xlsx</div>
                   <div class="doc-meta">Uploaded Jan 20, 2026 &middot; 98 KB</div>
                 </div>
-                <button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
+                <button class="btn btn-ghost btn-icon btn-xs" onclick="GHR.showToast('success','Download Started','Downloading Performance_Review_2025.xlsx...')"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
               </div>
               <div class="doc-item">
                 <div class="doc-icon"><svg data-lucide="file-image"></svg></div>
@@ -2382,7 +2481,7 @@
                   <div class="doc-name">ID_Scan_Passport.jpg</div>
                   <div class="doc-meta">Uploaded Mar 15, 2023 &middot; 1.2 MB</div>
                 </div>
-                <button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
+                <button class="btn btn-ghost btn-icon btn-xs" onclick="GHR.showToast('success','Download Started','Downloading ID_Scan_Passport.jpg...')"><svg data-lucide="download" style="width:16px;height:16px;"></svg></button>
               </div>
             </div>
           </div>
@@ -2393,7 +2492,7 @@
   </div>
 
   <!-- ============ INVITE MODAL ============ -->
-  <div class="modal-backdrop" id="inviteModal">
+  <div class="modal-backdrop" id="inviteModal" data-min-role="admin">
     <div class="modal modal-sm" role="dialog" aria-modal="true">
       <div class="modal-header">
         <span class="modal-title">Invite Team Member</span>
@@ -2451,7 +2550,7 @@
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Sarah Chen</div><div class="item-subtitle">Project Manager</div></div></div>
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Marie Dupont</div><div class="item-subtitle">CEO</div></div></div>
         <div class="cmd-palette-group-label">Actions</div>
-        <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user-plus" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Invite Team Member</div></div></div>
+        <div class="cmd-palette-item" data-min-role="admin"><div class="item-icon"><svg data-lucide="user-plus" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Invite Team Member</div></div></div>
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="download" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Export Team Directory</div></div></div>
       </div>
       <div class="cmd-palette-footer">
@@ -2611,6 +2710,23 @@
       });
     });
 
+    // ── Force card view on mobile (view toggle is hidden < 640px) ──
+    const mobileViewMQ = window.matchMedia('(max-width: 639px)');
+    function forceMobileCardView(e) {
+      if (e.matches) {
+        const activeView = document.querySelector('.view-toggle-btn.active');
+        if (activeView && activeView.dataset.view !== 'grid') {
+          document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+          document.querySelector('.view-toggle-btn[data-view="grid"]').classList.add('active');
+          gridView.classList.remove('hidden');
+          listView.classList.add('hidden');
+          orgView.classList.add('hidden');
+        }
+      }
+    }
+    mobileViewMQ.addEventListener('change', forceMobileCardView);
+    forceMobileCardView(mobileViewMQ);
+
     // ── Hash-based view switching ──
     function navigateToView() {
       const hash = window.location.hash || '#directory';
@@ -2688,6 +2804,60 @@
         }
       }
     });
+
+    // ── Action menu for "more-horizontal" buttons ──
+    (function() {
+      var actionMenu = document.createElement('div');
+      actionMenu.className = 'action-context-menu';
+      actionMenu.style.cssText = 'position:fixed;z-index:999;background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:var(--shadow-3);min-width:180px;padding:var(--space-1) 0;display:none;';
+      actionMenu.innerHTML =
+        '<button class="ctx-item" data-action="profile" style="display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2) var(--space-3);background:none;border:none;font-family:var(--font-sans);font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;text-align:left;transition:background var(--motion-fast);"><svg data-lucide="user" style="width:14px;height:14px;color:var(--color-text-2);"></svg> View Profile</button>' +
+        '<button class="ctx-item" data-action="edit" style="display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2) var(--space-3);background:none;border:none;font-family:var(--font-sans);font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;text-align:left;transition:background var(--motion-fast);"><svg data-lucide="pencil" style="width:14px;height:14px;color:var(--color-text-2);"></svg> Edit Details</button>' +
+        '<button class="ctx-item" data-action="message" style="display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2) var(--space-3);background:none;border:none;font-family:var(--font-sans);font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;text-align:left;transition:background var(--motion-fast);"><svg data-lucide="mail" style="width:14px;height:14px;color:var(--color-text-2);"></svg> Send Message</button>' +
+        '<div style="height:1px;background:var(--color-border-subtle);margin:var(--space-1) 0;"></div>' +
+        '<button class="ctx-item" data-action="timesheet" style="display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2) var(--space-3);background:none;border:none;font-family:var(--font-sans);font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;text-align:left;transition:background var(--motion-fast);"><svg data-lucide="clock" style="width:14px;height:14px;color:var(--color-text-2);"></svg> View Timesheet</button>' +
+        '<button class="ctx-item" data-action="deactivate" style="display:flex;align-items:center;gap:var(--space-2);width:100%;padding:var(--space-2) var(--space-3);background:none;border:none;font-family:var(--font-sans);font-size:var(--text-body-sm);color:var(--color-error);cursor:pointer;text-align:left;transition:background var(--motion-fast);"><svg data-lucide="user-x" style="width:14px;height:14px;color:var(--color-error);"></svg> Deactivate</button>';
+      document.body.appendChild(actionMenu);
+
+      var currentActionTarget = null;
+
+      // Hover effect for ctx-items
+      actionMenu.querySelectorAll('.ctx-item').forEach(function(item) {
+        item.addEventListener('mouseenter', function() { this.style.background = 'var(--color-surface-1)'; });
+        item.addEventListener('mouseleave', function() { this.style.background = 'none'; });
+      });
+
+      document.querySelectorAll('#listView .btn-ghost.btn-icon').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var row = btn.closest('tr');
+          var nameEl = row ? row.querySelector('.cell-user-name') : null;
+          currentActionTarget = nameEl ? nameEl.textContent.trim() : 'Employee';
+          var rect = btn.getBoundingClientRect();
+          actionMenu.style.top = (rect.bottom + 4) + 'px';
+          actionMenu.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
+          actionMenu.style.display = 'block';
+          lucide.createIcons({nodes: [actionMenu]});
+        });
+      });
+
+      actionMenu.addEventListener('click', function(e) {
+        var item = e.target.closest('.ctx-item');
+        if (!item) return;
+        var action = item.dataset.action;
+        actionMenu.style.display = 'none';
+        var msgs = {
+          profile: 'Opening ' + currentActionTarget + "'s profile...",
+          edit: 'Edit form for ' + currentActionTarget + ' would open here.',
+          message: 'Composing message to ' + currentActionTarget + '...',
+          timesheet: 'Opening ' + currentActionTarget + "'s timesheet...",
+          deactivate: 'Deactivation workflow for ' + currentActionTarget + ' would start here.'
+        };
+        showToast(msgs[action] || 'Action triggered', action === 'deactivate' ? 'warning' : 'info');
+      });
+
+      document.addEventListener('click', function() { actionMenu.style.display = 'none'; });
+    })();
 
     // ── Select All checkbox ──
     const selectAll = document.getElementById('selectAll');
@@ -2820,6 +2990,39 @@
         item.addEventListener('click', function() { closeCmdPalette(); window.location.href = paletteLinks[i]; });
       }
     });
+
+    // ── Timesheet monthly drill-down ──
+    (function() {
+      document.querySelectorAll('.ts-month-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+          var month = this.getAttribute('data-month');
+          var breakdown = document.getElementById('breakdown-' + month);
+          var chevron = this.querySelector('.ts-chevron');
+          if (!breakdown) return;
+          var isOpen = !breakdown.classList.contains('hidden');
+          if (isOpen) {
+            breakdown.classList.add('hidden');
+            if (chevron) chevron.style.transform = '';
+          } else {
+            breakdown.classList.remove('hidden');
+            if (chevron) chevron.style.transform = 'rotate(90deg)';
+            if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [breakdown] });
+          }
+        });
+      });
+    })();
+
+    // ── Saved Views ──
+    (function() {
+      var saveViewBtn = document.getElementById('saveViewBtn');
+      if (!saveViewBtn) return;
+      saveViewBtn.addEventListener('click', function() {
+        var name = prompt('Name this view:', 'My View');
+        if (name && name.trim()) {
+          showToast('success', 'View saved', '"' + name.trim() + '" saved as a view.');
+        }
+      });
+    })();
   </script>
   <script src="_shared.js"></script>
   <script>
