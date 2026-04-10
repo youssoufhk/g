@@ -58,10 +58,16 @@
     }
     .approval-card:hover { border-color: var(--color-border-strong); }
     .approval-card.urgent-card { border-left: 3px solid var(--color-error); }
+    .approval-card[data-type="timesheet"] { border-left: 3px solid var(--color-info); }
+    .approval-card[data-type="leave"] { border-left: 3px solid var(--color-success); }
+    .approval-card[data-type="expense"] { border-left: 3px solid var(--color-gold); }
+    .approval-card.urgent-card[data-type="timesheet"],
+    .approval-card.urgent-card[data-type="leave"],
+    .approval-card.urgent-card[data-type="expense"] { border-left: 3px solid var(--color-error); }
     .approval-card.removing-item {
       opacity: 0;
       transform: translateX(20px);
-      transition: all 0.3s ease-out;
+      transition: all var(--motion-slow) var(--ease-out);
     }
 
     .approval-card .card-check {
@@ -155,6 +161,22 @@
       color: var(--color-text-3);
     }
 
+    .sla-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 1px var(--space-2);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-full);
+      background: var(--color-surface-2);
+      color: var(--color-text-3);
+    }
+    .sla-tag.sla-warning {
+      background: var(--color-warning-muted);
+      color: var(--color-warning);
+    }
+
     /* Bulk action bar */
     .bulk-bar {
       position: fixed;
@@ -165,14 +187,17 @@
       align-items: center;
       gap: var(--space-4);
       padding: var(--space-3) var(--space-5);
-      background: var(--color-surface-3);
-      border: 1px solid var(--color-border-strong);
+      backdrop-filter: var(--glass-blur, blur(12px));
+      background: var(--glass-bg, var(--color-surface-3));
+      border: 1px solid var(--glass-border, var(--color-border-strong));
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-5);
       z-index: 800;
       opacity: 0;
       visibility: hidden;
       transition: all var(--motion-normal) var(--ease-out);
+      max-width: 100vw;
+      overflow-x: auto;
     }
     .bulk-bar.visible {
       opacity: 1;
@@ -219,125 +244,7 @@
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-        <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="bar-chart-3"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item active">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);margin-bottom:var(--space-2);" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?',bubbles:true}))">
-        <svg data-lucide="keyboard" width="16" height="16"></svg>
-        <span>Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Sidebar overlay for mobile -->
+  <aside class="sidebar" id="sidebar"></aside>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
@@ -436,43 +343,60 @@
           <p class="page-subtitle">Review and approve pending requests from your team</p>
         </div>
         <div class="page-header-actions">
-          <div class="dropdown">
+          <div class="dropdown" data-min-role="pm">
             <button class="btn btn-secondary btn-md" id="bulkDropdownBtn">
               <svg data-lucide="layers" width="16" height="16"></svg>
               Bulk Actions
               <svg data-lucide="chevron-down" width="14" height="14"></svg>
             </button>
             <div class="dropdown-menu right" id="bulkDropdownMenu">
-              <button class="dropdown-item" onclick="if(confirm('Approve all visible items? This cannot be undone.')) approveAllVisible()"><svg data-lucide="check-circle" width="16" height="16"></svg> Approve All Visible</button>
-              <button class="dropdown-item"><svg data-lucide="download" width="16" height="16"></svg> Export to CSV</button>
+              <button class="dropdown-item" id="approveAllVisibleBtn"><svg data-lucide="check-circle" width="16" height="16"></svg> Approve All Visible</button>
+              <button class="dropdown-item" id="exportCsvBtn"><svg data-lucide="download" width="16" height="16"></svg> Export to CSV</button>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item destructive"><svg data-lucide="x-circle" width="16" height="16"></svg> Reject All Selected</button>
+              <button class="dropdown-item destructive" id="rejectAllSelectedBtn"><svg data-lucide="x-circle" width="16" height="16"></svg> Reject All Selected</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- KPI Summary Row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);" class="kpi-grid-approvals">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);perspective:1200px;" class="kpi-grid-approvals">
         <div class="card" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Total Pending</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-text-1);font-family:var(--font-mono);">12</div>
-          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:var(--space-1);">2 overdue</div>
+          <!-- Mini donut: 7 timesheets, 3 leaves, 2 expenses -->
+          <svg width="48" height="48" viewBox="0 0 48 48" style="margin:var(--space-1) auto 0;display:block;" aria-label="Pending breakdown: 7 timesheets, 3 leaves, 2 expenses">
+            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-border)" stroke-width="6"/>
+            <!-- Timesheets 7/12 = 58.3% = stroke-dasharray 66 47 -->
+            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-info)" stroke-width="6"
+              stroke-dasharray="66 47" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 24 24)"/>
+            <!-- Leaves 3/12 = 25% = stroke-dasharray 28.3 84.7 -->
+            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-success)" stroke-width="6"
+              stroke-dasharray="28 85" stroke-dashoffset="-66" stroke-linecap="round" transform="rotate(-90 24 24)"/>
+            <!-- Expenses 2/12 = 16.7% = remainder -->
+            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-gold)" stroke-width="6"
+              stroke-dasharray="19 94" stroke-dashoffset="-94" stroke-linecap="round" transform="rotate(-90 24 24)"/>
+          </svg>
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">7 timesheets &middot; 3 leaves &middot; 2 expenses</div>
+          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">2 overdue</div>
         </div>
         <div class="card" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Timesheets</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-info);font-family:var(--font-mono);">7</div>
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Awaiting review</div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">294h total logged</div>
+          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">2 with overtime</div>
         </div>
         <div class="card" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Leaves</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-success);font-family:var(--font-mono);">3</div>
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Awaiting review</div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">8 days requested</div>
+          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">1 overlap detected</div>
         </div>
         <div class="card" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Expenses</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-gold);font-family:var(--font-mono);">2</div>
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">€425.50 total</div>
+          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">Both within policy</div>
         </div>
       </div>
 
@@ -490,22 +414,22 @@
         <!-- Filter Bar -->
         <div class="filter-bar-standard">
           <label>Sort by</label>
-          <select class="form-select form-input-sm" style="width: 140px;" id="sortSelect">
+          <select class="form-select form-input-sm" id="sortSelect" style="min-width:120px;max-width:180px;">
             <option value="urgency">Urgency</option>
             <option value="date">Date Submitted</option>
             <option value="name">Employee Name</option>
             <option value="type">Request Type</option>
           </select>
           <label>Department</label>
-          <select class="form-select form-input-sm" style="width: 140px;" id="deptFilter">
+          <select class="form-select form-input-sm" id="deptFilter" style="min-width:120px;max-width:180px;">
             <option value="all">All</option>
             <option value="engineering">Engineering</option>
             <option value="operations">Operations</option>
             <option value="design">Design</option>
-            <option value="analytics">Analytics</option>
+            <option value="finance">Finance</option>
           </select>
           <label>Employee</label>
-          <select class="form-select form-input-sm" style="width: 160px;" id="empFilter">
+          <select class="form-select form-input-sm" id="empFilter" style="min-width:140px;max-width:200px;">
             <option value="all">All</option>
             <option value="john-smith">John Smith</option>
             <option value="david-park">David Park</option>
@@ -513,13 +437,13 @@
             <option value="marco-rossi">Marco Rossi</option>
             <option value="liam-obrien">Liam O'Brien</option>
             <option value="bob-taylor">Bob Taylor</option>
-            <option value="carol-kim">Carol Kim</option>
+            <option value="carol-williams">Carol Williams</option>
             <option value="sophie-dubois">Sophie Dubois</option>
           </select>
         </div>
 
         <!-- URGENT Section -->
-        <div class="section-label urgent" id="urgentLabel">
+        <div class="section-label urgent" id="urgentLabel" data-min-role="pm">
           <span class="section-dot"></span>
           URGENT - Overdue
           <span class="badge badge-error" style="margin-left: var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> 2</span>
@@ -536,7 +460,7 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">JS</div>
-                  <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="88%" data-href="employees.html#john-smith">John Smith</a>
+                  <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#john-smith">John Smith</a>
                 </div>
                 <span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span>
               </div>
@@ -547,13 +471,22 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Acme Corp (32h), Internal (10h)</span>
               </div>
+              <!-- 42h/40h = 105% - slight overflow -->
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:100%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">42h vs 40h target (+2h overtime)</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted 3 days ago</span>
+                <span class="sla-tag sla-warning"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 3d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -567,7 +500,7 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">DP</div>
-                  <a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Backend Developer" data-dept="Engineering" data-worktime="72%" data-href="employees.html#david-park">David Park</a>
+                  <a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a>
                 </div>
                 <span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span>
                 <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Under target</span>
@@ -579,13 +512,22 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Globex Corp (30h), Internal (5h)</span>
               </div>
+              <!-- 35h/40h = 87.5% - under target -->
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:87.5%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">35h vs 40h target (-5h under)</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted 4 days ago</span>
+                <span class="sla-tag sla-warning"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 4d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -606,7 +548,7 @@
                 <span class="badge badge-success"><svg data-lucide="palm-tree" width="12" height="12"></svg> Leave</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">AW</div>
-                  <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="UI/UX Designer" data-dept="Design" data-worktime="85%" data-href="employees.html#alice-wang">Alice Wang</a>
+                  <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#alice-wang">Alice Wang</a>
                 </div>
               </div>
               <div class="card-details">
@@ -619,11 +561,13 @@
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="users" width="12" height="12"></svg> Team impact: No conflicts</span>
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -637,7 +581,7 @@
                 <span class="badge badge-success"><svg data-lucide="palm-tree" width="12" height="12"></svg> Leave</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">MR</div>
-                  <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Project Manager" data-dept="Engineering" data-worktime="88%" data-href="employees.html#marco-rossi">Marco Rossi</a>
+                  <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a>
                 </div>
               </div>
               <div class="card-details">
@@ -650,11 +594,13 @@
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="alert-triangle" width="12" height="12" style="color: var(--color-warning);"></svg> Team impact: 1 other person off</span>
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -678,11 +624,13 @@
               </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted yesterday</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 1d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -696,7 +644,7 @@
                 <span class="badge badge-gold"><svg data-lucide="receipt" width="12" height="12"></svg> Expense</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">BT</div>
-                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="42%" data-href="employees.html#bob-taylor">Bob Taylor</a>
+                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                 </div>
                 <span class="badge badge-primary"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
               </div>
@@ -711,16 +659,18 @@
                 <span class="context-item"><svg data-lucide="paperclip" width="12" height="12"></svg> Receipt attached</span>
                 <span class="context-item"><svg data-lucide="shield-check" width="12" height="12" style="color: var(--color-success);"></svg> Policy: Within limits</span>
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
 
-          <!-- 7. Expense - Carol Kim -->
+          <!-- 7. Expense - Carol Williams -->
           <div class="approval-card" data-type="expense" data-id="7">
             <div class="card-check"><input type="checkbox" class="item-check" data-id="7"></div>
             <div class="card-type-icon expense"><svg data-lucide="receipt" width="18" height="18"></svg></div>
@@ -728,8 +678,8 @@
               <div class="card-main-row">
                 <span class="badge badge-gold"><svg data-lucide="receipt" width="12" height="12"></svg> Expense</span>
                 <div class="card-employee">
-                  <div class="avatar avatar-xs">CK</div>
-                  <a href="employees.html#carol-kim" data-hovercard data-name="Carol Kim" data-role="Data Analyst" data-dept="Analytics" data-worktime="90%" data-href="employees.html#carol-kim">Carol Kim</a>
+                  <div class="avatar avatar-xs">CW</div>
+                  <a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a>
                 </div>
                 <span class="badge badge-primary"><svg data-lucide="badge-check" width="12" height="12"></svg> Billable</span>
               </div>
@@ -744,16 +694,18 @@
                 <span class="context-item"><svg data-lucide="paperclip" width="12" height="12"></svg> Receipt attached</span>
                 <span class="context-item"><svg data-lucide="shield-check" width="12" height="12" style="color: var(--color-success);"></svg> Policy: Within limits</span>
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
 
-          <!-- 8. Timesheet - Carol Kim -->
+          <!-- 8. Timesheet - Carol Williams -->
           <div class="approval-card" data-type="timesheet" data-id="8">
             <div class="card-check"><input type="checkbox" class="item-check" data-id="8"></div>
             <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
@@ -761,8 +713,8 @@
               <div class="card-main-row">
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
-                  <div class="avatar avatar-xs">CK</div>
-                  <a href="employees.html#carol-kim" data-hovercard data-name="Carol Kim" data-role="Data Analyst" data-dept="Analytics" data-worktime="90%" data-href="employees.html#carol-kim">Carol Kim</a>
+                  <div class="avatar avatar-xs">CW</div>
+                  <a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a>
                 </div>
               </div>
               <div class="card-details">
@@ -772,13 +724,21 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Initech (36h), Internal (4h)</span>
               </div>
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:100%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">40h / 40h target</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -792,7 +752,7 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">MR</div>
-                  <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Project Manager" data-dept="Engineering" data-worktime="88%" data-href="employees.html#marco-rossi">Marco Rossi</a>
+                  <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a>
                 </div>
                 <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Overtime</span>
               </div>
@@ -803,19 +763,27 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Acme Corp (40h), Internal (4h)</span>
               </div>
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:100%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">44h / 40h target (+4h overtime)</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
 
           <!-- 10. Timesheet - Bob Taylor -->
-          <div class="approval-card" data-type="timesheet" data-id="10">
+          <div class="approval-card urgent-card" data-type="timesheet" data-id="10">
             <div class="card-check"><input type="checkbox" class="item-check" data-id="10"></div>
             <div class="card-type-icon timesheet"><svg data-lucide="clock" width="18" height="18"></svg></div>
             <div class="card-body">
@@ -823,7 +791,7 @@
                 <span class="badge badge-info"><svg data-lucide="clock" width="12" height="12"></svg> Timesheet</span>
                 <div class="card-employee">
                   <div class="avatar avatar-xs">BT</div>
-                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="42%" data-href="employees.html#bob-taylor">Bob Taylor</a>
+                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                 </div>
                 <span class="warning-tag"><svg data-lucide="alert-triangle"></svg> Only 8h</span>
               </div>
@@ -834,13 +802,27 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Internal (8h)</span>
               </div>
+              <!-- Warning banner: below contracted hours -->
+              <div style="margin-top:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-md);display:flex;align-items:center;gap:var(--space-2);">
+                <svg data-lucide="alert-triangle" width="16" height="16" style="color:var(--color-error);flex-shrink:0;"></svg>
+                <span style="font-size:var(--text-caption);color:var(--color-error);font-weight:var(--weight-semibold);">Below contracted hours (8h of 40h) — review before approving</span>
+              </div>
+              <!-- Progress bar vs 40h target -->
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:20%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-error);margin-top:2px;">8h / 40h target</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted 1 day ago</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 1d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -864,13 +846,21 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Acme Corp (40h)</span>
               </div>
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:100%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">40h / 40h target</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -894,13 +884,21 @@
                 <span class="detail-sep">&middot;</span>
                 <span>Contoso Ltd (34h), Internal (4h)</span>
               </div>
+              <div style="margin-top:var(--space-2);">
+                <div style="height:4px;background:var(--color-surface-3);border-radius:var(--radius-full);overflow:hidden;">
+                  <div style="width:95%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
+                </div>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">38h / 40h target</div>
+              </div>
               <div class="card-context">
                 <span class="context-item"><svg data-lucide="clock" width="12" height="12"></svg> Submitted today</span>
+                <span class="sla-tag"><svg data-lucide="hourglass" width="12" height="12"></svg> Waiting 0d</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-primary btn-sm approve-btn">Approve</button>
-              <button class="btn btn-destructive-ghost btn-sm reject-btn">Reject</button>
+              <button class="btn btn-primary btn-sm approve-btn" data-min-role="pm">Approve</button>
+              <button class="btn btn-secondary btn-sm approve-note-btn" data-min-role="pm">Approve with Note</button>
+              <button class="btn btn-ghost btn-sm reject-btn text-error" data-min-role="pm">Reject</button>
               <button class="btn btn-ghost btn-sm detail-btn">View Details</button>
             </div>
           </div>
@@ -909,9 +907,10 @@
 
         <!-- Per-tab empty states (shown when filter yields no items) -->
         <div id="filterEmptyState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;color:var(--color-text-3);">
-          <svg data-lucide="check-circle-2" width="48" height="48" style="color:var(--color-success);opacity:0.6;margin-bottom:var(--space-4);"></svg>
+          <svg id="filterEmptyIcon" data-lucide="check-circle-2" width="48" height="48" style="color:var(--color-success);opacity:0.6;margin-bottom:var(--space-4);"></svg>
           <h3 style="font-size:var(--text-heading-2);color:var(--color-text-2);margin-bottom:var(--space-2);">All caught up!</h3>
           <p id="filterEmptyMsg" style="max-width:360px;">No pending requests in this category.</p>
+          <div id="filterEmptyCta" style="margin-top:var(--space-3);"></div>
         </div>
 
       </div><!-- /populated-content -->
@@ -932,6 +931,27 @@
   <span class="bulk-count" id="bulkCount">0 selected</span>
   <button class="btn btn-primary btn-sm" id="bulkApproveBtn"><svg data-lucide="check" width="14" height="14"></svg> Approve Selected</button>
   <button class="btn btn-destructive btn-sm" id="bulkRejectBtn"><svg data-lucide="x" width="14" height="14"></svg> Reject Selected</button>
+</div>
+
+<!-- Approve with Note Modal -->
+<div class="modal-backdrop" id="approveNoteModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">Approve with Note</h3>
+      <button class="modal-close" onclick="closeModal('approveNoteModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--color-text-2);margin-bottom:var(--space-3);">Add an optional note for the submitter before approving.</p>
+      <div class="form-group">
+        <label class="form-label">Note</label>
+        <textarea class="form-textarea" id="approveNote" rows="3" placeholder="e.g. Approved, but please split client hours next week..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('approveNoteModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" id="approveNoteConfirmBtn">Approve with Note</button>
+    </div>
+  </div>
 </div>
 
 <!-- Reject Reason Modal -->
@@ -962,11 +982,19 @@
       <button class="modal-close" id="detailModalClose"><svg data-lucide="x" width="18" height="18"></svg></button>
     </div>
     <div class="modal-body" id="detailModalBody">
-      <p class="text-2">Detailed view of the request including full breakdown, history, and comments would appear here in the full application.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:var(--text-body-sm);">
+        <thead><tr style="border-bottom:1px solid var(--color-border-1);"><th style="text-align:left;padding:var(--space-2) var(--space-3);color:var(--color-text-2);">Period</th><th style="text-align:right;padding:var(--space-2) var(--space-3);color:var(--color-text-2);">Hours</th><th style="text-align:left;padding:var(--space-2) var(--space-3);color:var(--color-text-2);">Project</th><th style="text-align:left;padding:var(--space-2) var(--space-3);color:var(--color-text-2);">Status</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--color-border-0);"><td style="padding:var(--space-2) var(--space-3);">Mar 30 – Apr 5</td><td style="text-align:right;padding:var(--space-2) var(--space-3);">36h</td><td style="padding:var(--space-2) var(--space-3);">Initech API</td><td style="padding:var(--space-2) var(--space-3);color:var(--color-success);">Billable</td></tr>
+          <tr style="border-bottom:1px solid var(--color-border-0);"><td style="padding:var(--space-2) var(--space-3);">Mar 30 – Apr 5</td><td style="text-align:right;padding:var(--space-2) var(--space-3);">4h</td><td style="padding:var(--space-2) var(--space-3);">Internal</td><td style="padding:var(--space-2) var(--space-3);color:var(--color-text-2);">Non-billable</td></tr>
+          <tr><td style="padding:var(--space-2) var(--space-3);font-weight:var(--weight-semibold);">Total</td><td style="text-align:right;padding:var(--space-2) var(--space-3);font-weight:var(--weight-semibold);">40h</td><td colspan="2"></td></tr>
+        </tbody>
+      </table>
+      <p class="text-2" style="margin-top:var(--space-3);color:var(--color-text-2);">No comments. Submitted on Apr 6, 2026.</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-md" onclick="closeModal('detailModal')">Close</button>
-      <button class="btn btn-primary btn-md">Approve</button>
+      <button class="btn btn-primary btn-md" data-min-role="pm" onclick="closeModal('detailModal');showToast('success','Approved','Item has been approved.')">Approve</button>
     </div>
   </div>
 </div>
@@ -1001,7 +1029,7 @@
         <div class="item-icon"><svg data-lucide="users" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Team Directory</div></div>
       </a>
-      <a href="admin.html" class="cmd-palette-item">
+      <a href="admin.html" class="cmd-palette-item" data-min-role="admin">
         <div class="item-icon"><svg data-lucide="settings" width="16" height="16"></svg></div>
         <div class="item-text"><div class="item-title">Configuration</div></div>
       </a>
@@ -1010,6 +1038,44 @@
       <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Navigate</span>
       <span><kbd>&crarr;</kbd> Open</span>
       <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Approve All Visible Confirmation Modal -->
+<div class="modal-backdrop" id="approveAllModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">Approve All Visible</h3>
+      <button class="modal-close" onclick="closeModal('approveAllModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--color-text-2);">Approve all <strong id="approveAllCount">0</strong> visible items? This action will notify all submitters.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('approveAllModal')">Cancel</button>
+      <button class="btn btn-primary btn-md" id="approveAllConfirmBtn">Approve All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reject All Selected Confirmation Modal -->
+<div class="modal-backdrop" id="rejectAllModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">Reject All Selected</h3>
+      <button class="modal-close" onclick="closeModal('rejectAllModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--color-text-2);margin-bottom:var(--space-3);">Reject all selected items? A rejection reason is required.</p>
+      <div class="form-group">
+        <label class="form-label">Rejection Reason <span class="required">*</span></label>
+        <textarea class="form-textarea" id="rejectAllReason" rows="3" placeholder="Provide a reason for rejection..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('rejectAllModal')">Cancel</button>
+      <button class="btn btn-destructive btn-md" id="rejectAllConfirmBtn">Reject Selected</button>
     </div>
   </div>
 </div>
@@ -1031,9 +1097,6 @@
 
   // ── DOM refs ──
   var sidebar = document.getElementById('sidebar');
-  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
-  var sidebarOverlay = document.getElementById('sidebarOverlay');
-  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
   var searchTrigger = document.getElementById('searchTrigger');
   var cmdPalette = document.getElementById('cmdPalette');
   var cmdInput = document.getElementById('cmdInput');
@@ -1047,19 +1110,6 @@
   var bulkCount = document.getElementById('bulkCount');
   var bulkDropdownBtn = document.getElementById('bulkDropdownBtn');
   var bulkDropdownMenu = document.getElementById('bulkDropdownMenu');
-
-  // ── Sidebar Collapse ──
-  sidebarCollapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-
-  // ── Mobile Menu ──
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Command Palette ──
   function openCmdPalette() {
@@ -1217,19 +1267,23 @@
     });
     var emptyState = document.getElementById('filterEmptyState');
     var emptyMsg = document.getElementById('filterEmptyMsg');
+    var emptyCta = document.getElementById('filterEmptyCta');
     if (emptyState) {
       if (visibleCount === 0) {
-        var msgs = {
-          'all': 'No pending approvals right now. Great work!',
-          'timesheet': 'All timesheets are reviewed. You\'re all caught up!',
-          'leave': 'No pending leave requests.',
-          'expense': 'No pending expense claims.'
+        var configs = {
+          'all': { msg: 'No pending approvals right now. Great work!', cta: '' },
+          'timesheet': { msg: 'No timesheet approvals match your filters.', cta: '<a href="timesheets.html" class="btn btn-secondary btn-sm"><svg data-lucide="clock" width="14" height="14"></svg> Go to Timesheets</a>' },
+          'leave': { msg: 'No leave approvals match your filters.', cta: '<a href="leaves.html" class="btn btn-secondary btn-sm"><svg data-lucide="palm-tree" width="14" height="14"></svg> Go to Leaves</a>' },
+          'expense': { msg: 'No expense approvals match your filters.', cta: '<a href="expenses.html" class="btn btn-secondary btn-sm"><svg data-lucide="receipt" width="14" height="14"></svg> Go to Expenses</a>' }
         };
-        emptyMsg.textContent = msgs[currentFilter] || 'No pending requests in this category.';
+        var cfg = configs[currentFilter] || configs['all'];
+        emptyMsg.textContent = cfg.msg;
+        if (emptyCta) emptyCta.innerHTML = cfg.cta;
         emptyState.style.display = 'flex';
         lucide.createIcons({ nodes: [emptyState] });
       } else {
         emptyState.style.display = 'none';
+        if (emptyCta) emptyCta.innerHTML = '';
       }
     }
   }
@@ -1380,8 +1434,36 @@
     '</div>';
   }
 
+  // ── Approve with Note modal ──
+  var approveNoteTargetCard = null;
+
+  document.getElementById('approveNoteConfirmBtn').addEventListener('click', function() {
+    if (approveNoteTargetCard) {
+      var note = document.getElementById('approveNote').value.trim();
+      closeModal('approveNoteModal');
+      approveCard(approveNoteTargetCard);
+      if (note) {
+        showToast('info', 'Note Sent', 'Your note has been sent to the submitter.');
+      }
+      approveNoteTargetCard = null;
+    }
+  });
+
+  document.getElementById('approveNoteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('approveNoteModal');
+  });
+
   // Event delegation for approve/reject/detail buttons
   document.getElementById('approvalList').addEventListener('click', function(e) {
+    // Approve with Note
+    var noteBtn = e.target.closest('.approve-note-btn');
+    if (noteBtn) {
+      approveNoteTargetCard = noteBtn.closest('.approval-card');
+      document.getElementById('approveNote').value = '';
+      document.getElementById('approveNoteModal').classList.add('active');
+      document.getElementById('approveNote').focus();
+      return;
+    }
     var btn = e.target.closest('.approve-btn');
     if (btn) {
       btn.classList.add('btn-loading');
@@ -1454,18 +1536,15 @@
     setTimeout(updateBulkBar, 350);
   });
 
-  // Approve all visible
+  // Approve all visible (no toast here — called by modal confirm which shows toast)
   window.approveAllVisible = function() {
     var cards = document.querySelectorAll('.approval-card');
-    var count = 0;
     cards.forEach(function(card) {
       if (card.style.display !== 'none') {
         card.classList.add('removing-item');
-        count++;
-        setTimeout(function() { card.style.display = 'none'; }, 300);
+        setTimeout(function() { card.style.display = 'none'; checkFilterEmptyState(); }, 300);
       }
     });
-    if (count > 0) showToast('success', 'Bulk Approved', count + ' request(s) have been approved.');
     bulkDropdownMenu.classList.remove('active');
   };
 
@@ -1476,6 +1555,58 @@
     document.body.className = isPopulated ? 'show-populated' : 'show-empty';
     this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
   });
+
+  // ── Approve All Visible (custom modal) ──
+  document.getElementById('approveAllVisibleBtn').addEventListener('click', function() {
+    var visibleCount = 0;
+    document.querySelectorAll('.approval-card').forEach(function(card) {
+      if (card.style.display !== 'none') visibleCount++;
+    });
+    document.getElementById('approveAllCount').textContent = visibleCount;
+    document.getElementById('approveAllModal').classList.add('active');
+    bulkDropdownMenu.classList.remove('active');
+  });
+
+  document.getElementById('approveAllConfirmBtn').addEventListener('click', function() {
+    closeModal('approveAllModal');
+    approveAllVisible();
+    showToast('success', 'Approved', 'All visible items have been approved.');
+  });
+
+  // ── Export to CSV ──
+  document.getElementById('exportCsvBtn').addEventListener('click', function() {
+    showToast('success', 'Export Started', 'CSV file will download shortly.');
+    bulkDropdownMenu.classList.remove('active');
+  });
+
+  // ── Reject All Selected (custom modal) ──
+  document.getElementById('rejectAllSelectedBtn').addEventListener('click', function() {
+    document.getElementById('rejectAllReason').value = '';
+    document.getElementById('rejectAllModal').classList.add('active');
+    bulkDropdownMenu.classList.remove('active');
+  });
+
+  document.getElementById('rejectAllConfirmBtn').addEventListener('click', function() {
+    var reason = document.getElementById('rejectAllReason').value.trim();
+    if (!reason) {
+      document.getElementById('rejectAllReason').style.borderColor = 'var(--color-error)';
+      return;
+    }
+    closeModal('rejectAllModal');
+    showToast('warning', 'Rejected', 'Selected items have been rejected.');
+  });
+
+  // ── Per-tab empty states with contextual CTAs ──
+  var originalCheckFilterEmptyState = checkFilterEmptyState;
+
+  // ── GHR shared init ──
+  if (window.GHR) {
+    GHR.initHoverCard();
+    GHR.initPresence();
+    GHR.initRoleSwitcher();
+    GHR.initKeyboardShortcuts();
+    GHR.initSkeletons();
+  }
 
   // ── Init Lucide Icons ──
   lucide.createIcons();

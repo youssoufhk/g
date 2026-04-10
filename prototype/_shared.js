@@ -194,14 +194,14 @@ GHR.initHoverCard = function() {
 /* ── C. REAL-TIME PRESENCE SIMULATION ────────────────────── */
 GHR.initPresence = function() {
   var employees = {
-    'sarah-chen':   { name: 'Sarah Chen',    status: 'online'  },
-    'john-smith':   { name: 'John Smith',     status: 'online'  },
-    'alice-wang':   { name: 'Alice Wang',     status: 'on-leave' },
-    'carol-kim':    { name: 'Carol Kim',      status: 'away'    },
-    'david-park':   { name: 'David Park',     status: 'online'  },
-    'marco-rossi':  { name: 'Marco Rossi',    status: 'busy'    },
-    'emma-laurent': { name: 'Emma Laurent',   status: 'online'  },
-    'bob-taylor':   { name: 'Bob Taylor',     status: 'away'    }
+    'sarah-chen':   { name: 'Sarah Chen',    status: 'online'   },
+    'john-smith':   { name: 'John Smith',    status: 'online'   },
+    'alice-wang':   { name: 'Alice Wang',    status: 'on-leave' },
+    'carol-williams':{ name: 'Carol Williams', status: 'online' },
+    'david-park':   { name: 'David Park',    status: 'offline'  },
+    'marco-rossi':  { name: 'Marco Rossi',   status: 'away'     },
+    'emma-laurent': { name: 'Emma Laurent',  status: 'online'   },
+    'bob-taylor':   { name: 'Bob Taylor',    status: 'offline'  }
   };
 
   var activeStatuses = ['online', 'away', 'busy'];
@@ -219,7 +219,8 @@ GHR.initPresence = function() {
 
   function rotateStatuses() {
     for (var id in employees) {
-      if (employees[id].status === 'on-leave') continue;
+      var status = employees[id].status;
+      if (status === 'on-leave' || status === 'offline') continue;
       // ~30% chance of status change each cycle
       if (Math.random() < 0.3) {
         employees[id].status = activeStatuses[Math.floor(Math.random() * activeStatuses.length)];
@@ -473,9 +474,9 @@ GHR.initKeyboardShortcuts = function() {
   }
 
   function closeAll() {
-    // Close modals
+    // Close modals (with exit animation)
     var backdrop = document.querySelector('.modal-backdrop.active');
-    if (backdrop) { backdrop.classList.remove('active'); return; }
+    if (backdrop) { GHR.closeModal(backdrop); return; }
 
     // Close slide panels
     var slidePanel = document.querySelector('.slide-panel-backdrop.active');
@@ -508,6 +509,13 @@ GHR.initKeyboardShortcuts = function() {
     }
 
     if (inInput) return;
+
+    // Shift+E — toggle dev mode (shows/hides state toggle buttons)
+    if (e.shiftKey && e.key === 'E') {
+      e.preventDefault();
+      document.body.classList.toggle('dev-mode');
+      return;
+    }
 
     // Cmd/Ctrl + K — command palette
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -554,8 +562,12 @@ GHR.initKeyboardShortcuts = function() {
       clearTimeout(gTimer);
       if (gKeyMap[key]) {
         e.preventDefault();
-        // Resolve relative to current page location
-        var base = window.location.pathname.split('/').slice(0, -1).join('/') + '/';
+        // Role-based navigation guard
+        var restrictedForEmployee = { 's': true, 'i': true };
+        if (GHR.currentRole === 'employee' && restrictedForEmployee[key]) {
+          GHR.showToast('error', 'Access Denied', 'You do not have permission to access that page.');
+          return;
+        }
         window.location.href = gKeyMap[key];
       }
     }
@@ -563,13 +575,100 @@ GHR.initKeyboardShortcuts = function() {
 };
 
 
-/* ── F. SKELETON LOADING MANAGER ─────────────────────────── */
+/* ── F. MODAL CLOSE WITH EXIT ANIMATION ──────────────────── */
+GHR.closeModal = function(backdrop) {
+  if (!backdrop) return;
+  backdrop.classList.add('removing');
+  setTimeout(function() {
+    backdrop.classList.remove('active', 'removing');
+  }, 200);
+};
+
+/* Global: close any modal on backdrop click (consistency across all pages) */
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.classList && e.target.classList.contains('modal-backdrop') && e.target.classList.contains('active')) {
+    GHR.closeModal(e.target);
+  }
+});
+
+
+/* ── G. KPI COUNTER ROLL ANIMATION ──────────────────────── */
+GHR.animateCounters = function() {
+  // Respect prefers-reduced-motion
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var elements = document.querySelectorAll('.stat-value');
+  elements.forEach(function(el) {
+    var text = el.textContent.trim();
+    if (!text) return;
+
+    // Parse: extract prefix (€), suffix (h, %), and numeric value
+    var prefix = '';
+    var suffix = '';
+    var numStr = text;
+
+    // Detect prefix (currency symbol)
+    var prefixMatch = text.match(/^([€$£¥])/);
+    if (prefixMatch) {
+      prefix = prefixMatch[1];
+      numStr = text.slice(prefix.length);
+    }
+
+    // Detect suffix (h, %, and anything non-numeric at end)
+    var suffixMatch = numStr.match(/([^0-9,\.]+)$/);
+    if (suffixMatch) {
+      suffix = suffixMatch[1];
+      numStr = numStr.slice(0, numStr.length - suffix.length);
+    }
+
+    // Remove commas for parsing
+    var useCommas = numStr.indexOf(',') !== -1;
+    var raw = parseFloat(numStr.replace(/,/g, ''));
+    if (isNaN(raw) || raw === 0) return;
+
+    var start = 0;
+    var end = raw;
+    var duration = 800;
+    var startTime = null;
+    var isInt = Number.isInteger(raw);
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function formatNum(val) {
+      var rounded = isInt ? Math.round(val) : Math.round(val * 10) / 10;
+      if (useCommas) {
+        rounded = rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+      return prefix + rounded + suffix;
+    }
+
+    el.textContent = formatNum(start);
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var elapsed = timestamp - startTime;
+      var progress = Math.min(elapsed / duration, 1);
+      var current = start + (end - start) * easeOut(progress);
+      el.textContent = formatNum(current);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = formatNum(end);
+      }
+    }
+
+    requestAnimationFrame(step);
+  });
+};
+
+
+/* ── H. SKELETON LOADING MANAGER ─────────────────────────── */
 GHR.initSkeletons = function() {
   var main = document.querySelector('main') || document.querySelector('.main-wrapper') || document.querySelector('.page-content');
   if (!main) return;
 
-  // Mark all cards/stat-cards
-  var cards = main.querySelectorAll('.card, .stat-card');
+  // Mark all cards/stat-cards and all .skeleton elements
+  var cards = main.querySelectorAll('.card, .stat-card, .skeleton');
   cards.forEach(function(card) {
     card.classList.add('ghr-skeleton-loading');
   });
@@ -578,18 +677,58 @@ GHR.initSkeletons = function() {
     cards.forEach(function(card) {
       card.classList.remove('ghr-skeleton-loading');
     });
+    // Animate counters after skeletons resolve
+    GHR.animateCounters();
   }, 600);
 };
 
 
-/* ── G. COMMAND PALETTE WIRING ───────────────────────────── */
+/* ── I. CHART DRAW-IN ANIMATION ──────────────────────────── */
+GHR.animateCharts = function() {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var paths = document.querySelectorAll('svg path[data-animate], svg circle[data-animate]');
+  if (!paths.length) return;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('chart-animate-in');
+        observer.unobserve(e.target);
+      }
+    });
+  });
+
+  paths.forEach(function(p) { observer.observe(p); });
+};
+
+
+/* ── J. COMMAND PALETTE WIRING ───────────────────────────── */
 GHR.initCommandPalette = function(items) {
   var backdrop = document.querySelector('.cmd-palette-backdrop');
   var input    = document.querySelector('.cmd-palette-input input');
   var results  = document.querySelector('.cmd-palette-results');
   if (!backdrop || !input || !results) return;
 
-  var filtered = items ? items.slice() : [];
+  // Canonical employees and clients data entities
+  var employeeIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 018 0v2"/></svg>';
+  var clientIcon   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg>';
+  var dataEntities = [
+    { label: 'Sarah Chen',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'John Smith',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'Marco Rossi',    href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'Carol Williams', href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'Alice Wang',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'David Park',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'Emma Laurent',   href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'Bob Taylor',     href: 'hr.html', icon: employeeIcon, category: 'employee' },
+    { label: 'Acme Corp',      href: 'clients.html', icon: clientIcon, category: 'client' },
+    { label: 'Globex Corp',    href: 'clients.html', icon: clientIcon, category: 'client' },
+    { label: 'Initech',        href: 'clients.html', icon: clientIcon, category: 'client' },
+    { label: 'Umbrella Corp',  href: 'clients.html', icon: clientIcon, category: 'client' }
+  ];
+
+  var filtered = (items ? items.slice() : []).concat(dataEntities);
 
   function renderItems(list) {
     // Clear existing dynamic items (keep static group labels if present)
@@ -689,11 +828,128 @@ GHR.avatarColor = function(name) {
 };
 
 
+/* ── K. SIDEBAR RENDERER (single source of truth) ────────── */
+GHR.renderSidebar = function() {
+  var sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+
+  // Detect active page from URL
+  var path = window.location.pathname;
+  var filename = path.split('/').pop() || 'index.html';
+  if (filename === '' || filename === '/') filename = 'index.html';
+
+  // For file:// protocol, also handle full paths
+  if (window.location.protocol === 'file:') {
+    var href = window.location.href;
+    var match = href.match(/([^\/]+\.html)/);
+    if (match) filename = match[1];
+  }
+
+  var active = filename;
+
+  function navItem(href, icon, label, badge) {
+    var itemFile = href.split('#')[0].split('?')[0];
+    var isActive = (itemFile === active) ? ' active' : '';
+    var badgeHtml = badge ? '<span class="nav-badge">' + badge + '</span>' : '';
+    return '<a href="' + href + '" class="nav-item' + isActive + '">' +
+      '<svg data-lucide="' + icon + '"></svg>' +
+      '<span class="nav-label">' + label + '</span>' +
+      badgeHtml +
+    '</a>';
+  }
+
+  sidebar.innerHTML =
+    '<div class="sidebar-logo">' +
+      '<div class="logo-icon">G</div>' +
+      '<span class="logo-text">GammaHR</span>' +
+    '</div>' +
+    '<nav class="sidebar-nav" aria-label="Main navigation">' +
+      '<div class="nav-section">' +
+        '<div class="nav-section-label">Main</div>' +
+        navItem('index.html', 'layout-dashboard', 'Dashboard') +
+        navItem('timesheets.html', 'clock', 'Timesheets', '7') +
+        navItem('expenses.html', 'receipt', 'Expenses', '2') +
+        navItem('leaves.html', 'palm-tree', 'Leaves', '3') +
+      '</div>' +
+      '<div class="nav-section">' +
+        '<div class="nav-section-label">HR</div>' +
+        navItem('hr.html', 'briefcase', 'Recruitment', '5') +
+        navItem('employees.html', 'users', 'Team Directory') +
+      '</div>' +
+      '<div class="nav-section">' +
+        '<div class="nav-section-label">Work</div>' +
+        navItem('projects.html', 'folder-kanban', 'Projects') +
+        navItem('gantt.html', 'gantt-chart-square', 'Gantt Chart') +
+        navItem('clients.html', 'building-2', 'Clients') +
+        navItem('planning.html', 'calendar-range', 'Resource Planning') +
+        navItem('calendar.html', 'calendar', 'Calendar') +
+      '</div>' +
+      '<div class="nav-section">' +
+        '<div class="nav-section-label">Finance</div>' +
+        navItem('invoices.html', 'file-text', 'Invoices') +
+        navItem('insights.html', 'sparkles', 'Insights') +
+      '</div>' +
+      '<div class="nav-section" data-min-role="admin">' +
+        '<div class="nav-section-label">Admin</div>' +
+        navItem('approvals.html', 'check-square', 'Approvals', '12') +
+        navItem('admin.html', 'settings', 'Settings') +
+      '</div>' +
+    '</nav>' +
+    '<div class="sidebar-footer">' +
+      '<a href="account.html" class="nav-item' + (active === 'account.html' ? ' active' : '') + '" style="margin-bottom:var(--space-2);">' +
+        '<svg data-lucide="user-circle"></svg>' +
+        '<span class="nav-label">Account</span>' +
+      '</a>' +
+      '<button class="sidebar-collapse-btn" id="sidebarCollapseBtn">' +
+        '<svg data-lucide="panel-left-close"></svg>' +
+        '<span>Collapse</span>' +
+      '</button>' +
+    '</div>';
+
+  // Restore collapsed state from localStorage
+  if (localStorage.getItem('ghr-sidebar-collapsed') === '1') {
+    sidebar.classList.add('collapsed');
+  }
+
+  // Wire up collapse button
+  var collapseBtn = document.getElementById('sidebarCollapseBtn');
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+      localStorage.setItem('ghr-sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+    });
+  }
+
+  // Wire up mobile overlay
+  var overlay = document.getElementById('sidebarOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', function() {
+      sidebar.classList.remove('mobile-open');
+    });
+  }
+
+  // Wire up mobile menu button
+  var mobileBtn = document.getElementById('mobileMenuBtn');
+  if (mobileBtn) {
+    mobileBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('mobile-open');
+    });
+  }
+
+  // Re-render Lucide icons for the sidebar
+  if (window.lucide) {
+    lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide', nodes: sidebar.querySelectorAll('[data-lucide]') });
+  }
+};
+
+
 /* ── AUTO-INIT ────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
+  GHR.renderSidebar();
   GHR.initHoverCard();
   GHR.initPresence();
   GHR.initRoleSwitcher();
   GHR.initKeyboardShortcuts();
+  GHR.animateCharts();
   // GHR.initSkeletons();  — opt-in per page
 });

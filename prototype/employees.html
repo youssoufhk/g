@@ -34,7 +34,7 @@
     }
     .filter-bar-standard .filter-search input {
       width: 100%;
-      height: 36px;
+      min-height: 44px;
       padding: 0 var(--space-3) 0 36px;
       background: var(--color-surface-0);
       border: 1px solid var(--color-border);
@@ -897,123 +897,8 @@
 <a href="#main-content" class="skip-to-content">Skip to content</a>
   <div class="app">
     <!-- ============ SIDEBAR ============ -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-icon">G</div>
-        <span class="logo-text">GammaHR</span>
-      </div>
-
-      <nav class="sidebar-nav" aria-label="Main navigation">
-        <!-- MAIN -->
-        <div class="nav-section">
-          <div class="nav-section-label">Main</div>
-          <a href="index.html" class="nav-item">
-            <svg data-lucide="layout-dashboard"></svg>
-            <span class="nav-label">Dashboard</span>
-          </a>
-          <a href="timesheets.html" class="nav-item">
-            <svg data-lucide="clock"></svg>
-            <span class="nav-label">Timesheets</span>
-            <span class="nav-badge">7</span>
-          </a>
-          <a href="expenses.html" class="nav-item">
-            <svg data-lucide="receipt"></svg>
-            <span class="nav-label">Expenses</span>
-            <span class="nav-badge">2</span>
-          </a>
-          <a href="leaves.html" class="nav-item">
-            <svg data-lucide="palm-tree"></svg>
-            <span class="nav-label">Leaves</span>
-            <span class="nav-badge">3</span>
-          </a>
-          <a href="calendar.html" class="nav-item">
-            <svg data-lucide="calendar"></svg>
-            <span class="nav-label">Calendar</span>
-          </a>
-          <a href="insights.html#ask-ai" class="nav-item">
-            <svg data-lucide="sparkles"></svg>
-            <span class="nav-label">Ask AI</span>
-          </a>
-        </div>
-
-        <!-- HR -->
-        <div class="nav-section">
-          <div class="nav-section-label">HR</div>
-          <a href="hr.html" class="nav-item">
-            <svg data-lucide="user-search"></svg>
-            <span class="nav-label">Recruitment</span>
-            <span class="nav-badge">5</span>
-          </a>
-          <a href="hr.html" class="nav-item">
-            <svg data-lucide="user-check"></svg>
-            <span class="nav-label">Onboarding</span>
-          </a>
-          <a href="employees.html" class="nav-item active">
-            <svg data-lucide="users"></svg>
-            <span class="nav-label">Team Directory</span>
-          </a>
-        </div>
-
-        <!-- WORK -->
-        <div class="nav-section">
-          <div class="nav-section-label">Work</div>
-          <a href="projects.html" class="nav-item">
-            <svg data-lucide="folder-kanban"></svg>
-            <span class="nav-label">Projects</span>
-          </a>
-          <a href="clients.html" class="nav-item">
-            <svg data-lucide="building-2"></svg>
-            <span class="nav-label">Clients</span>
-          </a>
-          <a href="planning.html" class="nav-item">
-            <svg data-lucide="calendar-range"></svg>
-            <span class="nav-label">Resource Planning</span>
-          </a>
-          <a href="gantt.html" class="nav-item">
-            <svg data-lucide="gantt-chart-square"></svg>
-            <span class="nav-label">Gantt Chart</span>
-          </a>
-        </div>
-
-        <!-- FINANCE -->
-        <div class="nav-section">
-          <div class="nav-section-label">Finance</div>
-          <a href="invoices.html" class="nav-item">
-            <svg data-lucide="file-text"></svg>
-            <span class="nav-label">Invoices</span>
-          </a>
-          <a href="insights.html" class="nav-item">
-            <svg data-lucide="sparkles"></svg>
-            <span class="nav-label">Insights</span>
-          </a>
-        </div>
-
-        <!-- ADMIN -->
-        <div class="nav-section">
-          <div class="nav-section-label">Admin</div>
-          <a href="approvals.html" class="nav-item">
-            <svg data-lucide="check-square"></svg>
-            <span class="nav-label">Approvals</span>
-            <span class="nav-badge">12</span>
-          </a>
-          <a href="admin.html" class="nav-item">
-            <svg data-lucide="settings"></svg>
-            <span class="nav-label">Settings</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button class="nav-item" onclick="GHR && GHR.openShortcuts ? GHR.openShortcuts() : document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
-          <svg data-lucide="keyboard" class="nav-icon"></svg>
-          <span class="nav-label">Help &amp; Shortcuts</span>
-        </button>
-        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-          <svg data-lucide="panel-left-close"></svg>
-          <span>Collapse</span>
-        </button>
-      </div>
-    </aside>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- ============ MAIN WRAPPER ============ -->
     <div class="main-wrapper">
@@ -1102,7 +987,7 @@
               <p class="page-subtitle">12 team members across 6 departments</p>
             </div>
             <div class="page-header-actions">
-              <button class="btn btn-secondary btn-md" id="exportBtn" onclick="showToast('Export started — CSV downloading...')">
+              <button class="btn btn-secondary btn-md" id="exportBtn" onclick="GHR && GHR.showToast ? GHR.showToast('info', 'Export', 'Exporting team data as CSV...') : showToast('Export started — CSV downloading...')">
                 <svg data-lucide="download" style="width:16px;height:16px;"></svg>
                 Export
               </button>
@@ -1183,9 +1068,9 @@
               <div class="employee-card-top">
                 <span class="avatar-status presence-online"><div class="avatar avatar-lg">SC</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
-                  <div class="employee-card-title">Design Lead</div>
-                  <div class="employee-card-dept">Design</div>
+                  <a class="employee-card-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
+                  <div class="employee-card-title">Project Manager</div>
+                  <div class="employee-card-dept">Engineering</div>
                 </div>
               </div>
               <div class="employee-card-projects">
@@ -1232,8 +1117,8 @@
               <div class="employee-card-top">
                 <span class="avatar-status presence-leave"><div class="avatar avatar-lg">AW</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="75" data-href="employees.html#profile-alice">Alice Wang</a>
-                  <div class="employee-card-title">Design Lead</div>
+                  <a class="employee-card-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a>
+                  <div class="employee-card-title">Software Engineer</div>
                   <div class="employee-card-dept">Engineering</div>
                 </div>
               </div>
@@ -1242,9 +1127,9 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill yellow" style="width: 75%;"></div>
+                  <div class="worktime-fill red" style="width: 45%;"></div>
                 </div>
-                <span class="worktime-pct yellow">75%</span>
+                <span class="worktime-pct red">45%</span>
               </div>
               <div class="employee-card-footer">
                 <span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14–18</span>
@@ -1256,43 +1141,44 @@
               <div class="employee-card-top">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-lg">BT</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="72" data-href="employees.html#profile-bob">Bob Taylor</a>
+                  <a class="employee-card-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
                   <div class="employee-card-title">Backend Developer</div>
                   <div class="employee-card-dept">Engineering</div>
                 </div>
               </div>
               <div class="employee-card-projects">
-                <a href="projects.html">Globex Phase 2</a>
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);font-style:italic;">On bench — no active project</span>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill yellow" style="width: 72%;"></div>
+                  <div class="worktime-fill red" style="width: 0%;"></div>
                 </div>
-                <span class="worktime-pct yellow">72%</span>
+                <span class="worktime-pct red">0%</span>
               </div>
               <div class="employee-card-footer">
                 <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
+                <span class="badge badge-warning" style="font-size:var(--text-caption);">Bench</span>
               </div>
             </div>
 
-            <!-- 5. Carol Kim -->
+            <!-- 5. Carol Williams -->
             <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <span class="avatar-status presence-online"><div class="avatar avatar-lg">CK</div></span>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">CW</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="carol-kim" data-hovercard data-name="Carol Kim" data-role="HR Manager" data-dept="HR" data-project="Initech API" data-worktime="78" data-href="employees.html#profile-carol">Carol Kim</a>
-                  <div class="employee-card-title">HR Manager</div>
-                  <div class="employee-card-dept">HR</div>
+                  <a class="employee-card-name" data-employee="carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="90" data-href="employees.html#profile-carol">Carol Williams</a>
+                  <div class="employee-card-title">Design Lead</div>
+                  <div class="employee-card-dept">Design</div>
                 </div>
               </div>
               <div class="employee-card-projects">
-                <a href="projects.html">Initech API</a>
+                <a href="projects.html">Acme Web Redesign</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill yellow" style="width: 78%;"></div>
+                  <div class="worktime-fill green" style="width: 90%;"></div>
                 </div>
-                <span class="worktime-pct yellow">78%</span>
+                <span class="worktime-pct green">90%</span>
               </div>
               <div class="employee-card-footer">
                 <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
@@ -1302,9 +1188,9 @@
             <!-- 6. David Park -->
             <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <span class="avatar-status presence-away"><div class="avatar avatar-lg">DP</div></span>
+                <span class="avatar-status presence-offline"><div class="avatar avatar-lg">DP</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Globex Phase 2" data-worktime="65" data-href="employees.html#profile-david">David Park</a>
+                  <a class="employee-card-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Globex Phase 2" data-worktime="45" data-href="employees.html#profile-david">David Park</a>
                   <div class="employee-card-title">Finance Lead</div>
                   <div class="employee-card-dept">Finance</div>
                 </div>
@@ -1314,12 +1200,12 @@
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill yellow" style="width: 65%;"></div>
+                  <div class="worktime-fill red" style="width: 45%;"></div>
                 </div>
-                <span class="worktime-pct yellow">65%</span>
+                <span class="worktime-pct red">45%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-warning"><svg data-lucide="moon" width="12" height="12"></svg> Away</span>
+                <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
               </div>
             </div>
 
@@ -1350,7 +1236,7 @@
             <!-- 8. Marco Rossi -->
             <div class="card card-interactive employee-card">
               <div class="employee-card-top">
-                <span class="avatar-status presence-online"><div class="avatar avatar-lg">MR</div></span>
+                <span class="avatar-status presence-away"><div class="avatar avatar-lg">MR</div></span>
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a>
                   <div class="employee-card-title">Operations Lead</div>
@@ -1367,7 +1253,7 @@
                 <span class="worktime-pct green">88%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Away</span>
               </div>
             </div>
 
@@ -1376,7 +1262,7 @@
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">SD</div>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="sophie-dubois">Sophie Dubois</a>
+                  <a class="employee-card-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Operations Manager" data-dept="Operations" data-project="Contoso Deal" data-worktime="82" data-href="employees.html">Sophie Dubois</a>
                   <div class="employee-card-title">Operations Manager</div>
                   <div class="employee-card-dept">Operations</div>
                 </div>
@@ -1400,7 +1286,7 @@
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status offline">YT</div>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="yuki-tanaka">Yuki Tanaka</a>
+                  <a class="employee-card-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html">Yuki Tanaka</a>
                   <div class="employee-card-title">QA Engineer</div>
                   <div class="employee-card-dept">Engineering</div>
                 </div>
@@ -1424,7 +1310,7 @@
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">MD</div>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="marie-dupont">Marie Dupont</a>
+                  <a class="employee-card-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html">Marie Dupont</a>
                   <div class="employee-card-title">CEO</div>
                   <div class="employee-card-dept">Executive</div>
                 </div>
@@ -1448,7 +1334,7 @@
               <div class="employee-card-top">
                 <div class="avatar avatar-lg avatar-status online">LO</div>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="liam-obrien">Liam O'Brien</a>
+                  <a class="employee-card-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Logistics Coordinator" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a>
                   <div class="employee-card-title">Logistics Coordinator</div>
                   <div class="employee-card-dept">Operations</div>
                 </div>
@@ -1486,9 +1372,9 @@
               <tbody>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SC</div><a class="cell-user-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a></div></td>
-                  <td data-label="Job Title">Design Lead</td>
-                  <td data-label="Department" class="cell-secondary">Design</td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SC</div><a class="cell-user-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a></div></td>
+                  <td data-label="Job Title">Project Manager</td>
+                  <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign, Initech API</a></td>
                   <td data-label="Work Time"><span class="font-mono text-success font-semibold">87%</span></td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
@@ -1506,42 +1392,42 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status on-leave">AW</div><a class="cell-user-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering" data-worktime="75" data-href="employees.html#profile-alice">Alice Wang</a></div></td>
-                  <td data-label="Job Title">Design Lead</td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status on-leave">AW</div><a class="cell-user-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a></div></td>
+                  <td data-label="Job Title">Software Engineer</td>
                   <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
-                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">75%</span></td>
+                  <td data-label="Work Time"><span class="font-mono text-error font-semibold">45%</span></td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14–18</span></td>
                   <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">BT</div><a class="cell-user-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="72" data-href="employees.html#profile-bob">Bob Taylor</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">BT</div><a class="cell-user-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a></div></td>
                   <td data-label="Job Title">Backend Developer</td>
                   <td data-label="Department" class="cell-secondary">Engineering</td>
-                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Globex Phase 2</a></td>
-                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">72%</span></td>
+                  <td data-label="Current Project"><span class="text-sm" style="color:var(--color-text-3);font-style:italic;">Bench</span></td>
+                  <td data-label="Work Time"><span class="font-mono text-error font-semibold">0%</span></td>
                   <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span></td>
                   <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">CK</div><a class="cell-user-name" data-employee="carol-kim" data-hovercard data-name="Carol Kim" data-role="HR Manager" data-dept="HR" data-worktime="78" data-href="employees.html#profile-carol">Carol Kim</a></div></td>
-                  <td data-label="Job Title">HR Manager</td>
-                  <td data-label="Department" class="cell-secondary">HR</td>
-                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Initech API</a></td>
-                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">78%</span></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">CW</div><a class="cell-user-name" data-employee="carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#profile-carol">Carol Williams</a></div></td>
+                  <td data-label="Job Title">Design Lead</td>
+                  <td data-label="Department" class="cell-secondary">Design</td>
+                  <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
+                  <td data-label="Work Time"><span class="font-mono text-success font-semibold">90%</span></td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
                   <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status away">DP</div><a class="cell-user-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="65" data-href="employees.html#profile-david">David Park</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">DP</div><a class="cell-user-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">David Park</a></div></td>
                   <td data-label="Job Title">Finance Lead</td>
                   <td data-label="Department" class="cell-secondary">Finance</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Globex Phase 2</a></td>
-                  <td data-label="Work Time"><span class="font-mono text-warning font-semibold">65%</span></td>
-                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="moon" width="12" height="12"></svg> Away</span></td>
+                  <td data-label="Work Time"><span class="font-mono text-error font-semibold">45%</span></td>
+                  <td data-label="Status"><span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span></td>
                   <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
@@ -1556,17 +1442,17 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MR</div><a class="cell-user-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status away">MR</div><a class="cell-user-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a></div></td>
                   <td data-label="Job Title">Operations Lead</td>
                   <td data-label="Department" class="cell-secondary">Operations</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
                   <td data-label="Work Time"><span class="font-mono text-success font-semibold">88%</span></td>
-                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span></td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Away</span></td>
                   <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois">Sophie Dubois</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="Operations Manager" data-dept="Operations" data-project="Contoso Deal" data-worktime="82" data-href="employees.html">Sophie Dubois</a></div></td>
                   <td data-label="Job Title">Operations Manager</td>
                   <td data-label="Department" class="cell-secondary">Operations</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Contoso Deal</a></td>
@@ -1576,7 +1462,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">YT</div><a class="cell-user-name" data-employee="yuki-tanaka">Yuki Tanaka</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">YT</div><a class="cell-user-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html">Yuki Tanaka</a></div></td>
                   <td data-label="Job Title">QA Engineer</td>
                   <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Initech API</a></td>
@@ -1586,7 +1472,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MD</div><a class="cell-user-name" data-employee="marie-dupont">Marie Dupont</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MD</div><a class="cell-user-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html">Marie Dupont</a></div></td>
                   <td data-label="Job Title">CEO</td>
                   <td data-label="Department" class="cell-secondary">Executive</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Internal</a></td>
@@ -1596,7 +1482,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien">Liam O'Brien</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Logistics Coordinator" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a></div></td>
                   <td data-label="Job Title">Logistics Coordinator</td>
                   <td data-label="Department" class="cell-secondary">Operations</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
@@ -1634,23 +1520,23 @@
                   <!-- Design Branch -->
                   <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
                     <div class="org-connector-up"></div>
-                    <a href="employees.html#profile-sarah" class="org-node org-node-dept-lead" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">
+                    <a href="employees.html#profile-sarah" class="org-node org-node-dept-lead" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">
                       <span class="avatar-status presence-online"><div class="avatar">SC</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">Sarah Chen</div>
-                        <div class="org-node-role">Design Lead</div>
-                        <div class="org-node-dept">Design</div>
+                        <div class="org-node-role">Project Manager</div>
+                        <div class="org-node-dept">Engineering</div>
                         <div class="org-direct-reports">1 direct report</div>
                       </div>
                     </a>
                     <div class="org-connector-down"></div>
-                    <!-- Alice (reports to Sarah) -->
-                    <a href="employees.html#profile-alice" class="org-node" data-hovercard data-name="Alice Wang" data-role="UX Designer" data-dept="Design" data-worktime="45" data-href="employees.html#profile-alice" style="max-width:185px;">
+                    <!-- Alice (Engineering, on leave) -->
+                    <a href="employees.html#profile-alice" class="org-node" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice" style="max-width:185px;">
                       <span class="avatar-status presence-leave"><div class="avatar">AW</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">Alice Wang</div>
-                        <div class="org-node-role">UX Designer</div>
-                        <div class="org-node-dept">Design</div>
+                        <div class="org-node-role">Software Engineer</div>
+                        <div class="org-node-dept">Engineering</div>
                       </div>
                     </a>
                   </div>
@@ -1658,19 +1544,19 @@
                   <!-- Operations Branch -->
                   <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
                     <div class="org-connector-up"></div>
-                    <a href="employees.html#profile-john" class="org-node org-node-dept-lead" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Operations" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#profile-john">
+                    <a href="employees.html#profile-john" class="org-node org-node-dept-lead" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#profile-john">
                       <span class="avatar-status presence-online"><div class="avatar">JS</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">John Smith</div>
-                        <div class="org-node-role">Project Manager</div>
-                        <div class="org-node-dept">Operations</div>
+                        <div class="org-node-role">Senior Developer</div>
+                        <div class="org-node-dept">Engineering</div>
                         <div class="org-direct-reports">1 direct report</div>
                       </div>
                     </a>
                     <div class="org-connector-down"></div>
                     <!-- Marco (reports to John) -->
                     <a href="employees.html#profile-marco" class="org-node" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html#profile-marco" style="max-width:185px;">
-                      <span class="avatar-status presence-online"><div class="avatar">MR</div></span>
+                      <span class="avatar-status presence-away"><div class="avatar">MR</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">Marco Rossi</div>
                         <div class="org-node-role">Operations Lead</div>
@@ -1707,7 +1593,7 @@
                   <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
                     <div class="org-connector-up"></div>
                     <a href="employees.html#profile-david" class="org-node org-node-dept-lead" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">
-                      <span class="avatar-status presence-away"><div class="avatar">DP</div></span>
+                      <span class="avatar-status presence-offline"><div class="avatar">DP</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">David Park</div>
                         <div class="org-node-role">Finance Lead</div>
@@ -1716,13 +1602,13 @@
                       </div>
                     </a>
                     <div class="org-connector-down"></div>
-                    <!-- Carol (reports to David) -->
-                    <a href="employees.html#profile-carol" class="org-node" data-hovercard data-name="Carol Kim" data-role="Finance Analyst" data-dept="Finance" data-project="Internal" data-worktime="90" data-href="employees.html#profile-carol" style="max-width:185px;">
-                      <span class="avatar-status presence-online"><div class="avatar">CK</div></span>
+                    <!-- Carol Williams (reports to David) -->
+                    <a href="employees.html#profile-carol" class="org-node" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="90" data-href="employees.html#profile-carol" style="max-width:185px;">
+                      <span class="avatar-status presence-online"><div class="avatar">CW</div></span>
                       <div class="org-node-info">
-                        <div class="org-node-name">Carol Kim</div>
-                        <div class="org-node-role">Finance Analyst</div>
-                        <div class="org-node-dept">Finance</div>
+                        <div class="org-node-name">Carol Williams</div>
+                        <div class="org-node-role">Design Lead</div>
+                        <div class="org-node-dept">Design</div>
                       </div>
                     </a>
                   </div>
@@ -1730,11 +1616,11 @@
                   <!-- HR Branch -->
                   <div class="org-child-branch" style="flex:1; align-items:center; max-width:200px;">
                     <div class="org-connector-up"></div>
-                    <a href="employees.html#profile-emma" class="org-node org-node-dept-lead" data-hovercard data-name="Emma Laurent" data-role="HR Manager" data-dept="HR" data-worktime="78" data-href="employees.html#profile-emma">
+                    <a href="employees.html#profile-emma" class="org-node org-node-dept-lead" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#profile-emma">
                       <span class="avatar-status presence-online"><div class="avatar">EL</div></span>
                       <div class="org-node-info">
                         <div class="org-node-name">Emma Laurent</div>
-                        <div class="org-node-role">HR Manager</div>
+                        <div class="org-node-role">HR Specialist</div>
                         <div class="org-node-dept">HR</div>
                         <div class="org-direct-reports">No direct reports</div>
                       </div>
@@ -1766,6 +1652,17 @@
           </div><!-- /orgView -->
 
           </div><!-- /empRealGrid -->
+
+          <!-- Search Empty State (hidden by default) -->
+          <div id="searchEmptyState" class="hidden" style="padding: var(--space-12) var(--space-6); text-align: center; color: var(--color-text-3);">
+            <svg data-lucide="search-x" style="width:48px;height:48px;margin:0 auto var(--space-4);opacity:0.4;display:block;"></svg>
+            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">No employees match your search</div>
+            <div style="font-size:var(--text-body);margin-bottom:var(--space-4);">Try a different name, role, or department.</div>
+            <button class="btn btn-secondary btn-sm" id="clearSearchBtn">
+              <svg data-lucide="x" style="width:14px;height:14px;"></svg>
+              Clear Search
+            </button>
+          </div>
 
           <!-- Empty State (hidden by default) -->
           <div id="emptyDirectory" class="empty-state hidden">
@@ -1802,7 +1699,7 @@
                 Sarah Chen
                 <span class="online-dot"></span>
               </div>
-              <div class="profile-hero-role">Design Lead &middot; Design</div>
+              <div class="profile-hero-role">Project Manager &middot; Engineering</div>
               <div class="profile-reports-to">
                 <span class="text-3">Reports to</span>
                 <a href="employees.html#profile-alex" class="text-primary" data-hovercard data-name="Alex Morrison" data-role="CEO" data-dept="Executive" data-worktime="72" data-href="employees.html#profile-alex">Alex Morrison</a>
@@ -1837,6 +1734,17 @@
                 <svg data-lucide="trending-up" style="width:12px;height:12px;"></svg>
                 +5% vs last month
               </div>
+              <!-- 8-week work time sparkline (Sarah: trending ~85-90%) -->
+              <svg viewBox="0 0 160 36" preserveAspectRatio="none" style="width:100%;height:36px;margin-top:var(--space-2);" aria-label="Work time trend last 8 weeks">
+                <polyline points="0,22 20,18 40,20 60,14 80,16 100,12 120,10 140,8 160,7"
+                  fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                <polyline points="0,22 20,18 40,20 60,14 80,16 100,12 120,10 140,8 160,7 160,36 0,36"
+                  fill="var(--color-primary-muted)" stroke="none" />
+                <circle cx="160" cy="7" r="3" fill="var(--color-primary)" />
+              </svg>
+              <div style="font-size:var(--text-caption);color:var(--color-text-3);display:flex;justify-content:space-between;margin-top:2px;">
+                <span>8 wks ago</span><span>Now</span>
+              </div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Billable This Month</div>
@@ -1845,6 +1753,17 @@
                 <svg data-lucide="trending-up" style="width:12px;height:12px;"></svg>
                 On track for target
               </div>
+              <!-- Billable hours sparkline -->
+              <svg viewBox="0 0 160 36" preserveAspectRatio="none" style="width:100%;height:36px;margin-top:var(--space-2);" aria-label="Billable hours trend">
+                <polyline points="0,28 20,22 40,26 60,18 80,20 100,16 120,12 140,14 160,10"
+                  fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                <polyline points="0,28 20,22 40,26 60,18 80,20 100,16 120,12 140,14 160,10 160,36 0,36"
+                  fill="var(--color-success-muted)" stroke="none" />
+                <circle cx="160" cy="10" r="3" fill="var(--color-success)" />
+              </svg>
+              <div style="font-size:var(--text-caption);color:var(--color-text-3);display:flex;justify-content:space-between;margin-top:2px;">
+                <span>8 wks ago</span><span>Now</span>
+              </div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Leave Remaining</div>
@@ -1852,6 +1771,17 @@
               <div class="stat-trend" style="color:var(--color-text-2);">
                 <svg data-lucide="calendar" style="width:12px;height:12px;"></svg>
                 7 used this year
+              </div>
+              <!-- Leave usage sparkline (cumulative days used) -->
+              <svg viewBox="0 0 160 36" preserveAspectRatio="none" style="width:100%;height:36px;margin-top:var(--space-2);" aria-label="Leave usage trend">
+                <polyline points="0,32 20,32 40,28 60,28 80,22 100,22 120,22 140,20 160,20"
+                  fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                <polyline points="0,32 20,32 40,28 60,28 80,22 100,22 120,22 140,20 160,20 160,36 0,36"
+                  fill="var(--color-warning-muted)" stroke="none" />
+                <circle cx="160" cy="20" r="3" fill="var(--color-warning)" />
+              </svg>
+              <div style="font-size:var(--text-caption);color:var(--color-text-3);display:flex;justify-content:space-between;margin-top:2px;">
+                <span>Jan 2026</span><span>Now</span>
               </div>
             </div>
           </div>
@@ -2072,6 +2002,29 @@
 
           <!-- Tab Content: Leaves -->
           <div class="tab-content" id="tab-leaves" class="pt-6">
+
+            <!-- 52-week heatmap -->
+            <div class="section-header" style="margin-bottom:var(--space-2);">
+              <h3 class="section-title">Leave Year Overview</h3>
+            </div>
+            <div class="card" style="padding:var(--space-4);margin-bottom:var(--space-6);">
+              <div id="leaveHeatmap" style="overflow-x:auto;">
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-2);">Jan 2026 ─────────────────────────────────── Dec 2026</div>
+                <div id="leaveHeatmapGrid" style="display:flex;flex-wrap:nowrap;gap:2px;"></div>
+                <div style="display:flex;align-items:center;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--color-warning);"></span> Approved leave
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--color-warning-muted);border:1px solid var(--color-warning);"></span> Pending leave
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--color-primary);"></span> Today
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="section-header">
               <h3 class="section-title">Leave Balances</h3>
             </div>
@@ -2495,7 +2448,7 @@
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="users" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Team Directory</div></div><div class="item-shortcut">Go</div></div>
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="clock" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Timesheets</div></div><div class="item-shortcut">Go</div></div>
         <div class="cmd-palette-group-label">People</div>
-        <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Sarah Chen</div><div class="item-subtitle">Engineering Lead</div></div></div>
+        <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Sarah Chen</div><div class="item-subtitle">Project Manager</div></div></div>
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Marie Dupont</div><div class="item-subtitle">CEO</div></div></div>
         <div class="cmd-palette-group-label">Actions</div>
         <div class="cmd-palette-item"><div class="item-icon"><svg data-lucide="user-plus" style="width:16px;height:16px;"></svg></div><div class="item-text"><div class="item-title">Invite Team Member</div></div></div>
@@ -2546,9 +2499,6 @@
     let isEmptyState = false;
 
     // ── DOM refs ──
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarCollapseBtn');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const headerSearch = document.getElementById('headerSearch');
     const cmdPalette = document.getElementById('cmdPalette');
     const cmdInput = document.getElementById('cmdInput');
@@ -2566,18 +2516,6 @@
     const gridView = document.getElementById('gridView');
     const listView = document.getElementById('listView');
     const backToTeam = document.getElementById('backToTeam');
-
-    // ── Sidebar collapse ──
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
-    });
-
-    // ── Mobile menu ──
-    if (mobileMenuBtn) {
-      mobileMenuBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('mobile-open');
-      });
-    }
 
     // ── Command Palette (Cmd+K) ──
     function openCmdPalette() {
@@ -2763,24 +2701,92 @@
 
     // ── Employee search filter ──
     const employeeSearch = document.getElementById('employeeSearch');
+    const searchEmptyState = document.getElementById('searchEmptyState');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    function runEmployeeSearch(query) {
+      query = query.toLowerCase();
+      let visibleCards = 0;
+      let visibleRows = 0;
+      document.querySelectorAll('.employee-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const visible = text.includes(query);
+        card.style.display = visible ? '' : 'none';
+        if (visible) visibleCards++;
+      });
+      document.querySelectorAll('#listView tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const visible = text.includes(query);
+        row.style.display = visible ? '' : 'none';
+        if (visible) visibleRows++;
+      });
+      // Show/hide search empty state
+      const activeViewBtn = document.querySelector('.view-toggle-btn.active');
+      const isOrg = activeViewBtn && activeViewBtn.dataset.view === 'org';
+      if (!isOrg && query && visibleCards === 0 && visibleRows === 0) {
+        if (searchEmptyState) searchEmptyState.classList.remove('hidden');
+      } else {
+        if (searchEmptyState) searchEmptyState.classList.add('hidden');
+      }
+    }
+
     if (employeeSearch) {
       employeeSearch.addEventListener('input', () => {
-        const query = employeeSearch.value.toLowerCase();
-        // Filter grid cards
-        document.querySelectorAll('.employee-card').forEach(card => {
-          const text = card.textContent.toLowerCase();
-          card.style.display = text.includes(query) ? '' : 'none';
-        });
-        // Filter list rows
-        document.querySelectorAll('#listView tbody tr').forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(query) ? '' : 'none';
-        });
+        runEmployeeSearch(employeeSearch.value);
+      });
+    }
+    if (clearSearchBtn) {
+      clearSearchBtn.addEventListener('click', () => {
+        if (employeeSearch) {
+          employeeSearch.value = '';
+          runEmployeeSearch('');
+        }
       });
     }
 
     // ── Init: navigate based on current hash ──
     navigateToView();
+
+    // ── 52-week Leave Heatmap ──
+    (function buildLeaveHeatmap() {
+      var grid = document.getElementById('leaveHeatmapGrid');
+      if (!grid) return;
+      var today = new Date(2026, 3, 6); // Apr 6 2026
+      var startOfYear = new Date(2026, 0, 1);
+      // Known approved leaves for Sarah (from leave history): Mar 10-14, Jan 2-3, Aug 4-15 (2025 so skip), Apr 14-18
+      var approvedDays = {};
+      // Jan 2-3, 2026
+      for (var d = 2; d <= 3; d++) { approvedDays['2026-01-' + String(d).padStart(2,'0')] = 'approved'; }
+      // Mar 10-14, 2026
+      for (var d = 10; d <= 14; d++) { approvedDays['2026-03-' + String(d).padStart(2,'0')] = 'approved'; }
+      // Apr 14-18, 2026 (pending/upcoming)
+      for (var d = 14; d <= 18; d++) { approvedDays['2026-04-' + String(d).padStart(2,'0')] = 'pending'; }
+      var msPerDay = 86400000;
+      var daysInYear = 365;
+      for (var i = 0; i < daysInYear; i++) {
+        var date = new Date(startOfYear.getTime() + i * msPerDay);
+        var y = date.getFullYear();
+        var m = String(date.getMonth() + 1).padStart(2,'0');
+        var day = String(date.getDate()).padStart(2,'0');
+        var key = y + '-' + m + '-' + day;
+        var isToday = (date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() && date.getDate() === today.getDate());
+        var sq = document.createElement('div');
+        sq.style.cssText = 'width:5px;height:5px;border-radius:1px;flex-shrink:0;';
+        var month = date.toLocaleString('en', {month:'short'});
+        sq.title = month + ' ' + date.getDate();
+        if (isToday) {
+          sq.style.background = 'var(--color-primary)';
+        } else if (approvedDays[key] === 'approved') {
+          sq.style.background = 'var(--color-warning)';
+        } else if (approvedDays[key] === 'pending') {
+          sq.style.background = 'var(--color-warning-muted)';
+          sq.style.border = '1px solid var(--color-warning)';
+        } else {
+          sq.style.background = 'var(--color-surface-2)';
+        }
+        grid.appendChild(sq);
+      }
+    })();
 
     // ── Skeleton loading for grid ──
     (function() {

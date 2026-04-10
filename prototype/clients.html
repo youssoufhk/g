@@ -88,7 +88,7 @@
       border-radius: var(--radius-lg);
       display: flex; align-items: center; justify-content: center;
       font-weight: var(--weight-bold);
-      font-size: 28px;
+      font-size: var(--text-heading-1);
       color: var(--color-text-inv);
       flex-shrink: 0;
     }
@@ -330,123 +330,7 @@
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-        <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item active">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="bar-chart-3"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);color:var(--color-text-2);margin-bottom:var(--space-2);" onclick="showToast('info','Shortcuts','Press Cmd+K to open command palette.')">
-        <svg data-lucide="keyboard" width="14" height="14"></svg>
-        <span style="font-size:var(--text-body-sm);">Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -588,10 +472,25 @@
             </div>
           </div>
 
+          <!-- Search no-results empty state -->
+          <div id="searchEmptyState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;">
+            <svg data-lucide="search-x" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg>
+            <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No clients match your search</h3>
+            <p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;margin-bottom:var(--space-6);">Try a different search term or clear your filters to see all clients.</p>
+            <div style="display:flex;gap:var(--space-3);">
+              <button class="btn btn-secondary btn-sm" onclick="clearClientSearch()">
+                <svg data-lucide="x" width="14" height="14"></svg> Clear Search
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="document.getElementById('newClientBtn').click()">
+                <svg data-lucide="plus" width="14" height="14"></svg> Add Client
+              </button>
+            </div>
+          </div>
+
           <!-- Client Cards -->
           <div id="clientList">
             <!-- Acme Corp -->
-            <div class="client-card" data-client="acme">
+            <div class="client-card card-interactive" data-client="acme">
               <div class="client-logo" style="background: linear-gradient(135deg, hsl(200, 60%, 45%), hsl(220, 60%, 55%));">AC</div>
               <div class="client-info">
                 <div class="client-name">Acme Corp</div>
@@ -607,11 +506,15 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;95,900</span>
                 <div class="client-revenue-label">YTD Revenue</div>
+                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
+                  <polyline points="0,18 10,14 20,12 30,10 40,7 50,5 60,3" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                </svg>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">&#9650; +18% vs last year</div>
               </div>
             </div>
 
             <!-- Globex Corporation -->
-            <div class="client-card" data-client="globex">
+            <div class="client-card card-interactive" data-client="globex">
               <div class="client-logo" style="background: linear-gradient(135deg, hsl(155, 40%, 40%), hsl(170, 40%, 50%));">GC</div>
               <div class="client-info">
                 <div class="client-name">Globex Corporation</div>
@@ -627,11 +530,15 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;89,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
+                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
+                  <polyline points="0,16 10,14 20,10 30,8 40,6 50,4 60,2" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                </svg>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">&#9650; +24% vs last year</div>
               </div>
             </div>
 
             <!-- Initech -->
-            <div class="client-card" data-client="initech">
+            <div class="client-card card-interactive" data-client="initech">
               <div class="client-logo" style="background: var(--color-gold);">IN</div>
               <div class="client-info">
                 <div class="client-name">Initech</div>
@@ -647,11 +554,15 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;42,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
+                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
+                  <polyline points="0,18 10,16 20,14 30,10 40,8 50,6 60,6" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                </svg>
+                <div style="font-size:var(--text-caption);color:var(--color-info);margin-top:2px;">New client</div>
               </div>
             </div>
 
             <!-- Contoso Inc -->
-            <div class="client-card" data-client="contoso">
+            <div class="client-card card-interactive" data-client="contoso">
               <div class="client-logo" style="background: var(--color-primary);">CO</div>
               <div class="client-info">
                 <div class="client-name">Contoso Inc</div>
@@ -666,11 +577,12 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;0</span>
                 <div class="client-revenue-label">YTD Revenue</div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Planning phase</div>
               </div>
             </div>
 
             <!-- Stark Industries -->
-            <div class="client-card" data-client="stark">
+            <div class="client-card card-interactive" data-client="stark">
               <div class="client-logo" style="background: var(--color-surface-3);">SI</div>
               <div class="client-info">
                 <div class="client-name">Stark Industries</div>
@@ -685,6 +597,10 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;67,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
+                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
+                  <polyline points="0,4 10,6 20,8 30,10 40,14 50,16 60,18" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                </svg>
+                <div style="font-size:var(--text-caption);color:var(--color-error);margin-top:2px;">&#9660; &minus;100% (inactive)</div>
               </div>
             </div>
           </div>
@@ -715,22 +631,6 @@
           Clients
         </button>
 
-        <!-- AI Client Intelligence -->
-        <div class="ai-insight-card mb-4" class="mt-4">
-          <div class="ai-header">
-            <svg data-lucide="sparkles" width="16" height="16"></svg> AI Client Intelligence
-          </div>
-          <div class="ai-body">
-            <strong>Revenue Impact:</strong> Acme Corp represents 35% of total revenue — <span style="color: var(--color-warning)">concentration risk</span>. Revenue trending +12% YoY.<br><br>
-            <strong>Payment Behavior:</strong> Average payment in 18 days (well within Net 30 terms). Zero late payments in 12 months. Excellent financial relationship.<br><br>
-            <strong>Recommendation:</strong> Propose Phase 2 engagement for Acme Analytics to deepen relationship. 3 active projects, 8 team members engaged. Consider cross-selling data pipeline services.
-          </div>
-          <div class="ai-actions">
-            <button class="btn btn-ghost btn-xs"><svg data-lucide="thumbs-up" width="12" height="12"></svg> Helpful</button>
-            <button class="btn btn-ghost btn-xs"><svg data-lucide="share-2" width="12" height="12"></svg> Share</button>
-          </div>
-        </div>
-
         <div class="mt-4">
           <!-- Client Health Summary -->
           <div class="grid-4 mb-4">
@@ -750,7 +650,10 @@
             </div>
             <div class="stat-card">
               <div class="stat-label">Client Health</div>
-              <div style="margin-top: var(--space-2);"><span class="badge badge-success badge-lg"><svg data-lucide="heart" width="14" height="14"></svg> Healthy</span></div>
+              <div style="margin-top: var(--space-2);display:flex;align-items:center;gap:var(--space-2);">
+                <span class="badge badge-success badge-lg"><svg data-lucide="heart" width="14" height="14"></svg> Healthy</span>
+                <svg data-lucide="trending-up" width="14" height="14" style="color:var(--color-success);"></svg>
+              </div>
             </div>
           </div>
 
@@ -761,7 +664,7 @@
               <h1 class="detail-title">Acme Corp</h1>
               <div class="detail-meta">
                 <span class="detail-meta-item"><svg data-lucide="factory"></svg> Technology</span>
-                <span class="detail-meta-item"><svg data-lucide="globe"></svg> <a href="#">acme.com</a></span>
+                <span class="detail-meta-item"><svg data-lucide="globe"></svg> <a href="#" onclick="event.preventDefault();window.open('https://acme.com','_blank');showToast('info','Opening Website','Opening acme.com in a new tab...')">acme.com</a></span>
                 <span class="badge badge-success badge-lg" id="detail-status-badge"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span>
                 <span class="detail-meta-item"><svg data-lucide="calendar"></svg> Client since January 2024</span>
               </div>
@@ -779,10 +682,10 @@
             </div>
             <div class="card-body">
               <div class="grid-3" style="gap: var(--space-3);">
-                <div class="contact-card">
+                <div class="contact-card" style="border-color:var(--color-gold);">
                   <div class="avatar avatar-md">JD</div>
                   <div class="contact-info">
-                    <div class="contact-name">Jane Doe</div>
+                    <div class="contact-name">Jane Doe <span class="badge badge-warning" style="font-size:var(--text-overline);">&#9733; Primary</span></div>
                     <div class="contact-role">CTO &middot; Primary Contact</div>
                     <div class="contact-email">jane@acme.com</div>
                   </div>
@@ -804,6 +707,25 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- AI Client Intelligence -->
+          <div class="ai-insight-card mb-4">
+            <div class="ai-header">
+              <svg data-lucide="sparkles" width="16" height="16"></svg> AI Client Intelligence
+            </div>
+            <div class="ai-body">
+              <strong>Revenue Impact:</strong> Acme Corp represents 35% of total revenue — <span style="color: var(--color-warning)">concentration risk</span>. Revenue trending +12% YoY.<br><br>
+              <strong>Payment Behavior:</strong> Average payment in 18 days (well within Net 30 terms). Zero late payments in 12 months. Excellent financial relationship.<br><br>
+              <strong>Recommendation:</strong> Propose Phase 2 engagement for Acme Analytics to deepen relationship. Consider cross-selling data pipeline services to TechCorp.
+            </div>
+            <div class="ai-actions">
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="thumbs-up" width="12" height="12"></svg> Helpful</button>
+              <button class="btn btn-ghost btn-xs"><svg data-lucide="share-2" width="12" height="12"></svg> Share</button>
+              <button class="btn btn-primary btn-xs" onclick="showToast('success','Task Created','Task created: Follow up on cross-sell opportunity.')">
+                <svg data-lucide="plus" width="12" height="12"></svg> Create Task
+              </button>
             </div>
           </div>
 
@@ -834,21 +756,33 @@
                   <div class="stat-label">Total Revenue</div>
                   <div class="stat-value font-mono" id="detail-total-revenue">&euro;95,900</div>
                   <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +18% vs last year</div>
+                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
+                    <polyline points="0,18 10,14 20,12 30,10 40,7 50,5 60,3" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                  </svg>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Active Projects</div>
                   <div class="stat-value">3</div>
                   <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> 1 new this quarter</div>
+                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
+                    <polyline points="0,18 10,18 20,14 30,14 40,10 50,10 60,10" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                  </svg>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Team Members</div>
                   <div class="stat-value">12</div>
-                  <div class="stat-trend" class="text-2">Across all projects</div>
+                  <div class="stat-trend" style="color:var(--color-text-3);">Across all projects</div>
+                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
+                    <polyline points="0,16 10,16 20,12 30,12 40,10 50,8 60,8" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                  </svg>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Avg Project Health</div>
                   <div class="stat-value" style="font-size: var(--text-heading-2);">On Track</div>
                   <div class="stat-trend up"><svg data-lucide="check-circle" width="14" height="14"></svg> All projects healthy</div>
+                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
+                    <polyline points="0,10 10,10 20,8 30,8 40,6 50,6 60,6" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                  </svg>
                 </div>
               </div>
 
@@ -859,36 +793,55 @@
                     <span class="card-title">Revenue (Last 6 Months)</span>
                   </div>
                   <div class="card-body">
-                    <div class="revenue-bars">
-                      <div class="revenue-bar-col">
-                        <div class="revenue-value">&euro;18k</div>
-                        <div class="revenue-bar" style="height: 55%;"></div>
-                        <div class="revenue-label">Nov</div>
+                    <div style="display:flex;gap:var(--space-2);">
+                      <!-- Y-axis labels -->
+                      <div style="display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-bottom:20px;min-width:36px;">
+                        <span style="font-size:var(--text-overline);color:var(--color-text-3);font-family:var(--font-mono);">&euro;35k</span>
+                        <span style="font-size:var(--text-overline);color:var(--color-text-3);font-family:var(--font-mono);">&euro;25k</span>
+                        <span style="font-size:var(--text-overline);color:var(--color-text-3);font-family:var(--font-mono);">&euro;15k</span>
+                        <span style="font-size:var(--text-overline);color:var(--color-text-3);font-family:var(--font-mono);">&euro;0</span>
                       </div>
-                      <div class="revenue-bar-col">
-                        <div class="revenue-value">&euro;22k</div>
-                        <div class="revenue-bar" style="height: 67%;"></div>
-                        <div class="revenue-label">Dec</div>
-                      </div>
-                      <div class="revenue-bar-col">
-                        <div class="revenue-value">&euro;28k</div>
-                        <div class="revenue-bar" style="height: 85%;"></div>
-                        <div class="revenue-label">Jan</div>
-                      </div>
-                      <div class="revenue-bar-col">
-                        <div class="revenue-value">&euro;25k</div>
-                        <div class="revenue-bar" style="height: 76%;"></div>
-                        <div class="revenue-label">Feb</div>
-                      </div>
-                      <div class="revenue-bar-col">
-                        <div class="revenue-value">&euro;33k</div>
-                        <div class="revenue-bar" style="height: 100%;"></div>
-                        <div class="revenue-label">Mar</div>
-                      </div>
-                      <div class="revenue-bar-col">
-                        <div class="revenue-value">&euro;19k</div>
-                        <div class="revenue-bar" style="height: 58%;"></div>
-                        <div class="revenue-label">Apr</div>
+                      <!-- Chart bars -->
+                      <div style="flex:1;position:relative;">
+                        <!-- Gridlines -->
+                        <div style="position:absolute;inset:0;padding-bottom:20px;pointer-events:none;">
+                          <div style="position:absolute;left:0;right:0;top:0;border-top:1px solid var(--color-border-subtle);"></div>
+                          <div style="position:absolute;left:0;right:0;top:33%;border-top:1px solid var(--color-border-subtle);"></div>
+                          <div style="position:absolute;left:0;right:0;top:66%;border-top:1px solid var(--color-border-subtle);"></div>
+                          <div style="position:absolute;left:0;right:0;bottom:20px;border-top:1px solid var(--color-border-subtle);"></div>
+                        </div>
+                        <div class="revenue-bars">
+                          <div class="revenue-bar-col">
+                            <div class="revenue-value">&euro;18k</div>
+                            <div class="revenue-bar" style="height: 55%;" title="November: €18,000"></div>
+                            <div class="revenue-label">Nov</div>
+                          </div>
+                          <div class="revenue-bar-col">
+                            <div class="revenue-value">&euro;22k</div>
+                            <div class="revenue-bar" style="height: 67%;" title="December: €22,000"></div>
+                            <div class="revenue-label">Dec</div>
+                          </div>
+                          <div class="revenue-bar-col">
+                            <div class="revenue-value">&euro;28k</div>
+                            <div class="revenue-bar" style="height: 85%;" title="January: €28,000"></div>
+                            <div class="revenue-label">Jan</div>
+                          </div>
+                          <div class="revenue-bar-col">
+                            <div class="revenue-value">&euro;25k</div>
+                            <div class="revenue-bar" style="height: 76%;" title="February: €25,000"></div>
+                            <div class="revenue-label">Feb</div>
+                          </div>
+                          <div class="revenue-bar-col">
+                            <div class="revenue-value">&euro;33k</div>
+                            <div class="revenue-bar" style="height: 100%;" title="March: €33,000"></div>
+                            <div class="revenue-label">Mar</div>
+                          </div>
+                          <div class="revenue-bar-col">
+                            <div class="revenue-value">&euro;19k</div>
+                            <div class="revenue-bar" style="height: 58%;" title="April: €19,000"></div>
+                            <div class="revenue-label">Apr</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -898,10 +851,13 @@
                 <div class="card">
                   <div class="card-header">
                     <span class="card-title">Notes</span>
-                    <button class="btn btn-ghost btn-xs">Save</button>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);">
+                      <span id="notes-unsaved-warning" style="display:none;font-size:var(--text-caption);color:var(--color-warning);font-weight:var(--weight-medium);">Unsaved changes</span>
+                      <button class="btn btn-ghost btn-xs" id="saveNotesBtn" onclick="saveNotes()">Save</button>
+                    </div>
                   </div>
                   <div class="card-body">
-                    <textarea class="notes-area">Key client — strategic partnership since 2024. Expanding into mobile app development. Jane prefers bi-weekly check-ins on Tuesdays at 10am CET.
+                    <textarea class="notes-area" id="clientNotesArea">Key client — strategic partnership since 2024. Expanding into mobile app development. Jane prefers bi-weekly check-ins on Tuesdays at 10am CET.
 
 Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   </div>
@@ -1038,92 +994,111 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
           <div class="tab-content" id="tab-team">
             <div style="padding-top: var(--space-4);">
               <div class="data-table-wrapper">
-                <div class="team-member-row" style="background: var(--color-surface-0); border-bottom: 1px solid var(--color-border);">
-                  <div style="width: 40px;"></div>
-                  <div style="flex:1; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Name</div>
-                  <div style="width: 140px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Role</div>
-                  <div style="width: 180px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Current Project</div>
-                  <div style="width: 120px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium); text-align: right;">Hours This Month</div>
+                <div class="team-member-row" style="background: var(--color-surface-0); border-bottom: 1px solid var(--color-border); flex-wrap: wrap;">
+                  <div style="width: 40px; flex-shrink:0;"></div>
+                  <div style="flex:1; min-width:120px; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Name</div>
+                  <div style="min-width:min(100%,140px); flex:0 0 auto; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Role</div>
+                  <div style="min-width:min(100%,180px); flex:0 0 auto; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium);">Project</div>
+                  <div style="min-width:min(100%,120px); flex:0 0 auto; font-size: var(--text-caption); color: var(--color-text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: var(--weight-medium); text-align: right;">Hours / Work Time</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm">SC</div>
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="flex-shrink:0;">SC</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Senior Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></div>
-                    <div class="team-member-role">Senior Developer</div>
-                  </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">42h</div>
-                </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-gold);">JS</div>
-                  <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></div>
+                    <div class="team-member-name"><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></div>
                     <div class="team-member-role">Project Manager</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill green" style="width:87%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">87%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">PM</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">22h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">42h</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-info);">AW</div>
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="background: var(--color-gold);flex-shrink:0;">JS</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></div>
-                    <div class="team-member-role">UI Designer</div>
+                    <div class="team-member-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></div>
+                    <div class="team-member-role">Senior Developer</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill green" style="width:82%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">82%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Designer</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">34h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">PM</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">22h</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-error);">MR</div>
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="background: var(--color-info);flex-shrink:0;">AW</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Frontend Developer" data-dept="Engineering" data-worktime="78">Marco Rossi</a></div>
-                    <div class="team-member-role">Frontend Developer</div>
+                    <div class="team-member-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang</a> <span class="badge badge-warning" style="font-size:var(--text-overline);">On Leave</span></div>
+                    <div class="team-member-role">Software Engineer</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill yellow" style="width:45%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">45%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">30h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">Engineer</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">34h</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-primary);">EL</div>
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="background: var(--color-error);flex-shrink:0;">MR</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="Backend Developer" data-dept="Engineering" data-worktime="91">Emma Laurent</a></div>
-                    <div class="team-member-role">Backend Developer</div>
+                    <div class="team-member-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88">Marco Rossi</a></div>
+                    <div class="team-member-role">Operations Lead</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill blue" style="width:88%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">88%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Mobile App</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">38h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">Web Redesign</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">30h</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-success);">BT</div>
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="background: var(--color-primary);flex-shrink:0;">EL</div>
                   <div class="team-member-info">
-                    <div class="team-member-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="QA Engineer" data-dept="Engineering" data-worktime="85">Bob Taylor</a></div>
-                    <div class="team-member-role">QA Engineer</div>
+                    <div class="team-member-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78">Emma Laurent</a></div>
+                    <div class="team-member-role">HR Specialist</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill green" style="width:78%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">78%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">QA</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">Mobile App</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">28h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">Developer</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">Mobile App</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">38h</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-warning);">DK</div>
+                <!-- Bob Taylor removed: on Bench, not assigned to any client project -->
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="background: var(--color-warning);flex-shrink:0;">DK</div>
                   <div class="team-member-info">
                     <div class="team-member-name"><a href="employees.html">David Kim</a></div>
                     <div class="team-member-role">DevOps Engineer</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill blue" style="width:75%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">75%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">DevOps</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">CRM Integration</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">18h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">DevOps</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">CRM Integration</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">18h</div>
                 </div>
-                <div class="team-member-row">
-                  <div class="avatar avatar-sm" style="background: var(--color-primary);">NP</div>
+                <div class="team-member-row" style="flex-wrap:wrap;">
+                  <div class="avatar avatar-sm" style="background: var(--color-primary);flex-shrink:0;">NP</div>
                   <div class="team-member-info">
                     <div class="team-member-name"><a href="employees.html">Nina Patel</a></div>
                     <div class="team-member-role">Business Analyst</div>
+                    <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-1);max-width:120px;">
+                      <div class="progress-bar" style="height:4px;flex:1;"><div class="progress-bar-fill green" style="width:80%;"></div></div>
+                      <span style="font-size:var(--text-caption);font-family:var(--font-mono);color:var(--color-text-3);">80%</span>
+                    </div>
                   </div>
-                  <div style="width: 140px; font-size: var(--text-body-sm); color: var(--color-text-2);">Analyst</div>
-                  <div style="width: 180px; font-size: var(--text-body-sm); color: var(--color-text-1);">CRM Integration</div>
-                  <div style="width: 120px; text-align: right;" class="font-mono">15h</div>
+                  <div style="min-width:min(100%,140px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-2);">Analyst</div>
+                  <div style="min-width:min(100%,180px);flex:0 0 auto; font-size: var(--text-body-sm); color: var(--color-text-1);">CRM Integration</div>
+                  <div style="min-width:min(100%,120px);flex:0 0 auto; text-align: right;" class="font-mono">15h</div>
                 </div>
               </div>
             </div>
@@ -1148,7 +1123,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Lead Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                      <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
                       <td data-label="Week">Week 13</td>
                       <td data-label="Project"><a href="projects.html#detail/acme-web">Web Redesign</a></td>
                       <td data-label="Hours" class="font-mono">32h</td>
@@ -1160,7 +1135,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                       </td>
                     </tr>
                     <tr>
-                      <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                      <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
                       <td data-label="Week">Week 13</td>
                       <td data-label="Project"><a href="projects.html#detail/acme-web">Web Redesign</a></td>
                       <td data-label="Hours" class="font-mono">38h</td>
@@ -1172,7 +1147,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                       </td>
                     </tr>
                     <tr>
-                      <td><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></td>
+                      <td><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang</a></td>
                       <td data-label="Week">Week 12</td>
                       <td data-label="Project"><a href="projects.html#detail/acme-mobile">Mobile App</a></td>
                       <td data-label="Hours" class="font-mono">28h</td>
@@ -1209,37 +1184,37 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-048</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-048</a></td>
                       <td data-label="Date">Mar 15, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;12,400</td>
                       <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-045</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-045</a></td>
                       <td data-label="Date">Feb 15, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;11,200</td>
                       <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-043</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-043</a></td>
                       <td data-label="Date">Feb 15, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;5,000</td>
                       <td data-label="Status"><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-041</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-041</a></td>
                       <td data-label="Date">Jan 15, 2026</td>
-                      <td data-label="Amount" class="font-mono">&euro;8,500</td>
+                      <td data-label="Amount" class="font-mono">&euro;12,400</td>
                       <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-039</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-039</a></td>
                       <td data-label="Date">Jan 15, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;8,600</td>
                       <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2025-031</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2025-031</a></td>
                       <td data-label="Date">Nov 1, 2025</td>
                       <td data-label="Amount" class="font-mono">&euro;9,200</td>
                       <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
@@ -1261,19 +1236,19 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-047</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-047</a></td>
                       <td data-label="Date">Mar 28, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;8,200</td>
                       <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-044</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-044</a></td>
                       <td data-label="Date">Feb 28, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;9,400</td>
                       <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                     </tr>
                     <tr>
-                      <td><a href="invoices.html#detail">INV-2026-040</a></td>
+                      <td data-label="Invoice"><a href="invoices.html#detail">INV-2026-040</a></td>
                       <td data-label="Date">Jan 1, 2026</td>
                       <td data-label="Amount" class="font-mono">&euro;15,000</td>
                       <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
@@ -1287,6 +1262,15 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
           <!-- Tab: Documents -->
           <div class="tab-content" id="tab-documents">
             <div style="padding-top: var(--space-4);">
+              <!-- Empty state for clients with no documents -->
+              <div id="docs-empty-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;">
+                <svg data-lucide="folder-open" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg>
+                <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No documents uploaded yet</h3>
+                <p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;margin-bottom:var(--space-6);">Upload contracts, proposals, and rate cards to keep everything in one place.</p>
+                <button class="btn btn-primary btn-sm" onclick="showToast('info','Upload','Use the Upload Document button to add files.')">
+                  <svg data-lucide="upload" width="14" height="14"></svg> Upload Document
+                </button>
+              </div>
               <div class="card">
                 <div class="doc-row">
                   <div class="doc-icon"><svg data-lucide="file-text" width="18" height="18"></svg></div>
@@ -1440,7 +1424,6 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
 
   // ── Element refs ──
   var sidebar = document.getElementById('sidebar');
-  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
   var sidebarOverlay = document.getElementById('sidebarOverlay');
   var mobileMenuBtn = document.getElementById('mobileMenuBtn');
   var notifBtn = document.getElementById('notifBtn');
@@ -1464,19 +1447,6 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
 
   var listView = document.getElementById('listView');
   var detailView = document.getElementById('detailView');
-
-  // ── Sidebar collapse ──
-  sidebarCollapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-
-  // ── Mobile menu ──
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Notification panel ──
   notifBtn.addEventListener('click', function(e) {
@@ -1745,6 +1715,46 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
     document.body.className = isPopulated ? 'show-populated' : 'show-empty';
     this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
   });
+
+  // ── Notes autosave ──
+  var notesArea = document.getElementById('clientNotesArea');
+  var notesWarning = document.getElementById('notes-unsaved-warning');
+  var notesHasChanges = false;
+  var notesAutosaveTimer = null;
+
+  window.saveNotes = function() {
+    notesHasChanges = false;
+    if (notesWarning) notesWarning.style.display = 'none';
+    showToast('success', 'Saved', 'Notes saved.');
+  };
+
+  if (notesArea) {
+    notesArea.addEventListener('input', function() {
+      notesHasChanges = true;
+      if (notesWarning) notesWarning.style.display = 'inline';
+      clearTimeout(notesAutosaveTimer);
+      notesAutosaveTimer = setTimeout(function() {
+        notesHasChanges = false;
+        if (notesWarning) notesWarning.style.display = 'none';
+        showToast('success', 'Auto-saved', 'Notes saved.');
+      }, 3000);
+    });
+  }
+
+  window.addEventListener('beforeunload', function(e) {
+    if (notesHasChanges) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  // ── Client search clear ──
+  window.clearClientSearch = function() {
+    var searchInput = document.querySelector('.filter-bar-standard .form-input');
+    if (searchInput) { searchInput.value = ''; }
+    document.getElementById('searchEmptyState').style.display = 'none';
+    document.getElementById('clientList').style.display = 'block';
+  };
 
 })();
 </script>

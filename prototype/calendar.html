@@ -117,8 +117,9 @@
     }
     .cal-day:nth-child(7n) { border-right: none; }
     .cal-day:hover { background: var(--color-surface-1); }
-    .cal-day.weekend { background: var(--color-surface-1); opacity: 0.55; }
-    .cal-day.weekend:hover { opacity: 0.8; }
+    .cal-day.weekend { background: hsla(35, 16%, 5%, 0.5); }
+    .cal-day.weekend .day-num { color: var(--color-text-3); }
+    .cal-day.weekend .cal-event { opacity: 0.7; }
     .cal-day.other-month { opacity: 0.25; pointer-events: none; }
     .cal-day.selected {
       background: var(--color-primary-muted);
@@ -213,7 +214,7 @@
     .week-header-cell.today .wh-day-num {
       color: var(--color-primary);
     }
-    .week-header-cell.weekend { opacity: 0.5; }
+    .week-header-cell.weekend { color: var(--color-text-3); }
 
     .week-body {
       display: grid;
@@ -231,7 +232,7 @@
     }
     .week-day-col:last-child { border-right: none; }
     .week-day-col:hover { background: var(--color-surface-1); }
-    .week-day-col.weekend { background: var(--color-surface-1); opacity: 0.55; }
+    .week-day-col.weekend { background: hsla(35, 16%, 5%, 0.5); }
     .week-day-col.selected {
       background: var(--color-primary-muted);
       box-shadow: inset 0 0 0 2px var(--color-primary);
@@ -288,8 +289,12 @@
       color: var(--color-text-3);
       border-radius: var(--radius-md);
       cursor: pointer;
+      margin-left: auto;
     }
     .ddp-close:hover { background: var(--color-surface-1); color: var(--color-text-1); }
+    @media (max-width: 639px) {
+      .ddp-close { margin-right: var(--space-2); }
+    }
 
     .ddp-events {
       padding: var(--space-2) var(--space-4) var(--space-4);
@@ -416,6 +421,98 @@
       .week-day-col { border-right: none; border-bottom: 1px solid var(--color-border-subtle); }
     }
 
+    /* Quarter view mobile */
+    @media (max-width: 639px) { .quarter-view > div { grid-template-columns: 1fr !important; } }
+
+    /* Year view mobile */
+    @media (max-width: 639px) { .year-view > div { grid-template-columns: repeat(2, 1fr) !important; } }
+
+    /* Mobile view toggle: show abbreviated labels */
+    @media (max-width: 639px) {
+      .cal-view-toggle .view-label { font-size: var(--text-overline); }
+      .cal-view-toggle button { padding: var(--space-1-5) var(--space-2); font-size: var(--text-overline); }
+    }
+
+    /* Mobile header: view toggle + add event */
+    @media (max-width: 639px) {
+      .page-header-actions { flex-wrap: wrap; gap: var(--space-2); }
+      .cal-view-toggle { order: 2; }
+      #addEventBtn { order: 1; }
+    }
+
+    /* Mobile day-switcher */
+    .mobile-day-switcher {
+      display: none;
+    }
+    @media (max-width: 639px) {
+      .mobile-day-switcher {
+        display: flex;
+        gap: var(--space-1);
+        background: var(--color-surface-1);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 2px;
+        margin-bottom: var(--space-3);
+        overflow-x: auto;
+      }
+      .mobile-day-btn {
+        flex: 1;
+        min-width: 36px;
+        padding: var(--space-1-5) var(--space-2);
+        background: transparent;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: var(--text-overline);
+        color: var(--color-text-2);
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-weight: var(--weight-semibold);
+        transition: all var(--motion-fast);
+        text-align: center;
+      }
+      .mobile-day-btn.active {
+        background: var(--color-primary);
+        color: var(--color-text-inv);
+      }
+    }
+
+    /* Day view */
+    .day-view { display: none; }
+    .day-view.active { display: block; }
+    .day-view-grid {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .day-time-slot {
+      display: flex;
+      border-bottom: 1px solid var(--color-border-subtle);
+      min-height: 48px;
+    }
+    .day-time-label {
+      width: 56px;
+      min-width: 56px;
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-caption);
+      color: var(--color-text-3);
+      font-family: var(--font-mono);
+      border-right: 1px solid var(--color-border-subtle);
+      background: var(--color-surface-1);
+    }
+    .day-time-content {
+      flex: 1;
+      padding: var(--space-1) var(--space-2);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    /* Modal grid mobile fix */
+    @media (max-width: 639px) {
+      .grid-2 { grid-template-columns: 1fr !important; }
+    }
+
     /* Responsive: smaller cells on mobile */
     @media (max-width: 1023px) {
       .cal-day { min-height: 80px; }
@@ -447,123 +544,7 @@
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-        <a href="calendar.html" class="nav-item active">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-        <a href="insights.html#ask-ai" class="nav-item">
-          <i data-lucide="sparkles" class="nav-icon"></i>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="rocket"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="calendar-range"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
-        <i data-lucide="keyboard" class="nav-icon"></i>
-        <span class="nav-label">Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
   <!-- Sidebar overlay for mobile -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -663,10 +644,11 @@
         </div>
         <div class="page-header-actions">
           <div class="cal-view-toggle" id="viewToggle">
-            <button class="active" data-view="month">Month</button>
-            <button data-view="week">Week</button>
-            <button data-view="quarter">Quarter</button>
-            <button data-view="year">Year</button>
+            <button data-view="day"><span class="view-label">Day</span></button>
+            <button class="active" data-view="month"><span class="view-label">Month</span></button>
+            <button data-view="week"><span class="view-label">Week</span></button>
+            <button data-view="quarter"><span class="view-label">Quarter</span></button>
+            <button data-view="year"><span class="view-label">Year</span></button>
           </div>
           <button class="btn btn-primary btn-md" id="addEventBtn">
             <svg data-lucide="plus" width="16" height="16"></svg>
@@ -719,6 +701,19 @@
         </div>
       </div>
 
+      <!-- Holiday Configuration Note -->
+      <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-gold-muted);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-gold);">
+        <svg data-lucide="info" width="14" height="14" style="flex-shrink:0;"></svg>
+        Holidays configured for France. Change in <a href="admin.html" style="color:var(--color-primary);text-decoration:underline;">Settings &rarr; Company &rarr; Holidays</a>.
+      </div>
+
+      <!-- Search Empty State (hidden by default) -->
+      <div id="searchEmptyState" style="display:none;text-align:center;padding:var(--space-8);color:var(--color-text-3);">
+        <svg data-lucide="search-x" width="40" height="40" style="opacity:0.3;margin-bottom:var(--space-3);"></svg>
+        <div style="font-size:var(--text-body);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-1);">No team members match</div>
+        <div style="font-size:var(--text-body-sm);">Try adjusting your search or filter criteria.</div>
+      </div>
+
       <!-- Calendar Navigation -->
       <div class="cal-header">
         <div class="cal-nav">
@@ -756,6 +751,14 @@
 
       <!-- ═══════════════ WEEK VIEW ═══════════════ -->
       <div class="week-view" id="weekView">
+        <!-- Mobile day-switcher (visible only on mobile) -->
+        <div class="mobile-day-switcher" id="mobileDaySwitcher">
+          <button class="mobile-day-btn active" data-col="0">M</button>
+          <button class="mobile-day-btn" data-col="1">T</button>
+          <button class="mobile-day-btn" data-col="2">W</button>
+          <button class="mobile-day-btn" data-col="3">T</button>
+          <button class="mobile-day-btn" data-col="4">F</button>
+        </div>
         <div class="week-grid">
           <div class="week-header" id="weekHeader">
             <!-- JS will populate this -->
@@ -780,10 +783,24 @@
         </div>
       </div>
 
+      <!-- ═══════════════ DAY VIEW ═══════════════ -->
+      <div class="day-view" id="dayView">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">
+          <h3 style="font-size:var(--text-heading-2);font-weight:var(--weight-semibold);color:var(--color-text-1);" id="dayViewDate">Monday, 6 April 2026</h3>
+        </div>
+        <div class="day-view-grid" id="dayViewGrid">
+          <!-- JS will populate -->
+        </div>
+      </div>
+
       <!-- ═══════════════ DAY DETAIL PANEL ═══════════════ -->
       <div class="day-detail-panel" id="dayDetail">
         <div class="ddp-header">
           <h3 id="ddpDate">--</h3>
+          <button class="btn btn-primary btn-sm" id="ddpAddEvent" style="margin-left:auto;margin-right:var(--space-2);">
+            <svg data-lucide="plus" width="14" height="14"></svg>
+            Add Event
+          </button>
           <button class="ddp-close" id="ddpClose" aria-label="Close">
             <svg data-lucide="x" width="18" height="18"></svg>
           </button>
@@ -799,7 +816,7 @@
 
 
 <!-- ════════════════════════════════════════ LEAVE STATUS PILL ════════════════════════════════════════ -->
-<div class="leave-status-pill" id="leaveStatusPill">
+<div class="leave-status-pill" id="leaveStatusPill" data-min-role="pm">
   <svg data-lucide="users"></svg>
   <span id="leaveStatusText">3 people on leave today</span>
 </div>
@@ -811,6 +828,63 @@
   </div>
 </div>
 
+
+<!-- ════════════════════════════════════════ ADD EVENT MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="addEventModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">New Event</h3>
+      <button class="modal-close" onclick="document.getElementById('addEventModal').classList.remove('active')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group mb-4">
+        <label class="form-label">Title <span style="color:var(--color-error);">*</span></label>
+        <input type="text" class="form-input" id="newEventTitle" placeholder="Event title...">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);" class="grid-2 mb-4">
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input" id="newEventStart" value="2026-04-06">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input" id="newEventEnd" value="2026-04-06">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);" class="grid-2 mb-4">
+        <div class="form-group">
+          <label class="form-label">Start Time</label>
+          <input type="time" class="form-input" id="newEventStartTime" value="09:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Time</label>
+          <input type="time" class="form-input" id="newEventEndTime" value="10:00">
+        </div>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="newEventType">
+          <option value="meeting">Meeting</option>
+          <option value="leave">Leave</option>
+          <option value="holiday">Holiday</option>
+          <option value="deadline">Deadline</option>
+          <option value="milestone">Milestone</option>
+        </select>
+      </div>
+      <div class="form-group mb-0">
+        <label class="form-label">Attendees <span class="text-3" style="font-weight:normal;">(optional)</span></label>
+        <input type="text" class="form-input" id="newEventAttendees" placeholder="Sarah Chen, John Smith...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-md" onclick="document.getElementById('addEventModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-primary btn-md" onclick="submitNewEvent()">
+        <svg data-lucide="plus" width="16" height="16"></svg>
+        Create Event
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════ COMMAND PALETTE ════════════════════════════════════════ -->
 <div class="cmd-palette-backdrop" id="cmdPalette">
@@ -935,10 +1009,6 @@ document.addEventListener('DOMContentLoaded', function() {
   lucide.createIcons();
 
   // ── DOM references ──
-  const sidebar        = document.getElementById('sidebar');
-  const collapseBtn    = document.getElementById('sidebarCollapseBtn');
-  const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
   const searchTrigger  = document.getElementById('searchTrigger');
   const cmdPalette     = document.getElementById('cmdPalette');
   const cmdInput       = document.getElementById('cmdInput');
@@ -1090,6 +1160,11 @@ document.addEventListener('DOMContentLoaded', function() {
     numEl.textContent = dayNum;
     cell.appendChild(numEl);
 
+    // Store date string for click handler
+    if (dateString) {
+      cell.setAttribute('data-datestr', dateString);
+    }
+
     // Events
     if (dateString) {
       var dayEvents = getEventsForDate(dateString);
@@ -1183,10 +1258,18 @@ document.addEventListener('DOMContentLoaded', function() {
         ? startD.getDate() + ' ' + MONTH_NAMES[startD.getMonth()].slice(0, 3)
         : startD.getDate() + ' ' + MONTH_NAMES[startD.getMonth()].slice(0, 3) + ' – ' + endD.getDate() + ' ' + MONTH_NAMES[endD.getMonth()].slice(0, 3);
 
+      var statusDot = '';
+      if (ev.type === 'leave') {
+        var isApproved = ev.desc && ev.desc.toLowerCase().indexOf('approved') !== -1;
+        var dotColor = isApproved ? 'var(--color-success)' : 'var(--color-warning)';
+        var dotLabel = isApproved ? 'Approved' : 'Pending';
+        statusDot = '<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--text-caption);color:' + dotColor + ';margin-left:var(--space-2);"><span style="width:8px;height:8px;border-radius:50%;background:' + dotColor + ';display:inline-block;"></span>' + dotLabel + '</span>';
+      }
+
       eventEl.innerHTML =
         '<div class="ddp-icon ' + ev.type + '"><svg data-lucide="' + iconForType(ev.type) + '"></svg></div>' +
         '<div class="ddp-info">' +
-          (ev.person ? '<div class="ddp-name">' + ev.person + '</div>' : '') +
+          (ev.person ? '<div class="ddp-name">' + ev.person + statusDot + '</div>' : '') +
           '<div class="ddp-desc">' + ev.desc + '</div>' +
           '<div class="ddp-duration">' + dateRange + ' (' + durationText + ')</div>' +
         '</div>';
@@ -1206,6 +1289,14 @@ document.addEventListener('DOMContentLoaded', function() {
       el.classList.remove('selected');
     });
   });
+
+  // Day detail "Add Event" button
+  var ddpAddEventBtn = document.getElementById('ddpAddEvent');
+  if (ddpAddEventBtn) {
+    ddpAddEventBtn.addEventListener('click', function() {
+      openAddEventModal(selectedDate || '2026-04-06');
+    });
+  }
 
 
   // ── Render Week View ──
@@ -1311,7 +1402,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var dayLabels = ['M','T','W','T','F','S','S'];
       dayLabels.forEach(function(l) {
         var d = document.createElement('div');
-        d.style.cssText = 'text-align:center;font-size:9px;font-weight:600;color:var(--color-text-3);padding-bottom:var(--space-1);';
+        d.style.cssText = 'text-align:center;font-size:var(--text-overline);font-weight:600;color:var(--color-text-3);padding-bottom:var(--space-1);';
         d.textContent = l;
         grid.appendChild(d);
       });
@@ -1331,7 +1422,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isT) cell.style.cssText += 'background:var(--color-primary);';
 
         var numEl = document.createElement('div');
-        numEl.style.cssText = 'font-size:10px;' + (isT ? 'color:white;font-weight:bold;' : 'color:var(--color-text-2);');
+        numEl.style.cssText = 'font-size:var(--text-overline);' + (isT ? 'color:var(--color-white);font-weight:bold;' : 'color:var(--color-text-2);');
         numEl.textContent = day;
         cell.appendChild(numEl);
 
@@ -1387,8 +1478,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var dayEvs = getEventsForDate(ds);
         var isT = isToday(currentYear, m, day);
         var cell = document.createElement('div');
-        var bgColor = isT ? 'background:var(--color-primary);color:white;' : (dayEvs.length > 0 ? 'background:var(--color-primary-muted);' : '');
-        cell.style.cssText = 'text-align:center;font-size:9px;padding:2px;border-radius:2px;cursor:pointer;color:var(--color-text-3);' + bgColor;
+        var bgColor = isT ? 'background:var(--color-primary);color:var(--color-white);' : (dayEvs.length > 0 ? 'background:var(--color-primary-muted);' : '');
+        cell.style.cssText = 'text-align:center;font-size:var(--text-overline);padding:2px;border-radius:2px;cursor:pointer;color:var(--color-text-3);' + bgColor;
         cell.textContent = day;
         grid.appendChild(cell);
       }
@@ -1406,10 +1497,13 @@ document.addEventListener('DOMContentLoaded', function() {
       var quarterView = document.getElementById('quarterView');
       var yearView = document.getElementById('yearView');
 
+      var dayViewEl = document.getElementById('dayView');
+
       monthView.style.display = 'none';
       weekView.style.display = 'none';
       if (quarterView) quarterView.style.display = 'none';
       if (yearView) yearView.style.display = 'none';
+      if (dayViewEl) dayViewEl.style.display = 'none';
 
       if (currentView === 'month') {
         monthView.style.display = 'block';
@@ -1422,6 +1516,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (quarterView) { quarterView.style.display = 'block'; renderQuarterView(); }
       } else if (currentView === 'year') {
         if (yearView) { yearView.style.display = 'block'; renderYearView(); }
+      } else if (currentView === 'day') {
+        if (dayViewEl) { dayViewEl.style.display = 'block'; renderDayView(selectedDate); }
       }
     });
   });
@@ -1518,21 +1614,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 
-  // ── Sidebar collapse ──
-  collapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-
-  // ── Mobile menu ──
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-    sidebarOverlay.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-    sidebarOverlay.style.display = 'none';
-  });
-
   // ── Command Palette ──
   function openCmdPalette() {
     cmdPalette.classList.add('active');
@@ -1589,18 +1670,172 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 
-  // ── Bottom nav "More" button ──
-  var moreNavBtn = document.getElementById('moreNavBtn');
-  if (moreNavBtn) {
-    moreNavBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      sidebar.classList.toggle('mobile-open');
-      sidebarOverlay.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
+  // ── Add Event Modal ──
+  var addEventBtn = document.getElementById('addEventBtn');
+  var addEventModal = document.getElementById('addEventModal');
+
+  function openAddEventModal(dateStr) {
+    if (dateStr) {
+      var startEl = document.getElementById('newEventStart');
+      var endEl = document.getElementById('newEventEnd');
+      if (startEl) startEl.value = dateStr;
+      if (endEl) endEl.value = dateStr;
+    }
+    addEventModal.classList.add('active');
+    lucide.createIcons({ nodes: [addEventModal] });
+  }
+
+  if (addEventBtn) {
+    addEventBtn.addEventListener('click', function() {
+      openAddEventModal(selectedDate || '2026-04-06');
     });
   }
 
+  window.submitNewEvent = function() {
+    var title = document.getElementById('newEventTitle').value.trim();
+    if (!title) {
+      if (window.GHR && GHR.showToast) GHR.showToast('error', 'Required', 'Please enter an event title.');
+      return;
+    }
+    addEventModal.classList.remove('active');
+    document.getElementById('newEventTitle').value = '';
+    if (window.GHR && GHR.showToast) {
+      GHR.showToast('success', 'Event Created', 'New event "' + title + '" added to calendar.');
+    }
+  };
+
+  // ── Click day to open Add Event modal (item 41) ──
+  // Attach to month and week day cells via event delegation
+  document.getElementById('monthDays') && document.getElementById('monthDays').addEventListener('click', function(e) {
+    var cell = e.target.closest('.cal-day:not(.other-month)');
+    if (!cell) return;
+    // Only open if click on the cell directly (not on an event badge)
+    if (e.target.closest('.cal-event') || e.target.closest('.cal-more')) return;
+    var ds = cell.getAttribute('data-datestr');
+    openAddEventModal(ds || '2026-04-06');
+  });
+
+  // ── Render Day View ──
+  function renderDayView(ds) {
+    var dayViewGrid = document.getElementById('dayViewGrid');
+    var dayViewDate = document.getElementById('dayViewDate');
+    if (!dayViewGrid) return;
+
+    if (!ds) {
+      var today = new Date(2026, 3, 6);
+      ds = dateStr(today.getFullYear(), today.getMonth(), today.getDate());
+    }
+
+    if (dayViewDate) {
+      dayViewDate.textContent = formatDateHeading(ds);
+    }
+
+    var dayEvents = getEventsForDate(ds);
+    dayViewGrid.innerHTML = '';
+
+    var hours = [];
+    for (var h = 8; h <= 19; h++) hours.push(h);
+
+    hours.forEach(function(h) {
+      var slot = document.createElement('div');
+      slot.className = 'day-time-slot';
+      var label = document.createElement('div');
+      label.className = 'day-time-label';
+      label.textContent = (h < 12 ? h + ':00 AM' : (h === 12 ? '12:00 PM' : (h - 12) + ':00 PM'));
+      var content = document.createElement('div');
+      content.className = 'day-time-content';
+      slot.appendChild(label);
+      slot.appendChild(content);
+      dayViewGrid.appendChild(slot);
+    });
+
+    if (dayEvents.length === 0) {
+      var freeEl = document.createElement('div');
+      freeEl.style.cssText = 'text-align:center;padding:var(--space-8);color:var(--color-text-3);';
+      freeEl.innerHTML = '<svg data-lucide="sun" width="40" height="40" style="margin:0 auto var(--space-3);display:block;opacity:0.3;"></svg><div>Free day</div>';
+      dayViewGrid.appendChild(freeEl);
+    } else {
+      // Place events in first time slot as cards
+      var firstContent = dayViewGrid.querySelector('.day-time-content');
+      if (firstContent) {
+        dayEvents.forEach(function(ev) {
+          var card = document.createElement('div');
+          card.className = 'week-event-card ' + ev.type;
+          card.innerHTML = '<div class="wec-title">' + ev.title + '</div><div class="wec-sub">' + (ev.person || '') + '</div>';
+          firstContent.appendChild(card);
+        });
+      }
+    }
+    lucide.createIcons({ nodes: [dayViewGrid] });
+  }
+
+  // ── Mobile Day-Switcher for Week View ──
+  var mobileDaySwitcher = document.getElementById('mobileDaySwitcher');
+  if (mobileDaySwitcher) {
+    mobileDaySwitcher.querySelectorAll('.mobile-day-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        mobileDaySwitcher.querySelectorAll('.mobile-day-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var colIdx = parseInt(btn.getAttribute('data-col'));
+        var cols = document.querySelectorAll('.week-day-col');
+        var headers = document.querySelectorAll('.week-header-cell');
+        cols.forEach(function(col, i) {
+          col.style.display = (i === colIdx) ? '' : 'none';
+        });
+        headers.forEach(function(h, i) {
+          h.style.display = (i === colIdx) ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  // ── filterSearch no results (item 43) ──
+  var filterSearchInput = document.getElementById('filterSearch');
+  if (filterSearchInput) {
+    var noResultsEl = document.createElement('div');
+    noResultsEl.id = 'filterNoResults';
+    noResultsEl.style.cssText = 'display:none;padding:var(--space-2) var(--space-3);font-size:var(--text-caption);color:var(--color-text-3);';
+    noResultsEl.textContent = 'No team members match your search.';
+    filterSearchInput.parentElement.appendChild(noResultsEl);
+
+    filterSearchInput.addEventListener('input', function() {
+      var val = this.value.trim().toLowerCase();
+      var noRes = document.getElementById('filterNoResults');
+      if (!val) { if (noRes) noRes.style.display = 'none'; return; }
+      var leavePersons = events.filter(function(e) { return e.person; }).map(function(e) { return e.person.toLowerCase(); });
+      var match = leavePersons.some(function(p) { return p.includes(val); });
+      if (noRes) noRes.style.display = match ? 'none' : 'block';
+    });
+  }
+
+  // Update view toggle to handle day view
+  var origViewToggle = viewToggle.querySelectorAll('button');
+  origViewToggle.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var view = btn.getAttribute('data-view');
+      var dayViewEl = document.getElementById('dayView');
+      if (dayViewEl) dayViewEl.classList.remove('active');
+      if (view === 'day') {
+        monthView.style.display = 'none';
+        weekView.style.display = 'none';
+        document.getElementById('quarterView') && (document.getElementById('quarterView').style.display = 'none');
+        document.getElementById('yearView') && (document.getElementById('yearView').style.display = 'none');
+        if (dayViewEl) { dayViewEl.classList.add('active'); }
+        renderDayView(selectedDate || '2026-04-06');
+        currentView = 'day';
+      }
+    }, true); // capture phase to run after existing handler
+  });
 
   // ── Initial render ──
+  // Attach datestr to day cells so click handler works
+  var origCreateDayCell = createDayCell;
+  createDayCell = function(dayNum, isOther, iTd, dateString, dow) {
+    var cell = origCreateDayCell(dayNum, isOther, iTd, dateString, dow);
+    if (dateString && !isOther) cell.setAttribute('data-datestr', dateString);
+    return cell;
+  };
+
   renderMonth();
   updateLeaveStatusPill();
 

@@ -267,6 +267,39 @@
     .chart-bar { cursor: pointer; transition: opacity var(--motion-fast); }
     .chart-bar:hover { opacity: 0.8; }
 
+    /* Mobile modal grid fix */
+    @media (max-width: 639px) { .modal .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Zoom btn for capacity period */
+    .zoom-btn {
+      padding: var(--space-1-5) var(--space-3);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: var(--weight-medium);
+      transition: all var(--motion-fast);
+    }
+    .zoom-btn.active {
+      background: var(--color-primary);
+      color: var(--color-text-inv);
+    }
+
+    /* Allocation matrix */
+    .alloc-matrix-table th, .alloc-matrix-table td { padding: var(--space-2) var(--space-3); text-align: center; font-size: var(--text-body-sm); white-space: nowrap; }
+    .alloc-matrix-table th:first-child, .alloc-matrix-table td:first-child { text-align: left; position: sticky; left: 0; background: var(--color-surface-0); z-index: 2; }
+    .alloc-cell { cursor: pointer; border-radius: var(--radius-sm); transition: background var(--motion-fast); }
+    .alloc-cell:hover { background: var(--color-primary-muted); }
+    .alloc-cell.has-alloc { font-weight: var(--weight-semibold); }
+
+    /* Skills gap mini bar */
+    .gap-bar-wrap { display: flex; align-items: center; gap: var(--space-2); }
+    .gap-bar { flex: 1; height: 6px; background: var(--color-surface-2); border-radius: var(--radius-full); overflow: hidden; min-width: 40px; }
+    .gap-bar-fill { height: 100%; border-radius: var(--radius-full); }
+
     /* Empty state toggles */
     .populated-content,
     .empty-content { display: none; }
@@ -281,121 +314,7 @@
 
 <div class="app">
   <!-- ════════════════ SIDEBAR ════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-        <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item active">
-          <svg data-lucide="bar-chart-3"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <svg data-lucide="gantt-chart-square"></svg>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);margin-bottom:var(--space-2);" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?',bubbles:true}))">
-        <svg data-lucide="keyboard" width="16" height="16"></svg>
-        <span>Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -507,7 +426,7 @@
               <button class="dropdown-item"><svg data-lucide="plus" width="16" height="16"></svg> New Scenario</button>
             </div>
           </div>
-          <button class="btn btn-secondary btn-md">
+          <button class="btn btn-secondary btn-md" onclick="GHR && GHR.showToast ? GHR.showToast('success','Export Started','Planning data exporting...') : showToast('success','Export Started','Planning data exporting...')">
             <svg data-lucide="download" width="16" height="16"></svg>
             Export
           </button>
@@ -515,7 +434,7 @@
       </div>
 
       <!-- Section 1: Capacity Overview -->
-      <div class="mb-6">
+      <div class="mb-6" data-min-role="pm">
         <div class="capacity-grid">
           <div class="capacity-card">
             <div class="capacity-card-title">April 2026</div>
@@ -526,6 +445,10 @@
             <div class="capacity-row">
               <span class="capacity-label">Allocated</span>
               <span class="capacity-value font-mono">1,872h</span>
+            </div>
+            <!-- Mini bar chart: allocated/available -->
+            <div style="margin:var(--space-2) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;" title="90% allocated">
+              <div style="width:90%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap surplus">Gap: +208h (surplus)</div>
           </div>
@@ -539,6 +462,10 @@
               <span class="capacity-label">Allocated</span>
               <span class="capacity-value font-mono">1,944h</span>
             </div>
+            <!-- Mini bar chart: allocated/available -->
+            <div style="margin:var(--space-2) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;" title="90% allocated">
+              <div style="width:90%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);opacity:0.8;"></div>
+            </div>
             <div class="capacity-gap surplus">Gap: +216h (surplus)</div>
           </div>
           <div class="capacity-card">
@@ -551,44 +478,60 @@
               <span class="capacity-label">Allocated</span>
               <span class="capacity-value font-mono">1,664h</span>
             </div>
+            <!-- Mini bar chart: allocated/available -->
+            <div style="margin:var(--space-2) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;" title="80% allocated">
+              <div style="width:80%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);opacity:0.8;"></div>
+            </div>
             <div class="capacity-gap warning">Gap: +416h (growing gap)</div>
           </div>
+        </div>
+
+        <!-- No available capacity warning (shown when all employees ≥100%) -->
+        <div id="noCapacityWarning" style="display:none;padding:var(--space-3) var(--space-4);background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-md);margin-bottom:var(--space-4);align-items:center;gap:var(--space-3);">
+          <svg data-lucide="alert-triangle" width="18" height="18" style="color:var(--color-warning);flex-shrink:0;"></svg>
+          <span style="font-size:var(--text-body-sm);color:var(--color-warning);font-weight:var(--weight-semibold);">&#9888; No available capacity this period</span>
+          <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">— All employees are at or above 100% allocation. Consider hiring or rescheduling.</span>
         </div>
 
         <!-- Stacked Bar Chart -->
         <div class="card">
           <div class="chart-container">
-            <div class="chart-title">Capacity vs Allocation</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);">
+              <div class="chart-title" style="margin-bottom:0;" id="capacityChartTitle">Capacity vs Allocation</div>
+              <div style="display:flex;gap:var(--space-1);background:var(--color-surface-1);border-radius:var(--radius-md);padding:2px;">
+                <button class="zoom-btn active" data-period="1M" onclick="setCapacityPeriod(this,'1M')">1M</button>
+                <button class="zoom-btn" data-period="3M" onclick="setCapacityPeriod(this,'3M')">3M</button>
+                <button class="zoom-btn" data-period="6M" onclick="setCapacityPeriod(this,'6M')">6M</button>
+                <button class="zoom-btn" data-period="1Y" onclick="setCapacityPeriod(this,'1Y')">1Y</button>
+              </div>
+            </div>
             <svg viewBox="0 0 700 200" preserveAspectRatio="xMidYMid meet">
               <!-- Y axis labels -->
-              <text x="10" y="24" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">2,500h</text>
-              <text x="10" y="72" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">2,000h</text>
-              <text x="10" y="119" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">1,500h</text>
-              <text x="10" y="167" fill="var(--color-text-3)" font-size="10" font-family="var(--font-mono)">1,000h</text>
+              <text x="10" y="24" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">2,500h</text>
+              <text x="10" y="72" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">2,000h</text>
+              <text x="10" y="119" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">1,500h</text>
+              <text x="10" y="167" fill="var(--color-text-3)" font-size="12" font-family="var(--font-mono)">1,000h</text>
               <!-- Grid -->
               <line x1="60" y1="68" x2="680" y2="68" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
               <line x1="60" y1="115" x2="680" y2="115" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
               <line x1="60" y1="163" x2="680" y2="163" stroke="var(--color-border-subtle)" stroke-width="0.5" stroke-dasharray="4"/>
               <line x1="60" y1="180" x2="680" y2="180" stroke="var(--color-border)" stroke-width="1"/>
-              <!-- April: Available 2080 outline, Allocated 1872 filled -->
+              <!-- April: Available 2080 outline, Allocated 1872 filled, Bench 208h -->
               <!-- Scale: 2500h = y20, 0 = y180, range=160. h/2500*160 -->
-              <!-- 2080: height = 133, y = 180-133=47 -->
-              <!-- 1872: height = 120, y = 180-120=60 -->
               <rect x="120" y="47" width="100" height="133" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
               <rect x="120" y="60" width="100" height="120" rx="4" fill="var(--color-primary)" opacity="0.8"/>
-              <text x="170" y="55" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">1,872h</text>
-              <!-- May: 2160 avail, 1944 alloc -->
-              <!-- 2160: height=138, y=42 -->
-              <!-- 1944: height=124, y=56 -->
+              <rect x="120" y="47" width="100" height="13" rx="4" fill="var(--color-warning)" opacity="0.5"/>
+              <text x="170" y="55" fill="var(--color-text-2)" font-size="12" font-family="var(--font-mono)" text-anchor="middle">1,872h</text>
+              <!-- May: 2160 avail, 1944 alloc, Bench 216h -->
               <rect x="300" y="42" width="100" height="138" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
               <rect x="300" y="56" width="100" height="124" rx="4" fill="var(--color-primary)" opacity="0.8"/>
-              <text x="350" y="50" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">1,944h</text>
-              <!-- June: 2080 avail, 1664 alloc -->
-              <!-- 2080: height=133, y=47 -->
-              <!-- 1664: height=106, y=74 -->
+              <rect x="300" y="42" width="100" height="14" rx="4" fill="var(--color-warning)" opacity="0.5"/>
+              <text x="350" y="50" fill="var(--color-text-2)" font-size="12" font-family="var(--font-mono)" text-anchor="middle">1,944h</text>
+              <!-- June: 2080 avail, 1664 alloc, Bench 416h -->
               <rect x="480" y="47" width="100" height="133" rx="4" fill="none" stroke="var(--color-border-strong)" stroke-width="2" stroke-dasharray="4"/>
               <rect x="480" y="74" width="100" height="106" rx="4" fill="var(--color-primary)" opacity="0.8"/>
-              <text x="530" y="68" fill="var(--color-text-2)" font-size="9" font-family="var(--font-mono)" text-anchor="middle">1,664h</text>
+              <rect x="480" y="47" width="100" height="27" rx="4" fill="var(--color-warning)" opacity="0.5"/>
+              <text x="530" y="68" fill="var(--color-text-2)" font-size="12" font-family="var(--font-mono)" text-anchor="middle">1,664h</text>
               <!-- Month labels -->
               <text x="170" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">April</text>
               <text x="350" y="196" fill="var(--color-text-3)" font-size="11" text-anchor="middle" font-weight="500">May</text>
@@ -602,6 +545,10 @@
               <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
                 <div style="width: 12px; height: 12px; border: 2px dashed var(--color-border-strong); border-radius: 2px;"></div>
                 Available
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); color: var(--color-text-2);">
+                <div style="width: 12px; height: 12px; background: var(--color-warning); border-radius: 2px; opacity: 0.5;"></div>
+                Bench / Unallocated
               </div>
             </div>
           </div>
@@ -623,7 +570,7 @@
           <div class="bench-item">
             <div class="avatar avatar-sm">BT</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="42%" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
+              <div class="bench-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
               <div class="bench-detail">Senior Developer &bull; Python, REST APIs, Django</div>
             </div>
             <div class="bench-days">21 days</div>
@@ -659,7 +606,7 @@
               <span class="forecast-value">2 employees</span>
             </div>
             <div style="padding-left: var(--space-4); font-size: var(--text-caption); color: var(--color-text-3); margin-bottom: var(--space-2);">
-              <a href="employees.html#alice-wang">Alice Wang</a> &mdash; Acme ends Apr 30 &bull; <a href="employees.html#carol-kim">Carol Kim</a> &mdash; Initech ends Apr 28
+              <a href="employees.html#alice-wang">Alice Wang</a> &mdash; Acme ends Apr 30 &bull; <a href="employees.html#carol-williams"><strong>Carol Williams</strong></a> &mdash; Initech ends Apr 28
             </div>
             <div class="forecast-row">
               <span class="forecast-label">Starting projects</span>
@@ -689,17 +636,17 @@
               <div class="ai-rec-text">Alice Wang has skills matching Globex Phase 3 requirements (UI/UX Design, React, Figma)</div>
               <div class="ai-rec-actions">
                 <button class="btn btn-primary btn-xs" onclick="assignToProject('Alice Wang')">Assign</button>
-                <button class="btn btn-ghost btn-xs">View Profile</button>
+                <button class="btn btn-ghost btn-xs" onclick="showToast('info','Opening Profile','Loading Alice Wang profile...')">View Profile</button>
               </div>
             </div>
           </div>
           <div class="ai-rec" id="benchRec2">
             <div class="ai-rec-icon"><svg data-lucide="sparkles" width="16" height="16"></svg></div>
             <div class="ai-rec-body">
-              <div class="ai-rec-text">Carol Kim could support Acme Web Redesign (data analytics needed, Python proficiency)</div>
+              <div class="ai-rec-text"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a> could support Acme Web Redesign (design expertise + data analytics needed)</div>
               <div class="ai-rec-actions">
-                <button class="btn btn-primary btn-xs" onclick="assignToProject('Carol Kim')">Assign</button>
-                <button class="btn btn-ghost btn-xs">View Profile</button>
+                <button class="btn btn-primary btn-xs" onclick="assignToProject('Carol Williams')">Assign</button>
+                <button class="btn btn-ghost btn-xs" onclick="showToast('info','Opening Profile','Loading Carol Williams profile...')">View Profile</button>
               </div>
             </div>
           </div>
@@ -731,6 +678,7 @@
                 <th>Available Next Month</th>
                 <th>Demand</th>
                 <th>Gap</th>
+                <th>Verified</th>
               </tr>
             </thead>
             <tbody>
@@ -739,43 +687,180 @@
                 <td data-label="Available Now" class="cell-mono">4</td>
                 <td data-label="Available Next Month" class="cell-mono">3</td>
                 <td data-label="Demand" class="cell-mono">5</td>
-                <td data-label="Gap" class="cell-mono gap-deficit">-1</td>
+                <td data-label="Gap" class="cell-mono gap-deficit"><div class="gap-bar-wrap"><span>-1</span><div class="gap-bar"><div class="gap-bar-fill" style="width:50%;background:var(--color-error);"></div></div></div></td>
+                <td data-label="Verified" class="cell-mono" style="font-size:var(--text-caption);color:var(--color-text-3);">Mar 2026</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">Python</td>
                 <td data-label="Available Now" class="cell-mono">3</td>
                 <td data-label="Available Next Month" class="cell-mono">3</td>
                 <td data-label="Demand" class="cell-mono">2</td>
-                <td data-label="Gap" class="cell-mono gap-surplus">+1</td>
+                <td data-label="Gap" class="cell-mono gap-surplus"><div class="gap-bar-wrap"><span>+1</span><div class="gap-bar"><div class="gap-bar-fill" style="width:33%;background:var(--color-success);"></div></div></div></td>
+                <td data-label="Verified" class="cell-mono" style="font-size:var(--text-caption);color:var(--color-text-3);">Feb 2026</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">UI/UX Design</td>
                 <td data-label="Available Now" class="cell-mono">1</td>
                 <td data-label="Available Next Month" class="cell-mono">2</td>
                 <td data-label="Demand" class="cell-mono">2</td>
-                <td data-label="Gap" class="cell-mono gap-balanced">0</td>
+                <td data-label="Gap" class="cell-mono gap-balanced"><div class="gap-bar-wrap"><span>0</span><div class="gap-bar"><div class="gap-bar-fill" style="width:0%;background:var(--color-text-3);"></div></div></div></td>
+                <td data-label="Verified" class="cell-mono" style="font-size:var(--text-caption);color:var(--color-text-3);">Jan 2026</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">DevOps</td>
                 <td data-label="Available Now" class="cell-mono">1</td>
                 <td data-label="Available Next Month" class="cell-mono">1</td>
                 <td data-label="Demand" class="cell-mono">2</td>
-                <td data-label="Gap" class="cell-mono gap-deficit">-1</td>
+                <td data-label="Gap" class="cell-mono gap-deficit"><div class="gap-bar-wrap"><span>-1</span><div class="gap-bar"><div class="gap-bar-fill" style="width:50%;background:var(--color-error);"></div></div></div></td>
+                <td data-label="Verified" class="cell-mono" style="font-size:var(--text-caption);color:var(--color-text-3);">Mar 2026</td>
               </tr>
               <tr>
                 <td style="font-weight: var(--weight-medium);">Project Management</td>
                 <td data-label="Available Now" class="cell-mono">2</td>
                 <td data-label="Available Next Month" class="cell-mono">2</td>
                 <td data-label="Demand" class="cell-mono">2</td>
-                <td data-label="Gap" class="cell-mono gap-balanced">0</td>
+                <td data-label="Gap" class="cell-mono gap-balanced"><div class="gap-bar-wrap"><span>0</span><div class="gap-bar"><div class="gap-bar-fill" style="width:0%;background:var(--color-text-3);"></div></div></div></td>
+                <td data-label="Verified" class="cell-mono" style="font-size:var(--text-caption);color:var(--color-text-3);">Feb 2026</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
+      <!-- Section 3b: Resource Allocation Matrix -->
+      <div class="card mb-6" data-min-role="pm" id="allocationMatrix">
+        <div class="card-header">
+          <span class="card-title" style="display:flex;align-items:center;gap:var(--space-2);">
+            <svg data-lucide="grid" width="18" height="18" style="color:var(--color-primary);"></svg>
+            Resource Allocation Matrix
+          </span>
+          <span class="badge badge-primary">Employee × Project</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table alloc-matrix-table" id="allocTable">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Acme Web Redesign</th>
+                <th>Globex Phase 2</th>
+                <th>Initech API</th>
+                <th>Contoso Deal</th>
+                <th>Globex Phase 3</th>
+                <th>Infra Overhaul</th>
+                <th>Internal</th>
+                <th style="font-weight:var(--weight-bold);color:var(--color-text-1);">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Sarah Chen','Acme Web Redesign',60)" title="Click to edit" style="color:var(--color-primary);">60%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Globex Phase 2',0)">—</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Sarah Chen','Initech API',27)" style="color:var(--color-success);">27%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">87%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Acme Web Redesign',0)">—</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'John Smith','Globex Phase 2',82)" style="color:var(--color-primary);">82%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Initech API',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">82%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88">Marco Rossi</a></td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Marco Rossi','Acme Web Redesign',88)" style="color:var(--color-primary);">88%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Globex Phase 2',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Initech API',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">88%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a></td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Acme Web Redesign',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Globex Phase 2',0)">—</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Carol Williams','Initech API',90)" style="color:var(--color-success);">90%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">90%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang <span class="badge badge-info" style="font-size:var(--text-overline);">On Leave</span></a></td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Alice Wang','Acme Web Redesign',45)" style="color:var(--color-warning);">45%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Globex Phase 2',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Initech API',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">45%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45">David Park</a></td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Acme Web Redesign',0)">—</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'David Park','Globex Phase 2',45)" style="color:var(--color-warning);">45%</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Initech API',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'David Park','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">45%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78">Emma Laurent</a></td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Acme Web Redesign',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Globex Phase 2',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Initech API',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Emma Laurent','Internal',78)" style="color:var(--color-primary);">78%</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);">78%</td>
+              </tr>
+              <tr>
+                <td><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="0">Bob Taylor <span class="badge badge-warning" style="font-size:var(--text-overline);">Bench</span></a></td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Acme Web Redesign',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 2',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Initech API',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 3',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Infra Overhaul',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Internal',0)">—</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-error);">0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:var(--space-3) var(--space-4);font-size:var(--text-caption);color:var(--color-text-3);">Click any cell to edit the allocation percentage for that employee-project pair.</div>
+      </div>
+
+      <!-- Allocation Inline Popover (hidden by default) -->
+      <div id="allocPopover" style="display:none;position:fixed;z-index:500;background:var(--color-surface-2);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);box-shadow:var(--shadow-4);padding:var(--space-4);min-width:220px;">
+        <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);" id="allocPopoverTitle">Edit Allocation</div>
+        <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">
+          <input type="number" id="allocInput" min="0" max="100" step="5" style="width:80px;" class="form-input" value="0">
+          <span style="color:var(--color-text-2);">%</span>
+        </div>
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-primary btn-xs" onclick="saveAllocPopover()">Save</button>
+          <button class="btn btn-ghost btn-xs" onclick="closeAllocPopover()">Cancel</button>
+        </div>
+      </div>
+
       <!-- Section 4: What-If Scenarios -->
-      <div class="card mb-6">
+      <div class="card mb-6" data-min-role="pm">
         <div class="card-header">
           <span class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
             <svg data-lucide="git-branch" width="18" height="18" style="color: var(--color-accent);"></svg>
@@ -803,9 +888,11 @@
             <!-- Before/After comparison chart -->
             <div id="scenarioChart" style="margin-bottom:var(--space-4);">
               <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-3);">Capacity Projection: Before vs After</div>
-              <svg id="scenarioChartSvg" viewBox="0 0 500 140" preserveAspectRatio="xMidYMid meet">
+              <div style="width:100%;overflow-x:auto;">
+            <svg id="scenarioChartSvg" viewBox="0 0 500 140" preserveAspectRatio="xMinYMid meet" style="min-width:320px;width:100%;">
                 <!-- Rendered by JS -->
               </svg>
+              </div>
               <div style="display:flex;gap:var(--space-4);justify-content:center;margin-top:var(--space-2);">
                 <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-caption);color:var(--color-text-2);">
                   <div style="width:12px;height:12px;background:var(--color-border-strong);border-radius:2px;"></div> Baseline
@@ -837,7 +924,7 @@
               </div>
               <div class="impact-row">
                 <span class="impact-label">Reallocation needed</span>
-                <span class="impact-value">Alice Wang from Acme, Carol Kim from Initech</span>
+                <span class="impact-value">Alice Wang from Acme, <a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a> from Initech</span>
               </div>
               <div class="impact-row">
                 <span class="impact-label">Revenue projection</span>
@@ -850,7 +937,7 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4);">
+          <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4); flex-wrap:wrap;">
             <button class="btn btn-primary btn-md" id="runScenarioBtn">
               <svg data-lucide="play" width="16" height="16"></svg>
               Run Scenario
@@ -858,6 +945,10 @@
             <button class="btn btn-secondary btn-md" id="saveScenarioBtn">
               <svg data-lucide="save" width="16" height="16"></svg>
               Save Scenario
+            </button>
+            <button class="btn btn-secondary btn-md" id="compareScenarioBtn" onclick="GHR && GHR.showToast ? GHR.showToast('info','Compare Mode','Side-by-side comparison view is coming in the full product.') : showToast('info','Compare','Side-by-side comparison view coming soon.')">
+              <svg data-lucide="columns" width="16" height="16"></svg>
+              Compare
             </button>
             <button class="btn btn-ghost btn-md" id="resetScenarioBtn">Reset</button>
           </div>
@@ -1050,7 +1141,6 @@
 
   // ── DOM refs ──
   var sidebar        = document.getElementById('sidebar');
-  var collapseBtn    = document.getElementById('sidebarCollapseBtn');
   var mobileMenuBtn  = document.getElementById('mobileMenuBtn');
   var sidebarOverlay = document.getElementById('sidebarOverlay');
   var searchTrigger  = document.getElementById('searchTrigger');
@@ -1062,13 +1152,6 @@
   var userDropdown   = document.getElementById('userDropdown');
   var stateToggle    = document.getElementById('stateToggle');
   var toastContainer = document.getElementById('toastContainer');
-
-  // ── Sidebar collapse ──
-  collapseBtn.addEventListener('click', function() { sidebar.classList.toggle('collapsed'); });
-
-  // ── Mobile menu ──
-  mobileMenuBtn.addEventListener('click', function() { sidebar.classList.toggle('mobile-open'); });
-  sidebarOverlay.addEventListener('click', function() { sidebar.classList.remove('mobile-open'); });
 
   // ── Command Palette ──
   function openCmdPalette() { cmdPalette.classList.add('active'); setTimeout(function() { cmdInput.focus(); }, 100); }
@@ -1135,7 +1218,7 @@
       ],
       desc: '<strong>Skills required:</strong> React ×3, Python ×2, UI/UX ×1, PM ×1, DevOps ×1. 5 FTEs available internally; 3 need to be hired (React ×1, DevOps ×1, Python ×1).',
       before: [78, 76, 74], after: [92, 91, 90],
-      impact: '3 hires needed · Alice Wang & Carol Kim reallocated · Revenue +€30k/mo'
+      impact: '3 hires needed · Alice Wang & Carol Williams reallocated · Revenue +€30k/mo'
     },
     'hire-2': {
       label: 'Hire 2 Engineers in Q3',
@@ -1203,9 +1286,9 @@
         var bY = startY + chartH - bH;
         var aY = startY + chartH - aH;
         svgContent += '<rect x="' + gx + '" y="' + bY + '" width="' + barW + '" height="' + bH + '" rx="3" fill="var(--color-border-strong)" opacity="0.7"/>';
-        svgContent += '<text x="' + (gx + barW/2) + '" y="' + (bY - 4) + '" fill="var(--color-text-3)" font-size="9" text-anchor="middle" font-family="var(--font-mono)">' + s.before[i] + '%</text>';
+        svgContent += '<text x="' + (gx + barW/2) + '" y="' + (bY - 4) + '" fill="var(--color-text-3)" font-size="12" text-anchor="middle" font-family="var(--font-mono)">' + s.before[i] + '%</text>';
         svgContent += '<rect x="' + (gx + barW + gap) + '" y="' + aY + '" width="' + barW + '" height="' + aH + '" rx="3" fill="var(--color-primary)" opacity="0.85"/>';
-        svgContent += '<text x="' + (gx + barW + gap + barW/2) + '" y="' + (aY - 4) + '" fill="var(--color-primary)" font-size="9" text-anchor="middle" font-family="var(--font-mono)">' + s.after[i] + '%</text>';
+        svgContent += '<text x="' + (gx + barW + gap + barW/2) + '" y="' + (aY - 4) + '" fill="var(--color-primary)" font-size="12" text-anchor="middle" font-family="var(--font-mono)">' + s.after[i] + '%</text>';
         svgContent += '<text x="' + (gx + barW + gap/2) + '" y="' + (startY + chartH + 14) + '" fill="var(--color-text-3)" font-size="10" text-anchor="middle">' + months[i] + '</text>';
       }
       svg.innerHTML = svgContent;
@@ -1317,6 +1400,58 @@
     isPopulated = !isPopulated;
     document.body.className = isPopulated ? 'show-populated' : 'show-empty';
     this.querySelector('span').textContent = isPopulated ? 'Toggle Empty State' : 'Toggle Populated State';
+  });
+
+  // ── Capacity Period Switcher ──
+  window.setCapacityPeriod = function(btn, period) {
+    document.querySelectorAll('[data-period]').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    var labels = { '1M': 'Capacity vs Allocation — April 2026', '3M': 'Capacity vs Allocation — Apr–Jun 2026', '6M': 'Capacity vs Allocation — Apr–Sep 2026', '1Y': 'Capacity vs Allocation — Apr 2026–Mar 2027' };
+    var titleEl = document.getElementById('capacityChartTitle');
+    if (titleEl) titleEl.textContent = labels[period] || 'Capacity vs Allocation';
+    showToast('info', 'Period Updated', 'Showing ' + period + ' capacity forecast.');
+  };
+
+  // ── Allocation Matrix Popover ──
+  var _allocCell = null;
+  window.openAllocPopover = function(cell, emp, project, current) {
+    _allocCell = cell;
+    var pop = document.getElementById('allocPopover');
+    var rect = cell.getBoundingClientRect();
+    pop.style.display = 'block';
+    pop.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
+    pop.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - 240) + 'px';
+    document.getElementById('allocPopoverTitle').textContent = emp + ' — ' + project;
+    document.getElementById('allocInput').value = current || 0;
+  };
+  window.saveAllocPopover = function() {
+    if (!_allocCell) return;
+    var val = parseInt(document.getElementById('allocInput').value) || 0;
+    _allocCell.textContent = val > 0 ? val + '%' : '—';
+    _allocCell.classList.toggle('has-alloc', val > 0);
+    _allocCell.style.color = val >= 75 ? 'var(--color-success)' : val >= 40 ? 'var(--color-warning)' : '';
+    closeAllocPopover();
+    showToast('success', 'Allocation Updated', 'Allocation set to ' + val + '%.');
+  };
+  window.closeAllocPopover = function() {
+    var pop = document.getElementById('allocPopover');
+    if (pop) pop.style.display = 'none';
+    _allocCell = null;
+  };
+  document.addEventListener('click', function(e) {
+    var pop = document.getElementById('allocPopover');
+    if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && !e.target.closest('.alloc-cell')) closeAllocPopover();
+  });
+
+  // ── initSkeletons via _shared.js ──
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.GHR) {
+      GHR.initHoverCard && GHR.initHoverCard();
+      GHR.initPresence && GHR.initPresence();
+      GHR.initRoleSwitcher && GHR.initRoleSwitcher();
+      GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
+      GHR.initSkeletons && GHR.initSkeletons();
+    }
   });
 
 })();

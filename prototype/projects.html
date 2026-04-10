@@ -447,6 +447,12 @@
     .color-swatch:hover { transform: scale(1.15); }
     .color-swatch.selected { border-color: var(--color-text-1); box-shadow: 0 0 0 2px var(--color-bg); }
 
+    /* Badge XS */
+    .badge-xs {
+      font-size: var(--text-overline);
+      padding: 2px var(--space-1-5);
+    }
+
     /* Empty state */
     .empty-state {
       display: none;
@@ -477,123 +483,7 @@
 <div class="app">
 
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item active">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="calendar-range"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;gap:var(--space-2);color:var(--color-text-2);margin-bottom:var(--space-2);" onclick="showToast('info','Shortcuts','Press Cmd+K to open command palette. Use ? for help.')">
-        <svg data-lucide="keyboard" width="14" height="14"></svg>
-        <span style="font-size:var(--text-body-sm);">Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
   <!-- Sidebar overlay for mobile -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -727,6 +617,13 @@
               Timeline
             </button>
           </div>
+          <select class="form-select" id="savedViewsSelect" onchange="if(this.value){showToast('info','View Applied',{all:'Showing all projects',active:'Showing active projects only',atrisk:'Showing at-risk projects',mine:'Showing projects assigned to you'}[this.value]||'View applied')}">
+            <option value="">Saved Views</option>
+            <option value="all">All Projects</option>
+            <option value="active">Active Only</option>
+            <option value="atrisk">At Risk</option>
+            <option value="mine">My Projects</option>
+          </select>
           <div style="flex: 1;"></div>
           <select class="form-select" id="filterStatus">
             <option value="">All Statuses</option>
@@ -774,7 +671,7 @@
                     <span class="meta-item"><svg data-lucide="credit-card"></svg> Fixed price</span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
                   </div>
-                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                  <span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
                 </div>
 
                 <div class="project-card card-interactive" data-project="internal-portal" onclick="showDetail('internal-portal')">
@@ -784,17 +681,20 @@
                     <span class="meta-item"><svg data-lucide="credit-card"></svg> &mdash;</span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 0 members</span>
                   </div>
-                  <span class="badge badge-default"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
+                  <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
+                    <span class="badge badge-default"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
+                    <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> No team assigned</span>
+                  </div>
                 </div>
 
                 <div class="project-card card-interactive" data-project="dataviz-dashboard" onclick="showDetail('dataviz-dashboard')">
                   <div class="project-card-name">DataViz Dashboard</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 1 member</span>
                   </div>
-                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                  <span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
                 </div>
 
               </div>
@@ -815,7 +715,7 @@
                   <div class="project-card-name">Acme Web Redesign</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;85/h</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;85/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 5 members</span>
                   </div>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
@@ -834,7 +734,7 @@
                   <div class="project-card-name">Globex Phase 2</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;90/h</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;90/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 4 members</span>
                   </div>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
@@ -853,7 +753,7 @@
                   <div class="project-card-name">Initech API Integration</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 3 members</span>
                   </div>
                   <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span>
@@ -872,7 +772,7 @@
                   <div class="project-card-name">Acme Mobile App</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;85/h</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;85/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
                   </div>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
@@ -905,7 +805,7 @@
                   <div class="project-card-name">Globex Data Migration</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;120k</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;120k</span></span>
                   </div>
                   <div class="card-revenue">
                     Revenue: <span class="amount">&euro;120,000</span>
@@ -919,7 +819,7 @@
                   <div class="project-card-name">Acme CRM Setup</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;80/h</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;80/h</span></span>
                   </div>
                   <div class="card-revenue">
                     Revenue: <span class="amount">&euro;45,000</span>
@@ -930,7 +830,7 @@
                   <div class="project-card-name">Initech Security Audit</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;30k</span></span>
+                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;30k</span></span>
                   </div>
                   <div class="card-revenue">
                     Revenue: <span class="amount">&euro;30,000</span>
@@ -962,7 +862,7 @@
                 <tr class="cursor-pointer" onclick="showDetail('acme-web')">
                   <td><strong>Acme Web Redesign</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
-                  <td data-label="Billing" class="cell-mono">&euro;85/h</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;85/h</td>
                   <td data-label="Team Size">5</td>
                   <td data-label="Budget %">
                     <div style="display:flex;align-items:center;gap:var(--space-2);">
@@ -971,12 +871,12 @@
                     </div>
                   </td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('globex-phase2')">
                   <td><strong>Globex Phase 2</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
-                  <td data-label="Billing" class="cell-mono">&euro;90/h</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;90/h</td>
                   <td data-label="Team Size">4</td>
                   <td data-label="Budget %">
                     <div style="display:flex;align-items:center;gap:var(--space-2);">
@@ -985,12 +885,12 @@
                     </div>
                   </td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('initech-api')">
                   <td><strong>Initech API Integration</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></td>
-                  <td data-label="Billing" class="cell-mono">&euro;95/h</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;95/h</td>
                   <td data-label="Team Size">3</td>
                   <td data-label="Budget %">
                     <div style="display:flex;align-items:center;gap:var(--space-2);">
@@ -999,12 +899,12 @@
                     </div>
                   </td>
                   <td data-label="Health"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
-                  <td data-label="Status"><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('acme-mobile')">
                   <td><strong>Acme Mobile App</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
-                  <td data-label="Billing" class="cell-mono">&euro;85/h</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;85/h</td>
                   <td data-label="Team Size">2</td>
                   <td data-label="Budget %">
                     <div style="display:flex;align-items:center;gap:var(--space-2);">
@@ -1013,39 +913,42 @@
                     </div>
                   </td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"><span class="badge badge-primary"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('contoso-deal')">
                   <td><strong>Contoso Deal</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/contoso" onclick="event.stopPropagation()">Contoso Inc</a></td>
-                  <td data-label="Billing" class="cell-mono">Fixed</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed price</td>
                   <td data-label="Team Size">2</td>
                   <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
-                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                  <td data-label="Health"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('internal-portal')">
                   <td><strong>Internal Portal v2</strong></td>
                   <td data-label="Client">Internal</td>
-                  <td data-label="Billing" class="cell-mono">&mdash;</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&mdash;</td>
                   <td data-label="Team Size">0</td>
                   <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
-                  <td data-label="Health"><span class="badge badge-default"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
-                  <td data-label="Status"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                  <td data-label="Health">
+                    <span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
+                    <span class="badge badge-warning" style="margin-left:var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> No team</span>
+                  </td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('dataviz-dashboard')">
                   <td><strong>DataViz Dashboard</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></td>
-                  <td data-label="Billing" class="cell-mono">&euro;95/h</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;95/h</td>
                   <td data-label="Team Size">1</td>
                   <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
-                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                  <td data-label="Health"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
+                  <td data-label="Status"></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('globex-migration')">
                   <td><strong>Globex Data Migration</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex</a></td>
-                  <td data-label="Billing" class="cell-mono">Fixed &euro;120k</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed &euro;120k</td>
                   <td data-label="Team Size">&mdash;</td>
                   <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;120,000</span></td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
@@ -1054,7 +957,7 @@
                 <tr class="cursor-pointer" onclick="showDetail('acme-crm')">
                   <td><strong>Acme CRM Setup</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
-                  <td data-label="Billing" class="cell-mono">&euro;80/h</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;80/h</td>
                   <td data-label="Team Size">&mdash;</td>
                   <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;45,000</span></td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
@@ -1063,7 +966,7 @@
                 <tr class="cursor-pointer" onclick="showDetail('initech-audit')">
                   <td><strong>Initech Security Audit</strong></td>
                   <td data-label="Client"><a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></td>
-                  <td data-label="Billing" class="cell-mono">Fixed &euro;30k</td>
+                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed &euro;30k</td>
                   <td data-label="Team Size">&mdash;</td>
                   <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;30,000</span></td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
@@ -1075,7 +978,7 @@
         </div>
 
         <!-- ── Timeline View ── -->
-        <div id="timelineView" class="hidden">
+        <div id="timelineView" style="display:none;">
           <!-- Timeline header -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-3);">
             <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">
@@ -1117,14 +1020,14 @@
             <!-- Acme Web Redesign: Feb–Jul (cols 2–7 of 12) -->
             <div class="tl-row" onclick="showDetail('acme-web')">
               <div class="tl-label">
-                <span class="badge badge-primary" style="font-size:10px;padding:2px 6px;">Active</span>
+                <span class="badge badge-primary badge-xs">Active</span>
                 <strong>Acme Web Redesign</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp · 5 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><!-- Jan -->
-                  <div style="grid-column:2/8;background:var(--color-primary);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:#fff;font-weight:600;position:relative;cursor:pointer;" title="Acme Web Redesign — Feb 1 – Jul 31, 2026">
+                  <div style="grid-column:2/8;background:var(--color-primary);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;position:relative;cursor:pointer;" title="Acme Web Redesign — Feb 1 – Jul 31, 2026">
                     Feb 1 – Jul 31
                     <span style="position:absolute;right:0;top:0;bottom:0;width:64%;background:rgba(255,255,255,0.12);border-radius:0 4px 4px 0;" title="64% budget consumed"></span>
                   </div>
@@ -1135,13 +1038,13 @@
             <!-- Globex Phase 2: Jan–Jun (cols 1–6) -->
             <div class="tl-row" onclick="showDetail('globex-phase2')">
               <div class="tl-label">
-                <span class="badge badge-primary" style="font-size:10px;padding:2px 6px;">Active</span>
+                <span class="badge badge-primary badge-xs">Active</span>
                 <strong>Globex Phase 2</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Globex Corp · 4 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
-                  <div style="grid-column:1/7;background:hsl(155,26%,38%);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:#fff;font-weight:600;position:relative;" title="Globex Phase 2 — Jan 15 – Jun 30, 2026">
+                  <div style="grid-column:1/7;background:var(--color-primary-active);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;position:relative;" title="Globex Phase 2 — Jan 15 – Jun 30, 2026">
                     Jan 15 – Jun 30
                     <span style="position:absolute;right:0;top:0;bottom:0;width:35%;background:rgba(255,255,255,0.12);border-radius:0 4px 4px 0;" title="35% budget consumed"></span>
                   </div>
@@ -1152,14 +1055,14 @@
             <!-- Initech API Integration: Mar–Sep (cols 3–9) -->
             <div class="tl-row" onclick="showDetail('initech-api')">
               <div class="tl-label">
-                <span class="badge badge-warning" style="font-size:10px;padding:2px 6px;">At Risk</span>
+                <span class="badge badge-warning badge-xs">At Risk</span>
                 <strong>Initech API Integration</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Initech · 3 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><!-- Jan,Feb -->
-                  <div style="grid-column:3/10;background:var(--color-warning);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:var(--color-text-inv);font-weight:600;position:relative;" title="Initech API — Mar 1 – Sep 30, 2026">
+                  <div style="grid-column:3/10;background:var(--color-warning);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-inv);font-weight:600;position:relative;" title="Initech API — Mar 1 – Sep 30, 2026">
                     Mar 1 – Sep 30
                     <span style="position:absolute;right:0;top:0;bottom:0;width:69%;background:rgba(0,0,0,0.08);border-radius:0 4px 4px 0;" title="69% budget consumed"></span>
                   </div>
@@ -1170,14 +1073,14 @@
             <!-- Acme Mobile App: Apr–Oct (cols 4–10) -->
             <div class="tl-row" onclick="showDetail('acme-mobile')">
               <div class="tl-label">
-                <span class="badge badge-primary" style="font-size:10px;padding:2px 6px;">Active</span>
+                <span class="badge badge-primary badge-xs">Active</span>
                 <strong>Acme Mobile App</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp · 2 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><div></div><!-- Jan–Mar -->
-                  <div style="grid-column:4/11;background:hsl(200,40%,44%);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:#fff;font-weight:600;position:relative;" title="Acme Mobile App — Apr 1 – Oct 31, 2026">
+                  <div style="grid-column:4/11;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;position:relative;" title="Acme Mobile App — Apr 1 – Oct 31, 2026">
                     Apr 1 – Oct 31
                     <span style="position:absolute;right:0;top:0;bottom:0;width:15%;background:rgba(255,255,255,0.12);border-radius:0 4px 4px 0;" title="15% budget consumed"></span>
                   </div>
@@ -1188,14 +1091,14 @@
             <!-- Contoso Deal: May–Dec (cols 5–12) — Planning -->
             <div class="tl-row" onclick="showDetail('contoso-deal')">
               <div class="tl-label">
-                <span class="badge badge-info" style="font-size:10px;padding:2px 6px;">Planning</span>
+                <span class="badge badge-info badge-xs">Planning</span>
                 <strong>Contoso Deal</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Contoso Inc · 2 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><div></div><div></div><!-- Jan–Apr -->
-                  <div style="grid-column:5/13;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:#fff;font-weight:600;opacity:0.75;border:1px dashed rgba(255,255,255,0.4);" title="Contoso Deal — May 1 – Dec 31, 2026 (Planning)">
+                  <div style="grid-column:5/13;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:600;opacity:0.75;border:1px dashed rgba(255,255,255,0.4);" title="Contoso Deal — May 1 – Dec 31, 2026 (Planning)">
                     May 1 – Dec 31 (planned)
                   </div>
                 </div>
@@ -1205,7 +1108,7 @@
             <!-- Globex Data Migration: Completed May–Nov 2025 -->
             <div class="tl-row" style="opacity:0.6;">
               <div class="tl-label">
-                <span class="badge badge-success" style="font-size:10px;padding:2px 6px;">Completed</span>
+                <span class="badge badge-success badge-xs">Completed</span>
                 <strong>Globex Data Migration</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Globex Corp · 2025</div>
               </div>
@@ -1219,7 +1122,7 @@
             <!-- Acme CRM Setup: Completed Jan–Apr 2025 -->
             <div class="tl-row" style="opacity:0.6;">
               <div class="tl-label">
-                <span class="badge badge-success" style="font-size:10px;padding:2px 6px;">Completed</span>
+                <span class="badge badge-success badge-xs">Completed</span>
                 <strong>Acme CRM Setup</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp · 2025</div>
               </div>
@@ -1232,20 +1135,20 @@
 
             <!-- Today marker overlay note -->
             <div style="padding:var(--space-3) var(--space-4);border-top:1px solid var(--color-border);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                 <span style="display:inline-block;width:2px;height:14px;background:var(--color-primary);border-radius:1px;"></span> Today (Apr 6, 2026)
               </div>
               <div style="display:flex;gap:var(--space-4);">
-                <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                   <span style="width:10px;height:10px;border-radius:2px;background:var(--color-primary);display:inline-block;"></span> Active (billable)
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                   <span style="width:10px;height:10px;border-radius:2px;background:var(--color-warning);display:inline-block;"></span> At Risk
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                   <span style="width:10px;height:10px;border-radius:2px;background:var(--color-info);display:inline-block;opacity:0.75;"></span> Planning
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-3);">
+                <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);">
                   <span style="width:10px;height:10px;border-radius:2px;background:var(--color-success);display:inline-block;"></span> Completed
                 </div>
               </div>
@@ -1290,7 +1193,7 @@
           <div class="project-detail-badges" id="detail-badges">
             <span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span>
             <span class="separator"></span>
-            <span class="detail-badge">
+            <span class="detail-badge" data-sensitive="billing">
               <svg data-lucide="credit-card"></svg>
               <span class="font-mono">Hourly</span>
             </span>
@@ -1525,10 +1428,10 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm">SC</div>
-                        <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Lead Developer" data-dept="Engineering" data-worktime="87" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Sarah Chen</a>
+                        <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Sarah Chen</a>
                       </div>
                     </td>
-                    <td data-label="Role">Lead Developer</td>
+                    <td data-label="Role">Project Manager</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;85/h</td>
                     <td data-label="Hours" class="font-mono">120h</td>
                     <td data-label="Revenue" class="font-mono">&euro;10,200</td>
@@ -1540,10 +1443,10 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm" style="background:var(--color-info);">JS</div>
-                        <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82" style="font-weight:var(--weight-medium);color:var(--color-text-1);">John Smith</a>
+                        <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" style="font-weight:var(--weight-medium);color:var(--color-text-1);">John Smith</a>
                       </div>
                     </td>
-                    <td data-label="Role">Project Manager</td>
+                    <td data-label="Role">Senior Developer</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;95/h</td>
                     <td data-label="Hours" class="font-mono">80h</td>
                     <td data-label="Revenue" class="font-mono">&euro;7,600</td>
@@ -1555,10 +1458,10 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm" style="background:var(--color-gold);">AW</div>
-                        <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Alice Wang</a>
+                        <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Alice Wang</a>
                       </div>
                     </td>
-                    <td data-label="Role">Designer</td>
+                    <td data-label="Role">Software Engineer</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;75/h</td>
                     <td data-label="Hours" class="font-mono">88h</td>
                     <td data-label="Revenue" class="font-mono">&euro;6,600</td>
@@ -1570,10 +1473,10 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm" style="background:var(--color-error);">MR</div>
-                        <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Frontend Developer" data-dept="Engineering" data-worktime="78" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Marco Rossi</a>
+                        <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Marco Rossi</a>
                       </div>
                     </td>
-                    <td data-label="Role">Frontend Dev</td>
+                    <td data-label="Role">Operations Lead</td>
                     <td data-label="Bill Rate" class="font-mono" data-sensitive="financials">&euro;85/h</td>
                     <td data-label="Hours" class="font-mono">65h</td>
                     <td data-label="Revenue" class="font-mono">&euro;5,525</td>
@@ -1625,12 +1528,12 @@
                   <tr>
                     <th>Member</th>
                     <th>Role</th>
-                    <th>Bill Rate</th>
+                    <th data-sensitive="billing">Bill Rate</th>
                     <th>Hours</th>
-                    <th>Revenue</th>
-                    <th>Cost Rate</th>
-                    <th>Cost</th>
-                    <th>Gross Margin</th>
+                    <th data-sensitive="financials">Revenue</th>
+                    <th data-sensitive="financials">Cost Rate</th>
+                    <th data-sensitive="financials">Cost</th>
+                    <th data-sensitive="financials">Gross Margin</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1642,7 +1545,7 @@
                       </div>
                     </td>
                     <td data-label="Role">Lead Backend Dev</td>
-                    <td data-label="Bill Rate" class="font-mono">&euro;95/h</td>
+                    <td data-label="Bill Rate" class="font-mono" data-sensitive="billing">&euro;95/h</td>
                     <td data-label="Hours" class="font-mono">145h</td>
                     <td data-label="Revenue" class="font-mono">&euro;13,775</td>
                     <td data-label="Cost Rate" class="font-mono">&euro;52/h</td>
@@ -1657,7 +1560,7 @@
                       </div>
                     </td>
                     <td data-label="Role">DevOps Engineer</td>
-                    <td data-label="Bill Rate" class="font-mono">&euro;90/h</td>
+                    <td data-label="Bill Rate" class="font-mono" data-sensitive="billing">&euro;90/h</td>
                     <td data-label="Hours" class="font-mono">92h</td>
                     <td data-label="Revenue" class="font-mono">&euro;8,280</td>
                     <td data-label="Cost Rate" class="font-mono">&euro;48/h</td>
@@ -1671,8 +1574,8 @@
                         <a href="employees.html#rachel-moore" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Rachel Moore</a>
                       </div>
                     </td>
-                    <td data-label="Role">QA Engineer</td>
-                    <td data-label="Bill Rate" class="font-mono">&euro;80/h</td>
+                    <td data-label="Role">Backend Developer</td>
+                    <td data-label="Bill Rate" class="font-mono" data-sensitive="billing">&euro;80/h</td>
                     <td data-label="Hours" class="font-mono">68h</td>
                     <td data-label="Revenue" class="font-mono">&euro;5,440</td>
                     <td data-label="Cost Rate" class="font-mono">&euro;38/h</td>
@@ -1714,7 +1617,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><a href="employees.html#profile-sarah" data-hovercard data-name="Sarah Chen" data-role="Lead Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                    <td><a href="employees.html#profile-sarah" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
                     <td data-label="Week">Week 13</td>
                     <td data-label="Hours" class="font-mono">32h</td>
                     <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;2,720</td>
@@ -1728,7 +1631,7 @@
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html#profile-alice" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></td>
+                    <td><a href="employees.html#profile-alice" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang</a></td>
                     <td data-label="Week">Week 13</td>
                     <td data-label="Hours" class="font-mono">30h</td>
                     <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;2,250</td>
@@ -1868,7 +1771,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><a href="employees.html" data-hovercard data-name="Bob Taylor" data-role="QA Engineer" data-dept="Engineering" data-worktime="85">Bob Taylor</a></td>
+                    <td><a href="employees.html" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0">Bob Taylor</a></td>
                     <td data-label="Date">Apr 2</td>
                     <td data-label="Category">Accommodation</td>
                     <td data-label="Description">Marriott Lyon</td>
@@ -1876,7 +1779,7 @@
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Lead Developer" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                    <td><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
                     <td data-label="Date">Mar 28</td>
                     <td data-label="Category">Travel</td>
                     <td data-label="Description">Train Paris&ndash;Lyon</td>
@@ -1884,7 +1787,7 @@
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html" data-hovercard data-name="Alice Wang" data-role="UI Designer" data-dept="Design" data-worktime="90">Alice Wang</a></td>
+                    <td><a href="employees.html" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang</a></td>
                     <td data-label="Date">Apr 2</td>
                     <td data-label="Category">Software License</td>
                     <td data-label="Description">Figma Pro</td>
@@ -1892,7 +1795,7 @@
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Project Manager" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                    <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
                     <td data-label="Date">Mar 28</td>
                     <td data-label="Category">Travel</td>
                     <td data-label="Description">Client site visit</td>
@@ -1981,6 +1884,16 @@
 
           <!-- ── Tab: Milestones ── -->
           <div class="tab-content" id="tab-milestones">
+            <!-- Empty state for new projects -->
+            <div id="milestones-empty-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;">
+              <svg data-lucide="flag" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg>
+              <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No milestones defined yet</h3>
+              <p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;margin-bottom:var(--space-6);">Break your project into phases and track progress with milestones.</p>
+              <button class="btn btn-primary btn-sm" onclick="showToast('success','Milestone Created','Discovery &amp; Requirements milestone added.')">
+                <svg data-lucide="plus" width="14" height="14"></svg>
+                Add Milestone
+              </button>
+            </div>
             <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Milestone Tracker</h3>
             <div class="card">
               <div class="card-body" style="padding:0;">
@@ -2065,6 +1978,16 @@
 
           <!-- ── Tab: Activity ── -->
           <div class="tab-content" id="tab-activity">
+            <!-- Empty state for new projects (shown when no activity) -->
+            <div id="activity-empty-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-6);text-align:center;">
+              <svg data-lucide="activity" style="width:48px;height:48px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg>
+              <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">No activity yet</h3>
+              <p style="font-size:var(--text-body);color:var(--color-text-2);max-width:360px;margin-bottom:var(--space-6);">This project was just created. Activity will appear here as the team logs time and milestones.</p>
+              <button class="btn btn-primary btn-sm" onclick="showToast('info','Add Milestone','Open the Milestones tab to define your first milestone.')">
+                <svg data-lucide="flag" width="14" height="14"></svg>
+                Add Milestone
+              </button>
+            </div>
             <h3 style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);">Recent Activity</h3>
             <div class="card">
               <div class="card-body" style="padding:0;">
@@ -2162,14 +2085,14 @@
         <select class="form-select" id="teamMemberSelect">
           <option value="">Select a team member...</option>
           <optgroup label="Available">
-            <option value="Bob Taylor">Bob Taylor — Backend Developer (0% utilization)</option>
+            <option value="Bob Taylor">Bob Taylor — Backend Developer (0% Work Time)</option>
             <option value="David Park">David Park — Finance Lead</option>
-            <option value="Emma Laurent">Emma Laurent — HR Manager</option>
+            <option value="Emma Laurent">Emma Laurent — HR Specialist</option>
           </optgroup>
           <optgroup label="Partially Available">
-            <option value="Sarah Chen">Sarah Chen — Design Lead (87% util.)</option>
-            <option value="Marco Rossi">Marco Rossi — Operations Lead (88% util.)</option>
-            <option value="Carol Kim">Carol Kim — Finance Analyst (90% util.)</option>
+            <option value="Sarah Chen">Sarah Chen — Project Manager (87% Work Time)</option>
+            <option value="Marco Rossi">Marco Rossi — Operations Lead (88% Work Time)</option>
+            <option value="Carol Williams">Carol Williams — Design Lead (90% Work Time)</option>
           </optgroup>
           <optgroup label="On Leave">
             <option value="Alice Wang" disabled>Alice Wang — On Leave until Apr 18</option>
@@ -2283,8 +2206,11 @@
       </div>
     </div>
     <div class="modal-footer">
+      <button class="btn btn-ghost btn-md" onclick="closeModal();showToast('info','Templates','Select a project template to pre-fill details: Web App, Mobile App, Consulting Engagement, or Security Audit.')">
+        <svg data-lucide="layout-template" width="16" height="16"></svg> Create from Template
+      </button>
       <button class="btn btn-secondary btn-md" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary btn-md" onclick="createProject()">
+      <button class="btn btn-primary btn-md" id="createProjectBtn" onclick="createProject()">
         <svg data-lucide="plus" width="16" height="16"></svg>
         Create Project
       </button>
@@ -2364,7 +2290,6 @@
 
   // ── DOM refs ──
   const sidebar = document.getElementById('sidebar');
-  const collapseBtn = document.getElementById('sidebarCollapseBtn');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
   const notifBtn = document.getElementById('notifBtn');
@@ -2384,19 +2309,6 @@
   const emptyState = document.getElementById('emptyState');
 
   let isEmptyState = false;
-
-  // ── Sidebar collapse ──
-  collapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-
-  // ── Mobile menu ──
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Notification panel ──
   notifBtn.addEventListener('click', function(e) {
@@ -2458,7 +2370,7 @@
       boardView.style.display = 'none';
       listViewTable.classList.remove('active');
       listViewTable.style.display = 'none';
-      timelineView.classList.add('hidden');
+      timelineView.style.display = 'none';
 
       if (view === 'board') {
         boardView.classList.remove('hidden');
@@ -2467,7 +2379,7 @@
         listViewTable.classList.add('active');
         listViewTable.style.display = 'block';
       } else {
-        timelineView.classList.remove('hidden');
+        timelineView.style.display = 'block';
         if (typeof lucide !== 'undefined') lucide.createIcons();
       }
     });
@@ -2519,14 +2431,14 @@
       client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
       budgetPct: 64,
       budgetText: '&euro;32,200 / &euro;50,000 (64%)',
-      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Feb 1, 2026</span>'
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Feb 1, 2026</span>'
     },
     'initech-api': {
       title: 'Initech &mdash; API Integration',
       client: 'Client: <a href="clients.html#detail/initech">Initech</a>',
       budgetPct: 69,
       budgetText: '&euro;27,495 / &euro;40,000 (69%)',
-      badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>'
+      badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>'
     }
   };
 
@@ -2634,8 +2546,13 @@
       if (nameInput) nameInput.focus();
       return;
     }
-    closeModal();
-    showToast('success', 'Project Created', name + ' has been created and added to Gantt chart.');
+    var btn = document.getElementById('createProjectBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<svg data-lucide="loader" width="16" height="16"></svg> Creating...'; lucide.createIcons({ nodes: [btn] }); }
+    setTimeout(function() {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<svg data-lucide="plus" width="16" height="16"></svg> Create Project'; lucide.createIcons({ nodes: [btn] }); }
+      closeModal();
+      showToast('success', 'Project Created', name + ' has been created and added to Gantt chart.');
+    }, 1200);
   };
 
   // ── Color swatch picker ──

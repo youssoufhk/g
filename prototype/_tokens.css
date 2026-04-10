@@ -114,11 +114,19 @@
   --space-4:   16px;
   --space-5:   20px;
   --space-6:   24px;
+  --space-7:   28px;
   --space-8:   32px;
+  --space-9:   36px;
   --space-10:  40px;
+  --space-11:  44px;
   --space-12:  48px;
+  --space-14:  56px;
   --space-16:  64px;
+  --space-18:  72px;
   --space-20:  80px;
+
+  /* ── Typography Extras ── */
+  --letter-spacing-caps: 0.05em;
 
   /* ── Border Radius ── */
   --radius-none: 0px;
@@ -318,11 +326,15 @@ a:hover {
 .text-error { color: var(--color-error); }
 .text-gold { color: var(--color-gold); }
 
-/* Reduced motion */
+/* Reduced motion — broad base; decorative overrides are in _components.css */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* NOTE: transition-duration is intentionally NOT suppressed here so that
+       functional transitions (modals, panels, dropdowns) remain usable.
+       Selective overrides are applied in _components.css. */
   }
 }

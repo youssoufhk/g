@@ -10,9 +10,9 @@
   <style>
     /* ── Portal visual differentiation ── */
     .portal-body {
-      --color-bg: hsl(35, 20%, 7%);
-      --color-surface-0: hsl(40, 15%, 10%);
-      --color-surface-1: hsl(40, 12%, 13%);
+      --color-bg: var(--color-background, hsl(35, 20%, 7%));
+      --color-surface-0: var(--color-surface-1, hsl(40, 15%, 10%));
+      --color-surface-1: var(--color-surface-2, hsl(40, 12%, 13%));
     }
 
     .portal-app {
@@ -324,7 +324,7 @@
       border-left: 1px solid var(--color-border);
       overflow-y: auto;
       transform: translateX(100%);
-      transition: transform 0.3s ease;
+      transition: transform var(--motion-slow, 0.3s) var(--ease-out, ease);
     }
     .slide-panel-overlay.open .slide-panel { transform: translateX(0); }
     .slide-panel-header {
@@ -397,6 +397,77 @@
     }
 
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* ── Tab transition ── */
+    .portal-section {
+      transition: opacity var(--motion-fast, 150ms);
+    }
+    .portal-section.switching {
+      opacity: 0;
+    }
+
+    /* ── Pending approval banner ── */
+    .pending-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      background: var(--color-warning-muted, rgba(245,158,11,0.1));
+      border: 1px solid var(--color-warning, #f59e0b);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-5);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .pending-banner-text {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-warning, #f59e0b);
+    }
+    .pending-banner-text strong { color: var(--color-text-1); }
+
+    /* ── Timesheet filter bar ── */
+    .ts-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .ts-filter-btn {
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full, 999px);
+      border: 1px solid var(--color-border);
+      background: transparent;
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .ts-filter-btn.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: var(--color-white);
+    }
+    .ts-filter-btn:hover:not(.active) { background: var(--color-surface-1); color: var(--color-text-1); }
+
+    /* ── Empty state ── */
+    .empty-state-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      padding: var(--space-12, 3rem) var(--space-6);
+      text-align: center;
+      color: var(--color-text-3);
+    }
+    .empty-state-card svg { opacity: 0.4; }
+    .empty-state-card .empty-title { font-size: var(--text-body-lg); font-weight: var(--weight-medium); color: var(--color-text-2); }
+    .empty-state-card .empty-sub { font-size: var(--text-body-sm); color: var(--color-text-3); }
 
     /* ── Extra button variants not yet in _components.css ── */
     .btn-success {
@@ -479,7 +550,7 @@
       <a class="portal-nav-item" href="#" data-tab="messages">
         <svg data-lucide="message-square"></svg>
         Messages
-        <span class="badge badge-error" style="font-size:10px; padding: 1px 6px;">2</span>
+        <span class="badge badge-error badge-xs">2</span>
       </a>
       <a class="portal-nav-item" href="#" data-tab="documents">
         <svg data-lucide="paperclip"></svg>
@@ -489,6 +560,28 @@
 
     <!-- ── Portal Content ── -->
     <main class="portal-content">
+
+      <!-- ── Pending Approval Banner ── -->
+      <div class="pending-banner" id="pendingBanner">
+        <div class="pending-banner-text">
+          <svg data-lucide="clock" width="18" height="18"></svg>
+          <span><strong>3 timesheets</strong> are awaiting your approval</span>
+        </div>
+        <button class="btn btn-warning btn-sm" onclick="switchTab('timesheets')">
+          <svg data-lucide="check-circle" width="14" height="14"></svg>
+          Review &amp; Approve
+        </button>
+      </div>
+
+      <!-- ── Empty State (dev util / new-client state) ── -->
+      <div id="sec-empty" class="empty-state" style="display:none;">
+        <div class="empty-state-card">
+          <svg data-lucide="inbox" width="48" height="48"></svg>
+          <div class="empty-title">Nothing here yet</div>
+          <div class="empty-sub">There's no data to show right now. Check back later or contact your account manager.</div>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('info', 'Account Manager', 'Your account manager has been notified.')">Contact Account Manager</button>
+        </div>
+      </div>
 
       <!-- ════════════════════════════════════
            DASHBOARD
@@ -693,22 +786,22 @@
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-sage">SC</div>
               <div class="member-name">Sarah Chen</div>
-              <div class="member-role">Lead Developer</div>
+              <div class="member-role">Project Manager</div>
             </div>
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-violet">JS</div>
               <div class="member-name">John Smith</div>
-              <div class="member-role">Project Manager</div>
+              <div class="member-role">Senior Developer</div>
             </div>
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-sage-gold">AW</div>
               <div class="member-name">Alice Wang</div>
-              <div class="member-role">UI/UX Designer</div>
+              <div class="member-role">Software Engineer</div>
             </div>
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-amber">MR</div>
               <div class="member-name">Marco Rossi</div>
-              <div class="member-role">Frontend Developer</div>
+              <div class="member-role">Operations Lead</div>
             </div>
             <div class="team-member-portal">
               <div class="avatar avatar-md avatar-coral">LO</div>
@@ -767,14 +860,38 @@
            TIMESHEETS
       ════════════════════════════════════ -->
       <section class="portal-section" id="sec-timesheets">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-6); flex-wrap:wrap; gap: var(--space-3);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-4); flex-wrap:wrap; gap: var(--space-3);">
           <div>
             <h2 style="font-size: var(--text-heading-1); font-weight: var(--weight-semibold);">Timesheets</h2>
             <p style="color: var(--color-text-2); margin-top: var(--space-1);">Review, approve or flag timesheets submitted by your team.</p>
           </div>
-          <button class="btn btn-secondary btn-sm"><svg data-lucide="download" width="14" height="14"></svg> Export Report</button>
+          <button class="btn btn-secondary btn-sm" onclick="GHR.showToast('info', 'Export', 'Generating timesheet report PDF...')"><svg data-lucide="download" width="14" height="14"></svg> Export Report</button>
         </div>
-        <div class="data-table-wrapper">
+
+        <!-- Filter bar + Bulk approve -->
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap: var(--space-3); margin-bottom: var(--space-4);">
+          <div class="ts-filter-bar" style="margin-bottom:0;">
+            <button class="ts-filter-btn active" id="tsFilterAll" onclick="applyTsFilter('all')">All</button>
+            <button class="ts-filter-btn" id="tsFilterPending" onclick="applyTsFilter('pending')">Pending Approval</button>
+            <button class="ts-filter-btn" id="tsFilterApproved" onclick="applyTsFilter('approved')">Approved</button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openBulkApproveModal()">
+            <svg data-lucide="check-circle" width="14" height="14"></svg>
+            Approve All Pending
+          </button>
+        </div>
+
+        <!-- Timesheet empty state (shown when no entries) -->
+        <div id="tsEmptyState" style="display:none;" class="card">
+          <div class="empty-state-card">
+            <svg data-lucide="clock" width="48" height="48"></svg>
+            <div class="empty-title">No timesheets submitted yet</div>
+            <div class="empty-sub">When your team submits timesheets, they'll appear here for your review and approval.</div>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('info', 'Account Manager', 'Your account manager has been notified.')">Contact Account Manager</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper" id="tsTableWrapper">
           <table class="data-table mobile-cards" id="timesheetTable">
             <thead>
               <tr>
@@ -788,7 +905,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr data-ts-status="pending">
                 <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-sage">SC</div> Sarah Chen</div></td>
                 <td data-label="Week">Mar 30 – Apr 5</td>
                 <td data-label="Project">Website Redesign</td>
@@ -811,7 +928,7 @@
                   </div>
                 </td>
               </tr>
-              <tr>
+              <tr data-ts-status="pending">
                 <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-amber">MR</div> Marco Rossi</div></td>
                 <td data-label="Week">Mar 30 – Apr 5</td>
                 <td data-label="Project">Website Redesign</td>
@@ -834,7 +951,7 @@
                   </div>
                 </td>
               </tr>
-              <tr>
+              <tr data-ts-status="approved">
                 <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-sage-gold">AW</div> Alice Wang</div></td>
                 <td data-label="Week">Mar 30 – Apr 5</td>
                 <td data-label="Project">Website Redesign</td>
@@ -845,7 +962,7 @@
                   <span style="font-size: var(--text-caption); color: var(--color-text-3);">Approved</span>
                 </td>
               </tr>
-              <tr>
+              <tr data-ts-status="pending">
                 <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-violet">JS</div> John Smith</div></td>
                 <td data-label="Week">Mar 30 – Apr 5</td>
                 <td data-label="Project">Website Redesign</td>
@@ -868,7 +985,7 @@
                   </div>
                 </td>
               </tr>
-              <tr>
+              <tr data-ts-status="pending">
                 <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-coral">LO</div> Liam O'Brien</div></td>
                 <td data-label="Week">Mar 30 – Apr 5</td>
                 <td data-label="Project">Website Redesign</td>
@@ -891,7 +1008,7 @@
                   </div>
                 </td>
               </tr>
-              <tr>
+              <tr data-ts-status="approved">
                 <td><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-sm avatar-sage">SC</div> Sarah Chen</div></td>
                 <td data-label="Week">Mar 23 – 29</td>
                 <td data-label="Project">Website Redesign</td>
@@ -908,9 +1025,9 @@
             <span>Showing 6 of 24 entries</span>
             <div class="pagination-buttons">
               <button class="active">1</button>
-              <button>2</button>
-              <button>3</button>
-              <button>4</button>
+              <button onclick="showToast('info', 'Loading', 'Loading page 2...')">2</button>
+              <button onclick="showToast('info', 'Loading', 'Loading page 3...')">3</button>
+              <button onclick="showToast('info', 'Loading', 'Loading page 4...')">4</button>
             </div>
           </div>
         </div>
@@ -943,8 +1060,9 @@
                 <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€12,400.00</td>
                 <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
                 <td data-label="Actions" style="white-space:nowrap;">
-                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download', 'Downloading INV-2026-048.pdf...')" title="Download PDF"><svg data-lucide="download" width="14" height="14"></svg></button>
                   <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-048','Website Redesign','Apr 1, 2026','Apr 30, 2026','Sent')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
+                  <button class="btn btn-primary btn-xs" onclick="openPaymentModal('INV-2026-048', '€12,400')"><svg data-lucide="credit-card" width="14" height="14"></svg> Pay</button>
                 </td>
               </tr>
               <tr>
@@ -955,7 +1073,7 @@
                 <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€11,200.00</td>
                 <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                 <td data-label="Actions" style="white-space:nowrap;">
-                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download', 'Downloading INV-2026-045.pdf...')" title="Download PDF"><svg data-lucide="download" width="14" height="14"></svg></button>
                   <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-045','Website Redesign','Mar 1, 2026','Mar 31, 2026','Paid')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
@@ -967,8 +1085,9 @@
                 <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€5,000.00</td>
                 <td data-label="Status"><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> Overdue</span></td>
                 <td data-label="Actions" style="white-space:nowrap;">
-                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download', 'Downloading INV-2026-043.pdf...')" title="Download PDF"><svg data-lucide="download" width="14" height="14"></svg></button>
                   <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-043','Mobile App','Feb 15, 2026','Mar 15, 2026','Overdue')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
+                  <button class="btn btn-primary btn-xs" onclick="openPaymentModal('INV-2026-043', '€5,000')"><svg data-lucide="credit-card" width="14" height="14"></svg> Pay</button>
                 </td>
               </tr>
               <tr>
@@ -979,7 +1098,7 @@
                 <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€8,200.00</td>
                 <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                 <td data-label="Actions" style="white-space:nowrap;">
-                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download started', 'PDF download started')"><svg data-lucide="download" width="14" height="14"></svg> PDF</button>
+                  <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download', 'Downloading INV-2026-041.pdf...')" title="Download PDF"><svg data-lucide="download" width="14" height="14"></svg></button>
                   <button class="btn btn-secondary btn-xs" onclick="openInvoiceDetail('INV-2026-041','CRM Integration','Jan 15, 2026','Feb 14, 2026','Paid')"><svg data-lucide="eye" width="14" height="14"></svg> Details</button>
                 </td>
               </tr>
@@ -1227,13 +1346,78 @@
           </div>
         </div>
         <!-- Actions -->
-        <div style="display:flex; gap: var(--space-3);">
-          <button class="btn btn-primary" onclick="showToast('info', 'PDF download started', 'Your invoice PDF is being prepared')">
+        <div style="display:flex; gap: var(--space-3); flex-wrap:wrap;" id="invoicePanelActions">
+          <button class="btn btn-primary" id="invoicePayBtn" onclick="openPaymentModalFromPanel()" style="display:none;">
+            <svg data-lucide="credit-card" width="16" height="16"></svg>
+            Pay Invoice
+          </button>
+          <button class="btn btn-secondary" onclick="showToast('info', 'PDF download started', 'Your invoice PDF is being prepared')">
             <svg data-lucide="download" width="16" height="16"></svg>
             Download PDF
           </button>
           <button class="btn btn-ghost" onclick="closeInvoiceDetail()">Close</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       PAYMENT CONFIRMATION MODAL
+  ════════════════════════════════════ -->
+  <div class="modal-backdrop" id="paymentModal">
+    <div class="modal" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg data-lucide="credit-card" width="20" height="20" style="color: var(--color-accent); vertical-align:middle; margin-right: var(--space-2);"></svg>
+          Pay Invoice
+        </h3>
+        <button class="modal-close" onclick="closePaymentModal()"><svg data-lucide="x" width="18" height="18"></svg></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-4);">You are about to initiate payment for:</p>
+        <div style="background: var(--color-surface-1); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-4);">
+          <div style="display:flex; justify-content:space-between; margin-bottom: var(--space-2);">
+            <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Invoice</span>
+            <span style="font-weight: var(--weight-semibold); color: var(--color-text-1);" id="payModalInvNum">—</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Amount</span>
+            <span style="font-weight: var(--weight-bold); font-size: var(--text-heading-3); color: var(--color-text-1); font-variant-numeric: tabular-nums;" id="payModalAmount">—</span>
+          </div>
+        </div>
+        <p style="font-size: var(--text-caption); color: var(--color-text-3);">Payment will be processed via bank transfer. You'll receive a confirmation email once complete.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closePaymentModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmPayment()">
+          <svg data-lucide="check" width="16" height="16"></svg>
+          Confirm Payment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       BULK APPROVE MODAL
+  ════════════════════════════════════ -->
+  <div class="modal-backdrop" id="bulkApproveModal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg data-lucide="check-circle" width="20" height="20" style="color: var(--color-success); vertical-align:middle; margin-right: var(--space-2);"></svg>
+          Approve All Pending
+        </h3>
+        <button class="modal-close" onclick="closeBulkApproveModal()"><svg data-lucide="x" width="18" height="18"></svg></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Are you sure you want to approve all <strong id="bulkPendingCount">3</strong> pending timesheets? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeBulkApproveModal()">Cancel</button>
+        <button class="btn btn-success" onclick="confirmBulkApprove()">
+          <svg data-lucide="check-circle" width="16" height="16"></svg>
+          Approve All
+        </button>
       </div>
     </div>
   </div>
@@ -1248,6 +1432,7 @@
   </button>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../_shared.js"></script>
   <script>
     lucide.createIcons();
 
@@ -1265,10 +1450,17 @@
       document.querySelectorAll('.portal-nav-item').forEach(function(i) {
         i.classList.toggle('active', i.dataset.tab === tab);
       });
-      document.querySelectorAll('.portal-section').forEach(function(s) { s.classList.remove('active'); });
-      var sec = document.getElementById('sec-' + tab);
-      if (sec) sec.classList.add('active');
-      currentTab = tab;
+      // Tab transition: fade out
+      var activeSec = document.querySelector('.portal-section.active');
+      if (activeSec) activeSec.classList.add('switching');
+      setTimeout(function() {
+        document.querySelectorAll('.portal-section').forEach(function(s) {
+          s.classList.remove('active', 'switching');
+        });
+        var sec = document.getElementById('sec-' + tab);
+        if (sec) sec.classList.add('active');
+        currentTab = tab;
+      }, 80);
     }
 
     // Handle hash on load
@@ -1296,6 +1488,7 @@
     // ── Timesheet approve / flag ─────────────────
     function approveTimesheetRow(btn) {
       var row = btn.closest('tr');
+      row.dataset.tsStatus = 'approved';
       var statusCell = row.querySelector('.ts-status-cell');
       statusCell.innerHTML = '<span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span>';
       var actionsCell = btn.closest('td');
@@ -1308,8 +1501,13 @@
       var actionsCell = btn.closest('td');
       var flagForm = actionsCell.querySelector('.flag-form');
       if (flagForm) {
-        flagForm.classList.toggle('open');
-        if (flagForm.classList.contains('open')) {
+        var isOpening = !flagForm.classList.contains('open');
+        // Close all other open flag forms first (mutual exclusivity)
+        document.querySelectorAll('.flag-form.open').forEach(function(f) {
+          if (f !== flagForm) f.classList.remove('open');
+        });
+        flagForm.classList.toggle('open', isOpening);
+        if (isOpening) {
           flagForm.querySelector('input').focus();
         }
       }
@@ -1341,8 +1539,8 @@
         lines: [
           { desc: 'Development (Sarah Chen)', hours: '31h', rate: '€85/h', amount: '€2,635' },
           { desc: 'Development (Marco Rossi)', hours: '40h', rate: '€85/h', amount: '€3,400' },
-          { desc: 'Design (Alice Wang)', hours: '24h', rate: '€75/h', amount: '€1,800' },
-          { desc: 'PM (John Smith)', hours: '15h', rate: '€95/h', amount: '€1,425' },
+          { desc: 'Engineering (Alice Wang)', hours: '24h', rate: '€75/h', amount: '€1,800' },
+          { desc: 'Development (John Smith)', hours: '15h', rate: '€95/h', amount: '€1,425' },
           { desc: 'Development (Liam O\'Brien)', hours: '32h', rate: '€65/h', amount: '€2,080' }
         ],
         subtotal: '€11,340', tax: '€1,060', total: '€12,400', paid: false
@@ -1409,12 +1607,19 @@
         document.getElementById('detailTax').textContent = data.tax;
         document.getElementById('detailTotal').textContent = data.total;
         var payCard = document.getElementById('paymentHistoryCard');
+        var payBtn = document.getElementById('invoicePayBtn');
         if (data.paid) {
           payCard.style.display = 'block';
           document.getElementById('detailPaymentDate').textContent = data.paymentDate || '—';
           document.getElementById('detailPaymentRef').textContent = data.paymentRef || '—';
+          if (payBtn) payBtn.style.display = 'none';
         } else {
           payCard.style.display = 'none';
+          if (payBtn) {
+            payBtn.style.display = '';
+            payBtn.dataset.invNum = invNum;
+            payBtn.dataset.total = data.total;
+          }
         }
       }
 
@@ -1468,7 +1673,7 @@
       } else if (q.includes('project') || q.includes('status') || q.includes('progress')) {
         answer = 'You have <strong>3 active projects</strong>: Website Redesign (55% complete, on track — Sprint 1 in progress), Mobile App (15% complete, early stage), and CRM Integration (20% complete). All projects are currently on track with their milestones.';
       } else if (q.includes('team') || q.includes('member') || q.includes('who')) {
-        answer = 'Your team consists of <strong>12 members across 3 projects</strong>. The Website Redesign team includes Sarah Chen (Lead Dev), John Smith (PM), Alice Wang (Designer), Marco Rossi (Frontend), and Liam O\'Brien (Junior Dev).';
+        answer = 'Your team consists of <strong>12 members across 3 projects</strong>. The Website Redesign team includes Sarah Chen (Project Manager), John Smith (Senior Developer), Alice Wang (Software Engineer), Marco Rossi (Operations Lead), and Liam O\'Brien (Junior Dev).';
       } else {
         answer = 'I can help you with information about your <strong>invoices</strong>, <strong>timesheets</strong>, <strong>project status</strong>, and <strong>team members</strong>. Try asking something like "What invoices are overdue?" or "How many hours were logged this month?"';
       }
@@ -1489,6 +1694,90 @@
         document.getElementById('sec-' + currentTab).classList.add('active');
       }
     }
+
+    // ── Timesheet filter ────────────────────────
+    var currentTsFilter = 'all';
+    function applyTsFilter(filter) {
+      currentTsFilter = filter;
+      // Update button states
+      ['all','pending','approved'].forEach(function(f) {
+        var btn = document.getElementById('tsFilter' + f.charAt(0).toUpperCase() + f.slice(1));
+        if (btn) btn.classList.toggle('active', f === filter);
+      });
+      // Filter rows
+      document.querySelectorAll('#timesheetTable tbody tr').forEach(function(row) {
+        var status = row.dataset.tsStatus || 'pending';
+        if (filter === 'all') {
+          row.style.display = '';
+        } else {
+          row.style.display = (status === filter) ? '' : 'none';
+        }
+      });
+    }
+
+    // ── Bulk approve modal ──────────────────────
+    function openBulkApproveModal() {
+      var count = document.querySelectorAll('#timesheetTable tbody tr[data-ts-status="pending"]').length;
+      if (count === 0) {
+        showToast('info', 'No Pending Timesheets', 'There are no pending timesheets to approve.');
+        return;
+      }
+      document.getElementById('bulkPendingCount').textContent = count;
+      document.getElementById('bulkApproveModal').classList.add('active');
+      lucide.createIcons({ nodes: [document.getElementById('bulkApproveModal')] });
+    }
+    function closeBulkApproveModal() {
+      var modal = document.getElementById('bulkApproveModal');
+      modal.classList.add('removing');
+      setTimeout(function() { modal.classList.remove('active', 'removing'); }, 200);
+    }
+    function confirmBulkApprove() {
+      // Approve all pending rows
+      document.querySelectorAll('#timesheetTable tbody tr[data-ts-status="pending"]').forEach(function(row) {
+        row.dataset.tsStatus = 'approved';
+        var statusCell = row.querySelector('.ts-status-cell');
+        if (statusCell) statusCell.innerHTML = '<span class="badge badge-success"><svg data-lucide="check" width="12" height="12"></svg> Approved</span>';
+        var actionsCell = row.querySelector('td:last-child');
+        if (actionsCell) actionsCell.innerHTML = '<span style="font-size: var(--text-caption); color: var(--color-text-3);">Approved</span>';
+        lucide.createIcons({ nodes: [row] });
+      });
+      closeBulkApproveModal();
+      showToast('success', 'Approved', 'All pending timesheets have been approved.');
+      // Dismiss pending banner
+      var banner = document.getElementById('pendingBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    // ── Payment modal ────────────────────────────
+    var _payModalInv = '';
+    var _payModalAmt = '';
+    function openPaymentModal(invNum, amount) {
+      _payModalInv = invNum;
+      _payModalAmt = amount;
+      document.getElementById('payModalInvNum').textContent = invNum;
+      document.getElementById('payModalAmount').textContent = amount;
+      document.getElementById('paymentModal').classList.add('active');
+      lucide.createIcons({ nodes: [document.getElementById('paymentModal')] });
+    }
+    function openPaymentModalFromPanel() {
+      var btn = document.getElementById('invoicePayBtn');
+      if (btn) openPaymentModal(btn.dataset.invNum, btn.dataset.total);
+    }
+    function closePaymentModal() {
+      var modal = document.getElementById('paymentModal');
+      modal.classList.add('removing');
+      setTimeout(function() { modal.classList.remove('active', 'removing'); }, 200);
+    }
+    function confirmPayment() {
+      closePaymentModal();
+      showToast('success', 'Payment Initiated', 'Payment for ' + _payModalAmt + ' is being processed.');
+    }
+
+    // ── Init ─────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.GHR && GHR.initSkeletons) GHR.initSkeletons();
+      lucide.createIcons();
+    });
   </script>
 </body>
 </html>

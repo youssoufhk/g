@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account &amp; Settings — GammaHR Quantum</title>
+  <title>Account — GammaHR</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <link rel="stylesheet" href="_layout.css">
@@ -196,13 +196,13 @@
       background: var(--color-surface-3);
       border-radius: var(--radius-full);
       overflow: hidden;
-      margin-bottom: 6px;
+      margin-bottom: var(--space-1-5);
     }
     .pw-strength-fill {
       height: 100%;
       border-radius: var(--radius-full);
       width: 0%;
-      transition: width 0.3s ease, background 0.3s ease;
+      transition: width var(--motion-slow) var(--ease-out), background var(--motion-slow) var(--ease-out);
     }
     .pw-strength-label {
       font-size: var(--text-caption);
@@ -228,7 +228,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: var(--text-heading-1);
       font-weight: var(--weight-bold);
       color: var(--color-text-on-primary);
       flex-shrink: 0;
@@ -331,7 +331,7 @@
       position: absolute;
       inset: 0;
       background: var(--color-surface-3);
-      border-radius: 24px;
+      border-radius: var(--radius-2xl);
       cursor: pointer;
       transition: background var(--motion-fast);
     }
@@ -391,7 +391,7 @@
       color: var(--color-text-2);
     }
     .theme-preview-dark {
-      background: hsl(35, 16%, 5%);
+      background: var(--color-background);
     }
     .theme-preview-dark::before {
       content: '';
@@ -399,19 +399,19 @@
       top: 6px; left: 6px;
       width: 20px;
       height: 42px;
-      background: hsl(35, 11%, 11%);
-      border-radius: 3px;
+      background: var(--color-surface-1);
+      border-radius: var(--radius-sm);
     }
     .theme-preview-dark::after {
       content: '';
       position: absolute;
       top: 6px; left: 32px; right: 6px;
       height: 8px;
-      background: hsl(35, 9%, 15%);
-      border-radius: 3px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-sm);
     }
     .theme-preview-light {
-      background: hsl(40, 30%, 96%);
+      background: var(--color-surface-0);
     }
     .theme-preview-light::before {
       content: '';
@@ -419,8 +419,8 @@
       top: 6px; left: 6px;
       width: 20px;
       height: 42px;
-      background: hsl(155, 26%, 46%);
-      border-radius: 3px;
+      background: var(--color-primary);
+      border-radius: var(--radius-sm);
       opacity: 0.3;
     }
     .theme-preview-light::after {
@@ -428,11 +428,11 @@
       position: absolute;
       top: 6px; left: 32px; right: 6px;
       height: 8px;
-      background: hsl(35, 10%, 85%);
-      border-radius: 3px;
+      background: var(--color-border);
+      border-radius: var(--radius-sm);
     }
     .theme-preview-system {
-      background: linear-gradient(135deg, hsl(35, 16%, 5%) 50%, hsl(40, 30%, 96%) 50%);
+      background: linear-gradient(135deg, var(--color-background) 50%, var(--color-surface-0) 50%);
     }
 
     /* Connected apps */
@@ -467,7 +467,7 @@
     /* Delete confirmation */
     .delete-zone {
       background: var(--color-error-muted);
-      border: 1px solid hsla(5, 65%, 52%, 0.3);
+      border: 1px solid var(--color-error-muted);
       border-radius: var(--radius-lg);
       padding: var(--space-5);
     }
@@ -680,121 +680,7 @@
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="calendar-range"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="account.html" class="nav-item active" style="margin-bottom:var(--space-2);">
-        <svg data-lucide="user-circle"></svg>
-        <span class="nav-label">Account</span>
-      </a>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Sidebar overlay for mobile -->
+  <aside class="sidebar" id="sidebar"></aside>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
@@ -1002,6 +888,34 @@
             <button class="btn btn-ghost btn-md" style="margin-left:var(--space-3);">Cancel</button>
           </div>
 
+          <!-- Recent Activity -->
+          <div class="settings-section" style="margin-top:var(--space-6);">
+            <div class="settings-section-title">Recent Activity</div>
+            <div class="settings-section-desc">Your recent account activity and login history.</div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-subtle);">
+                <svg data-lucide="log-in" width="16" height="16" style="color:var(--color-success);flex-shrink:0;"></svg>
+                <div style="flex:1;"><span style="font-size:var(--text-body-sm);color:var(--color-text-1);">Signed in</span><span style="font-size:var(--text-caption);color:var(--color-text-3);margin-left:var(--space-2);">MacBook Pro, Paris</span></div>
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Today, 09:14</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-subtle);">
+                <svg data-lucide="save" width="16" height="16" style="color:var(--color-info);flex-shrink:0;"></svg>
+                <div style="flex:1;"><span style="font-size:var(--text-body-sm);color:var(--color-text-1);">Profile updated</span><span style="font-size:var(--text-caption);color:var(--color-text-3);margin-left:var(--space-2);">Changed bio</span></div>
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Yesterday, 16:05</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0;border-bottom:1px solid var(--color-border-subtle);">
+                <svg data-lucide="log-in" width="16" height="16" style="color:var(--color-success);flex-shrink:0;"></svg>
+                <div style="flex:1;"><span style="font-size:var(--text-body-sm);color:var(--color-text-1);">Signed in</span><span style="font-size:var(--text-caption);color:var(--color-text-3);margin-left:var(--space-2);">iPhone 14, Paris</span></div>
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Yesterday, 08:42</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0;">
+                <svg data-lucide="key" width="16" height="16" style="color:var(--color-warning);flex-shrink:0;"></svg>
+                <div style="flex:1;"><span style="font-size:var(--text-body-sm);color:var(--color-text-1);">Password changed</span></div>
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);white-space:nowrap;">Apr 3, 14:20</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1080,7 +994,7 @@
             <div class="settings-section-desc">These devices are currently signed into your account. Revoke any session you don't recognise.</div>
 
             <div style="overflow-x:auto;margin-bottom:var(--space-4);">
-              <table class="sessions-table">
+              <table class="sessions-table mobile-cards">
                 <thead>
                   <tr>
                     <th>Device</th>
@@ -1091,42 +1005,42 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>
+                    <td data-label="Device">
                       <div class="session-device">
                         <svg data-lucide="monitor" width="16" height="16" style="color:var(--color-primary);flex-shrink:0;"></svg>
                         <span>MacBook Pro</span>
                         <span class="badge badge-success" style="font-size:10px;">This device</span>
                       </div>
                     </td>
-                    <td style="color:var(--color-text-2);">Paris, FR</td>
-                    <td style="color:var(--color-success);font-size:var(--text-caption);">Active now</td>
-                    <td style="text-align:right;">
+                    <td data-label="Location" style="color:var(--color-text-2);">Paris, FR</td>
+                    <td data-label="Last Active" style="color:var(--color-success);font-size:var(--text-caption);">Active now</td>
+                    <td data-label="Action" style="text-align:right;">
                       <button class="btn btn-ghost btn-xs" disabled style="opacity:0.4;cursor:not-allowed;">Current</button>
                     </td>
                   </tr>
                   <tr>
-                    <td>
+                    <td data-label="Device">
                       <div class="session-device">
                         <svg data-lucide="smartphone" width="16" height="16" style="color:var(--color-text-3);flex-shrink:0;"></svg>
                         <span>iPhone 14</span>
                       </div>
                     </td>
-                    <td style="color:var(--color-text-2);">Paris, FR</td>
-                    <td style="color:var(--color-text-3);font-size:var(--text-caption);">2 hours ago</td>
-                    <td style="text-align:right;">
+                    <td data-label="Location" style="color:var(--color-text-2);">Paris, FR</td>
+                    <td data-label="Last Active" style="color:var(--color-text-3);font-size:var(--text-caption);">2 hours ago</td>
+                    <td data-label="Action" style="text-align:right;">
                       <button class="btn btn-destructive-ghost btn-xs" onclick="revokeSession(this,'iPhone 14')">Revoke</button>
                     </td>
                   </tr>
                   <tr>
-                    <td>
+                    <td data-label="Device">
                       <div class="session-device">
                         <svg data-lucide="chrome" width="16" height="16" style="color:var(--color-text-3);flex-shrink:0;"></svg>
                         <span>Chrome on Windows</span>
                       </div>
                     </td>
-                    <td style="color:var(--color-text-2);">Lyon, FR</td>
-                    <td style="color:var(--color-text-3);font-size:var(--text-caption);">Yesterday 3:42 PM</td>
-                    <td style="text-align:right;">
+                    <td data-label="Location" style="color:var(--color-text-2);">Lyon, FR</td>
+                    <td data-label="Last Active" style="color:var(--color-text-3);font-size:var(--text-caption);">Yesterday 3:42 PM</td>
+                    <td data-label="Action" style="text-align:right;">
                       <button class="btn btn-destructive-ghost btn-xs" onclick="revokeSession(this,'Chrome on Windows')">Revoke</button>
                     </td>
                   </tr>
@@ -1146,6 +1060,20 @@
       <!-- ═══════════════════════════ TAB 3: NOTIFICATIONS ═══════════════════════════ -->
       <div class="account-panel" id="panel-notifications" role="tabpanel">
         <div class="settings-layout">
+
+          <!-- Do Not Disturb -->
+          <div class="settings-section">
+            <div class="settings-section-title">Do Not Disturb</div>
+            <div class="settings-section-desc">Pause all non-critical notifications. Urgent system alerts will still come through.</div>
+
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">Enable Do Not Disturb</div>
+                <div class="toggle-desc">Silence all email and in-app notifications until you turn this off</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="dndToggle" onchange="if(this.checked){showToast('info','DND Enabled','Notifications are now paused.')}else{showToast('success','DND Off','Notifications resumed.')}"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
 
           <!-- Email notifications -->
           <div class="settings-section">
@@ -1300,7 +1228,7 @@
           <!-- Language & locale -->
           <div class="settings-section">
             <div class="settings-section-title">Language &amp; Locale</div>
-            <div class="settings-section-desc">Set your language, date format, and regional preferences.</div>
+            <div class="settings-section-desc">Set your language, date format, and regional preferences. <button class="btn btn-ghost btn-xs" style="font-size:var(--text-caption);" onclick="detectLocale()">Detect automatically</button></div>
 
             <div class="form-row">
               <div class="form-group">
@@ -1320,6 +1248,7 @@
                   <option value="America/New_York">America/New_York (EST)</option>
                   <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
                 </select>
+                <div class="form-hint" id="tzAutoDetect"></div>
               </div>
             </div>
 
@@ -1580,9 +1509,6 @@
 
   // ── DOM references ──
   var sidebar        = document.getElementById('sidebar');
-  var collapseBtn    = document.getElementById('sidebarCollapseBtn');
-  var mobileMenuBtn  = document.getElementById('mobileMenuBtn');
-  var sidebarOverlay = document.getElementById('sidebarOverlay');
   var searchTrigger  = document.getElementById('searchTrigger');
   var cmdPalette     = document.getElementById('cmdPalette');
   var cmdInput       = document.getElementById('cmdInput');
@@ -1591,17 +1517,6 @@
   var userMenuBtn    = document.getElementById('userMenuBtn');
   var userDropdown   = document.getElementById('userDropdown');
   var toastContainer = document.getElementById('toastContainer');
-
-  // ── Sidebar collapse ──
-  if (collapseBtn) collapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-  if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  if (sidebarOverlay) sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Command palette ──
   function openCmd() { cmdPalette.classList.add('active'); setTimeout(function() { cmdInput.focus(); }, 100); }
@@ -1835,6 +1750,45 @@
     }
   })();
 
+  // ── Locale auto-detect ──
+  window.detectLocale = function() {
+    var tz = Intl && Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : null;
+    var lang = navigator.language || navigator.userLanguage || 'en';
+    var tzSelect = document.getElementById('timezone');
+    var langSelect = document.getElementById('language');
+    if (tz && tzSelect) {
+      for (var i = 0; i < tzSelect.options.length; i++) {
+        if (tzSelect.options[i].value === tz) { tzSelect.selectedIndex = i; break; }
+      }
+    }
+    if (langSelect) {
+      var langCode = lang.split('-')[0];
+      for (var j = 0; j < langSelect.options.length; j++) {
+        if (langSelect.options[j].value === langCode) { langSelect.selectedIndex = j; break; }
+      }
+    }
+    showToast('success', 'Detected', 'Timezone and language set from your browser: ' + (tz || 'unknown') + ', ' + lang + '.');
+  };
+
+  // ── Auto-detect timezone hint ──
+  (function() {
+    var tzHint = document.getElementById('tzAutoDetect');
+    if (tzHint && Intl && Intl.DateTimeFormat) {
+      var detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      tzHint.textContent = 'Auto-detected from your browser: ' + detectedTz;
+      // Also try to pre-select matching option
+      var tzSelect = document.getElementById('timezone');
+      if (tzSelect) {
+        for (var i = 0; i < tzSelect.options.length; i++) {
+          if (tzSelect.options[i].value === detectedTz) {
+            tzSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+  })();
+
   // ── Day picker ──
   window.toggleDay = function(btn) {
     btn.classList.toggle('active');
@@ -1872,6 +1826,7 @@
     GHR.initPresence();
     GHR.initRoleSwitcher();
     GHR.initKeyboardShortcuts();
+    GHR.initSkeletons();
   }
 
 })();

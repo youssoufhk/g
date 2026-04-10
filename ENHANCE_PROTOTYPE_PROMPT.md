@@ -284,7 +284,7 @@ Read all 11 `CRITIC_[TAG].md` files produced in Wave 1.
 
 1. Deduplicate: if multiple critics flag the same issue, it becomes ONE item (note how many critics flagged it — more flags = higher priority)
 2. Sort strictly: CRITICAL → HIGH → MEDIUM → LOW
-3. Within each level: **[FEEL] issues from the UX Feeling critic take priority over all other tags at the same severity level** — these are product-defining, not just quality issues
+3. Within each level: **[FEEL] issues from the UX Feeling critic take priority over all other tags no matter the severity level** — these are product-defining, not just quality issues
 4. Within each level after FEEL: most pages affected first
 5. Flag systemic issues (same pattern across 3+ pages) as a single item with a note
 
@@ -295,7 +295,7 @@ Output: `ENHANCE_CHECKLIST.md` with:
 - **Systemic patterns** (cross-page issues — fix once in shared CSS/JS, propagate everywhere)
 - **Full sorted list:** `[ ] [SEVERITY] [TAG] [description] | [files affected]`
 
-Target: 150–250 items total. Fewer than 100 means critics were not harsh enough.
+Target: 250+ items total. Fewer than 200 means critics were not harsh enough.
 
 ---
 
@@ -410,8 +410,8 @@ These are the golden rules from `AGENT_WORKFLOW.md`. Violate any of them and the
 The enhancement cycle is complete when:
 
 - [ ] `ENHANCE_FINAL.md` exists and says "Ready for stakeholder review"
-- [ ] All CRITICAL and HIGH items from `ENHANCE_CHECKLIST.md` are resolved ✅
-- [ ] The Anti-Tempolia List is fully cleared — zero [FEEL] CRITICAL items remain
+- [ ] All items from `ENHANCE_CHECKLIST.md` are resolved ✅
+- [ ] The Anti-Tempolia List is fully cleared — zero [FEEL] items remain
 - [ ] Every prototype page passes a visual check at 390px and 1440px
 - [ ] Every interactive element on every page has a working handler
 - [ ] All 10 canonical data points are consistent across all pages

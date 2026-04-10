@@ -18,7 +18,9 @@
     .portal-auth-card {
       width: 100%;
       max-width: 420px;
-      background: var(--color-surface-0);
+      background: var(--glass-bg, rgba(30,26,22,0.85));
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-3);
@@ -36,9 +38,9 @@
       background: linear-gradient(135deg, var(--color-accent), var(--color-gold));
       border-radius: var(--radius-lg);
       display: flex; align-items: center; justify-content: center;
-      color: #fff;
+      color: var(--color-white);
       font-weight: var(--weight-bold);
-      font-size: 28px;
+      font-size: var(--text-heading-1);
       box-shadow: var(--shadow-2);
     }
     .portal-logo h1 {
@@ -105,12 +107,25 @@
           <input type="password" class="form-input" placeholder="Enter your password" value="password123" id="portal-pass">
         </div>
         <div style="text-align: right; margin-top: calc(-1 * var(--space-2));">
-          <a href="#" style="font-size: var(--text-body-sm); color: var(--color-text-2);">Forgot password?</a>
+          <a href="#" style="font-size: var(--text-body-sm); color: var(--color-text-2);" onclick="showForgotPassword(event)">Forgot password?</a>
         </div>
         <button type="submit" class="btn btn-lg portal-submit" onclick="handlePortalLogin()">
           Sign In to Portal
         </button>
       </form>
+
+      <!-- Forgot Password form (shown in place of login) -->
+      <div id="forgotPasswordForm" style="display:none; flex-direction:column; gap: var(--space-4);">
+        <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Enter your email address and we'll send you a reset link.</p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="resetEmail" placeholder="you@acme.com" style="height:44px; padding:0 var(--space-4);">
+        </div>
+        <button type="button" class="btn btn-lg portal-submit" onclick="handleResetLink()">Send Reset Link</button>
+        <div style="text-align:center;">
+          <a href="#" style="font-size: var(--text-body-sm); color: var(--color-text-2);" onclick="hideForgotPassword(event)">← Back to Sign In</a>
+        </div>
+      </div>
 
       <div class="portal-footer">
         <div style="height:1px; background: var(--color-border); margin-bottom: var(--space-4);"></div>
@@ -119,6 +134,8 @@
     </div>
   </div>
 
+  <div class="toast-container" id="toast-container"></div>
+  <script src="../_shared.js"></script>
   <script>
     function handlePortalLogin() {
       const btn = document.querySelector('.portal-submit');
@@ -132,6 +149,31 @@
     document.getElementById('portal-pass').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') handlePortalLogin();
     });
+
+    function showForgotPassword(e) {
+      if (e) e.preventDefault();
+      document.querySelector('.portal-form').style.display = 'none';
+      document.getElementById('forgotPasswordForm').style.display = 'flex';
+      document.getElementById('resetEmail').focus();
+    }
+
+    function hideForgotPassword(e) {
+      if (e) e.preventDefault();
+      document.getElementById('forgotPasswordForm').style.display = 'none';
+      document.querySelector('.portal-form').style.display = 'flex';
+    }
+
+    function handleResetLink() {
+      const email = document.getElementById('resetEmail').value.trim();
+      if (!email) {
+        document.getElementById('resetEmail').focus();
+        return;
+      }
+      if (window.GHR && GHR.showToast) {
+        GHR.showToast('success', 'Check Your Email', 'Password reset link has been sent.');
+      }
+      setTimeout(function() { hideForgotPassword(); }, 800);
+    }
   </script>
 </body>
 </html>

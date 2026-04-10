@@ -11,7 +11,7 @@
     /* ── Dashboard-specific styles ── */
     .greeting { margin-bottom: var(--space-6); }
     .greeting h1 {
-      font-size: var(--text-display-lg);
+      font-size: var(--text-display-xl, var(--text-display-lg));
       font-weight: var(--weight-bold);
       color: var(--color-text-1);
       line-height: 1.2;
@@ -315,7 +315,7 @@
     .heatmap-grid {
       display: grid;
       grid-template-columns: 72px repeat(5, 1fr);
-      gap: 3px;
+      gap: var(--space-1);
       margin-bottom: var(--space-3);
     }
     .heatmap-day-header {
@@ -327,7 +327,7 @@
       padding: 2px 0 4px;
     }
     .heatmap-week-label {
-      font-size: 10px;
+      font-size: var(--text-overline);
       color: var(--color-text-3);
       display: flex;
       align-items: center;
@@ -372,15 +372,15 @@
     }
     @media (max-width: 639px) {
       .heatmap-cell { height: 14px; }
-      .heatmap-week-label { font-size: 9px; }
-      .heatmap-grid { grid-template-columns: 56px repeat(5, 1fr); gap: 2px; }
+      .heatmap-week-label { font-size: var(--text-overline); }
+      .heatmap-grid { grid-template-columns: 56px repeat(5, 1fr); gap: var(--space-1); }
     }
 
     /* ── Revenue Snapshot ── */
     .revenue-snapshot-chart {
       display: flex;
       align-items: flex-end;
-      gap: 5px;
+      gap: var(--space-1);
       height: 64px;
       margin-top: var(--space-4);
     }
@@ -389,7 +389,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: var(--space-1);
       height: 100%;
       justify-content: flex-end;
     }
@@ -403,7 +403,7 @@
     .rev-bar.actual    { background: var(--color-gold); }
     .rev-bar.projected { background: var(--color-gold); opacity: 0.4; border: 1px dashed var(--color-gold); }
     .rev-label {
-      font-size: 9px;
+      font-size: var(--text-overline);
       color: var(--color-text-3);
     }
 
@@ -499,121 +499,7 @@
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item active">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="calendar-range"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="account.html" class="nav-item" style="margin-bottom:var(--space-2);">
-        <svg data-lucide="user-circle"></svg>
-        <span class="nav-label">Account</span>
-      </a>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Sidebar overlay for mobile -->
+  <aside class="sidebar" id="sidebar"></aside>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
@@ -648,9 +534,14 @@
           <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications" style="box-shadow: var(--shadow-3);">
             <div class="notif-panel-header">
               <span style="font-weight: var(--weight-semibold); font-size: var(--text-body);">Notifications</span>
-              <button class="btn btn-ghost btn-xs">Mark all read</button>
+              <button class="btn btn-ghost btn-xs" id="markAllReadBtn">Mark all read</button>
             </div>
-            <div class="notif-panel-list">
+            <div id="notifAllCaughtUp" style="display:none; padding: var(--space-8) var(--space-4); text-align:center;">
+              <svg data-lucide="check-circle" width="32" height="32" style="color:var(--color-success);margin:0 auto var(--space-3);display:block;"></svg>
+              <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">All caught up</div>
+              <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">No new notifications</div>
+            </div>
+            <div class="notif-panel-list" id="notifPanelList">
               <a href="timesheets.html" class="notif-item unread" style="text-decoration:none;color:inherit;">
                 <div class="notif-icon"><svg data-lucide="clock" width="16" height="16" style="color: var(--color-warning);"></svg></div>
                 <div class="notif-text">
@@ -720,7 +611,7 @@
       <!-- Greeting -->
       <div class="greeting">
         <h1 id="greetingHeading">Good morning, Sarah</h1>
-        <div class="greeting-date">Monday, April 6, 2026</div>
+        <div class="greeting-date" id="greetingDate">Monday, April 6, 2026</div>
       </div>
 
       <!-- ── KPI STAT CARDS ── -->
@@ -733,6 +624,7 @@
             <div>
               <div class="stat-value font-mono">12</div>
               <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +3 this month</div>
+              <div style="font-size:var(--text-overline);color:var(--color-text-3);margin-top:var(--space-1);">7 active · 1 bench · 1 on leave</div>
             </div>
           </div>
           <div class="stat-sparkline">
@@ -774,13 +666,24 @@
           <div class="stat-row">
             <div>
               <div class="stat-value font-mono">12</div>
-              <div class="stat-meta">
+              <div class="stat-trend down"><svg data-lucide="trending-up" width="14" height="14"></svg> +4 vs last week</div>
+              <div class="stat-meta" style="margin-top:var(--space-1);">
                 <span class="stat-warning-indicator">
                   <svg data-lucide="alert-triangle" width="12" height="12"></svg>
                   3 urgent
                 </span>
               </div>
             </div>
+          </div>
+          <div class="stat-sparkline">
+            <svg viewBox="0 0 120 32" fill="none">
+              <polyline points="0,24 20,20 40,22 60,18 80,20 100,16 120,12" stroke="var(--color-warning)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <linearGradient id="sparkWarning" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-warning)" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="var(--color-warning)" stop-opacity="0"/>
+              </linearGradient>
+              <polygon points="0,24 20,20 40,22 60,18 80,20 100,16 120,12 120,32 0,32" fill="url(#sparkWarning)"/>
+            </svg>
           </div>
         </a>
 
@@ -911,6 +814,7 @@
             <div style="display:flex;align-items:center;gap:var(--space-2);">
               <svg data-lucide="target" width="16" height="16" style="color:var(--color-text-3);"></svg>
               <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">Weekly target</span>
+              <span class="badge badge-warning" style="font-size:var(--text-overline);">On Track</span>
             </div>
             <div style="display:flex;align-items:center;gap:var(--space-3);">
               <div style="width:120px;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
@@ -918,6 +822,11 @@
               </div>
               <span class="font-mono" style="font-size:var(--text-body-sm);color:var(--color-text-1);">28h / 40h</span>
             </div>
+          </div>
+          <div style="display:flex;gap:var(--space-4);margin-top:var(--space-2);font-size:var(--text-overline);color:var(--color-text-3);">
+            <span><span style="color:var(--color-gold);font-weight:var(--weight-semibold);">24h</span> billable</span>
+            <span><span style="color:var(--color-text-2);font-weight:var(--weight-semibold);">4h</span> internal</span>
+            <span style="color:var(--color-success);">87% billable rate</span>
           </div>
         </div>
       </div>
@@ -1002,7 +911,10 @@
           <!-- Team Work Time Table -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Team Work Time: 82%</span>
+              <div>
+                <span class="card-title">Team Work Time: 82%</span>
+                <div style="font-size:var(--text-overline);color:var(--color-text-3);margin-top:2px;">6 above target · 2 below · 1 bench</div>
+              </div>
               <a href="employees.html" class="btn btn-ghost btn-xs">View all</a>
             </div>
             <div class="overflow-x-auto">
@@ -1023,14 +935,14 @@
                         <span class="avatar avatar-xs">SC</span>
                       </span>
                       <a href="employees.html#profile-sarah" data-hovercard
-                         data-name="Sarah Chen" data-role="Design Lead" data-dept="Design"
+                         data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering"
                          data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
                     </td>
-                    <td data-label="Role" class="cell-secondary">Design Lead</td>
+                    <td data-label="Role" class="cell-secondary">Project Manager</td>
                     <td data-label="Current Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:87%; background: var(--color-warning);"></div></div>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:87%; background: var(--color-success);"></div></div>
                         <span class="worktime-pct">87%</span>
                       </div>
                     </td>
@@ -1049,7 +961,7 @@
                     <td data-label="Current Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:82%; background: var(--color-primary);"></div></div>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:82%; background: var(--color-success);"></div></div>
                         <span class="worktime-pct">82%</span>
                       </div>
                     </td>
@@ -1061,15 +973,15 @@
                         <span class="avatar avatar-xs">AW</span>
                       </span>
                       <a href="employees.html#alice-wang" data-hovercard
-                         data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering"
-                         data-project="Acme Web Redesign" data-worktime="75" data-href="employees.html#alice-wang">Alice Wang</a>
+                         data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering"
+                         data-project="" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a>
                     </td>
-                    <td data-label="Role" class="cell-secondary">UX Designer</td>
-                    <td data-label="Current Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
+                    <td data-label="Role" class="cell-secondary">Software Engineer</td>
+                    <td data-label="Current Project"><span class="text-3">On Leave</span></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:75%; background: var(--color-primary);"></div></div>
-                        <span class="worktime-pct">75%</span>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:45%; background: var(--color-error);"></div></div>
+                        <span class="worktime-pct">45%</span>
                       </div>
                     </td>
                     <td data-label="Status"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> On Leave Apr 14-18</span></td>
@@ -1080,34 +992,34 @@
                         <span class="avatar avatar-xs">BT</span>
                       </span>
                       <a href="employees.html#bob-taylor" data-hovercard
-                         data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering"
-                         data-project="Globex Phase 2" data-worktime="72" data-href="employees.html#bob-taylor">Bob Taylor</a>
+                         data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering"
+                         data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                     </td>
                     <td data-label="Role" class="cell-secondary">Backend Developer</td>
-                    <td data-label="Current Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
+                    <td data-label="Current Project"><span class="text-3">Bench</span></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:72%; background: var(--color-primary);"></div></div>
-                        <span class="worktime-pct">72%</span>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:0%; background: var(--color-error);"></div></div>
+                        <span class="worktime-pct">0%</span>
                       </div>
                     </td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                    <td data-label="Status"><span class="badge badge-ghost"><svg data-lucide="minus-circle" width="12" height="12"></svg> Bench</span></td>
                   </tr>
                   <tr>
                     <td>
                       <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
-                        <span class="avatar avatar-xs">CK</span>
+                        <span class="avatar avatar-xs">CW</span>
                       </span>
-                      <a href="employees.html#carol-kim" data-hovercard
-                         data-name="Carol Kim" data-role="HR Manager" data-dept="HR"
-                         data-project="Initech API" data-worktime="78" data-href="employees.html#carol-kim">Carol Kim</a>
+                      <a href="employees.html#carol-williams" data-hovercard
+                         data-name="Carol Williams" data-role="Design Lead" data-dept="Design"
+                         data-project="Umbrella Corp Portal" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a>
                     </td>
-                    <td data-label="Role" class="cell-secondary">HR Manager</td>
-                    <td data-label="Current Project"><a href="projects.html#initech-api">Initech API</a></td>
+                    <td data-label="Role" class="cell-secondary">Design Lead</td>
+                    <td data-label="Current Project"><a href="projects.html#umbrella-portal">Umbrella Corp Portal</a></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:78%; background: var(--color-primary);"></div></div>
-                        <span class="worktime-pct">78%</span>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:90%; background: var(--color-success);"></div></div>
+                        <span class="worktime-pct">90%</span>
                       </div>
                     </td>
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
@@ -1119,14 +1031,14 @@
                       </span>
                       <a href="employees.html#david-park" data-hovercard
                          data-name="David Park" data-role="Finance Lead" data-dept="Finance"
-                         data-project="Initech API" data-worktime="65" data-href="employees.html#david-park">David Park</a>
+                         data-project="Initech API" data-worktime="45" data-href="employees.html#david-park">David Park</a>
                     </td>
                     <td data-label="Role" class="cell-secondary">Finance Lead</td>
                     <td data-label="Current Project"><a href="projects.html#initech-api">Initech API</a></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:65%; background: var(--color-primary);"></div></div>
-                        <span class="worktime-pct">65%</span>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:45%; background: var(--color-error);"></div></div>
+                        <span class="worktime-pct">45%</span>
                       </div>
                     </td>
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Low</span></td>
@@ -1144,7 +1056,7 @@
                     <td data-label="Current Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:78%; background: var(--color-primary);"></div></div>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:78%; background: var(--color-warning);"></div></div>
                         <span class="worktime-pct">78%</span>
                       </div>
                     </td>
@@ -1152,7 +1064,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <span class="avatar-status presence-online" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
+                      <span class="avatar-status presence-away" style="display:inline-flex;margin-right:var(--space-2);vertical-align:middle;">
                         <span class="avatar avatar-xs">MR</span>
                       </span>
                       <a href="employees.html#marco-rossi" data-hovercard
@@ -1163,7 +1075,7 @@
                     <td data-label="Current Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
                     <td data-label="Work Time">
                       <div class="worktime-bar-wrap">
-                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:88%; background: var(--color-primary);"></div></div>
+                        <div class="worktime-bar"><div class="worktime-bar-fill" style="width:88%; background: var(--color-success);"></div></div>
                         <span class="worktime-pct">88%</span>
                       </div>
                     </td>
@@ -1198,15 +1110,28 @@
                 </div>
               </div>
               <div class="ai-alert">
-                <div class="ai-alert-icon"><svg data-lucide="palm-tree" width="18" height="18" style="color: var(--color-warning);"></svg></div>
+                <div class="ai-alert-icon"><svg data-lucide="file-warning" width="18" height="18" style="color: var(--color-warning);"></svg></div>
                 <div class="ai-alert-body">
                   <div class="ai-alert-text">
-                    <span class="badge badge-warning" style="margin-right: var(--space-1);"><svg data-lucide="palm-tree" width="12" height="12"></svg> Holiday Gap</span>
-                    4 team members haven't taken leave in 3+ months (<a href="employees.html#bob-taylor">Bob Taylor</a>, <a href="employees.html#carol-kim">Carol Kim</a>, <a href="employees.html#liam-obrien">Liam O'Brien</a>, <a href="employees.html#david-park">David Park</a>). Consider encouraging time off.
+                    <span class="badge badge-warning" style="margin-right: var(--space-1);"><svg data-lucide="file-warning" width="12" height="12"></svg> Contract Expiry</span>
+                    <a href="employees.html#alice-wang">Alice Wang</a>'s contract expires in 14 days (Apr 20). Renew before she returns from leave.
                   </div>
                   <div class="ai-alert-actions">
                     <button class="btn btn-ghost btn-xs">Dismiss</button>
-                    <button class="btn btn-secondary btn-xs">Investigate</button>
+                    <button class="btn btn-primary btn-xs" onclick="GHR&&GHR.showToast('success','Contract renewal initiated','Draft renewal sent to Alice Wang for review.')">Renew Contract</button>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-alert">
+                <div class="ai-alert-icon"><svg data-lucide="briefcase" width="18" height="18" style="color: var(--color-info);"></svg></div>
+                <div class="ai-alert-body">
+                  <div class="ai-alert-text">
+                    <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="briefcase" width="12" height="12"></svg> Bench Alert</span>
+                    <a href="employees.html#bob-taylor">Bob Taylor</a> has been on bench for 3 weeks with 0% work time. Available capacity: 40h/week.
+                  </div>
+                  <div class="ai-alert-actions">
+                    <button class="btn btn-ghost btn-xs">Dismiss</button>
+                    <button class="btn btn-primary btn-xs" onclick="GHR&&GHR.showToast('info','Opening project assignment','Select a project to assign Bob Taylor to.')">Assign to Project</button>
                   </div>
                 </div>
               </div>
@@ -1240,7 +1165,7 @@
                 <div class="gantt-row">
                   <span class="gantt-name"><a href="employees.html#sarah-chen" class="text-2">Sarah Chen</a></span>
                   <div class="gantt-track">
-                    <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
+                    <div class="gantt-cell" style="background: var(--color-chart-1); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">ACM</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
@@ -1250,7 +1175,7 @@
                 <div class="gantt-row">
                   <span class="gantt-name"><a href="employees.html#john-smith" class="text-2">John Smith</a></span>
                   <div class="gantt-track">
-                    <div class="gantt-cell" style="background: var(--color-chart-2);"></div>
+                    <div class="gantt-cell" style="background: var(--color-chart-2); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">GLX</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-2);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-2);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
@@ -1264,13 +1189,13 @@
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
-                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell" style="background:var(--color-surface-2);"></div>
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#carol-kim" class="text-2">Carol Kim</a></span>
+                  <span class="gantt-name"><a href="employees.html#carol-williams" class="text-2">Carol Williams</a></span>
                   <div class="gantt-track">
-                    <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
+                    <div class="gantt-cell" style="background: var(--color-chart-3); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">UMB</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
@@ -1280,8 +1205,8 @@
                 <div class="gantt-row">
                   <span class="gantt-name"><a href="employees.html#marco-rossi" class="text-2">Marco Rossi</a></span>
                   <div class="gantt-track">
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
+                    <div class="gantt-cell" style="background:var(--color-surface-2);"></div>
+                    <div class="gantt-cell" style="background: var(--color-chart-1); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">ACM</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
@@ -1291,7 +1216,7 @@
               <div style="display: flex; gap: var(--space-4); margin-top: var(--space-3); flex-wrap: wrap;">
                 <span class="status-label"><span class="status-dot" style="background: var(--color-chart-1);"></span> Acme Web Redesign</span>
                 <span class="status-label"><span class="status-dot" style="background: var(--color-chart-2);"></span> Globex Phase 2</span>
-                <span class="status-label"><span class="status-dot" style="background: var(--color-chart-3);"></span> Initech API</span>
+                <span class="status-label"><span class="status-dot" style="background: var(--color-chart-3);"></span> Umbrella Corp Portal</span>
               </div>
             </div>
           </div>
@@ -1329,8 +1254,8 @@
                          data-name="John Smith" data-role="Senior Developer" data-dept="Engineering"
                          data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith"
                          class="text-primary" onclick="event.stopPropagation()">John Smith</a> approved <a href="employees.html#alice-wang" data-hovercard
-                         data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering"
-                         data-project="Acme Web Redesign" data-worktime="75" data-href="employees.html#alice-wang"
+                         data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering"
+                         data-project="" data-worktime="45" data-href="employees.html#alice-wang"
                          class="text-primary" onclick="event.stopPropagation()">Alice Wang</a>'s leave (Apr 14-18)
                     </div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:2px;">1h ago</div>
@@ -1356,8 +1281,8 @@
                   <div class="flex-1">
                     <div class="text-sm text-1">
                       <a href="employees.html#bob-taylor" data-hovercard
-                         data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering"
-                         data-project="Globex Phase 2" data-worktime="72" data-href="employees.html#bob-taylor"
+                         data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering"
+                         data-project="" data-worktime="0" data-href="employees.html#bob-taylor"
                          class="text-primary" onclick="event.stopPropagation()">Bob Taylor</a> submitted expense (<span class="font-mono" data-sensitive="financials">&#8364;340</span>, Hotel)
                     </div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:2px;">3h ago</div>
@@ -1379,6 +1304,12 @@
                   </div>
                   <div class="activity-arrow"><svg data-lucide="chevron-right" width="14" height="14"></svg></div>
                 </div>
+              </div>
+              <div style="padding:var(--space-3) 0 0;text-align:center;border-top:1px solid var(--color-border-subtle);margin-top:var(--space-1);">
+                <a href="timesheets.html" class="btn btn-ghost btn-xs" style="width:100%;">
+                  <svg data-lucide="activity" width="12" height="12"></svg>
+                  View all activity
+                </a>
               </div>
             </div>
           </div>
@@ -1421,7 +1352,7 @@
                   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
                     <div id="donutCenterPct" style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);">87%</div>
                     <div id="donutCenterLabel" style="font-size:var(--text-overline);color:var(--color-text-3);text-transform:lowercase;">billable</div>
-                    <div id="donutCenterTotal" style="font-family:var(--font-mono);font-size:9px;color:var(--color-text-3);margin-top:1px;">1,842h total</div>
+                    <div id="donutCenterTotal" style="font-family:var(--font-mono);font-size:var(--text-overline);color:var(--color-text-3);margin-top:1px;">1,842h total</div>
                   </div>
                   <div id="donutTooltip" style="display:none;position:absolute;background:var(--color-surface-3);color:var(--color-text-1);font-size:var(--text-caption);padding:var(--space-1) var(--space-2);border-radius:var(--radius-sm);white-space:nowrap;pointer-events:none;z-index:10;"></div>
                 </div>
@@ -1465,12 +1396,12 @@
               <div class="presence-item">
                 <span class="presence-status online"></span>
                 <div class="presence-info">
-                  <div class="presence-name"><a href="employees.html#carol-kim">Carol Kim</a></div>
+                  <div class="presence-name"><a href="employees.html#carol-williams">Carol Williams</a></div>
                   <div class="presence-detail">Sprint planning meeting</div>
                 </div>
               </div>
               <div class="presence-item">
-                <span class="presence-status online"></span>
+                <span class="presence-status away"></span>
                 <div class="presence-info">
                   <div class="presence-name"><a href="employees.html#marco-rossi">Marco Rossi</a></div>
                   <div class="presence-detail"><a href="projects.html#acme-web-redesign" style="color:var(--color-text-3);">Acme Web Redesign</a> - frontend</div>
@@ -1484,17 +1415,17 @@
                 </div>
               </div>
               <div class="presence-item">
-                <span class="presence-status away"></span>
+                <span class="presence-status offline"></span>
                 <div class="presence-info">
                   <div class="presence-name"><a href="employees.html#bob-taylor">Bob Taylor</a></div>
-                  <div class="presence-detail">Away - on bench</div>
+                  <div class="presence-detail">Offline — on bench</div>
                 </div>
               </div>
               <div class="presence-item">
-                <span class="presence-status online"></span>
+                <span class="presence-status offline"></span>
                 <div class="presence-info">
                   <div class="presence-name"><a href="employees.html#david-park">David Park</a></div>
-                  <div class="presence-detail">Infra monitoring</div>
+                  <div class="presence-detail">Offline</div>
                 </div>
               </div>
               <div class="presence-item">
@@ -1522,7 +1453,7 @@
           </div>
 
           <!-- Pending Approvals Widget -->
-          <div class="card">
+          <div class="card" data-min-role="pm">
             <div class="card-header" style="padding-bottom: 0; border-bottom: none;">
               <span class="card-title">Pending Approvals</span>
             </div>
@@ -1546,14 +1477,14 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">CK</div>
+                <div class="avatar avatar-xs">CW</div>
                 <div class="approval-info">
-                  <div class="approval-title">Carol Kim - Week 13</div>
-                  <div class="approval-sub">38h logged - Initech API - <span class="font-mono" data-sensitive="billing">&#8364;2,850</span></div>
+                  <div class="approval-title">Carol Williams - Week 13</div>
+                  <div class="approval-sub">38h logged - Umbrella Corp Portal - <span class="font-mono" data-sensitive="billing">&#8364;2,850</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Carol Kim">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Carol Kim">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" aria-label="Approve timesheet for Carol Williams">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs" aria-label="Reject timesheet for Carol Williams">Reject</button>
                 </div>
               </div>
               <div class="approval-item">
@@ -1691,11 +1622,11 @@
               <div style="display:flex;gap:var(--space-2);">
                 <!-- Y-axis labels -->
                 <div style="display:flex;flex-direction:column;justify-content:space-between;height:120px;padding-top:var(--space-2);padding-bottom:0;margin-right:var(--space-1);">
-                  <span style="font-size:9px;color:var(--color-text-3);line-height:1;">€80k</span>
-                  <span style="font-size:9px;color:var(--color-text-3);line-height:1;">€60k</span>
-                  <span style="font-size:9px;color:var(--color-text-3);line-height:1;">€40k</span>
-                  <span style="font-size:9px;color:var(--color-text-3);line-height:1;">€20k</span>
-                  <span style="font-size:9px;color:var(--color-text-3);line-height:1;">0</span>
+                  <span style="font-size:var(--text-overline);color:var(--color-text-3);line-height:1;">€80k</span>
+                  <span style="font-size:var(--text-overline);color:var(--color-text-3);line-height:1;">€60k</span>
+                  <span style="font-size:var(--text-overline);color:var(--color-text-3);line-height:1;">€40k</span>
+                  <span style="font-size:var(--text-overline);color:var(--color-text-3);line-height:1;">€20k</span>
+                  <span style="font-size:var(--text-overline);color:var(--color-text-3);line-height:1;">0</span>
                 </div>
               <div class="revenue-bars" style="flex:1;">
                 <div class="revenue-bar-col">
@@ -1912,10 +1843,6 @@
   lucide.createIcons();
 
   // ── DOM references ──
-  const sidebar       = document.getElementById('sidebar');
-  const collapseBtn   = document.getElementById('sidebarCollapseBtn');
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const sidebarOverlay= document.getElementById('sidebarOverlay');
   const searchTrigger = document.getElementById('searchTrigger');
   const cmdPalette    = document.getElementById('cmdPalette');
   const cmdInput      = document.getElementById('cmdInput');
@@ -1925,19 +1852,6 @@
   const userDropdown  = document.getElementById('userDropdown');
   const stateToggle   = document.getElementById('stateToggle');
   const toastContainer= document.getElementById('toastContainer');
-
-  // ── Sidebar collapse ──
-  collapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-
-  // ── Mobile menu ──
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Command Palette ──
   function openCmdPalette() {
@@ -2018,8 +1932,8 @@
     userDropdown.classList.remove('active');
   });
 
-  // Mark all notifications as read (ISSUE-48)
-  var markAllBtn = notifPanel.querySelector('.btn-ghost');
+  // Mark all notifications as read
+  var markAllBtn = document.getElementById('markAllReadBtn');
   if (markAllBtn) {
     markAllBtn.addEventListener('click', function() {
       notifPanel.querySelectorAll('.notif-item.unread').forEach(function(item) {
@@ -2027,6 +1941,11 @@
       });
       var dot = notifBtn.querySelector('.notif-dot');
       if (dot) dot.style.display = 'none';
+      // Show "all caught up" empty state
+      var list = document.getElementById('notifPanelList');
+      var caughtUp = document.getElementById('notifAllCaughtUp');
+      if (list) list.style.display = 'none';
+      if (caughtUp) { caughtUp.style.display = 'block'; lucide.createIcons({ nodes: [caughtUp] }); }
       showToast('success', 'Done', 'All notifications marked as read.');
     });
   }
@@ -2172,12 +2091,25 @@
     });
   });
 
-  // ── Time-Aware Greeting ──
+  // ── Time-Aware Greeting with contextual intelligence ──
   (function() {
     var h = new Date().getHours();
     var greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
     var el = document.getElementById('greetingHeading');
-    if (el) el.textContent = greeting + ', Sarah';
+    // Read state from page: 12 pending approvals, invoice due Wed, 3 urgent items
+    var pendingApprovals = 12;
+    var urgentCount = 3;
+    var context = pendingApprovals + ' approvals waiting';
+    if (urgentCount > 0) context += ' (' + urgentCount + ' urgent)';
+    context += ' and an invoice due Wednesday';
+    if (el) el.textContent = greeting + ', Sarah — you have ' + context + '.';
+    // ── Dynamic date ──
+    var dateEl = document.getElementById('greetingDate');
+    if (dateEl) {
+      try {
+        dateEl.textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+      } catch(e) { /* fallback to existing static value */ }
+    }
   })();
 
   // ── Day bar click toast (Week at a Glance) ──

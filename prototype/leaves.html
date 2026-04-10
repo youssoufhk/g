@@ -550,6 +550,11 @@
       max-width: 400px;
     }
 
+    /* Mobile action buttons min-width (issue 29) */
+    @media (max-width: 639px) {
+      .leave-request-actions .btn { min-width: 64px; }
+    }
+
     /* Confirmation modal */
     .confirm-body {
       text-align: center;
@@ -564,125 +569,7 @@
 
 <div class="app">
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item active">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-        <a href="insights.html#ask-ai" class="nav-item">
-          <i data-lucide="sparkles" class="nav-icon"></i>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="calendar-range"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
-        <i data-lucide="keyboard" class="nav-icon"></i>
-        <span class="nav-label">Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Sidebar overlay for mobile -->
+  <aside class="sidebar" id="sidebar"></aside>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
@@ -796,7 +683,7 @@
           <svg data-lucide="user" width="16" height="16"></svg>
           My Leaves
         </button>
-        <button class="tab" data-tab="team">
+        <button class="tab" data-tab="team" data-min-role="pm">
           <svg data-lucide="users" width="16" height="16"></svg>
           Team Leaves
           <span class="tab-count">8</span>
@@ -825,8 +712,17 @@
                 <div class="balance-meta-item">Used: <span>5</span></div>
                 <div class="balance-meta-item">Pending: <span>2</span></div>
               </div>
+              <!-- Bar shows remaining (72%) in success color -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-1);">
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);">18/25 days remaining</span>
+              </div>
               <div class="balance-bar">
-                <div class="balance-bar-fill" style="width: 72%;"></div>
+                <div class="balance-bar-fill" style="width: 72%; background: var(--color-success);"></div>
+              </div>
+              <!-- Carry-over note (issue 23) -->
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-warning);">
+                <svg data-lucide="alert-triangle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+                8 days expire on Dec 31, 2026
               </div>
             </div>
 
@@ -842,8 +738,11 @@
                 <div class="balance-meta-item">Used: <span>2</span></div>
                 <div class="balance-meta-item">Pending: <span>0</span></div>
               </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-1);">
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);">10/12 days remaining</span>
+              </div>
               <div class="balance-bar">
-                <div class="balance-bar-fill" style="width: 83%;"></div>
+                <div class="balance-bar-fill" style="width: 83%; background: var(--color-success);"></div>
               </div>
             </div>
 
@@ -859,8 +758,11 @@
                 <div class="balance-meta-item">Used: <span>0</span></div>
                 <div class="balance-meta-item">Pending: <span>0</span></div>
               </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-1);">
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);">3/3 days remaining</span>
+              </div>
               <div class="balance-bar">
-                <div class="balance-bar-fill" style="width: 100%;"></div>
+                <div class="balance-bar-fill" style="width: 100%; background: var(--color-success);"></div>
               </div>
             </div>
 
@@ -876,13 +778,26 @@
                 <div class="balance-meta-item">Used: <span>0</span></div>
                 <div class="balance-meta-item">Pending: <span>0</span></div>
               </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-1);">
+                <span style="font-size:var(--text-caption);color:var(--color-text-3);">5/5 days remaining</span>
+              </div>
               <div class="balance-bar">
-                <div class="balance-bar-fill" style="width: 100%;"></div>
+                <div class="balance-bar-fill" style="width: 100%; background: var(--color-success);"></div>
               </div>
             </div>
           </div>
 
-          <!-- Filters -->
+          <!-- Smart suggestion nudge card (issue 24) -->
+          <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-info-muted);border:1px solid var(--color-info);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
+            <svg data-lucide="lightbulb" width="18" height="18" style="color:var(--color-info);flex-shrink:0;margin-top:1px;"></svg>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-info);margin-bottom:var(--space-0-5);">Book your remaining days soon</div>
+              <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">You have <strong>8 days remaining</strong> and 3 bank holidays in December — consider booking before year-end.</div>
+            </div>
+            <button class="btn btn-xs btn-secondary" onclick="document.getElementById('requestLeaveBtn').click()">Book now</button>
+          </div>
+
+          <!-- Filters (issue 22: default to current year) -->
           <div class="filter-bar-standard">
             <select class="form-select form-input-sm">
               <option value="">All Statuses</option>
@@ -898,9 +813,9 @@
               <option>Personal</option>
               <option>Remote Work</option>
             </select>
-            <input type="date" class="form-input form-input-sm" value="2025-01-01" title="From date">
+            <input type="date" class="form-input form-input-sm" id="myLeavesFrom" value="2026-01-01" title="From date">
             <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
-            <input type="date" class="form-input form-input-sm" value="2026-12-31" title="To date">
+            <input type="date" class="form-input form-input-sm" id="myLeavesTo" value="2026-12-31" title="To date">
           </div>
 
           <!-- My Leave Requests -->
@@ -1032,7 +947,7 @@
       </div>
 
       <!-- ═══════════════ TAB 2: TEAM LEAVES ═══════════════ -->
-      <div class="tab-content" id="team">
+      <div class="tab-content" id="team" data-min-role="pm">
         <div class="populated-content">
 
           <!-- Filters -->
@@ -1239,6 +1154,10 @@
           <svg data-lucide="users"></svg>
           <h3>No team leave requests</h3>
           <p>Team members' leave requests will appear here once submitted.</p>
+          <button class="btn btn-primary btn-sm mt-4" onclick="document.getElementById('requestLeaveBtn').click()">
+            <svg data-lucide="plus" width="16" height="16"></svg>
+            Submit Leave for Team Member
+          </button>
         </div>
       </div>
 
@@ -1265,9 +1184,10 @@
             </div>
           </div>
 
-          <!-- Calendar Grid (month view) -->
+          <!-- Calendar Grid (month view) — wrapped for mobile overflow -->
           <div id="leaveCalMonth">
-          <div class="calendar-grid">
+          <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <div class="calendar-grid" style="min-width: 480px;">
             <div class="calendar-weekdays">
               <div class="calendar-weekday">Mon</div>
               <div class="calendar-weekday">Tue</div>
@@ -1282,6 +1202,7 @@
             </div>
           </div>
           </div>
+          </div>
 
           <!-- Quarter View -->
           <div id="leaveCalQuarter" class="hidden">
@@ -1290,31 +1211,31 @@
               <!-- April -->
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);color:var(--color-primary);margin-bottom:var(--space-2);font-size:var(--text-body-sm);">April 2026</div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:var(--space-0-5, 2px);font-size:var(--text-overline);text-align:center;">
                   <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
-                  <span></span><span></span><span>1</span><span>2</span><span style="background:var(--color-primary);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;">3</span><span>4</span><span>5</span>
-                  <span style="background:var(--color-primary);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;">6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+                  <span></span><span></span><span>1</span><span>2</span><span style="background:var(--color-primary);color:var(--color-white);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;">3</span><span>4</span><span>5</span>
+                  <span style="background:var(--color-primary);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);">6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
                   <span>13</span><span style="background:var(--color-warning);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">14</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">15</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">16</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">17</span><span style="background:var(--color-warning);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-text-inv);">18</span><span>19</span>
                   <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
-                  <span>27</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">28</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">29</span><span>30</span><span></span><span></span><span></span>
+                  <span>27</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">28</span><span style="background:var(--color-chart-1);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">29</span><span>30</span><span></span><span></span><span></span>
                 </div>
               </div>
               <!-- May -->
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);font-size:var(--text-body-sm);">May 2026</div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:var(--space-0-5, 2px);font-size:var(--text-overline);text-align:center;">
                   <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
                   <span></span><span></span><span></span><span></span><span>1</span><span>2</span><span>3</span>
                   <span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                   <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
                   <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span>
-                  <span>25</span><span>26</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">27</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">28</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;opacity:0.7;">29</span><span>30</span><span>31</span>
+                  <span>25</span><span>26</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">27</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">28</span><span style="background:var(--color-chart-4);border-radius:3px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;color:var(--color-white);opacity:0.7;">29</span><span>30</span><span>31</span>
                 </div>
               </div>
               <!-- June -->
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);font-size:var(--text-body-sm);">June 2026</div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:var(--space-0-5, 2px);font-size:var(--text-overline);text-align:center;">
                   <span style="color:var(--color-text-3);">M</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">W</span><span style="color:var(--color-text-3);">T</span><span style="color:var(--color-text-3);">F</span><span style="color:var(--color-text-3);">S</span><span style="color:var(--color-text-3);">S</span>
                   <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
                   <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
@@ -1326,16 +1247,16 @@
             </div>
             <!-- Quarter legend -->
             <div style="display:flex;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:10px;height:10px;border-radius:2px;background:var(--color-primary);display:inline-block;"></span> Today
               </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:10px;height:10px;border-radius:2px;background:var(--color-warning);display:inline-block;"></span> Alice Wang — On Leave
               </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:10px;height:10px;border-radius:2px;background:var(--color-chart-1);display:inline-block;opacity:0.7;"></span> Your Annual Leave (pending)
               </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:10px;height:10px;border-radius:2px;background:var(--color-chart-4);display:inline-block;opacity:0.7;"></span> Bob Taylor — Bank Holiday
               </div>
             </div>
@@ -1348,7 +1269,7 @@
               <!-- We'll render simplified month blocks -->
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">January 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;">
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);">
                   <!-- 31 days, placeholder boxes -->
                   <script>
                     // Jan 2026 leave: none
@@ -1360,65 +1281,65 @@
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">February 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-feb"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-feb"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">March 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-mar">
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-mar">
                   <!-- Sarah Mar 22-26 annual leave (approved) -->
                 </div>
               </div>
               <div class="card" style="padding:var(--space-3);border:1px solid var(--color-primary);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-primary);margin-bottom:var(--space-2);">April 2026 ← Today</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-apr">
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-apr">
                   <!-- Alice Apr 14-18 on leave -->
                 </div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">May 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-may"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-may"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">June 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-jun"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-jun"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">July 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-jul"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-jul"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">August 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-aug"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-aug"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">September 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-sep"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-sep"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">October 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-oct"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-oct"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">November 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-nov"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-nov"></div>
               </div>
               <div class="card" style="padding:var(--space-3);">
                 <div style="font-weight:var(--weight-semibold);font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-2);">December 2026</div>
-                <div style="display:flex;flex-wrap:wrap;gap:2px;" id="year-dec"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-1);" id="year-dec"></div>
               </div>
             </div>
             <!-- Legend -->
             <div style="display:flex;gap:var(--space-4);margin-top:var(--space-3);flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-1);display:inline-block;"></span> Annual Leave (approved)
               </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-1);display:inline-block;opacity:0.5;"></span> Annual Leave (pending)
               </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:12px;height:12px;border-radius:2px;background:var(--color-chart-6);display:inline-block;"></span> Sick Leave
               </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-caption);color:var(--color-text-2);">
+              <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
                 <span style="width:12px;height:12px;border-radius:2px;background:var(--color-success);display:inline-block;"></span> Public Holiday
               </div>
             </div>
@@ -1491,6 +1412,11 @@
         <div class="conflict-check no-conflict" id="modalConflict">
           <svg data-lucide="check-circle"></svg>
           <span>No conflicts detected</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reports to</label>
+          <input type="text" class="form-input" id="modalManager" value="Emma Laurent, HR Specialist" readonly style="background:var(--color-surface-1);color:var(--color-text-2);">
+          <span class="form-helper">Leave request will be sent to your manager.</span>
         </div>
         <div class="form-group">
           <label class="form-label">Notes</label>
@@ -1620,10 +1546,6 @@
   'use strict';
 
   // ── Element Refs ──
-  var sidebar = document.getElementById('sidebar');
-  var sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
-  var sidebarOverlay = document.getElementById('sidebarOverlay');
-  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
   var searchTrigger = document.getElementById('searchTrigger');
   var cmdPalette = document.getElementById('cmdPalette');
   var cmdInput = document.getElementById('cmdInput');
@@ -1648,17 +1570,6 @@
   var modalWorkingDays = document.getElementById('modalWorkingDays');
   var modalBalanceAfter = document.getElementById('modalBalanceAfter');
   var modalConflict = document.getElementById('modalConflict');
-
-  // ── Sidebar Collapse ──
-  sidebarCollapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Command Palette ──
   function openCmdPalette() {

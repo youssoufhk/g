@@ -473,6 +473,29 @@
     }
     @media (max-width: 1023px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 639px) { .stats-grid { grid-template-columns: 1fr; } }
+
+    /* Mobile expense item stacking (issue 33) */
+    @media (max-width: 639px) {
+      .expense-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .expense-item .expense-amount {
+        min-width: unset;
+        font-size: var(--text-heading-3);
+      }
+      .expense-item .expense-right {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+    }
+
+    /* Analytics 2-column grid mobile (issue 34) */
+    @media (max-width: 639px) {
+      .analytics-chart-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -480,125 +503,7 @@
 <div class="app">
 
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-        <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item active">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-        <a href="insights.html#ask-ai" class="nav-item">
-          <i data-lucide="sparkles" class="nav-icon"></i>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="bar-chart-3"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
-        <i data-lucide="keyboard" class="nav-icon"></i>
-        <span class="nav-label">Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Sidebar overlay for mobile -->
+  <aside class="sidebar" id="sidebar"></aside>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
@@ -724,7 +629,11 @@
             <svg data-lucide="plus-circle" width="16" height="16"></svg>
             Submit Expense
           </button>
-          <button class="tab" data-tab="approval">
+          <button class="tab" data-tab="team-expenses" data-min-role="pm">
+            <svg data-lucide="users" width="16" height="16"></svg>
+            Team Expenses
+          </button>
+          <button class="tab" data-tab="approval" data-min-role="pm">
             <svg data-lucide="check-circle" width="16" height="16"></svg>
             Approval Queue
             <span class="tab-count">4</span>
@@ -818,9 +727,9 @@
                 <div class="toggle-switch" id="billableToggle" onclick="this.classList.toggle('active')"></div>
                 <span>Billable only</span>
               </div>
-              <input type="date" class="form-input" style="width: 150px;" value="2026-01-01">
+              <input type="date" class="form-input" style="min-width: 0; flex: 1 1 120px;" value="2026-01-01">
               <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
-              <input type="date" class="form-input" style="width: 150px;" value="2026-04-05">
+              <input type="date" class="form-input" style="min-width: 0; flex: 1 1 120px;" value="2026-04-05">
             </div>
 
             <!-- Expense List (populated state) -->
@@ -856,7 +765,7 @@
 
               <!-- 3. Software - Approved -->
               <div class="expense-item">
-                <div class="expense-icon" style="background: hsla(270, 45%, 58%, 0.14); color: hsl(270, 45%, 58%);">
+                <div class="expense-icon" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);">
                   <svg data-lucide="monitor"></svg>
                 </div>
                 <div class="expense-amount">&euro;120.00</div>
@@ -1039,6 +948,14 @@
                       </div>
                     </div>
                   </div>
+                  <div id="aiAutoFilledBanner" style="display:none;margin-top:var(--space-3);padding:var(--space-2) var(--space-3);background:var(--color-success-muted);border:1px solid var(--color-success);border-radius:var(--radius-sm);font-size:var(--text-caption);color:var(--color-success);">
+                    <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:var(--space-1);"></svg>
+                    Form auto-filled from receipt. Please review.
+                  </div>
+                  <button class="btn btn-primary btn-sm" style="margin-top:var(--space-3);width:100%;" onclick="applyAiToForm()">
+                    <svg data-lucide="arrow-right" width="16" height="16"></svg>
+                    Apply to Expense Form &rarr;
+                  </button>
                 </div>
 
                 <!-- Policy checks -->
@@ -1087,7 +1004,7 @@
                     </div>
                     <div class="form-group">
                       <label class="form-label">Date <span class="required">*</span></label>
-                      <input type="date" class="form-input" id="formDate" value="2026-04-05">
+                      <input type="date" class="form-input" id="formDate">
                     </div>
                   </div>
 
@@ -1130,8 +1047,86 @@
           </div>
         </div>
 
-        <!-- ═══════════════ TAB 3: APPROVAL QUEUE ═══════════════ -->
-        <div class="tab-content" id="tab-approval">
+        <!-- ═══════════════ TAB 3: TEAM EXPENSES ═══════════════ -->
+        <div class="tab-content" id="tab-team-expenses" data-min-role="pm">
+          <div class="pt-6">
+            <div class="data-table-wrapper">
+              <table class="data-table mobile-cards">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Project</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">SC</div><a href="employees.html#sarah-chen" style="color:var(--color-text-1);">Sarah Chen</a></div></td>
+                    <td data-label="Type">Travel</td>
+                    <td data-label="Amount" class="cell-mono">&euro;450.00</td>
+                    <td data-label="Date">Feb 15, 2026</td>
+                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Acme Web Redesign</a></td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">JS</div><a href="employees.html#john-smith" style="color:var(--color-text-1);">John Smith</a></div></td>
+                    <td data-label="Type">Meals</td>
+                    <td data-label="Amount" class="cell-mono">&euro;120.00</td>
+                    <td data-label="Date">Mar 5, 2026</td>
+                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Globex Phase 2</a></td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">MR</div><a href="employees.html#marco-rossi" style="color:var(--color-text-1);">Marco Rossi</a></div></td>
+                    <td data-label="Type">Hotel</td>
+                    <td data-label="Amount" class="cell-mono">&euro;340.00</td>
+                    <td data-label="Date">Apr 2, 2026</td>
+                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Acme Web Redesign</a></td>
+                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">CW</div><a href="employees.html#carol-williams" style="color:var(--color-text-1);">Carol Williams</a></div></td>
+                    <td data-label="Type">Software</td>
+                    <td data-label="Amount" class="cell-mono">&euro;89.00</td>
+                    <td data-label="Date">Jan 10, 2026</td>
+                    <td data-label="Project" style="color:var(--color-text-3);">&mdash;</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">DP</div><a href="employees.html#david-park" style="color:var(--color-text-1);">David Park</a></div></td>
+                    <td data-label="Type">Equipment</td>
+                    <td data-label="Amount" class="cell-mono">&euro;1,450.00</td>
+                    <td data-label="Date">Apr 3, 2026</td>
+                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Globex Phase 2</a></td>
+                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">EL</div><a href="employees.html#emma-laurent" style="color:var(--color-text-1);">Emma Laurent</a></div></td>
+                    <td data-label="Type">Transport</td>
+                    <td data-label="Amount" class="cell-mono">&euro;45.00</td>
+                    <td data-label="Date">Mar 20, 2026</td>
+                    <td data-label="Project" style="color:var(--color-text-3);">&mdash;</td>
+                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">AW</div><a href="employees.html#alice-wang" style="color:var(--color-text-1);">Alice Wang</a></div></td>
+                    <td data-label="Type">Meals</td>
+                    <td data-label="Amount" class="cell-mono">&euro;67.30</td>
+                    <td data-label="Date">Apr 1, 2026</td>
+                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Initech API</a></td>
+                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════ TAB 4: APPROVAL QUEUE ═══════════════ -->
+        <div class="tab-content" id="tab-approval" data-min-role="pm">
           <div class="pt-6">
 
             <div style="margin-bottom: var(--space-4);">
@@ -1183,11 +1178,11 @@
                 </div>
               </div>
 
-              <!-- 2. Carol Kim - Meals -->
+              <!-- 2. Carol Williams - Meals -->
               <div class="approval-item" data-approval="2">
                 <div class="approval-employee">
-                  <div class="avatar avatar-sm">CK</div>
-                  <div class="emp-name"><a href="employees.html#carol-kim">Carol Kim</a></div>
+                  <div class="avatar avatar-sm">CW</div>
+                  <div class="emp-name"><a href="employees.html#carol-williams">Carol Williams</a></div>
                 </div>
                 <div class="approval-info">
                   <div class="info-row">
@@ -1311,7 +1306,7 @@
         <div class="tab-content" id="tab-analytics">
           <div class="pt-6">
             <!-- Row 1: Charts -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">
+            <div class="analytics-chart-row" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">
               <!-- Expense by Category donut -->
               <div class="card" style="padding:var(--space-5);">
                 <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-4);">Expense by Category</div>
@@ -1358,19 +1353,19 @@
                   </div>
                 </div>
                 <div style="display:flex;gap:var(--space-3);">
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€1,200</div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);">Jan</div>
                   </div>
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€980</div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);">Feb</div>
                   </div>
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€1,450</div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);">Mar</div>
                   </div>
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);">
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-mono);">€640</div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);">Apr</div>
                   </div>
@@ -1378,11 +1373,12 @@
               </div>
             </div>
             <!-- Row 2 -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+            <div class="analytics-chart-row" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
               <!-- Top Spenders -->
               <div class="card" style="padding:var(--space-5);">
                 <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-4);">Top Spenders</div>
-                <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;min-width:300px;">
                   <thead>
                     <tr style="border-bottom:1px solid var(--color-border);">
                       <th style="text-align:left;padding:var(--space-2) 0;color:var(--color-text-3);font-weight:var(--weight-medium);font-size:var(--text-caption);text-transform:uppercase;letter-spacing:.5px;">Name</th>
@@ -1393,25 +1389,26 @@
                   </thead>
                   <tbody>
                     <tr style="border-bottom:1px solid var(--color-border-subtle);">
-                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">BT</div><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="92" data-href="employees.html#bob-taylor" style="color:var(--color-text-1);">Bob Taylor</a></div></td>
+                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">BT</div><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:var(--color-text-1);">Bob Taylor</a></div></td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);" data-sensitive="financials">€1,240</td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-2);">7</td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-3);" data-sensitive="financials">€177</td>
                     </tr>
                     <tr style="border-bottom:1px solid var(--color-border-subtle);">
-                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">SC</div><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Admin" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="98" data-href="employees.html#sarah-chen" style="color:var(--color-text-1);">Sarah Chen</a></div></td>
+                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">SC</div><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#sarah-chen" style="color:var(--color-text-1);">Sarah Chen</a></div></td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);" data-sensitive="financials">€890</td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-2);">5</td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-3);" data-sensitive="financials">€178</td>
                     </tr>
                     <tr>
-                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">MR</div><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#marco-rossi" style="color:var(--color-text-1);">Marco Rossi</a></div></td>
+                      <td style="padding:var(--space-2) 0;"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">MR</div><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#marco-rossi" style="color:var(--color-text-1);">Marco Rossi</a></div></td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);" data-sensitive="financials">€760</td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-2);">4</td>
                       <td style="text-align:right;padding:var(--space-2) 0;font-family:var(--font-mono);color:var(--color-text-3);" data-sensitive="financials">€190</td>
                     </tr>
                   </tbody>
                 </table>
+                </div>
               </div>
               <!-- Billable vs Non-Billable donut -->
               <div class="card" style="padding:var(--space-5);">
@@ -1541,27 +1538,6 @@
 (function() {
   'use strict';
 
-  // ── Sidebar collapse ──
-  const sidebar = document.getElementById('sidebar');
-  const collapseBtn = document.getElementById('sidebarCollapseBtn');
-  collapseBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-  });
-
-  // Mobile menu
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('mobile-open');
-    });
-  }
-  if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', () => {
-      sidebar.classList.remove('mobile-open');
-    });
-  }
-
   // ── Command Palette ──
   const cmdPalette = document.getElementById('cmdPalette');
   const cmdInput = document.getElementById('cmdInput');
@@ -1657,6 +1633,14 @@
   handleHash();
   window.addEventListener('hashchange', handleHash);
 
+  // ── Set expense date default to today ──
+  (function() {
+    var formDateEl = document.getElementById('formDate');
+    if (formDateEl && !formDateEl.value) {
+      formDateEl.value = new Date().toISOString().split('T')[0];
+    }
+  })();
+
   // ── AI Scan Simulation ──
   window.startAiScan = function() {
     const overlay = document.getElementById('uploadOverlay');
@@ -1673,24 +1657,31 @@
       aiResult.classList.add('active');
       aiBtn.disabled = false;
       aiBtn.classList.remove('btn-loading');
-
-      // Auto-fill form from AI scan
-      setTimeout(function() {
-        var typeEl = document.getElementById('formType');
-        var amountEl = document.getElementById('formAmount');
-        var dateEl = document.getElementById('formDate');
-        if (typeEl) typeEl.value = 'Hotel';
-        if (amountEl) amountEl.value = '340.00';
-        if (dateEl) dateEl.value = '2026-04-02';
-      }, 100);
-
-      // Additional auto-fill fields
-      document.getElementById('formProject').value = 'acme';
-      document.getElementById('formBillable').checked = true;
-      document.getElementById('formDesc').value = 'Marriott Hotel Lyon - 2 nights for client workshop';
-
       lucide.createIcons();
     }, 2000);
+  };
+
+  // ── Apply AI scan results to form ──
+  window.applyAiToForm = function() {
+    var typeEl = document.getElementById('formType');
+    var amountEl = document.getElementById('formAmount');
+    var dateEl = document.getElementById('formDate');
+    var projectEl = document.getElementById('formProject');
+    var billableEl = document.getElementById('formBillable');
+    var descEl = document.getElementById('formDesc');
+    if (typeEl) typeEl.value = 'hotel';
+    if (amountEl) amountEl.value = '340.00';
+    if (dateEl) dateEl.value = '2026-04-02';
+    if (projectEl) projectEl.value = 'acme';
+    if (billableEl) billableEl.checked = true;
+    if (descEl) descEl.value = 'Marriott Hotel Lyon - 2 nights for client workshop';
+    // Show auto-filled banner
+    var banner = document.getElementById('aiAutoFilledBanner');
+    if (banner) {
+      banner.style.display = 'block';
+      lucide.createIcons({ nodes: [banner] });
+    }
+    showToast('success', 'Form Auto-filled', 'Receipt data applied to the form. Please review before submitting.');
   };
 
   // ── Upload zone drag/drop ──

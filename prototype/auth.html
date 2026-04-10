@@ -40,7 +40,7 @@
       display: flex; align-items: center; justify-content: center;
       color: var(--color-white);
       font-weight: var(--weight-bold);
-      font-size: 24px;
+      font-size: var(--text-heading-1);
       box-shadow: var(--shadow-2);
       animation: logoFloat 6s ease-in-out infinite;
     }
@@ -363,6 +363,15 @@
       border-top: 1px solid var(--color-border);
     }
 
+    /* Multi-step wizard fade transition */
+    .wizard-step-panel {
+      animation: stepFadeIn 0.2s ease forwards;
+    }
+    @keyframes stepFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     /* Rate limit */
     #rateLimitMsg { display: none; }
     .countdown-badge {
@@ -421,6 +430,12 @@
               <svg data-lucide="log-in" width="18" height="18"></svg>
               Sign In
             </button>
+            <div style="text-align:center;margin-top:var(--space-2);">
+              <a href="#" style="font-size:var(--text-body-sm);color:var(--color-text-2);" onclick="handleMagicLink(event)">
+                <svg data-lucide="sparkles" width="14" height="14" style="vertical-align:-2px;color:var(--color-accent);margin-right:4px;"></svg>
+                Send me a magic link instead
+              </a>
+            </div>
           </form>
 
           <!-- MFA inline section (post-login) -->
@@ -588,7 +603,7 @@
             <div style="text-align:center; margin-bottom: var(--space-4);">
               <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-4);">Open your authenticator app and scan this QR code.</p>
               <!-- Stylized QR code SVG -->
-              <div style="width:180px; height:180px; background: var(--color-white); border-radius: var(--radius-md); margin: 0 auto; padding: 12px; display:flex; align-items:center; justify-content:center;">
+              <div style="width:180px; height:180px; background: var(--color-white); border-radius: var(--radius-md); margin: 0 auto; padding: var(--space-3); display:flex; align-items:center; justify-content:center;">
                 <svg width="156" height="156" viewBox="0 0 156 156" style="color: #1a1a1a;">
                   <!-- Top-left finder pattern -->
                   <rect x="0" y="0" width="42" height="42" fill="currentColor" rx="4"/>
@@ -717,7 +732,7 @@
               <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Enter the 6-digit code shown in your authenticator app to confirm setup.</p>
             </div>
             <div class="mfa-digits" id="mfaSetupDigits"></div>
-            <div class="auth-error" id="mfaSetupError" style="margin-top: var(--space-3);">Invalid code. Expected <strong>123456</strong> for this demo.</div>
+            <div class="auth-error" id="mfaSetupError" style="margin-top: var(--space-3);">Invalid code. Please try again.</div>
             <div class="wizard-nav">
               <button class="btn btn-ghost" onclick="mfaGoStep(2)">
                 <svg data-lucide="arrow-left" width="16" height="16"></svg>
@@ -733,7 +748,7 @@
           <!-- Step success -->
           <div id="mfaSuccess" style="display:none; text-align:center; padding: var(--space-4) 0;">
             <div class="success-check">
-              <svg data-lucide="check" width="36" height="36" style="color: white;"></svg>
+              <svg data-lucide="check" width="36" height="36" style="color: var(--color-white);"></svg>
             </div>
             <h3 style="font-size: var(--text-heading-2); font-weight: var(--weight-semibold); color: var(--color-text-1); margin-bottom: var(--space-2);">2FA Enabled!</h3>
             <p style="color: var(--color-text-2); font-size: var(--text-body-sm);">Your account is now protected. Redirecting to dashboard...</p>
@@ -925,12 +940,26 @@
               <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
                 <div class="form-group">
                   <label class="form-label">Fiscal Year Start</label>
-                  <select class="form-input form-select">
-                    <option selected>January</option>
-                    <option>April</option>
-                    <option>July</option>
-                    <option>October</option>
-                  </select>
+                  <div style="display:flex;gap:var(--space-2);">
+                    <select class="form-input form-select" style="flex:2;" id="fiscalYearMonth">
+                      <option value="1" selected>January</option>
+                      <option value="2">February</option>
+                      <option value="3">March</option>
+                      <option value="4">April</option>
+                      <option value="5">May</option>
+                      <option value="6">June</option>
+                      <option value="7">July</option>
+                      <option value="8">August</option>
+                      <option value="9">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                    <select class="form-input form-select" style="flex:1;" id="fiscalYearDay">
+                      <option value="1" selected>1st</option>
+                      <option value="15">15th</option>
+                    </select>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label class="form-label">Currency</label>
@@ -1090,7 +1119,7 @@
           <div id="obS3" style="display:none;">
             <div style="text-align:center; margin-bottom: var(--space-6);">
               <div class="success-check">
-                <svg data-lucide="check" width="36" height="36" style="color: white;"></svg>
+                <svg data-lucide="check" width="36" height="36" style="color: var(--color-white);"></svg>
               </div>
               <h2 style="font-size: var(--text-heading-2); font-weight: var(--weight-bold); color: var(--color-text-1); margin-bottom: var(--space-2);">You're all set!</h2>
               <p style="color: var(--color-text-2); font-size: var(--text-body-sm);">Here's what you can do with GammaHR:</p>
@@ -1295,14 +1324,21 @@
       showView('view-reset-sent');
     }
 
+    // ── Magic link handler ───────────────────────
+    function handleMagicLink(e) {
+      e.preventDefault();
+      var email = document.getElementById('login-email').value || 'your email';
+      showToast('success', 'Magic link sent', 'Check your inbox at ' + email);
+    }
+
     // ── Resend handler ───────────────────────────
     function handleResend() {
       var btn = document.getElementById('resendBtn');
       btn.disabled = true;
-      var countdown = 30;
+      var countdown = 60;
       showToast('success', 'Email sent', 'Reset link resent to your inbox');
       var interval = setInterval(function() {
-        btn.innerHTML = '<svg data-lucide="refresh-cw" width="16" height="16"></svg> Resend email (' + countdown + 's)';
+        btn.innerHTML = '<svg data-lucide="refresh-cw" width="16" height="16"></svg> Resend in ' + countdown + 's';
         lucide.createIcons({ nodes: [btn] });
         countdown--;
         if (countdown < 0) {
@@ -1386,9 +1422,11 @@
     // ── MFA setup wizard ─────────────────────────
     var currentMFAStep = 1;
     function mfaGoStep(step) {
-      document.getElementById('mfaS1').style.display = step === 1 ? 'block' : 'none';
-      document.getElementById('mfaS2').style.display = step === 2 ? 'block' : 'none';
-      document.getElementById('mfaS3').style.display = step === 3 ? 'block' : 'none';
+      [1,2,3].forEach(function(s) {
+        var el = document.getElementById('mfaS' + s);
+        el.style.display = s === step ? 'block' : 'none';
+        if (s === step) { el.classList.remove('wizard-step-panel'); void el.offsetWidth; el.classList.add('wizard-step-panel'); }
+      });
       document.getElementById('mfaSuccess').style.display = 'none';
       currentMFAStep = step;
       // Update step dots
@@ -1440,7 +1478,10 @@
     function companyGoStep(step) {
       for (var s = 1; s <= 4; s++) {
         var el = document.getElementById('csS' + s);
-        if (el) el.style.display = s === step ? 'block' : 'none';
+        if (el) {
+          el.style.display = s === step ? 'block' : 'none';
+          if (s === step) { el.classList.remove('wizard-step-panel'); void el.offsetWidth; el.classList.add('wizard-step-panel'); }
+        }
         var node = document.getElementById('csStep' + s + 'Node');
         if (node) {
           var dot = node.querySelector('.step-dot');
@@ -1482,7 +1523,10 @@
     function onboardGoStep(step) {
       for (var s = 1; s <= 3; s++) {
         var el = document.getElementById('obS' + s);
-        if (el) el.style.display = s === step ? 'block' : 'none';
+        if (el) {
+          el.style.display = s === step ? 'block' : 'none';
+          if (s === step) { el.classList.remove('wizard-step-panel'); void el.offsetWidth; el.classList.add('wizard-step-panel'); }
+        }
         var node = document.getElementById('obStep' + s + 'Node');
         if (node) {
           var dot = node.querySelector('.step-dot');
@@ -1522,6 +1566,36 @@
     // Init MFA digit containers
     buildMFADigits('mfaInlineDigits');
     buildMFADigits('mfaSetupDigits');
+
+    // ── Timezone auto-detect ─────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (tz) {
+          var tzSelect = document.querySelector('#csS4 select[class*="form-select"]');
+          // Find the timezone select (3rd select in step 4 grid)
+          var allSelects = document.querySelectorAll('#csS4 .form-select');
+          // The timezone select is the last one in csS4
+          var tzEl = allSelects[allSelects.length - 1];
+          if (tzEl) {
+            // Check if there's a matching option, else add it
+            var found = false;
+            for (var i = 0; i < tzEl.options.length; i++) {
+              if (tzEl.options[i].value && tzEl.options[i].text.indexOf(tz) !== -1) {
+                tzEl.selectedIndex = i; found = true; break;
+              }
+            }
+            if (!found) {
+              var opt = document.createElement('option');
+              opt.value = tz;
+              opt.textContent = tz + ' (detected)';
+              opt.selected = true;
+              tzEl.insertBefore(opt, tzEl.firstChild);
+            }
+          }
+        }
+      } catch(e) { /* Intl not supported */ }
+    });
   </script>
 </body>
 </html>

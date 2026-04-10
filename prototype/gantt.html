@@ -98,7 +98,7 @@
       gap: var(--space-1);
       padding: var(--space-1) var(--space-2);
       background: var(--color-primary-muted);
-      border: 1px solid hsla(155, 26%, 46%, 0.25);
+      border: 1px solid var(--color-primary-muted);
       border-radius: var(--radius-full);
       font-size: var(--text-caption);
       color: var(--color-primary);
@@ -395,9 +395,24 @@
       background: var(--color-primary);
       z-index: 4;
       pointer-events: none;
-      opacity: 0.8;
+      box-shadow: 0 0 6px var(--color-primary);
     }
     .today-line::before {
+      content: 'Today';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-primary);
+      color: var(--color-text-inv);
+      font-size: var(--text-overline);
+      font-weight: var(--weight-semibold);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      font-family: var(--font-sans);
+    }
+    .today-line::after {
       content: '';
       position: absolute;
       top: 0;
@@ -419,7 +434,7 @@
       grid-template-columns: repeat(30, 40px);
       align-items: center;
       pointer-events: none;
-      padding: 6px 0;
+      padding: var(--space-1-5) 0;
     }
     .gantt-bar {
       height: 32px;
@@ -427,7 +442,7 @@
       display: flex;
       align-items: center;
       padding: 0 var(--space-2) 0 18px;
-      font-size: 11px;
+      font-size: var(--text-overline);
       font-weight: var(--weight-medium);
       color: var(--color-text-1);
       white-space: nowrap;
@@ -436,7 +451,7 @@
       cursor: grab;
       pointer-events: all;
       position: relative;
-      transition: filter var(--motion-fast), transform var(--motion-fast);
+      transition: filter var(--motion-fast), transform var(--motion-fast), left var(--motion-fast), width var(--motion-fast);
       z-index: 2;
     }
     .gantt-bar::before {
@@ -446,7 +461,7 @@
       top: 50%;
       transform: translateY(-50%);
       color: rgba(255,255,255,0.45);
-      font-size: 10px;
+      font-size: var(--text-overline);
       cursor: ew-resize;
       letter-spacing: -1px;
     }
@@ -484,6 +499,39 @@
         var(--color-bar-bench) 4px,
         var(--color-bar-bench) 8px
       );
+    }
+    /* Leave: pending vs approved distinction */
+    .gantt-bar-leave-pending {
+      background: var(--color-warning-muted);
+      border-left: 3px dashed var(--color-warning);
+      opacity: 0.65;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 4px,
+        hsla(38, 65%, 50%, 0.12) 4px,
+        hsla(38, 65%, 50%, 0.12) 8px
+      );
+    }
+    /* Over-allocation (>100%) */
+    .gantt-bar-over-alloc {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 3px,
+        rgba(255,0,0,0.12) 3px,
+        rgba(255,0,0,0.12) 6px
+      ) !important;
+      border-left-color: var(--color-error) !important;
+    }
+    .gantt-bar-over-alloc::after {
+      content: '\26A0';
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: var(--text-caption);
+      color: var(--color-error);
     }
 
     /* Stacked bars (second row) */
@@ -730,6 +778,12 @@
     @media (max-width: 639px) {
       .gantt-mobile-view { display: block; }
       .filter-panel, .gantt-controls, .gantt-wrapper, .gantt-summary { display: none; }
+      .filter-group { min-width: unset !important; }
+      .gantt-mobile-view .text-caption div {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     /* ── Dragging ── */
@@ -797,123 +851,8 @@
   <div class="app">
 
     <!-- ═══ SIDEBAR ═══ -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-icon">G</div>
-        <span class="logo-text">GammaHR</span>
-      </div>
-
-          <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-        <a href="insights.html#ask-ai" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="bar-chart-3"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-        <a href="gantt.html" class="nav-item active">
-          <svg data-lucide="gantt-chart-square"></svg>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-      <div class="sidebar-footer">
-        <button class="nav-item" onclick="GHR && GHR.openShortcuts ? GHR.openShortcuts() : document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
-          <svg data-lucide="keyboard" class="nav-icon"></svg>
-          <span class="nav-label">Help &amp; Shortcuts</span>
-        </button>
-        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-          <svg data-lucide="panel-left-close"></svg>
-          <span>Collapse</span>
-        </button>
-      </div>
-    </aside>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- ═══ MAIN WRAPPER ═══ -->
     <div class="main-wrapper">
@@ -969,16 +908,16 @@
           </div>
           <div class="relative">
             <div class="header-user" id="userBtn">
-              <div class="avatar avatar-sm avatar-1">MK</div>
+              <div class="avatar avatar-sm avatar-1">SC</div>
               <div>
-                <div class="user-name">Marie Kowalski</div>
-                <div class="user-role">Resource Manager</div>
+                <div class="user-name">Sarah Chen</div>
+                <div class="user-role">Project Manager</div>
               </div>
             </div>
             <div class="user-dropdown" id="userDropdown">
               <div class="user-dropdown-header">
-                <div class="name">Marie Kowalski</div>
-                <div class="email">m.kowalski@gammahr.io</div>
+                <div class="name">Sarah Chen</div>
+                <div class="email">sarah.chen@gammahr.io</div>
               </div>
               <a href="employees.html#sarah-chen" class="dropdown-item"><svg data-lucide="user"></svg> Profile</a>
               <a href="admin.html" class="dropdown-item"><svg data-lucide="settings"></svg> Settings</a>
@@ -1007,11 +946,11 @@
             <p class="page-subtitle">April 2026 — Team allocation and work time overview</p>
           </div>
           <div class="page-header-actions">
-            <button class="btn btn-secondary btn-sm">
+            <button class="btn btn-secondary btn-sm" onclick="GHR && GHR.showToast ? GHR.showToast('info','Export','Exporting Gantt data as CSV...') : showToast('Exporting Gantt data as CSV...','info')">
               <svg data-lucide="download" style="width:16px;height:16px;"></svg>
               Export
             </button>
-            <button class="btn btn-secondary btn-sm">
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('shortcutsPanel')?.classList.toggle('open')">
               <svg data-lucide="help-circle" style="width:16px;height:16px;"></svg>
               Help
             </button>
@@ -1164,6 +1103,7 @@
               <svg data-lucide="chevron-left"></svg>
             </button>
             <button class="today-btn" id="navToday">Today</button>
+            <button class="today-btn" id="snapToday" title="Scroll to today">Today ⇥</button>
             <button class="nav-btn" id="navNext">
               <svg data-lucide="chevron-right"></svg>
             </button>
@@ -1171,7 +1111,7 @@
         </div>
 
         <!-- ═══ GANTT CHART ═══ -->
-        <div class="gantt-wrapper" id="ganttChart">
+        <div class="gantt-wrapper" id="ganttChart" data-min-role="pm">
           <div class="gantt-container">
 
             <!-- LEFT: Employee Panel -->
@@ -1186,8 +1126,8 @@
                 <div class="gantt-employee-row" style="border-left:3px solid var(--color-accent);" data-skills="react typescript figma css-tailwind nodejs">
                   <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-1">SC</div></span>
                   <div class="employee-info">
-                    <a href="employees.html#profile-sarah" class="employee-name" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
-                    <div class="employee-role">Design Lead</div>
+                    <a href="employees.html#profile-sarah" class="employee-name" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
+                    <div class="employee-role">Project Manager</div>
                   </div>
                   <span class="worktime-badge worktime-high font-mono">87%</span>
                 </div>
@@ -1207,31 +1147,31 @@
                 <div class="gantt-employee-row" style="border-left:3px solid var(--color-primary);" data-skills="figma react typescript">
                   <span class="avatar-status presence-leave"><div class="avatar avatar-sm avatar-3">AW</div></span>
                   <div class="employee-info">
-                    <a href="employees.html#profile-alice" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering" data-worktime="75" data-href="employees.html#profile-alice">Alice Wang</a>
-                    <div class="employee-role">UX Designer</div>
+                    <a href="employees.html#profile-alice" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a>
+                    <div class="employee-role">Software Engineer — On Leave Apr 14-18</div>
                   </div>
-                  <span class="worktime-badge worktime-mid font-mono">75%</span>
+                  <span class="worktime-badge worktime-low font-mono">45%</span>
                 </div>
                 <!-- Row 4: Bob Taylor -->
                 <div class="gantt-employee-row" style="border-left:3px solid var(--color-primary);" data-skills="nodejs python sql react">
                   <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-4">BT</div></span>
                   <div class="employee-info">
-                    <a href="employees.html#profile-bob" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="72" data-href="employees.html#profile-bob">Bob Taylor</a>
-                    <div class="employee-role">Backend Developer</div>
+                    <a href="employees.html#profile-bob" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
+                    <div class="employee-role">Backend Developer — Bench</div>
                   </div>
-                  <span class="worktime-badge worktime-mid font-mono">72%</span>
+                  <span class="worktime-badge worktime-low font-mono">0%</span>
                 </div>
 
                 <!-- Department header: HR -->
                 <div style="padding:var(--space-2) var(--space-4);background:var(--color-info-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-info);text-transform:uppercase;letter-spacing:0.5px;">HR</div>
-                <!-- Row 5: Carol Kim -->
-                <div class="gantt-employee-row" style="border-left:3px solid var(--color-info);" data-skills="project-management sql">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-5">CK</div></span>
+                <!-- Row 5: Carol Williams -->
+                <div class="gantt-employee-row" style="border-left:3px solid var(--color-info);" data-skills="project-management sql figma">
+                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-5">CW</div></span>
                   <div class="employee-info">
-                    <a href="employees.html#profile-carol" class="employee-name" data-hovercard data-name="Carol Kim" data-role="HR Manager" data-dept="HR" data-worktime="78" data-href="employees.html#profile-carol">Carol Kim</a>
-                    <div class="employee-role">HR Manager</div>
+                    <a href="employees.html#profile-carol" class="employee-name" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#profile-carol">Carol Williams</a>
+                    <div class="employee-role">Design Lead</div>
                   </div>
-                  <span class="worktime-badge worktime-mid font-mono">78%</span>
+                  <span class="worktime-badge worktime-high font-mono">90%</span>
                 </div>
                 <!-- Row 7: Emma Laurent -->
                 <div class="gantt-employee-row" style="border-left:3px solid var(--color-info);" data-skills="project-management">
@@ -1244,22 +1184,22 @@
                 </div>
 
                 <!-- Department header: Finance -->
-                <div style="padding:var(--space-2) var(--space-4);background:hsla(43,74%,66%,0.15);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-gold);text-transform:uppercase;letter-spacing:0.5px;">Finance</div>
+                <div style="padding:var(--space-2) var(--space-4);background:var(--color-gold-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-gold);text-transform:uppercase;letter-spacing:0.5px;">Finance</div>
                 <!-- Row 6: David Park -->
                 <div class="gantt-employee-row" style="border-left:3px solid var(--color-gold);" data-skills="sql project-management python">
-                  <span class="avatar-status presence-away"><div class="avatar avatar-sm avatar-6">DP</div></span>
+                  <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-6">DP</div></span>
                   <div class="employee-info">
-                    <a href="employees.html#profile-david" class="employee-name" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="65" data-href="employees.html#profile-david">David Park</a>
+                    <a href="employees.html#profile-david" class="employee-name" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">David Park</a>
                     <div class="employee-role">Finance Lead</div>
                   </div>
-                  <span class="worktime-badge worktime-mid font-mono">65%</span>
+                  <span class="worktime-badge worktime-low font-mono">45%</span>
                 </div>
 
                 <!-- Department header: Operations -->
                 <div style="padding:var(--space-2) var(--space-4);background:var(--color-warning-muted);border-bottom:1px solid var(--color-border);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);text-transform:uppercase;letter-spacing:0.5px;">Operations</div>
                 <!-- Row 8: Marco Rossi -->
                 <div class="gantt-employee-row" style="border-left:3px solid var(--color-warning);" data-skills="project-management sql">
-                  <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-8">MR</div></span>
+                  <span class="avatar-status presence-away"><div class="avatar avatar-sm avatar-8">MR</div></span>
                   <div class="employee-info">
                     <a href="employees.html#profile-marco" class="employee-name" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a>
                     <div class="employee-role">Operations Lead</div>
@@ -1357,8 +1297,8 @@
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-1">SC</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-sarah" class="employee-name" data-hovercard data-name="Sarah Chen" data-role="Design Lead" data-dept="Design" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
-                  <div class="employee-role">Design Lead</div>
+                  <a href="employees.html#profile-sarah" class="employee-name" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" data-href="employees.html#profile-sarah">Sarah Chen</a>
+                  <div class="employee-role">Project Manager</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
@@ -1394,13 +1334,13 @@
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-leave"><div class="avatar avatar-sm avatar-3">AW</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-alice" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Senior Developer" data-dept="Engineering" data-worktime="75" data-href="employees.html#profile-alice">Alice Wang</a>
-                  <div class="employee-role">UX Designer</div>
+                  <a href="employees.html#profile-alice" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a>
+                  <div class="employee-role">Software Engineer — On Leave Apr 14-18</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
-                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:75%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
-                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);min-width:36px;">75%</span>
+                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:45%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
+                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">45%</span>
               </div>
               <div class="text-caption text-2">
                 <div>Annual Leave — Apr 1 to Apr 13</div>
@@ -1414,30 +1354,30 @@
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-4">BT</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-bob" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Senior Developer" data-dept="Engineering" data-worktime="72" data-href="employees.html#profile-bob">Bob Taylor</a>
-                  <div class="employee-role">Backend Developer</div>
+                  <a href="employees.html#profile-bob" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
+                  <div class="employee-role">Backend Developer — Bench</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
-                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:72%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
-                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);min-width:36px;">72%</span>
+                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:0%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
+                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">0%</span>
               </div>
               <div class="text-caption text-2"><div>Globex Phase 2 — Apr 1 to Apr 30</div></div>
             </div>
           </div>
-          <!-- Carol Kim -->
+          <!-- Carol Williams -->
           <div class="card mb-3">
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
-                <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-5">CK</div></span>
+                <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-5">CW</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-carol" class="employee-name" data-hovercard data-name="Carol Kim" data-role="HR Manager" data-dept="HR" data-worktime="78" data-href="employees.html#profile-carol">Carol Kim</a>
-                  <div class="employee-role">HR Manager</div>
+                  <a href="employees.html#profile-carol" class="employee-name" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#profile-carol">Carol Williams</a>
+                  <div class="employee-role">Design Lead</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
-                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:78%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
-                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);min-width:36px;">78%</span>
+                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:90%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
+                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">90%</span>
               </div>
               <div class="text-caption text-2"><div>Initech API — Apr 1 to Apr 24</div></div>
             </div>
@@ -1446,15 +1386,15 @@
           <div class="card mb-3">
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
-                <span class="avatar-status presence-away"><div class="avatar avatar-sm avatar-6">DP</div></span>
+                <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-6">DP</div></span>
                 <div style="flex:1;min-width:0;">
-                  <a href="employees.html#profile-david" class="employee-name" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="65" data-href="employees.html#profile-david">David Park</a>
+                  <a href="employees.html#profile-david" class="employee-name" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#profile-david">David Park</a>
                   <div class="employee-role">Finance Lead</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
-                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:65%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
-                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);min-width:36px;">65%</span>
+                <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:45%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
+                <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">45%</span>
               </div>
               <div class="text-caption text-2">
                 <div>Globex Phase 2 — Apr 1 to Apr 10</div>
@@ -1484,7 +1424,7 @@
           <div class="card mb-3">
             <div class="card-body">
               <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2);">
-                <span class="avatar-status presence-online"><div class="avatar avatar-sm avatar-8">MR</div></span>
+                <span class="avatar-status presence-away"><div class="avatar avatar-sm avatar-8">MR</div></span>
                 <div style="flex:1;min-width:0;">
                   <a href="employees.html#profile-marco" class="employee-name" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#profile-marco">Marco Rossi</a>
                   <div class="employee-role">Operations Lead</div>
@@ -1540,9 +1480,9 @@
         <div class="gantt-wrapper" id="emptyState" style="display:none;">
           <div class="empty-state" style="padding:var(--space-16) var(--space-8);">
             <svg data-lucide="gantt-chart" class="empty-icon" style="width:64px;height:64px;color:var(--color-text-3);margin-bottom:var(--space-4);"></svg>
-            <div class="empty-title">No team members match your filters</div>
-            <div class="empty-desc">Try adjusting your search criteria or clearing some filters to see team members.</div>
-            <button class="btn btn-primary btn-sm" onclick="toggleEmptyState()">Clear All Filters</button>
+            <div class="empty-title">No projects scheduled in this date range</div>
+            <div class="empty-desc">Try adjusting your filters or date range to see team assignments, or return to today's view.</div>
+            <button class="btn btn-primary btn-sm" id="emptyReturnToday">Return to Today</button>
           </div>
         </div>
 
@@ -1578,7 +1518,7 @@
             <span class="detail-label">End Date</span>
             <span class="detail-value" id="panelEnd">May 30, 2026</span>
           </div>
-          <div class="panel-detail-row">
+          <div class="panel-detail-row" data-sensitive="billing">
             <span class="detail-label">Budget</span>
             <span class="detail-value font-mono" id="panelBudget">€124,000</span>
           </div>
@@ -1586,7 +1526,7 @@
             <span class="detail-label">Hours Logged</span>
             <span class="detail-value font-mono" id="panelHours">342 / 480h</span>
           </div>
-          <div class="panel-detail-row">
+          <div class="panel-detail-row" data-sensitive="billing">
             <span class="detail-label">Billing Type</span>
             <span class="detail-value" id="panelBilling">Time & Materials</span>
           </div>
@@ -1610,7 +1550,7 @@
               <div class="avatar avatar-sm avatar-1">SC</div>
               <div class="member-info">
                 <div class="member-name">Sarah Chen</div>
-                <div class="member-role">Sr. Frontend Dev</div>
+                <div class="member-role">Project Manager</div>
               </div>
               <span class="member-hours font-mono">124h</span>
             </div>
@@ -1618,7 +1558,7 @@
               <div class="avatar avatar-sm avatar-8">MR</div>
               <div class="member-info">
                 <div class="member-name">Marco Rossi</div>
-                <div class="member-role">Sr. Frontend Dev</div>
+                <div class="member-role">Operations Lead</div>
               </div>
               <span class="member-hours font-mono">156h</span>
             </div>
@@ -1626,7 +1566,7 @@
               <div class="avatar avatar-sm avatar-3">AW</div>
               <div class="member-info">
                 <div class="member-name">Alice Wang</div>
-                <div class="member-role">UX Designer</div>
+                <div class="member-role">Software Engineer</div>
               </div>
               <span class="member-hours font-mono">62h</span>
             </div>
@@ -1665,14 +1605,14 @@
           <div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div>
           <div class="item-text">
             <div class="item-title">Sarah Chen</div>
-            <div class="item-subtitle">Sr. Frontend Dev - 87% utilized</div>
+            <div class="item-subtitle">Project Manager — 87% work time</div>
           </div>
         </div>
         <div class="cmd-palette-item">
           <div class="item-icon"><svg data-lucide="user" style="width:16px;height:16px;"></svg></div>
           <div class="item-text">
             <div class="item-title">Bob Taylor</div>
-            <div class="item-subtitle">Full Stack Dev - On Bench</div>
+            <div class="item-subtitle">Backend Developer - On Bench</div>
           </div>
         </div>
       </div>
@@ -1698,6 +1638,40 @@
     <button class="gantt-ctx-item" onclick="ctxAction('reassign')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-text-1);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-surface-3)'" onmouseout="this.style.background=''">Reassign</button>
     <hr style="margin:4px 0; border-color:var(--color-border); border-style:solid; border-width:1px 0 0 0;">
     <button class="gantt-ctx-item" onclick="ctxAction('remove')" style="display:block;width:100%;text-align:left;padding:var(--space-2) var(--space-4);background:none;border:none;font-size:var(--text-body-sm);color:var(--color-error);cursor:pointer;font-family:var(--font-sans);" onmouseover="this.style.background='var(--color-error-muted)'" onmouseout="this.style.background=''">Remove</button>
+  </div>
+
+  <!-- ═══ QUICK-ASSIGN MODAL ═══ -->
+  <div class="modal-backdrop" id="quickAssignModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Assign <span id="quickAssignEmployee">Employee</span> to Project?</h3>
+        <button class="modal-close" onclick="document.getElementById('quickAssignModal').classList.remove('active')"><svg data-lucide="x" width="18" height="18"></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group mb-4">
+          <label class="form-label">Project</label>
+          <select class="form-select" id="quickAssignProject">
+            <option value="">Select project...</option>
+            <option value="acme">Acme Web Redesign</option>
+            <option value="globex">Globex Phase 2</option>
+            <option value="initech">Initech API</option>
+            <option value="contoso">Contoso Deal</option>
+            <option value="internal">Internal</option>
+          </select>
+        </div>
+        <div class="form-group mb-0">
+          <label class="form-label">Hours / Week</label>
+          <input type="number" class="form-input" id="quickAssignHours" min="1" max="40" value="20" placeholder="20">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost btn-md" onclick="document.getElementById('quickAssignModal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary btn-md" onclick="(function(){var p=document.getElementById('quickAssignProject');if(!p.value){GHR&&GHR.showToast?GHR.showToast('error','Required','Please select a project.'):showToast('Please select a project.','error');return;}document.getElementById('quickAssignModal').classList.remove('active');var msg=(document.getElementById('quickAssignEmployee').textContent||'Employee')+' assigned to '+(p.options[p.selectedIndex].text)+'.';GHR&&GHR.showToast?GHR.showToast('success','Assignment Created',msg):showToast(msg,'success');})()">
+          <svg data-lucide="check" width="16" height="16"></svg>
+          Confirm
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ═══ STATE TOGGLE ═══ -->
@@ -1742,7 +1716,7 @@
     }
 
     // Avatar class lookup
-    const avatarClassMap = { SC:'avatar-1', JS:'avatar-2', AW:'avatar-3', BT:'avatar-4', CK:'avatar-5', DP:'avatar-6', EL:'avatar-7', MR:'avatar-8', SD:'avatar-9', JW:'avatar-10' };
+    const avatarClassMap = { SC:'avatar-1', JS:'avatar-2', AW:'avatar-3', BT:'avatar-4', CW:'avatar-5', DP:'avatar-6', EL:'avatar-7', MR:'avatar-8', SD:'avatar-9', JW:'avatar-10' };
 
     // Project data for the slide panel
     const projectData = {
@@ -1750,25 +1724,25 @@
         client: 'Acme Corp', status: 'Active', start: 'Mar 15, 2026', end: 'May 30, 2026',
         budget: '€124,000', hours: '342 / 480h', billing: 'Time & Materials', progress: 71,
         team: [
-          { initials: 'SC', name: 'Sarah Chen', role: 'Sr. Frontend Dev', hours: '124h' },
-          { initials: 'MR', name: 'Marco Rossi', role: 'Sr. Frontend Dev', hours: '156h' },
-          { initials: 'AW', name: 'Alice Wang', role: 'UX Designer', hours: '62h' }
+          { initials: 'SC', name: 'Sarah Chen', role: 'Project Manager', hours: '124h' },
+          { initials: 'MR', name: 'Marco Rossi', role: 'Operations Lead', hours: '156h' },
+          { initials: 'AW', name: 'Alice Wang', role: 'Software Engineer', hours: '62h' }
         ]
       },
       'Globex Phase 2': {
         client: 'Globex Inc', status: 'Active', start: 'Feb 1, 2026', end: 'Jun 15, 2026',
         budget: '€198,500', hours: '512 / 720h', billing: 'Fixed Price', progress: 58,
         team: [
-          { initials: 'JS', name: 'John Smith', role: 'Backend Engineer', hours: '210h' },
-          { initials: 'DP', name: 'David Park', role: 'DevOps Engineer', hours: '142h' }
+          { initials: 'JS', name: 'John Smith', role: 'Senior Developer', hours: '210h' },
+          { initials: 'DP', name: 'David Park', role: 'Finance Lead', hours: '142h' }
         ]
       },
       'Initech API': {
         client: 'Initech', status: 'Active', start: 'Mar 1, 2026', end: 'May 15, 2026',
         budget: '€87,000', hours: '198 / 360h', billing: 'Time & Materials', progress: 55,
         team: [
-          { initials: 'SC', name: 'Sarah Chen', role: 'Sr. Frontend Dev', hours: '48h' },
-          { initials: 'CK', name: 'Carol Kim', role: 'Backend Engineer', hours: '96h' },
+          { initials: 'SC', name: 'Sarah Chen', role: 'Project Manager', hours: '48h' },
+          { initials: 'CW', name: 'Carol Williams', role: 'Design Lead', hours: '96h' },
           { initials: 'JW', name: 'James Wilson', role: 'QA Engineer', hours: '54h' }
         ]
       },
@@ -1783,33 +1757,33 @@
         client: 'GammaHR (Internal)', status: 'Ongoing', start: 'Jan 1, 2026', end: 'Dec 31, 2026',
         budget: 'N/A', hours: '180h', billing: 'Non-Billable', progress: 30,
         team: [
-          { initials: 'EL', name: 'Emma Laurent', role: 'Project Manager', hours: '180h' }
+          { initials: 'EL', name: 'Emma Laurent', role: 'HR Specialist', hours: '180h' }
         ]
       },
       'Annual Leave': {
         client: 'N/A', status: 'Approved', start: 'Apr 1, 2026', end: 'Apr 11, 2026',
         budget: 'N/A', hours: 'N/A', billing: 'N/A', progress: 0,
         team: [
-          { initials: 'AW', name: 'Alice Wang', role: 'UX Designer', hours: '—' }
+          { initials: 'AW', name: 'Alice Wang', role: 'Software Engineer', hours: '—' }
         ]
       },
       'BENCH': {
         client: 'Unassigned', status: 'Bench', start: 'Mar 20, 2026', end: 'TBD',
         budget: 'N/A', hours: 'N/A', billing: 'N/A', progress: 0,
         team: [
-          { initials: 'BT', name: 'Bob Taylor', role: 'Full Stack Dev', hours: '—' }
+          { initials: 'BT', name: 'Bob Taylor', role: 'Backend Developer', hours: '—' }
         ]
       }
     };
 
     // Employee bar definitions: [{ label, type, gridStart, gridEnd, project }]
     const employeeBars = [
-      // Sarah Chen - 87%
+      // Sarah Chen - 87% (overlapping bars Apr 20-26 = over-allocated)
       [
-        { label: 'Acme Web Redesign', type: 'billable', start: 1, end: 26, project: 'Acme Web Redesign' },
+        { label: 'Acme Web Redesign', type: 'billable', start: 1, end: 26, project: 'Acme Web Redesign', overAllocated: true },
         { label: 'Initech API', type: 'billable', start: 20, end: 30, project: 'Initech API', row: 2 }
       ],
-      // John Smith - 92%
+      // John Smith - 82%
       [
         { label: 'Globex Phase 2', type: 'billable', start: 1, end: 30, project: 'Globex Phase 2' }
       ],
@@ -1824,21 +1798,21 @@
         { label: 'BENCH', type: 'bench', start: 1, end: 30, project: 'BENCH' },
         { label: 'Initech', type: 'billable-faint', start: 30, end: 31, project: 'Initech API' }
       ],
-      // Carol Kim - 78%
+      // Carol Williams - 90%
       [
         { label: 'Initech API', type: 'billable', start: 1, end: 24, project: 'Initech API' }
       ],
-      // David Park - 65%
+      // David Park - 45%
       [
         { label: 'Globex Phase 2', type: 'billable', start: 1, end: 10, project: 'Globex Phase 2' },
         { label: 'Globex Phase 2', type: 'billable', start: 14, end: 22, project: 'Globex Phase 2' },
         { label: 'Globex Phase 2', type: 'billable', start: 27, end: 30, project: 'Globex Phase 2' }
       ],
-      // Emma Laurent - 100%
+      // Emma Laurent - 78%
       [
         { label: 'Internal', type: 'nonbillable', start: 1, end: 30, project: 'Internal' }
       ],
-      // Marco Rossi - 95%
+      // Marco Rossi - 88%
       [
         { label: 'Acme Web Redesign', type: 'billable', start: 1, end: 30, project: 'Acme Web Redesign' }
       ],
@@ -1916,7 +1890,32 @@
             barEl.style.opacity = '0.4';
           }
 
-          barEl.textContent = bar.label;
+          // Add completion annotation if project data available
+          var pData = projectData[bar.project || bar.label];
+          var completionTxt = '';
+          if (pData && pData.progress > 0) { completionTxt = ' · ' + pData.progress + '%'; }
+          barEl.textContent = bar.label + completionTxt;
+
+          // Over-allocation indicator (>100%)
+          if (bar.overAllocated) {
+            barEl.classList.add('gantt-bar-over-alloc');
+          }
+
+          // Leave bar click handler
+          if (bar.type === 'leave') {
+            barEl.style.cursor = 'pointer';
+            barEl.addEventListener('click', function(e) {
+              e.stopPropagation();
+              var empNames = ['Sarah Chen','John Smith','Alice Wang','Bob Taylor','Carol Williams','David Park','Emma Laurent','Marco Rossi','Sophie Dubois','James Wilson'];
+              var empName = empNames[rowIdx] || 'Employee';
+              var msg = empName + ' — ' + bar.label + ': Apr ' + bar.start + '-' + Math.min(bar.end, 30);
+              if (typeof GHR !== 'undefined' && GHR.showToast) {
+                GHR.showToast('info', 'Leave Details', msg);
+              } else {
+                showToast(msg, 'info');
+              }
+            });
+          }
 
           // Data for tooltip and slide panel
           barEl.dataset.project = bar.project || bar.label;
@@ -2024,11 +2023,6 @@
       if (e.target === e.currentTarget) {
         document.getElementById('slideBackdrop').classList.remove('active');
       }
-    });
-
-    // ── SIDEBAR TOGGLE ──
-    document.getElementById('sidebarCollapseBtn').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('collapsed');
     });
 
     // ── FILTER PANEL TOGGLE ──
@@ -2239,11 +2233,41 @@
       }
     });
 
+    // ── SNAP TO TODAY ──
+    var snapBtn = document.getElementById('snapToday');
+    if (snapBtn) {
+      snapBtn.addEventListener('click', function() {
+        var line = document.getElementById('todayLine');
+        if (line) line.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    }
+
+    // ── EMPTY CELL RETURN TO TODAY ──
+    var emptyReturnTodayBtn = document.getElementById('emptyReturnToday');
+    if (emptyReturnTodayBtn) {
+      emptyReturnTodayBtn.addEventListener('click', function() { toggleEmptyState(); });
+    }
+
+    // ── QUICK-ASSIGN EMPTY CELL CLICK ──
+    document.getElementById('ganttRight') && document.getElementById('ganttRight').addEventListener('click', function(e) {
+      var cell = e.target.closest('.gantt-day-cell');
+      if (!cell) return;
+      var row = cell.closest('.gantt-timeline-row');
+      if (!row) return;
+      var rows = Array.from(document.querySelectorAll('.gantt-timeline-row'));
+      var rowIdx = rows.indexOf(row);
+      var empRows = document.querySelectorAll('.gantt-employee-row');
+      var empName = empRows[rowIdx] ? (empRows[rowIdx].querySelector('.employee-name') || {}).textContent || 'Employee' : 'Employee';
+      document.getElementById('quickAssignEmployee').textContent = empName;
+      document.getElementById('quickAssignModal').classList.add('active');
+      lucide.createIcons({ nodes: [document.getElementById('quickAssignModal')] });
+    });
+
     // ── BAR DATA-TOOLTIP ──
     var tooltipData = {
       'Acme Web Redesign': 'Acme Web Redesign · Sarah Chen · Mar 1 – Apr 30 · 87% capacity',
       'Globex Phase 2': 'Globex Phase 2 · John Smith · Feb 1 – Jun 15 · 82% capacity',
-      'Initech API': 'Initech API · Carol Kim · Mar 1 – May 15 · 78% capacity',
+      'Initech API': 'Initech API · Carol Williams · Mar 1 – May 15 · 90% capacity',
       'Contoso Deal': 'Contoso Deal · Sophie Dubois · Apr 1 – Jul 31 · 82% capacity',
       'Internal': 'Internal · Emma Laurent · Jan 1 – Dec 31 · 78% capacity',
       'Annual Leave': 'Annual Leave · Alice Wang · Apr 1 – Apr 11',

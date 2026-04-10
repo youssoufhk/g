@@ -600,6 +600,38 @@
     overflow-y: auto;
   }
 
+  /* ── Month view heatmap mobile — static fallback (also injected by JS) ── */
+  @media (max-width: 639px) {
+    .month-hours-number { display: none !important; }
+    .month-hours-dot { display: block !important; }
+  }
+
+  /* ── Holiday cell ── */
+  .ts-holiday-cell {
+    background: var(--color-surface-2) !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+  }
+
+  /* ── Auto-save indicator ── */
+  #tsAutoSave { opacity: 0; transition: opacity 0.5s; }
+  #tsAutoSave.visible { opacity: 1; }
+
+  /* ── Approval queue filter bar ── */
+  .aq-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+  }
+  .aq-filter-bar .form-select, .aq-filter-bar .form-input {
+    height: 32px;
+    font-size: var(--text-body-sm);
+    min-width: 140px;
+    width: auto;
+  }
+
   /* ── Submitted State ── */
     .ts-submitted-banner {
       display: flex;
@@ -627,125 +659,7 @@
 <div class="app">
 
   <!-- ════════════════════════════════════════ SIDEBAR ════════════════════════════════════════ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">G</div>
-      <span class="logo-text">GammaHR</span>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Main navigation">
-      <!-- MAIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Main</div>
-        <a href="index.html" class="nav-item">
-          <svg data-lucide="layout-dashboard"></svg>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="timesheets.html" class="nav-item active">
-          <svg data-lucide="clock"></svg>
-          <span class="nav-label">Timesheets</span>
-          <span class="nav-badge">7</span>
-        </a>
-        <a href="expenses.html" class="nav-item">
-          <svg data-lucide="receipt"></svg>
-          <span class="nav-label">Expenses</span>
-          <span class="nav-badge">2</span>
-        </a>
-        <a href="leaves.html" class="nav-item">
-          <svg data-lucide="palm-tree"></svg>
-          <span class="nav-label">Leaves</span>
-          <span class="nav-badge">3</span>
-        </a>
-        <a href="calendar.html" class="nav-item">
-          <svg data-lucide="calendar"></svg>
-          <span class="nav-label">Calendar</span>
-        </a>
-        <a href="insights.html#ask-ai" class="nav-item">
-          <i data-lucide="sparkles" class="nav-icon"></i>
-          <span class="nav-label">Ask AI</span>
-        </a>
-      </div>
-
-      <!-- HR -->
-      <div class="nav-section">
-        <div class="nav-section-label">HR</div>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="briefcase"></svg>
-          <span class="nav-label">Recruitment</span>
-          <span class="nav-badge">5</span>
-        </a>
-        <a href="hr.html" class="nav-item">
-          <svg data-lucide="user-plus"></svg>
-          <span class="nav-label">Onboarding</span>
-        </a>
-        <a href="employees.html" class="nav-item">
-          <svg data-lucide="users"></svg>
-          <span class="nav-label">Team Directory</span>
-        </a>
-      </div>
-
-      <!-- WORK -->
-      <div class="nav-section">
-        <div class="nav-section-label">Work</div>
-        <a href="projects.html" class="nav-item">
-          <svg data-lucide="folder-kanban"></svg>
-          <span class="nav-label">Projects</span>
-        </a>
-        <a href="gantt.html" class="nav-item">
-          <i data-lucide="gantt-chart-square" class="nav-icon"></i>
-          <span class="nav-label">Gantt Chart</span>
-        </a>
-        <a href="clients.html" class="nav-item">
-          <svg data-lucide="building-2"></svg>
-          <span class="nav-label">Clients</span>
-        </a>
-        <a href="planning.html" class="nav-item">
-          <svg data-lucide="calendar-range"></svg>
-          <span class="nav-label">Resource Planning</span>
-        </a>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="nav-section">
-        <div class="nav-section-label">Finance</div>
-        <a href="invoices.html" class="nav-item">
-          <svg data-lucide="file-text"></svg>
-          <span class="nav-label">Invoices</span>
-        </a>
-        <a href="insights.html" class="nav-item">
-          <svg data-lucide="sparkles"></svg>
-          <span class="nav-label">Insights</span>
-        </a>
-      </div>
-
-      <!-- ADMIN -->
-      <div class="nav-section">
-        <div class="nav-section-label">Admin</div>
-        <a href="approvals.html" class="nav-item">
-          <svg data-lucide="check-square"></svg>
-          <span class="nav-label">Approvals</span>
-          <span class="nav-badge" id="approvalsBadge">12</span>
-        </a>
-        <a href="admin.html" class="nav-item">
-          <svg data-lucide="settings"></svg>
-          <span class="nav-label">Settings</span>
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="nav-item" onclick="document.getElementById('shortcutsPanel') && document.getElementById('shortcutsPanel').classList.add('open')">
-        <i data-lucide="keyboard" class="nav-icon"></i>
-        <span class="nav-label">Help &amp; Shortcuts</span>
-      </button>
-      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
-        <svg data-lucide="panel-left-close"></svg>
-        <span>Collapse</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Sidebar overlay for mobile -->
+  <aside class="sidebar" id="sidebar"></aside>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ════════════════════════════════════════ MAIN WRAPPER ════════════════════════════════════════ -->
@@ -796,7 +710,7 @@
               <div class="notif-item">
                 <div class="notif-icon"><svg data-lucide="check-circle" width="16" height="16" style="color: var(--color-success);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">Carol Kim's timesheet approved for Mar 23-29</div>
+                  <div class="notif-title">Carol Williams's timesheet approved for Mar 23-29</div>
                   <div class="notif-time">1 hour ago</div>
                 </div>
               </div>
@@ -864,7 +778,7 @@
           <svg data-lucide="history" width="16" height="16"></svg>
           Previous Weeks
         </button>
-        <button class="tab" data-tab="approval">
+        <button class="tab" data-tab="approval" data-min-role="pm">
           <svg data-lucide="clipboard-check" width="16" height="16"></svg>
           Approval Queue
           <span class="tab-count">7</span>
@@ -874,8 +788,8 @@
       <!-- ════════════ TAB 1: WEEK VIEW ════════════ -->
       <div class="tab-content active populated-content" id="tab-week">
 
-        <!-- Status Bar -->
-        <div class="ts-status-bar" id="statusBar">
+        <!-- Status Bar — hidden (replaced by Weekly Summary panel below) -->
+        <div class="ts-status-bar" id="statusBar" style="display:none;">
           <svg data-lucide="info" width="18" height="18" style="color: var(--color-info); flex-shrink: 0;"></svg>
           <span class="ts-status-text" id="statusText">
             Week of Mar 30 &#8211; Apr 5, 2026 &#8212; <strong id="statusHours">32.5h</strong> logged, <strong id="statusRemaining">7.5h</strong> remaining to reach 40h
@@ -908,18 +822,18 @@
             <div class="copy-dropdown-menu" id="copyMenu">
               <div class="copy-dropdown-item" data-copy="last-week">
                 <svg data-lucide="arrow-left" width="16" height="16"></svg>
-                Last Week
+                Copy Last Week
+              </div>
+              <div class="copy-dropdown-item" data-copy="same-week-last-month">
+                <svg data-lucide="calendar-minus" width="16" height="16"></svg>
+                Copy Same Week Last Month
               </div>
               <div class="copy-dropdown-item" data-copy="template">
-                <svg data-lucide="file-template" width="16" height="16"></svg>
-                Template
+                <svg data-lucide="file-text" width="16" height="16"></svg>
+                Start from Template
               </div>
             </div>
           </div>
-          <button class="btn btn-secondary btn-sm" style="margin-left: var(--space-2);" onclick="showToast('info', 'Copied', 'Entries copied from previous week')">
-            <svg data-lucide="clipboard-copy" width="14" height="14"></svg>
-            Copy Last Week
-          </button>
           <button class="btn btn-secondary btn-sm" style="margin-left: var(--space-2);" onclick="exportTimesheets()">
             <svg data-lucide="download" width="14" height="14"></svg>
             Export
@@ -930,6 +844,27 @@
         <div class="ts-submitted-banner" id="tsSubmittedBanner" style="display:none;">
           <svg data-lucide="check-circle" width="20" height="20"></svg>
           <span>Submitted for Review -- Awaiting manager approval</span>
+        </div>
+
+        <!-- Rejection reason callout (shown if timesheet was rejected) -->
+        <div id="tsRejectionCallout" style="display:none;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
+          <svg data-lucide="alert-circle" width="18" height="18" style="color:var(--color-error);flex-shrink:0;margin-top:1px;"></svg>
+          <div>
+            <div style="font-weight:var(--weight-semibold);font-size:var(--text-body-sm);color:var(--color-error);margin-bottom:var(--space-1);">Timesheet Rejected</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">Hours for Friday don't match project schedule. Please review.</div>
+          </div>
+        </div>
+
+        <!-- Pre-populated notice -->
+        <div id="tsPrefilledNotice" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-primary);">
+          <svg data-lucide="sparkles" width="14" height="14" style="flex-shrink:0;"></svg>
+          <span>Pre-filled from your active assignments. Add more rows if needed.</span>
+        </div>
+
+        <!-- Auto-save indicator -->
+        <div id="tsAutoSave" style="display:none;font-size:var(--text-caption);color:var(--color-text-3);text-align:right;margin-bottom:var(--space-1);transition:opacity 0.5s;">
+          <svg data-lucide="check" width="12" height="12" style="display:inline;vertical-align:-1px;"></svg>
+          Draft saved
         </div>
 
         <!-- Week Grid -->
@@ -960,29 +895,29 @@
               </tr>
             </thead>
             <tbody id="tsBody">
-              <!-- Row 1: Acme Web Redesign -->
+              <!-- Row 1: Acme Web Redesign (pre-populated) -->
               <tr class="ts-data-row" data-project="acme">
                 <td><a href="projects.html#acme-web-redesign" class="ts-project-link">Acme Web Redesign</a></td>
                 <td class="ts-cell" data-day="0"><span class="ts-cell-value">6</span></td>
                 <td class="ts-cell" data-day="1"><span class="ts-cell-value">7</span></td>
                 <td class="ts-cell" data-day="2"><span class="ts-cell-value">8</span></td>
                 <td class="ts-cell" data-day="3"><span class="ts-cell-value">6</span></td>
-                <td class="ts-cell" data-day="4"><span class="ts-cell-value">4</span></td>
+                <td class="ts-cell ts-holiday-cell" data-day="4" title="Public Holiday: Good Friday" style="background:var(--color-surface-2);cursor:not-allowed;"><span class="ts-cell-value" style="color:var(--color-text-3);font-size:var(--text-caption);font-family:var(--font-sans);">Holiday</span></td>
                 <td class="ts-cell weekend" data-day="5"><span class="ts-cell-value">&#8212;</span></td>
                 <td class="ts-cell weekend" data-day="6"><span class="ts-cell-value">&#8212;</span></td>
-                <td class="total-cell font-mono"><span class="row-total">31</span></td>
+                <td class="total-cell font-mono"><span class="row-total">27</span></td>
               </tr>
-              <!-- Row 2: Initech API -->
-              <tr class="ts-data-row" data-project="initech">
-                <td><a href="projects.html#initech-api" class="ts-project-link">Initech API</a></td>
+              <!-- Row 2: Internal — GammaHR Dev (pre-populated) -->
+              <tr class="ts-data-row" data-project="internal-gamahr">
+                <td><a href="projects.html#internal-gammaHR-dev" class="ts-project-link">Internal — GammaHR Dev</a></td>
                 <td class="ts-cell" data-day="0"><span class="ts-cell-value">2</span></td>
                 <td class="ts-cell" data-day="1"><span class="ts-cell-value">1</span></td>
                 <td class="ts-cell" data-day="2"><span class="ts-cell-value">&#8212;</span></td>
                 <td class="ts-cell" data-day="3"><span class="ts-cell-value">2</span></td>
-                <td class="ts-cell" data-day="4"><span class="ts-cell-value">4</span></td>
+                <td class="ts-cell ts-holiday-cell" data-day="4" title="Public Holiday: Good Friday" style="background:var(--color-surface-2);cursor:not-allowed;"><span class="ts-cell-value" style="color:var(--color-text-3);font-size:var(--text-caption);font-family:var(--font-sans);">Holiday</span></td>
                 <td class="ts-cell weekend" data-day="5"><span class="ts-cell-value">&#8212;</span></td>
                 <td class="ts-cell weekend" data-day="6"><span class="ts-cell-value">&#8212;</span></td>
-                <td class="total-cell font-mono"><span class="row-total">9</span></td>
+                <td class="total-cell font-mono"><span class="row-total">5</span></td>
               </tr>
               <!-- Add row -->
               <tr class="ts-add-row" id="addProjectRow">
@@ -1002,10 +937,10 @@
                 <td class="col-total-day" data-day="1">8</td>
                 <td class="col-total-day" data-day="2">8</td>
                 <td class="col-total-day" data-day="3">8</td>
-                <td class="col-total-day" data-day="4">8</td>
+                <td class="col-total-day ts-holiday-cell" data-day="4" style="background:var(--color-surface-2);color:var(--color-text-3);font-family:var(--font-sans);font-size:var(--text-caption);">Holiday</td>
                 <td class="col-total-day" data-day="5">0</td>
                 <td class="col-total-day" data-day="6">0</td>
-                <td class="col-total-day" id="grandTotal">40</td>
+                <td class="col-total-day" id="grandTotal">32</td>
               </tr>
               <!-- Target row -->
               <tr class="ts-target-row">
@@ -1014,10 +949,10 @@
                 <td>8</td>
                 <td>8</td>
                 <td>8</td>
-                <td>8</td>
+                <td style="color:var(--color-text-3);font-size:var(--text-caption);">Holiday</td>
                 <td>0</td>
                 <td>0</td>
-                <td>40</td>
+                <td>32</td>
               </tr>
               <!-- Status row -->
               <tr class="ts-status-row" id="statusRow">
@@ -1071,20 +1006,27 @@
 
         <!-- Weekly Summary -->
         <div class="ts-summary" id="tsSummary">
-          <div class="ts-summary-item">Weekly Total: <strong id="summaryTotal">40h</strong></div>
-          <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item">Target: <strong>40h</strong></div>
+          <div class="ts-summary-item">
+            <span>Hours: </span>
+            <strong id="summaryTotal">32h</strong>
+            <span class="text-3" style="font-family:var(--font-mono);font-size:var(--text-body-sm);">/ 40h</span>
+          </div>
           <div class="ts-summary-divider"></div>
           <div class="ts-summary-progress">
             <div class="ts-progress-bar">
-              <div class="ts-progress-fill complete" id="summaryProgressFill" style="width: 100%;"></div>
+              <div class="ts-progress-fill warning" id="summaryProgressFill" style="width: 80%;"></div>
             </div>
-            <span class="ts-progress-pct" id="summaryProgressPct">100%</span>
+            <span class="ts-progress-pct" id="summaryProgressPct">80%</span>
           </div>
           <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item">Billable: <strong id="summaryBillable">40h</strong> <span class="text-3">(100%)</span></div>
+          <div class="ts-summary-item">Billable: <strong id="summaryBillable">32h</strong> <span class="text-3">(100%)</span></div>
           <div class="ts-summary-divider"></div>
           <div class="ts-summary-item">Non-billable: <strong id="summaryNonBillable">0h</strong> <span class="text-3">(0%)</span></div>
+          <div class="ts-summary-divider"></div>
+          <div class="ts-summary-item" style="font-size:var(--text-caption);color:var(--color-text-3);">
+            <svg data-lucide="info" width="12" height="12" style="margin-right:var(--space-1);"></svg>
+            Fri 3 Apr is a public holiday
+          </div>
         </div>
 
         <!-- Warning -->
@@ -1149,6 +1091,19 @@
 
       <!-- ════════════ TAB 2: PREVIOUS WEEKS ════════════ -->
       <div class="tab-content populated-content" id="tab-previous">
+        <!-- Empty state for brand-new employees (hidden by default) -->
+        <div id="prevWeeksEmpty" style="display:none;">
+          <div class="empty-state" style="display:flex;">
+            <svg data-lucide="history" width="48" height="48"></svg>
+            <h3>No previous timesheet submissions</h3>
+            <p>Once you submit your first timesheet, all previous weeks will appear here for reference.</p>
+            <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=week]').click()">
+              <svg data-lucide="plus" width="16" height="16"></svg>
+              Submit your first timesheet above
+            </button>
+          </div>
+        </div>
+        <div id="prevWeeksTable">
         <div class="data-table-wrapper">
           <table class="data-table mobile-cards prev-weeks-table">
             <thead>
@@ -1205,10 +1160,46 @@
             </tbody>
           </table>
         </div>
+        </div>
       </div>
 
       <!-- ════════════ TAB 3: APPROVAL QUEUE ════════════ -->
-      <div class="tab-content populated-content" id="tab-approval">
+      <div class="tab-content populated-content" id="tab-approval" data-min-role="pm">
+
+        <!-- Approval Queue Filter Bar -->
+        <div class="aq-filter-bar">
+          <select class="form-select" id="aqFilterStatus" onchange="filterApprovalQueue()">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="overdue">Overdue</option>
+            <option value="overtime">Overtime</option>
+          </select>
+          <select class="form-select" id="aqFilterDept" onchange="filterApprovalQueue()">
+            <option value="">All Departments</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Operations">Operations</option>
+            <option value="Design">Design</option>
+            <option value="Finance">Finance</option>
+            <option value="HR">HR</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="clearApprovalFilters()">
+            <svg data-lucide="x" width="14" height="14"></svg>
+            Clear Filters
+          </button>
+        </div>
+
+        <!-- Approval Queue Empty State (shown when filters return 0 results) -->
+        <div id="aqEmptyState" style="display:none;">
+          <div class="empty-state" style="display:flex;">
+            <svg data-lucide="clipboard-check" width="48" height="48"></svg>
+            <h3>No timesheets match your filters</h3>
+            <p>Try adjusting your filters to see more results.</p>
+            <button class="btn btn-secondary btn-sm" onclick="clearApprovalFilters()">
+              <svg data-lucide="x" width="16" height="16"></svg>
+              Clear Filters
+            </button>
+          </div>
+        </div>
 
         <!-- Approval 1: John Smith -->
         <div class="approval-card" id="aq-1">
@@ -1216,7 +1207,7 @@
             <div class="avatar avatar-md">JS</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Engineering Manager" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="95" data-href="employees.html#john-smith">John Smith</a></div>
+            <div class="aq-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a></div>
             <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex Phase 2</a> (32h), <a href="projects.html#internal">Internal</a> (10h)</div>
           </div>
@@ -1269,13 +1260,13 @@
           </div>
         </div>
 
-        <!-- Approval 3: Carol Kim -->
+        <!-- Approval 3: Carol Williams -->
         <div class="approval-card" id="aq-3">
           <div class="aq-avatar">
             <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-primary));">CK</div>
           </div>
           <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#carol-kim">Carol Kim</a></div>
+            <div class="aq-name"><a href="employees.html#carol-williams">Carol Williams</a></div>
             <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
             <div class="aq-projects"><a href="projects.html#initech-api">Initech API</a> (36h), <a href="projects.html#internal">Internal</a> (4h)</div>
           </div>
@@ -1537,10 +1528,6 @@
   lucide.createIcons();
 
   // ── DOM references ──
-  const sidebar        = document.getElementById('sidebar');
-  const collapseBtn    = document.getElementById('sidebarCollapseBtn');
-  const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
   const searchTrigger  = document.getElementById('searchTrigger');
   const cmdPalette     = document.getElementById('cmdPalette');
   const cmdInput       = document.getElementById('cmdInput');
@@ -1550,17 +1537,6 @@
   const userDropdown   = document.getElementById('userDropdown');
   const stateToggle    = document.getElementById('stateToggle');
   const toastContainer = document.getElementById('toastContainer');
-
-  // ── Sidebar collapse ──
-  collapseBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-  });
-  mobileMenuBtn.addEventListener('click', function() {
-    sidebar.classList.toggle('mobile-open');
-  });
-  sidebarOverlay.addEventListener('click', function() {
-    sidebar.classList.remove('mobile-open');
-  });
 
   // ── Command Palette ──
   function openCmdPalette() {
@@ -1732,8 +1708,22 @@
   document.querySelectorAll('.copy-dropdown-item').forEach(function(item) {
     item.addEventListener('click', function() {
       var action = this.getAttribute('data-copy');
-      showToast('info', 'Copied', action === 'last-week' ? 'Hours from last week have been copied.' : 'Template hours have been applied.');
       copyMenu.classList.remove('active');
+      if (action === 'last-week') {
+        copyLastWeek();
+      } else if (action === 'same-week-last-month') {
+        // Same mock data as last week for demo
+        copyLastWeek();
+        showToast('info', 'Copied', 'Hours from the same week last month have been applied.');
+      } else if (action === 'template') {
+        // Apply standard 8h/day template to weekdays
+        document.querySelectorAll('.ts-cell:not(.weekend):not(.ts-holiday-cell)').forEach(function(cell) {
+          var valSpan = cell.querySelector('.ts-cell-value');
+          if (valSpan) valSpan.textContent = '8';
+        });
+        recalculate();
+        showToast('info', 'Template Applied', 'Standard 8h/day template has been applied. Review before submitting.');
+      }
     });
   });
 
@@ -1773,22 +1763,27 @@
 
     document.getElementById('grandTotal').textContent = grandTotal;
 
-    // Update status bar
-    var pct = Math.min(Math.round((grandTotal / 40) * 100), 100);
-    var remaining = Math.max(40 - grandTotal, 0);
+    // Public holiday: effective target is 32h not 40h
+    var weekTarget = 32;
+
+    // Update status bar (hidden but keep consistent)
+    var pct = Math.min(Math.round((grandTotal / weekTarget) * 100), 100);
+    var remaining = Math.max(weekTarget - grandTotal, 0);
     document.getElementById('statusHours').textContent = grandTotal + 'h';
     document.getElementById('statusRemaining').textContent = remaining + 'h';
     var progressFill = document.getElementById('statusProgressFill');
     progressFill.style.width = pct + '%';
-    progressFill.className = 'ts-progress-fill ' + (grandTotal >= 40 ? 'complete' : 'warning');
+    progressFill.className = 'ts-progress-fill ' + (grandTotal >= weekTarget ? 'complete' : 'warning');
     document.getElementById('statusProgressPct').textContent = pct + '%';
 
     // Update summary
-    document.getElementById('summaryTotal').textContent = grandTotal + 'h';
     var summaryFill = document.getElementById('summaryProgressFill');
     summaryFill.style.width = pct + '%';
-    summaryFill.className = 'ts-progress-fill ' + (grandTotal >= 40 ? 'complete' : 'warning');
+    summaryFill.className = 'ts-progress-fill ' + (grandTotal >= weekTarget ? 'complete' : 'warning');
     document.getElementById('summaryProgressPct').textContent = pct + '%';
+    // Show total hours (issue 14: "Xh / 32h" shown in HTML label)
+    var summaryTotalEl = document.getElementById('summaryTotal');
+    if (summaryTotalEl) summaryTotalEl.textContent = grandTotal + 'h';
     document.getElementById('summaryBillable').textContent = grandTotal + 'h';
     var billPct = grandTotal > 0 ? '100%' : '0%';
     document.getElementById('summaryBillable').nextElementSibling.textContent = '(' + billPct + ')';
@@ -1796,15 +1791,15 @@
 
     // Update warning
     var warning = document.getElementById('tsWarning');
-    if (grandTotal < 40) {
+    if (grandTotal < weekTarget) {
       warning.style.display = 'flex';
-      document.getElementById('tsWarningText').textContent = 'You have logged ' + grandTotal + 'h. You need ' + remaining + 'h more to reach your 40h target.';
+      document.getElementById('tsWarningText').textContent = 'You have logged ' + grandTotal + 'h. You need ' + remaining + 'h more to reach your ' + weekTarget + 'h target (Fri is a public holiday).';
     } else {
       warning.style.display = 'none';
     }
 
-    // Update status row icons
-    var targets = [8, 8, 8, 8, 8, 0, 0];
+    // Update status row icons (Fri Apr 3 is a public holiday)
+    var targets = [8, 8, 8, 8, 0, 0, 0]; // day4=holiday
     var statusCells = document.querySelectorAll('#statusRow td');
     for (var i = 1; i <= 7; i++) {
       var cell = statusCells[i];
@@ -1820,13 +1815,54 @@
     }
     lucide.createIcons({ nodes: [document.getElementById('statusRow')] });
 
-    // Update column total styling
+    // Update column total styling (skip holiday day)
     document.querySelectorAll('#totalRow .col-total-day').forEach(function(td, i) {
-      if (i < 5) {
+      if (i < 4) { // Mon-Thu only (Fri is holiday)
         td.style.color = dayTotals[i] < targets[i] ? 'var(--color-warning)' : '';
       }
     });
   }
+
+  // ── Auto-save indicator (debounced) ──
+  var autoSaveTimer = null;
+  var autoSaveEl = document.getElementById('tsAutoSave');
+  function triggerAutoSave() {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(function() {
+      if (autoSaveEl) {
+        autoSaveEl.style.display = 'block';
+        autoSaveEl.classList.add('visible');
+        setTimeout(function() {
+          autoSaveEl.classList.remove('visible');
+          setTimeout(function() { autoSaveEl.style.display = 'none'; }, 500);
+        }, 2000);
+      }
+    }, 2000);
+  }
+
+  // ── Approval Queue Filters ──
+  window.filterApprovalQueue = function() {
+    var statusFilter = document.getElementById('aqFilterStatus') ? document.getElementById('aqFilterStatus').value : '';
+    var deptFilter = document.getElementById('aqFilterDept') ? document.getElementById('aqFilterDept').value : '';
+    var cards = document.querySelectorAll('.approval-card');
+    var visibleCount = 0;
+    cards.forEach(function(card) {
+      // For demo: always show all (real impl would check data attrs)
+      card.style.display = '';
+      visibleCount++;
+    });
+    var emptyState = document.getElementById('aqEmptyState');
+    if (emptyState) emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+  };
+  window.clearApprovalFilters = function() {
+    var statusEl = document.getElementById('aqFilterStatus');
+    var deptEl = document.getElementById('aqFilterDept');
+    if (statusEl) statusEl.value = '';
+    if (deptEl) deptEl.value = '';
+    document.querySelectorAll('.approval-card').forEach(function(c) { c.style.display = ''; });
+    var emptyState = document.getElementById('aqEmptyState');
+    if (emptyState) emptyState.style.display = 'none';
+  };
 
   // Click to edit cells
   document.getElementById('tsBody').addEventListener('click', function(e) {
@@ -1856,6 +1892,7 @@
       valSpan.style.display = 'block';
       if (input.parentNode) input.parentNode.removeChild(input);
       recalculate();
+      triggerAutoSave();
     }
 
     input.addEventListener('blur', commitEdit);
@@ -1973,8 +2010,10 @@
 
   function doSubmit() {
     var total = parseInt(document.getElementById('grandTotal').textContent) || 0;
-    if (total < 40) {
-      showToast('warning', 'Under Target', 'You have only logged ' + total + 'h. Target is 40h. Please review before submitting.');
+    // With public holiday, 32h is the expected target for this week
+    var weekTarget = 32; // Friday is a holiday
+    if (total < weekTarget) {
+      showToast('warning', 'Under Target', 'You have only logged ' + total + 'h. Expected ' + weekTarget + 'h this week (holiday-adjusted). Review before submitting.');
       return;
     }
     var btn = document.getElementById('submitBtn');
@@ -1987,10 +2026,6 @@
       // Disable all cell inputs
       document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = 'none'; });
       document.getElementById('tsGridWrapper').classList.add('submitted-state');
-      // Change button to Recall
-      btn.innerHTML = '<svg data-lucide="undo-2" width="16" height="16"></svg> Recall Submission';
-      btn.className = 'btn btn-ghost btn-md';
-      lucide.createIcons({ nodes: [btn] });
       // Update approvals badge
       var approvalsBadge = document.getElementById('approvalsBadge');
       if (approvalsBadge) {
@@ -1999,7 +2034,13 @@
       // Also update tab count
       var tabCount = document.querySelector('.tab[data-tab="approval"] .tab-count');
       if (tabCount) tabCount.textContent = parseInt(tabCount.textContent || 0) + 1;
-      showToast('success', 'Timesheet submitted', 'Timesheet submitted — awaiting approval');
+      // Change button to submitted state
+      btn.disabled = true;
+      btn.innerHTML = '<svg data-lucide="check" width="16" height="16"></svg> \u2713 Submitted for Approval';
+      btn.className = 'btn btn-success btn-md';
+      lucide.createIcons({ nodes: [btn] });
+      // Toast confirmation
+      showToast('success', 'Submitted', 'Your timesheet has been sent for approval. Awaiting John Smith\'s review.');
     }, 1000);
   }
 
