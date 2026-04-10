@@ -616,7 +616,7 @@
                   Unusual expense pattern
                   <span class="badge badge-error"><svg data-lucide="arrow-up" width="12" height="12"></svg> High</span>
                 </div>
-                <div class="insight-desc">Bob Taylor's <span class="font-mono">&euro;340</span> hotel expense is 2x his average. This deviates significantly from his typical spending pattern and warrants review.
+                <div class="insight-desc" title="Deviates significantly from his typical spending pattern and warrants review.">Bob Taylor's <span class="font-mono">&euro;340</span> hotel expense is 2&times; his average.
                   <span class="anomaly-sparkline" title="Bob's last 6 hotel expenses vs this one">
                     <svg viewBox="0 0 80 24" width="80" height="24" style="vertical-align:middle;">
                       <rect x="2" y="16" width="8" height="7" rx="1" fill="var(--color-chart-2)" opacity="0.7"/>
@@ -647,7 +647,7 @@
                   Timesheet gap detected
                   <span class="badge badge-warning"><svg data-lucide="minus" width="12" height="12"></svg> Medium</span>
                 </div>
-                <div class="insight-desc">David Park has no entries for Mar 28-29, possibly missed. This may affect invoicing accuracy for the Infra Overhaul project.
+                <div class="insight-desc" title="May affect invoicing accuracy for the Infra Overhaul project.">David Park has no entries for Mar 28–29.
                   <span class="anomaly-sparkline" title="David's daily log entries over 6 days">
                     <svg viewBox="0 0 80 24" width="80" height="24" style="vertical-align:middle;">
                       <rect x="2" y="8" width="8" height="15" rx="1" fill="var(--color-chart-1)" opacity="0.7"/>
@@ -678,7 +678,7 @@
                   Duplicate expense suspected
                   <span class="badge badge-info"><svg data-lucide="arrow-down" width="12" height="12"></svg> Low</span>
                 </div>
-                <div class="insight-desc">Carol Williams submitted similar <span class="font-mono">&euro;85</span> meals expense twice this week. Both entries reference client dinners on consecutive days.
+                <div class="insight-desc" title="Both entries reference client dinners on consecutive days.">Carol Williams submitted similar <span class="font-mono">&euro;85</span> meals expense twice this week.
                   <span class="anomaly-sparkline" title="Carol's meal expense submissions this week">
                     <svg viewBox="0 0 80 24" width="80" height="24" style="vertical-align:middle;">
                       <rect x="2" y="18" width="8" height="5" rx="1" fill="var(--color-chart-3)" opacity="0.7"/>
@@ -712,7 +712,7 @@
                   Work Time trending up
                   <span class="badge badge-success"><svg data-lucide="trending-up" width="12" height="12"></svg> Positive</span>
                 </div>
-                <div class="insight-desc">Team avg work time rose from 72% to 82% over last 3 months. This suggests improved resource allocation and reduced bench time across the organization.</div>
+                <div class="insight-desc" title="Suggests improved resource allocation and reduced bench time across the organization.">Team avg work time rose from 72% to 82% over the last 3 months.</div>
                 <div class="insight-meta">
                   <span>Affected: Entire team</span>
                   <span>Period: Jan &ndash; Mar 2026</span>
@@ -730,7 +730,7 @@
                   Expense growth in travel
                   <span class="badge badge-default"><svg data-lucide="minus" width="12" height="12"></svg> Neutral</span>
                 </div>
-                <div class="insight-desc">Travel expenses up 35% vs last quarter, driven by Acme project on-site requirements. This aligns with project scope but may need budget review if trend continues.</div>
+                <div class="insight-desc" title="Driven by Acme project on-site requirements; may need budget review if trend continues.">Travel expenses up 35% vs last quarter.</div>
                 <div class="insight-meta">
                   <span>Category: Travel</span>
                   <span>Period: Q1 2026</span>
@@ -753,7 +753,7 @@
                   Assign Bob Taylor to Initech API
                   <span class="badge badge-accent"><svg data-lucide="lightbulb" width="12" height="12"></svg> Recommendation</span>
                 </div>
-                <div class="insight-desc">Bob has been on bench 3 weeks. Skills match Initech API needs (Python, REST APIs). Assigning would improve work time and fill a critical gap on the Initech team.</div>
+                <div class="insight-desc" title="Skills match Initech API needs (Python, REST APIs). Assigning would fill a critical gap on the Initech team.">Bob has been on bench 3 weeks — 92% skill match with Initech API.</div>
                 <div class="insight-meta">
                   <span>Affected: <a href="employees.html">Bob Taylor</a></span>
                   <span>Match confidence: 92%</span>
@@ -772,12 +772,9 @@
                   Review Acme project budget
                   <span class="badge badge-accent"><svg data-lucide="lightbulb" width="12" height="12"></svg> Recommendation</span>
                 </div>
-                <div class="insight-desc">At current burn rate, budget exhausted by May 20. Consider rate adjustment or scope review. Current spend is <span class="font-mono">&euro;142,000</span> of <span class="font-mono">&euro;180,000</span> total budget (79% consumed).
+                <div class="insight-desc" title="Consider rate adjustment or scope review. Budget exhausted by May 20 at current burn rate."><span class="font-mono">&euro;142,000</span> of <span class="font-mono">&euro;180,000</span> budget consumed (79%).
                   <div class="budget-burn-bar" style="margin-top:var(--space-2);" title="Budget burn: €142k of €180k (79%)">
                     <div class="budget-burn-fill" style="width:79%;"></div>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;font-size:var(--text-caption);color:var(--color-text-3);margin-top:3px;">
-                    <span>&euro;0</span><span style="color:var(--color-warning);font-weight:var(--weight-semibold);">79% used</span><span>&euro;180k</span>
                   </div>
                 </div>
                 <div class="insight-meta">
@@ -798,7 +795,7 @@
                   Schedule Carol Williams' review
                   <span class="badge badge-accent"><svg data-lucide="lightbulb" width="12" height="12"></svg> Recommendation</span>
                 </div>
-                <div class="insight-desc">Carol has completed 3 months on Initech. Performance review due per company policy. Her work time has been consistently above 90%.</div>
+                <div class="insight-desc" title="Performance review due per company policy after 3 months on Initech.">Carol's work time consistently above 90% — review due.</div>
                 <div class="insight-meta">
                   <span>Affected: <a href="employees.html">Carol Williams</a></span>
                   <span>Tenure: 3 months</span>
@@ -1521,10 +1518,7 @@
                 <svg data-lucide="brain" style="width:18px;height:18px;flex-shrink:0;color:var(--color-warning);margin-top:2px;"></svg>
                 <div>
                   <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">AI Insight: Leave concentration risk</div>
-                  <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">
-                    Based on historical patterns, 60% of annual leave is taken in Jul–Aug. In the current pipeline, Acme Web Redesign has a <strong>critical delivery sprint</strong> scheduled Aug 1–20.
-                    Consider setting a leave freeze on this project team for that period.
-                  </div>
+                  <div style="font-size:var(--text-body-sm);color:var(--color-text-2);" title="60% of annual leave falls in Jul–Aug; Acme Web Redesign has a critical delivery sprint Aug 1–20.">Acme sprint (Aug 1–20) overlaps with peak leave season — consider a leave freeze.</div>
                   <div style="margin-top:var(--space-3);display:flex;gap:var(--space-2);">
                     <button class="btn btn-sm" style="background:var(--color-warning-muted);color:var(--color-warning);border:1px solid var(--color-warning);" onclick="showToast('success','Done','Leave freeze recommendation sent to John Smith.')">Set Leave Freeze ▸</button>
                     <button class="btn btn-ghost btn-sm" onclick="this.closest('.card').style.opacity='0.4'">Dismiss</button>
@@ -1807,7 +1801,7 @@
           <div class="scheduled-reports-empty" style="display:none;text-align:center;padding:var(--space-12) var(--space-8);">
             <svg data-lucide="calendar-clock" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin:0 auto var(--space-4);display:block;"></svg>
             <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">No scheduled reports yet</div>
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:360px;margin:0 auto var(--space-4);">Set up automated weekly or monthly report delivery to your inbox. Reports include work time summaries, revenue snapshots, and AI-highlighted anomalies.</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:360px;margin:0 auto var(--space-4);" title="Reports include work time summaries, revenue snapshots, and AI-highlighted anomalies.">Automate report delivery to your inbox on a weekly or monthly schedule.</div>
             <button class="btn btn-primary btn-md" onclick="openScheduleModal()">
               <svg data-lucide="plus" width="16" height="16"></svg>
               Create Your First Schedule
@@ -1818,7 +1812,7 @@
               <svg data-lucide="calendar-clock" style="width:24px;height:24px;flex-shrink:0;color:var(--color-accent);margin-top:2px;"></svg>
               <div>
                 <div style="font-size:var(--text-body);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">Automated Report Delivery</div>
-                <div style="font-size:var(--text-body-sm);color:var(--color-text-2);line-height:1.5;">Set up automated weekly or monthly report delivery to your inbox. Reports include work time summaries, revenue snapshots, and AI-highlighted anomalies.</div>
+                <div style="font-size:var(--text-body-sm);color:var(--color-text-2);line-height:1.5;" title="Reports include work time summaries, revenue snapshots, and AI-highlighted anomalies.">Automate weekly or monthly report delivery to your inbox.</div>
               </div>
             </div>
 
@@ -1865,7 +1859,7 @@
           <div class="forecasting-empty" style="display:none;text-align:center;padding:var(--space-12) var(--space-8);">
             <svg data-lucide="brain" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin:0 auto var(--space-4);display:block;"></svg>
             <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">Not enough data for forecasting</div>
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:400px;margin:0 auto var(--space-4);">AI-powered forecasting requires at least 3 months of timesheet and project data to generate reliable predictions. Keep logging to unlock this feature.</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:400px;margin:0 auto var(--space-4);" title="Requires at least 3 months of timesheet and project data.">Keep logging to unlock AI-powered forecasting.</div>
             <div style="display:flex;align-items:center;gap:var(--space-3);justify-content:center;">
               <div style="width:120px;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:40%;height:100%;background:var(--color-accent);border-radius:var(--radius-full);"></div></div>
               <span style="font-size:var(--text-caption);color:var(--color-text-3);">40% of data needed</span>
@@ -1876,7 +1870,7 @@
               <svg data-lucide="brain" style="width:24px;height:24px;flex-shrink:0;color:var(--color-accent);margin-top:2px;"></svg>
               <div>
                 <div style="font-size:var(--text-body);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">AI-Powered Forecasting</div>
-                <div style="font-size:var(--text-body-sm);color:var(--color-text-2);line-height:1.5;">Forecasting uses historical data, current trends, and project pipeline to predict future revenue, capacity, and resource needs. Models improve over time as more data is collected.</div>
+                <div style="font-size:var(--text-body-sm);color:var(--color-text-2);line-height:1.5;" title="Uses historical data, trends, and project pipeline to predict revenue, capacity, and resource needs. Models improve over time.">AI predicts future revenue, capacity, and resource needs from your data.</div>
               </div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-bottom:var(--space-6);" class="insights-kpi-grid">
@@ -1899,7 +1893,7 @@
             <div class="card" style="padding:var(--space-6);text-align:center;">
               <svg data-lucide="line-chart" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin-bottom:var(--space-3);"></svg>
               <div style="font-size:var(--text-body);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">Detailed forecasting charts</div>
-              <div style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-4);">Detailed interactive revenue projections, capacity planning timelines, and hiring roadmaps — click View Forecast to explore.</div>
+              <div style="font-size:var(--text-body-sm);color:var(--color-text-3);margin-bottom:var(--space-4);" title="Includes revenue projections, capacity timelines, and hiring roadmaps.">Interactive forecast charts available on demand.</div>
               <button class="btn btn-primary btn-md" onclick="openForecastPanel()">
                 <svg data-lucide="sparkles" width="16" height="16"></svg>
                 View Forecast
@@ -1917,7 +1911,7 @@
       <div class="card" style="max-width: 500px; text-align: center; padding: var(--space-8);">
         <svg data-lucide="sparkles" width="48" height="48" style="color: var(--color-accent); margin-bottom: var(--space-4);"></svg>
         <h2 style="font-size: var(--text-heading-2); margin-bottom: var(--space-2);">No insights yet</h2>
-        <p style="color: var(--color-text-2); margin-bottom: var(--space-4);">AI insights will appear here once you have enough timesheet, expense, and project data. Start logging to unlock powerful analytics.</p>
+        <p style="color: var(--color-text-2); margin-bottom: var(--space-4);" title="AI insights require timesheet, expense, and project data to generate.">Start logging to unlock AI-powered insights and analytics.</p>
         <a href="timesheets.html" class="btn btn-primary btn-md">Log Your First Timesheet</a>
       </div>
     </main>

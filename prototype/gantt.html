@@ -218,8 +218,9 @@
     }
 
     /* Inner min-width forces horizontal scroll when needed */
+    /* 220px name col + 30days * 30px/day = 220+900 = 1120px minimum */
     .gantt-inner {
-      min-width: 900px;
+      min-width: 1120px;
       position: relative;
     }
 
@@ -308,8 +309,9 @@
     /* ── TIMELINE HEADER CELLS ── */
     .gantt-timeline-cells {
       flex: 1;
-      display: flex;
+      position: relative;
       height: 56px;
+      overflow: hidden;
     }
     .gantt-day-header {
       width: 30px;
@@ -1683,48 +1685,153 @@
     ];
 
 
-    // ── BUILD TIMELINE HEADER ──
-    function buildTimelineHeader() {
-      const header = document.getElementById('timelineHeader');
-      header.innerHTML = '';
+    // ── GANTT CONSTANTS ──
+    const COL_W = 30; // px per day
+
+    // Employee data aligned with employeeBars index order
+    const employeeRows = [
+      { name: 'Sarah Chen',    role: 'Project Manager',    dept: 'Engineering', worktime: 87, wt: 'high', presence: 'online',  initials: 'SC', avatarCls: 'avatar-1', href: 'employees.html#profile-sarah',  skills: 'react typescript figma css-tailwind nodejs', deptColor: 'var(--color-accent)',   deptBg: 'var(--color-accent-muted)' },
+      { name: 'John Smith',    role: 'Senior Developer',   dept: 'Engineering', worktime: 82, wt: 'high', presence: 'online',  initials: 'JS', avatarCls: 'avatar-2', href: 'employees.html#profile-john',  skills: 'react typescript nodejs sql',               deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
+      { name: 'Alice Wang',    role: 'Software Engineer — On Leave Apr 14-18', dept: 'Engineering', worktime: 45, wt: 'low', presence: 'leave',   initials: 'AW', avatarCls: 'avatar-3', href: 'employees.html#profile-alice', skills: 'figma react typescript',                    deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
+      { name: 'Bob Taylor',    role: 'Backend Developer — Bench',  dept: 'Engineering', worktime: 0,  wt: 'low', presence: 'offline', initials: 'BT', avatarCls: 'avatar-4', href: 'employees.html#profile-bob',   skills: 'nodejs python sql react',                   deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
+      { name: 'Carol Williams',role: 'Design Lead',         dept: 'Design',      worktime: 90, wt: 'high', presence: 'online',  initials: 'CW', avatarCls: 'avatar-5', href: 'employees.html#profile-carol', skills: 'project-management sql figma',              deptColor: 'var(--color-info)',     deptBg: 'var(--color-info-muted)' },
+      { name: 'David Park',    role: 'Finance Lead',        dept: 'Finance',     worktime: 45, wt: 'low',  presence: 'offline', initials: 'DP', avatarCls: 'avatar-6', href: 'employees.html#profile-david', skills: 'sql project-management python',             deptColor: 'var(--color-gold)',     deptBg: 'var(--color-gold-muted)' },
+      { name: 'Emma Laurent',  role: 'HR Specialist',       dept: 'HR',          worktime: 78, wt: 'mid',  presence: 'online',  initials: 'EL', avatarCls: 'avatar-7', href: 'employees.html#profile-emma',  skills: 'project-management',                       deptColor: 'var(--color-info)',     deptBg: 'var(--color-info-muted)' },
+      { name: 'Marco Rossi',   role: 'Operations Lead',     dept: 'Operations',  worktime: 88, wt: 'high', presence: 'away',    initials: 'MR', avatarCls: 'avatar-8', href: 'employees.html#profile-marco', skills: 'project-management sql',                    deptColor: 'var(--color-warning)',  deptBg: 'var(--color-warning-muted)' },
+      { name: 'Sophie Dubois', role: 'Business Analyst',    dept: 'Operations',  worktime: 82, wt: 'high', presence: 'online',  initials: 'SD', avatarCls: 'avatar-9', href: 'employees.html#profile-sophie',skills: 'project-management',                       deptColor: 'var(--color-warning)',  deptBg: 'var(--color-warning-muted)' },
+      { name: 'James Wilson',  role: 'DevOps Engineer',     dept: 'Engineering', worktime: 70, wt: 'mid',  presence: 'offline', initials: 'JW', avatarCls: 'avatar-10',href: 'employees.html#profile-james', skills: 'typescript react sql',                      deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' }
+    ];
+
+    // ── BUILD ENTIRE GANTT (unified) ──
+    function buildGantt() {
+      const inner = document.getElementById('ganttInner');
+      inner.innerHTML = '';
+
+      const totalW = APRIL_2026.length * COL_W; // e.g. 30*30 = 900px
+      const todayIdx = APRIL_2026.findIndex(d => d.isToday);
+      const todayPx = todayIdx >= 0 ? todayIdx * COL_W + Math.floor(COL_W / 2) : -1;
+
+      // ── HEADER ROW ──
+      const headerRow = document.createElement('div');
+      headerRow.className = 'gantt-header-row';
+
+      const headerNameCol = document.createElement('div');
+      headerNameCol.className = 'gantt-name-col';
+      headerNameCol.textContent = 'Team Member';
+      headerRow.appendChild(headerNameCol);
+
+      // Build month label + day cells area
+      const headerTimelineCells = document.createElement('div');
+      headerTimelineCells.className = 'gantt-timeline-cells';
+      headerTimelineCells.style.minWidth = totalW + 'px';
+
+      // Month label row (Apr 2026 spans all)
+      // Embedded as a sub-header strip above day numbers — achieved by stacking in the day cells area
+      const monthStrip = document.createElement('div');
+      monthStrip.style.cssText = 'position:absolute;top:0;left:0;right:0;height:20px;display:flex;align-items:center;padding:0 var(--space-2);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-2);border-bottom:1px solid var(--color-border-subtle);background:var(--color-surface-1);';
+      monthStrip.textContent = 'April 2026';
+      headerTimelineCells.appendChild(monthStrip);
+
+      // Day header cells
       APRIL_2026.forEach(d => {
         const div = document.createElement('div');
         div.className = 'gantt-day-header' + (d.isWeekend ? ' weekend' : '') + (d.isToday ? ' today' : '');
+        div.style.cssText = 'position:absolute;top:20px;bottom:0;width:' + COL_W + 'px;left:' + ((d.day - 1) * COL_W) + 'px;';
         div.innerHTML = `<span class="day-num">${d.day}</span><span class="day-name">${d.dayName}</span>`;
-        header.appendChild(div);
+        headerTimelineCells.appendChild(div);
       });
-    }
 
-    // ── BUILD TIMELINE BODY ──
-    function buildTimelineBody() {
-      const body = document.getElementById('timelineBody');
-      body.innerHTML = '';
+      // Today line in header
+      if (todayPx >= 0) {
+        const todayLineHeader = document.createElement('div');
+        todayLineHeader.className = 'today-line';
+        todayLineHeader.style.left = todayPx + 'px';
+        headerTimelineCells.appendChild(todayLineHeader);
+      }
 
-      employeeBars.forEach((bars, rowIdx) => {
+      headerRow.appendChild(headerTimelineCells);
+      inner.appendChild(headerRow);
+
+      // ── DATA ROWS ──
+      // Track dept changes for dept separator rows
+      let lastDept = null;
+      employeeRows.forEach((emp, rowIdx) => {
+        // Dept header row
+        if (emp.dept !== lastDept) {
+          lastDept = emp.dept;
+          const deptRow = document.createElement('div');
+          deptRow.className = 'gantt-dept-row';
+
+          const deptNameCol = document.createElement('div');
+          deptNameCol.className = 'gantt-dept-name-col';
+          deptNameCol.style.cssText = 'position:sticky;left:0;z-index:4;background:' + emp.deptBg + ';padding:var(--space-1-5) var(--space-3);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:' + emp.deptColor + ';text-transform:uppercase;letter-spacing:0.5px;border-right:2px solid var(--color-border-strong);';
+          deptNameCol.textContent = emp.dept;
+          deptRow.appendChild(deptNameCol);
+
+          const deptTimelineCol = document.createElement('div');
+          deptTimelineCol.className = 'gantt-dept-timeline-col';
+          deptTimelineCol.style.cssText = 'flex:1;background:' + emp.deptBg + ';min-width:' + totalW + 'px;';
+          deptRow.appendChild(deptTimelineCol);
+
+          inner.appendChild(deptRow);
+        }
+
+        // Employee row
         const row = document.createElement('div');
-        row.className = 'gantt-timeline-row';
+        row.className = 'gantt-row';
+        row.dataset.skills = emp.skills;
 
-        // Background cells for weekends
+        // Name column (sticky)
+        const nameCol = document.createElement('div');
+        nameCol.className = 'gantt-name-col';
+        nameCol.style.borderLeft = '3px solid ' + emp.deptColor;
+        nameCol.innerHTML = `
+          <span class="avatar-status presence-${emp.presence}"><div class="avatar avatar-sm ${emp.avatarCls}">${emp.initials}</div></span>
+          <div class="employee-info">
+            <a href="${emp.href}" class="employee-name"
+               data-hovercard data-name="${emp.name}" data-role="${emp.role}"
+               data-dept="${emp.dept}" data-worktime="${emp.worktime}" data-href="${emp.href}">${emp.name}</a>
+            <div class="employee-role">${emp.role}</div>
+          </div>
+          <span class="worktime-badge worktime-${emp.wt} font-mono">${emp.worktime}%</span>
+        `;
+        row.appendChild(nameCol);
+
+        // Bars column
+        const barsCol = document.createElement('div');
+        barsCol.className = 'gantt-bars-col';
+        barsCol.style.minWidth = totalW + 'px';
+
+        // Weekend background strips
         APRIL_2026.forEach(d => {
-          const cell = document.createElement('div');
-          cell.className = 'gantt-day-cell' + (d.isWeekend ? ' weekend' : '');
-          row.appendChild(cell);
+          if (d.isWeekend || d.isToday) {
+            const bg = document.createElement('div');
+            bg.className = 'gantt-day-bg' + (d.isWeekend ? ' weekend' : '') + (d.isToday ? ' today-col' : '');
+            bg.style.left = ((d.day - 1) * COL_W) + 'px';
+            barsCol.appendChild(bg);
+          }
         });
 
-        // Bar container (absolute positioned)
-        const barContainer = document.createElement('div');
-        barContainer.className = 'gantt-bar-container';
+        // Today line within each row
+        if (todayPx >= 0) {
+          const tl = document.createElement('div');
+          tl.className = 'today-line';
+          tl.style.left = todayPx + 'px';
+          barsCol.appendChild(tl);
+        }
 
+        // Bars
+        const bars = employeeBars[rowIdx] || [];
         bars.forEach(bar => {
           if (bar.type === 'gap') {
-            // Warning badge for unassigned gap
             const warn = document.createElement('div');
             warn.className = 'gap-warning';
-            warn.style.gridColumn = `${bar.start} / ${bar.end + 1}`;
-            warn.style.justifySelf = 'center';
+            // Center it in the gap
+            const gapCenterPx = ((bar.start - 1) + (bar.end - bar.start) / 2) * COL_W;
+            warn.style.left = (gapCenterPx - 9) + 'px';
             warn.innerHTML = '<svg data-lucide="alert-triangle"></svg>';
             warn.title = 'Unassigned gap - Apr 12-13 (between assignments)';
-            barContainer.appendChild(warn);
+            barsCol.appendChild(warn);
             return;
           }
 
@@ -1735,15 +1842,16 @@
           else if (bar.type === 'nonbillable') barClass += ' gantt-bar-nonbillable';
           else if (bar.type === 'leave') barClass += ' gantt-bar-leave';
           else if (bar.type === 'bench') barClass += ' gantt-bar-bench';
-
           if (bar.row === 2) barClass += ' bar-row-2';
-
           barEl.className = barClass;
-          barEl.style.gridColumn = `${bar.start} / ${Math.min(bar.end + 1, 31)}`;
 
-          if (bar.type === 'billable-faint') {
-            barEl.style.opacity = '0.4';
-          }
+          // Pixel positioning: (startDay-1)*COL_W for left, (endDay-startDay+1)*COL_W for width
+          const leftPx  = (bar.start - 1) * COL_W;
+          const widthPx = Math.max(COL_W, (Math.min(bar.end, 30) - bar.start + 1) * COL_W - 2);
+          barEl.style.left  = leftPx + 'px';
+          barEl.style.width = widthPx + 'px';
+
+          if (bar.type === 'billable-faint') barEl.style.opacity = '0.4';
 
           // Add completion annotation if project data available
           var pData = projectData[bar.project || bar.label];
@@ -1752,17 +1860,14 @@
           barEl.textContent = bar.label + completionTxt;
 
           // Over-allocation indicator (>100%)
-          if (bar.overAllocated) {
-            barEl.classList.add('gantt-bar-over-alloc');
-          }
+          if (bar.overAllocated) barEl.classList.add('gantt-bar-over-alloc');
 
           // Leave bar click handler
           if (bar.type === 'leave') {
             barEl.style.cursor = 'pointer';
             barEl.addEventListener('click', function(e) {
               e.stopPropagation();
-              var empNames = ['Sarah Chen','John Smith','Alice Wang','Bob Taylor','Carol Williams','David Park','Emma Laurent','Marco Rossi','Sophie Dubois','James Wilson'];
-              var empName = empNames[rowIdx] || 'Employee';
+              var empName = emp.name;
               var msg = empName + ' — ' + bar.label + ': Apr ' + bar.start + '-' + Math.min(bar.end, 30);
               if (typeof GHR !== 'undefined' && GHR.showToast) {
                 GHR.showToast('info', 'Leave Details', msg);
@@ -1776,35 +1881,20 @@
           barEl.dataset.project = bar.project || bar.label;
           barEl.dataset.start = bar.start;
           barEl.dataset.end = bar.end;
-
-          // Rich tooltip data attribute
-          const proj = bar.project || bar.label;
-          barEl.dataset.tooltip = proj + ' · Apr ' + bar.start + ' – Apr ' + Math.min(bar.end, 30);
+          barEl.dataset.tooltip = (bar.project || bar.label) + ' · Apr ' + bar.start + ' – Apr ' + Math.min(bar.end, 30);
 
           // Events
-          barEl.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openSlidePanel(bar.project || bar.label);
-          });
+          barEl.addEventListener('click', (e) => { e.stopPropagation(); openSlidePanel(bar.project || bar.label); });
           barEl.addEventListener('mouseenter', (e) => showTooltip(e, bar));
           barEl.addEventListener('mouseleave', hideTooltip);
           barEl.addEventListener('mousemove', moveTooltip);
 
-          barContainer.appendChild(barEl);
+          barsCol.appendChild(barEl);
         });
 
-        row.appendChild(barContainer);
-        body.appendChild(row);
+        row.appendChild(barsCol);
+        inner.appendChild(row);
       });
-    }
-
-    // ── POSITION TODAY LINE ──
-    function positionTodayLine() {
-      const todayIdx = APRIL_2026.findIndex(d => d.isToday);
-      if (todayIdx >= 0) {
-        const line = document.getElementById('todayLine');
-        line.style.left = (todayIdx * 40 + 20) + 'px';
-      }
     }
 
     // ── TOOLTIP ──
@@ -1953,16 +2043,7 @@
       document.getElementById('userDropdown').classList.remove('active');
     });
 
-    // ── SCROLL SYNC (left and right) ──
-    const ganttRight = document.getElementById('ganttRight');
-    const ganttLeftBody = document.getElementById('ganttLeftBody');
-
-    ganttRight.addEventListener('scroll', () => {
-      ganttLeftBody.scrollTop = ganttRight.scrollTop;
-    });
-    ganttLeftBody.addEventListener('scroll', () => {
-      ganttRight.scrollTop = ganttLeftBody.scrollTop;
-    });
+    // (Scroll sync removed — unified single-container design)
 
     // ── EMPTY STATE TOGGLE ──
     let isEmptyState = false;
@@ -1980,9 +2061,7 @@
     });
 
     // ── INIT ──
-    buildTimelineHeader();
-    buildTimelineBody();
-    positionTodayLine();
+    buildGantt();
     lucide.createIcons();
 
     // ── CONTEXT MENU ──
@@ -2008,11 +2087,12 @@
       hideCtxMenu();
       showToast(action.charAt(0).toUpperCase() + action.slice(1) + ' — Action applied to assignment', 'info');
     }
-    document.querySelectorAll('.gantt-bar').forEach(function(bar) {
-      bar.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        showCtxMenu(e.clientX, e.clientY);
-      });
+    // Use event delegation for context menu (bars are dynamically created)
+    document.addEventListener('contextmenu', function(e) {
+      var bar = e.target.closest('.gantt-bar');
+      if (!bar) return;
+      e.preventDefault();
+      showCtxMenu(e.clientX, e.clientY);
     });
     document.addEventListener('click', function() { hideCtxMenu(); });
 
@@ -2020,8 +2100,8 @@
     (function() {
       var dragging = null;
       var dragStartX = 0;
-      var barStartLeft = 0;
-      var colWidth = 40;
+      var barOrigLeft = 0;
+      var colWidth = COL_W;
 
       document.addEventListener('mousedown', function(e) {
         var bar = e.target.closest('.gantt-bar');
@@ -2033,8 +2113,7 @@
         e.preventDefault();
         dragging = bar;
         dragStartX = e.clientX;
-        var style = window.getComputedStyle(bar);
-        barStartLeft = parseInt(bar.dataset.start || 1) - 1;
+        barOrigLeft = parseInt(bar.style.left) || (parseInt(bar.dataset.start || 1) - 1) * colWidth;
         bar.classList.add('dragging');
       });
 
@@ -2042,10 +2121,8 @@
         if (!dragging) return;
         var dx = e.clientX - dragStartX;
         var colShift = Math.round(dx / colWidth);
-        var newStart = Math.max(1, barStartLeft + colShift + 1);
-        var currentEnd = parseInt(dragging.dataset.end || dragging.style.gridColumnEnd) || (barStartLeft + 5);
-        var span = currentEnd - barStartLeft;
-        dragging.style.gridColumn = newStart + ' / ' + Math.min(newStart + span, 31);
+        var newLeft = Math.max(0, barOrigLeft + colShift * colWidth);
+        dragging.style.left = newLeft + 'px';
       });
 
       document.addEventListener('mouseup', function(e) {
@@ -2053,7 +2130,7 @@
         dragging.classList.remove('dragging');
         var dx = e.clientX - dragStartX;
         var colShift = Math.round(dx / colWidth);
-        var newStart = Math.max(1, barStartLeft + colShift + 1);
+        var newStart = Math.max(1, Math.round(barOrigLeft / colWidth) + colShift + 1);
         showToast('Assignment moved to Apr ' + newStart, 'success');
         dragging = null;
       });
@@ -2064,17 +2141,10 @@
     if (skillsFilter) {
       skillsFilter.addEventListener('change', function() {
         var selected = Array.from(skillsFilter.selectedOptions).map(function(o) { return o.value.toLowerCase().replace(/[^a-z0-9]/g,'-'); });
-        if (selected.length === 0) {
-          document.querySelectorAll('.gantt-employee-row, .gantt-timeline-row').forEach(function(row) { row.style.display = ''; });
-          return;
-        }
-        document.querySelectorAll('.gantt-employee-row').forEach(function(row, idx) {
+        document.querySelectorAll('#ganttInner .gantt-row').forEach(function(row) {
+          if (selected.length === 0) { row.style.display = ''; return; }
           var skills = (row.dataset.skills || '').split(' ');
-          var match = selected.some(function(s) { return skills.includes(s); });
-          row.style.display = match ? '' : 'none';
-          // Also hide corresponding timeline row
-          var timelineRows = document.querySelectorAll('.gantt-timeline-row');
-          if (timelineRows[idx]) timelineRows[idx].style.display = match ? '' : 'none';
+          row.style.display = selected.some(function(s) { return skills.includes(s); }) ? '' : 'none';
         });
       });
     }
@@ -2083,23 +2153,20 @@
     (function() {
       var searchInput = document.querySelector('.filter-group-search input');
       if (!searchInput) return;
-      // Create no-results message
       var noResultsMsg = document.createElement('div');
       noResultsMsg.id = 'filterNoResults';
       noResultsMsg.style.cssText = 'display:none;padding:var(--space-4);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);';
       noResultsMsg.innerHTML = '<svg data-lucide="search-x" width="24" height="24" style="margin:0 auto var(--space-2);display:block;opacity:0.4;"></svg>No team members match your search.';
-      var ganttBody = document.getElementById('employeeList');
-      if (ganttBody) ganttBody.parentNode.insertBefore(noResultsMsg, ganttBody.nextSibling);
+      var ganttInner = document.getElementById('ganttInner');
+      if (ganttInner) ganttInner.parentNode.insertBefore(noResultsMsg, ganttInner.nextSibling);
 
       searchInput.addEventListener('input', function() {
         var q = this.value.trim().toLowerCase();
         var visibleCount = 0;
-        document.querySelectorAll('.gantt-employee-row').forEach(function(row, idx) {
+        document.querySelectorAll('#ganttInner .gantt-row').forEach(function(row) {
           var name = (row.querySelector('.employee-name') || {}).textContent || '';
           var match = !q || name.toLowerCase().includes(q);
           row.style.display = match ? '' : 'none';
-          var timelineRows = document.querySelectorAll('.gantt-timeline-row');
-          if (timelineRows[idx]) timelineRows[idx].style.display = match ? '' : 'none';
           if (match) visibleCount++;
         });
         noResultsMsg.style.display = (q && visibleCount === 0) ? 'block' : 'none';
@@ -2129,7 +2196,7 @@
     var snapBtn = document.getElementById('snapToday');
     if (snapBtn) {
       snapBtn.addEventListener('click', function() {
-        var line = document.getElementById('todayLine');
+        var line = document.querySelector('#ganttInner .gantt-header-row .today-line');
         if (line) line.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       });
     }
@@ -2141,15 +2208,12 @@
     }
 
     // ── QUICK-ASSIGN EMPTY CELL CLICK ──
-    document.getElementById('ganttRight') && document.getElementById('ganttRight').addEventListener('click', function(e) {
-      var cell = e.target.closest('.gantt-day-cell');
-      if (!cell) return;
-      var row = cell.closest('.gantt-timeline-row');
+    document.getElementById('ganttContainer') && document.getElementById('ganttContainer').addEventListener('click', function(e) {
+      var bg = e.target.closest('.gantt-day-bg');
+      if (!bg) return;
+      var row = bg.closest('.gantt-row');
       if (!row) return;
-      var rows = Array.from(document.querySelectorAll('.gantt-timeline-row'));
-      var rowIdx = rows.indexOf(row);
-      var empRows = document.querySelectorAll('.gantt-employee-row');
-      var empName = empRows[rowIdx] ? (empRows[rowIdx].querySelector('.employee-name') || {}).textContent || 'Employee' : 'Employee';
+      var empName = (row.querySelector('.employee-name') || {}).textContent || 'Employee';
       document.getElementById('quickAssignEmployee').textContent = empName;
       document.getElementById('quickAssignModal').classList.add('active');
       lucide.createIcons({ nodes: [document.getElementById('quickAssignModal')] });

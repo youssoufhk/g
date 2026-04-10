@@ -31,6 +31,22 @@
     @media (max-width: 1023px) { .settings-grid { grid-template-columns: 1fr; } }
     @media (max-width: 639px) { .row-check { display: none; } }
 
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      font-size: 11px;
+      font-weight: var(--weight-semibold);
+      background: var(--color-border);
+      color: var(--color-text-2);
+      border-radius: 50%;
+      cursor: help;
+      margin-left: var(--space-1);
+      vertical-align: middle;
+      text-decoration: none;
+    }
     .settings-grid .form-group-full {
       grid-column: 1 / -1;
     }
@@ -196,7 +212,7 @@
             <span style="color:var(--color-text-2);">Administration</span>
           </nav>
           <h1 class="page-title">Administration</h1>
-          <p class="page-subtitle">Manage company settings, users, and system settings</p>
+          <p class="page-subtitle">Manage company settings, users, and system configuration</p>
         </div>
       </div>
 
@@ -1103,7 +1119,7 @@
       <div class="empty-content empty-state" id="emptyStateGeneric">
         <svg data-lucide="settings" width="64" height="64"></svg>
         <h2 id="emptyStateTitle">No settings data</h2>
-        <p id="emptyStateMsg">This section is empty. Start by configuring your company settings.</p>
+        <p id="emptyStateMsg">Nothing to show here yet.</p>
         <div id="emptyStateCta" style="margin-top:var(--space-3);"></div>
       </div>
 

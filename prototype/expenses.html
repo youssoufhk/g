@@ -1055,77 +1055,170 @@
                 Clear Filters
               </button>
             </div>
-            <div class="data-table-wrapper" id="teamExpenseTable">
-              <table class="data-table mobile-cards">
-                <thead>
-                  <tr>
-                    <th>Employee</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th>Project</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">SC</div><a href="employees.html#sarah-chen" style="color:var(--color-text-1);">Sarah Chen</a></div></td>
-                    <td data-label="Type">Travel</td>
-                    <td data-label="Amount" class="cell-mono">&euro;450.00</td>
-                    <td data-label="Date">Feb 15, 2026</td>
-                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Acme Web Redesign</a></td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">JS</div><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#john-smith" style="color:var(--color-text-1);">John Smith</a></div></td>
-                    <td data-label="Type">Meals</td>
-                    <td data-label="Amount" class="cell-mono">&euro;120.00</td>
-                    <td data-label="Date">Mar 5, 2026</td>
-                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Globex Phase 2</a></td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">BT</div><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color:var(--color-text-1);">Bob Taylor</a></div></td>
-                    <td data-label="Type">Hotel</td>
-                    <td data-label="Amount" class="cell-mono">&euro;340.00</td>
-                    <td data-label="Date">Apr 2, 2026</td>
-                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Acme Web Redesign</a></td>
-                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
-                  </tr>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">CW</div><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams" style="color:var(--color-text-1);">Carol Williams</a></div></td>
-                    <td data-label="Type">Software</td>
-                    <td data-label="Amount" class="cell-mono">&euro;89.00</td>
-                    <td data-label="Date">Jan 10, 2026</td>
-                    <td data-label="Project" style="color:var(--color-text-3);">&mdash;</td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">DP</div><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park" style="color:var(--color-text-1);">David Park</a></div></td>
-                    <td data-label="Type">Equipment</td>
-                    <td data-label="Amount" class="cell-mono">&euro;1,450.00</td>
-                    <td data-label="Date">Apr 3, 2026</td>
-                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Globex Phase 2</a></td>
-                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
-                  </tr>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">EL</div><a href="employees.html#emma-laurent" style="color:var(--color-text-1);">Emma Laurent</a></div></td>
-                    <td data-label="Type">Transport</td>
-                    <td data-label="Amount" class="cell-mono">&euro;45.00</td>
-                    <td data-label="Date">Mar 20, 2026</td>
-                    <td data-label="Project" style="color:var(--color-text-3);">&mdash;</td>
-                    <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td data-label="Employee"><div style="display:flex;align-items:center;gap:var(--space-2);"><div class="avatar avatar-xs">AW</div><a href="employees.html#alice-wang" style="color:var(--color-text-1);">Alice Wang</a></div></td>
-                    <td data-label="Type">Meals</td>
-                    <td data-label="Amount" class="cell-mono">&euro;67.30</td>
-                    <td data-label="Date">Apr 1, 2026</td>
-                    <td data-label="Project"><a href="projects.html#detail" style="color:var(--color-primary);">Initech API</a></td>
-                    <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="action-table" id="teamExpenseTable">
+              <div class="action-table-header">
+                <div style="width:20px;flex-shrink:0;"></div>
+                <div style="width:32px;flex-shrink:0;"></div>
+                <div style="width:180px;flex-shrink:0;">Employee</div>
+                <div style="flex:1;">Detail</div>
+                <div style="flex-shrink:0;width:100px;text-align:right;">Amount</div>
+                <div style="flex-shrink:0;min-width:80px;text-align:right;">Status</div>
+                <div style="flex-shrink:0;width:120px;"></div>
+              </div>
+
+              <!-- Sarah Chen — Travel -->
+              <div class="action-row" data-type="Travel" data-status="Approved" data-employee="Sarah Chen">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Sarah Chen expense"></div>
+                <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
+                  <svg data-lucide="plane" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">SC</div>
+                  <span class="employee-name"><a href="employees.html#sarah-chen" style="color:inherit;text-decoration:none;">Sarah Chen</a></span>
+                </div>
+                <div class="action-row-detail">Travel &mdash; Client site visit Paris&ndash;Lyon</div>
+                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Acme Web Redesign</a> &bull; Feb 15, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;450.00</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','Receipt','Viewing receipt for Sarah Chen')"><svg data-lucide="paperclip" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
+              <!-- John Smith — Meals -->
+              <div class="action-row" data-type="Meals" data-status="Approved" data-employee="John Smith">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select John Smith expense"></div>
+                <div class="action-row-icon" style="background:var(--color-gold-muted);color:var(--color-gold);">
+                  <svg data-lucide="utensils" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">JS</div>
+                  <span class="employee-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#john-smith" style="color:inherit;text-decoration:none;">John Smith</a></span>
+                </div>
+                <div class="action-row-detail">Meals &mdash; Client lunch quarterly review</div>
+                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Globex Phase 2</a> &bull; Mar 5, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;120.00</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
+              <!-- Bob Taylor — Hotel (Pending) -->
+              <div class="action-row" data-type="Hotel" data-status="Pending" data-employee="Bob Taylor">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Bob Taylor expense"></div>
+                <div class="action-row-icon" style="background:var(--color-primary-muted);color:var(--color-primary);">
+                  <svg data-lucide="building" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">BT</div>
+                  <span class="employee-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;">Bob Taylor</a></span>
+                </div>
+                <div class="action-row-detail">Hotel &mdash; Marriott Lyon</div>
+                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Acme Web Redesign</a> &bull; Apr 2, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;340.00</span>
+                  <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
+                  <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
+              <!-- Carol Williams — Software -->
+              <div class="action-row" data-type="Software" data-status="Approved" data-employee="Carol Williams">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Carol Williams expense"></div>
+                <div class="action-row-icon" style="background:var(--color-chart-5-muted);color:var(--color-chart-5);">
+                  <svg data-lucide="monitor" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">CW</div>
+                  <span class="employee-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams" style="color:inherit;text-decoration:none;">Carol Williams</a></span>
+                </div>
+                <div class="action-row-detail">Software &mdash; Figma annual license</div>
+                <div class="action-row-meta"><span style="color:var(--color-text-3);">&mdash;</span> &bull; Jan 10, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;89.00</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
+              <!-- David Park — Equipment (Pending) -->
+              <div class="action-row" data-type="Equipment" data-status="Pending" data-employee="David Park">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select David Park expense"></div>
+                <div class="action-row-icon" style="background:var(--color-error-muted);color:var(--color-error);">
+                  <svg data-lucide="laptop" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">DP</div>
+                  <span class="employee-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park" style="color:inherit;text-decoration:none;">David Park</a></span>
+                </div>
+                <div class="action-row-detail">Equipment &mdash; Dell UltraSharp 27" monitor</div>
+                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Globex Phase 2</a> &bull; Apr 3, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-error);">&euro;1,450.00</span>
+                  <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
+                  <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
+              <!-- Emma Laurent — Transport -->
+              <div class="action-row" data-type="Transport" data-status="Approved" data-employee="Emma Laurent">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Emma Laurent expense"></div>
+                <div class="action-row-icon" style="background:var(--color-surface-2);color:var(--color-text-2);">
+                  <svg data-lucide="car" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">EL</div>
+                  <span class="employee-name"><a href="employees.html#emma-laurent" style="color:inherit;text-decoration:none;">Emma Laurent</a></span>
+                </div>
+                <div class="action-row-detail">Transport &mdash; Taxi to client office</div>
+                <div class="action-row-meta"><span style="color:var(--color-text-3);">&mdash;</span> &bull; Mar 20, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;45.00</span>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
+              <!-- Alice Wang — Meals (Pending) -->
+              <div class="action-row" data-type="Meals" data-status="Pending" data-employee="Alice Wang">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Alice Wang expense"></div>
+                <div class="action-row-icon" style="background:var(--color-gold-muted);color:var(--color-gold);">
+                  <svg data-lucide="utensils" width="16" height="16"></svg>
+                </div>
+                <div class="action-row-employee">
+                  <div class="avatar avatar-xs">AW</div>
+                  <span class="employee-name"><a href="employees.html#alice-wang" style="color:inherit;text-decoration:none;">Alice Wang</a></span>
+                </div>
+                <div class="action-row-detail">Meals &mdash; Lunch client meeting</div>
+                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Initech API</a> &bull; Apr 1, 2026</div>
+                <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
+                  <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;67.30</span>
+                  <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
+                </div>
+                <div class="action-row-actions">
+                  <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
+                  <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
+                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -2024,11 +2117,18 @@
   window.filterTeamExpenses = function() {
     var search = (document.getElementById('teamExpenseSearch') || {}).value || '';
     search = search.toLowerCase();
-    var rows = document.querySelectorAll('#teamExpenseTable tbody tr');
+    var statusFilter = ((document.getElementById('teamExpenseStatus') || {}).value || '').toLowerCase();
+    var typeFilter = ((document.getElementById('teamExpenseType') || {}).value || '').toLowerCase();
+    var rows = document.querySelectorAll('#teamExpenseTable .action-row');
     var visible = 0;
     rows.forEach(function(row) {
       var text = row.textContent.toLowerCase();
-      var match = !search || text.indexOf(search) >= 0;
+      var rowStatus = (row.dataset.status || '').toLowerCase();
+      var rowType = (row.dataset.type || '').toLowerCase();
+      var matchSearch = !search || text.indexOf(search) >= 0;
+      var matchStatus = !statusFilter || rowStatus === statusFilter;
+      var matchType = !typeFilter || rowType === typeFilter;
+      var match = matchSearch && matchStatus && matchType;
       row.style.display = match ? '' : 'none';
       if (match) visible++;
     });

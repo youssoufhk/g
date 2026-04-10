@@ -34,14 +34,40 @@ Before dispatching any agent, read these files yourself so you understand the fu
 
 ```
 EMPLOYEES (8 named people, 12 total in company):
-  Sarah Chen      | 87% work time | Project Manager    | Engineering dept   | Online
-  John Smith      | 82% work time | Senior Developer   | Engineering dept   | Online
-  Marco Rossi     | 88% work time | Operations Lead    | Operations dept    | Away
-  Carol Williams  | 90% work time | Design Lead        | Design dept        | Online
-  Alice Wang      | 45% work time | On Leave Apr 14-18 | Engineering dept   | On Leave
-  David Park      | 45% work time | Finance Lead       | Finance dept       | Offline
-  Emma Laurent    | 78% work time | HR Specialist      | HR dept            | Online
-  Bob Taylor      |  0% work time | Backend Developer  | Engineering dept   | Offline (Bench)
+
+Work time is calculated from real hours, NOT stored as a raw percentage.
+Formula: Billable % = billableHours / 40 × 100. Internal % = internalHours / 40 × 100.
+Total Work Time % = (billableHours + internalHours) / 40 × 100. CAN exceed 100% (overwork).
+
+  Employee         | Billable h | Internal h | Total h | Billable% | Internal% | Work Time% | Presence  | Role
+  Sarah Chen       |    34h     |     6h     |   40h   |    85%    |    15%    |    100%    | Online    | Project Manager    | Engineering
+  John Smith       |    40h     |     5h     |   45h   |   100%    |   12.5%   |   112.5%   | Online    | Senior Developer   | Engineering  ← OVERWORK (amber)
+  Marco Rossi      |    36h     |     7h     |   43h   |    90%    |   17.5%   |   107.5%   | Away      | Operations Lead    | Operations   ← OVERWORK (amber)
+  Carol Williams   |    38h     |     2h     |   40h   |    95%    |    5%     |    100%    | Online    | Design Lead        | Design
+  Alice Wang       |    16h     |     2h     |   18h   |    40%    |    5%     |     45%    | On Leave  | On Leave Apr 14–18 | Engineering
+  David Park       |    28h     |     6h     |   34h   |    70%    |    15%    |     85%    | Offline   | Finance Lead       | Finance
+  Emma Laurent     |    18h     |    18h     |   36h   |    45%    |    45%    |     90%    | Online    | HR Specialist      | HR
+  Bob Taylor       |     0h     |     0h     |    0h   |     0%    |     0%    |      0%    | Offline   | Backend Developer  | Engineering (Bench)
+
+Unnamed employees (Liam O'Brien, Sophie Dubois, Lisa Martinez, + 1 other):
+  Each ~34h billable + 1h internal = 35h/week ≈ 87.5% work time
+  Named 8 total: 256h. Unnamed 4 total: ~138h. Company total: ~394h ✓
+
+ADMIN RESOURCE MANAGEMENT VIEW — canonical display format:
+  This is the view an Admin sees to manage team capacity. It must be a simple, scannable
+  table — NOT cards, NOT donuts. One row per employee showing:
+  [Name] [Role] [Billable bar] [Internal bar] [Total %] [Overwork indicator if >100%]
+  The work time bar is a horizontal progress bar that can overflow past 100% in amber.
+  This is the ONLY correct way to represent hours in this app. See rule below.
+
+⚠ NO DONUT CHARTS FOR HOURS — EVER.
+  Donut/pie charts are BANNED for representing work hours or capacity.
+  Reason: they cap at 100% by design and cannot show overwork. A developer at 112.5%
+  work time is invisible in a donut — it looks the same as 100%. This is a dangerous
+  misrepresentation of real workload.
+  Correct replacement: horizontal progress bar with overflow zone (amber past 100%).
+  If ANY donut chart shows hours/capacity/work time anywhere in the prototype, REMOVE IT
+  and replace with a horizontal bar visualization.
 
 Other employees (Liam O'Brien, Sophie Dubois, Lisa Martinez, etc.) must have CONSISTENT
 roles and departments across ALL pages they appear on. If an employee appears on 5 pages

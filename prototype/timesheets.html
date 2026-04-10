@@ -63,6 +63,20 @@
       min-width: 36px;
       text-align: right;
     }
+    .ts-progress-pct.overwork { color: var(--color-warning); }
+    .ts-progress-pct.serious-overwork { color: var(--color-error); }
+
+    /* Overflow segment appended after the main fill bar */
+    .ts-progress-bar { position: relative; }
+    .ts-progress-overflow {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      min-width: 6px;
+      border-radius: 0 var(--radius-full) var(--radius-full) 0;
+      background: var(--color-warning);
+    }
 
     /* Week navigation */
     .week-nav {
@@ -349,88 +363,47 @@
       text-decoration: underline;
     }
 
-    /* Approval queue */
-    .approval-card {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4);
-      padding: var(--space-4);
-      background: var(--color-surface-0);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      margin-bottom: var(--space-3);
-      transition: all var(--motion-normal) var(--ease-out);
-    }
-    .approval-card:hover {
-      border-color: var(--color-border-strong);
-    }
+    /* Approval queue — compact action rows (UI15) */
+    /* .approval-card kept only for fading animation on removal */
     .approval-card.fading {
       opacity: 0;
       transform: translateX(20px);
       transition: all var(--motion-slow) var(--ease-gentle);
     }
-    .approval-card .aq-avatar {
+
+    /* Work-time progress bar with overflow indicator (UI13) */
+    .aq-worktime-bar {
+      position: relative;
+      width: 80px;
+      height: 6px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      overflow: visible;
       flex-shrink: 0;
     }
-    .approval-card .aq-info {
-      flex: 1;
-      min-width: 0;
+    .aq-worktime-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      max-width: 100%;
     }
-    .approval-card .aq-name {
-      font-weight: var(--weight-semibold);
-      font-size: var(--text-body);
-      color: var(--color-text-1);
-      margin-bottom: var(--space-0-5);
+    .aq-worktime-overflow {
+      position: absolute;
+      right: -10px;
+      top: -1px;
+      height: 8px;
+      min-width: 6px;
+      border-radius: var(--radius-full);
+      background: var(--color-warning);
     }
-    .approval-card .aq-name a {
-      color: var(--color-text-1);
-    }
-    .approval-card .aq-name a:hover {
-      color: var(--color-primary);
-    }
-    .approval-card .aq-period {
-      font-size: var(--text-body-sm);
-      color: var(--color-text-2);
-      margin-bottom: var(--space-1);
-    }
-    .approval-card .aq-projects {
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
-    }
-    .approval-card .aq-projects a {
-      color: var(--color-primary);
-      font-size: var(--text-caption);
-    }
-    .approval-card .aq-hours {
-      text-align: center;
-      flex-shrink: 0;
-      min-width: 60px;
-    }
-    .approval-card .aq-hours-value {
+    .aq-worktime-pct {
       font-family: var(--font-mono);
-      font-size: var(--text-heading-2);
-      font-weight: var(--weight-bold);
-      color: var(--color-text-1);
-    }
-    .approval-card .aq-hours-label {
       font-size: var(--text-caption);
-      color: var(--color-text-3);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-2);
     }
-    .approval-card .aq-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: var(--space-2);
-      flex-shrink: 0;
-    }
-    .approval-card .aq-submitted {
-      font-size: var(--text-caption);
-      color: var(--color-text-3);
-    }
-    .approval-card .aq-actions {
-      display: flex;
-      gap: var(--space-2);
-    }
+    .aq-worktime-pct.overwork { color: var(--color-warning); }
+    .aq-worktime-pct.serious-overwork { color: var(--color-error); }
 
     /* Copy dropdown */
     .copy-dropdown {
@@ -1170,14 +1143,20 @@
           <div class="ts-summary-divider"></div>
           <div class="ts-summary-progress">
             <div class="ts-progress-bar">
-              <div class="ts-progress-fill warning" id="summaryProgressFill" style="width: 80%;"></div>
+              <div class="ts-progress-fill" id="summaryProgressFill" style="width: 67%;background:var(--color-primary);"></div>
+              <div class="ts-progress-overflow" id="summaryProgressOverflow" style="display:none;width:0;"></div>
             </div>
             <span class="ts-progress-pct" id="summaryProgressPct">80%</span>
           </div>
           <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item">Billable: <strong id="summaryBillable">32h</strong> <span class="text-3">(100%)</span></div>
+          <div class="ts-summary-item" id="summaryBillableItem">Billable: <strong id="summaryBillable">27h</strong> <span class="text-3" id="summaryBillablePct">(67%)</span></div>
           <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item">Non-billable: <strong id="summaryNonBillable">0h</strong> <span class="text-3">(0%)</span></div>
+          <div class="ts-summary-item" id="summaryInternalItem">Internal: <strong id="summaryNonBillable">5h</strong> <span class="text-3" id="summaryInternalPct">(12%)</span></div>
+          <div class="ts-summary-divider" id="summaryOverworkDivider" style="display:none;"></div>
+          <div class="ts-summary-item" id="summaryOverworkItem" style="display:none;color:var(--color-warning);">
+            <svg data-lucide="alert-triangle" width="12" height="12" style="margin-right:var(--space-1);flex-shrink:0;"></svg>
+            <span id="summaryOverworkText">+0h overwork</span>
+          </div>
           <div class="ts-summary-divider"></div>
           <div class="ts-summary-item" style="font-size:var(--text-caption);color:var(--color-text-3);">
             <svg data-lucide="info" width="12" height="12" style="margin-right:var(--space-1);"></svg>
@@ -1376,211 +1355,250 @@
           </div>
         </div>
 
-        <!-- Approval 1: John Smith -->
-        <div class="approval-card" id="aq-1">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md">JS</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a></div>
-            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
-            <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex Phase 2</a> (32h), <a href="projects.html#internal">Internal</a> (10h)</div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value">42h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted 2h ago</div>
-            <div class="aq-actions">
+        <!-- Approval Queue — compact action rows (UI15) -->
+        <div class="action-table">
+
+          <!-- Row 1: John Smith — 32h billable + 10h internal = 80% + 25% = 105% total -->
+          <div class="action-row approval-card" id="aq-1">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select John Smith">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;">JS</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering</div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">42h</strong> total &mdash; <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex Phase 2</a> (32h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (10h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="80% billable + 25% internal = 105% total work time">
+                <div class="aq-worktime-fill" style="width:80%;"></div>
+                <div class="aq-worktime-overflow" style="width:6px;" title="+2h overwork"></div>
+              </div>
+              <span class="aq-worktime-pct overwork">105%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> +2h overwork</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-1">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-1">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Approval 2: Bob Taylor -->
-        <div class="approval-card" id="aq-2">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-warning), var(--color-accent));">BT</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
-            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
-            <div class="aq-projects"><a href="projects.html#internal">Internal</a> (8h)</div>
-            <div style="margin-top: var(--space-1);"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Only 8h logged</span></div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value" style="color: var(--color-warning);">8h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted 1d ago</div>
-            <div class="aq-actions">
+          <!-- Row 2: Bob Taylor — 8h internal only = 0% billable + 20% internal = 20% total -->
+          <div class="action-row approval-card" id="aq-2">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select Bob Taylor">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-warning),var(--color-accent));">BT</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering &mdash; Bench</div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">8h</strong> total &mdash; <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (8h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="0% billable + 20% internal = 20% total work time">
+                <div class="aq-worktime-fill" style="width:0%;"></div>
+              </div>
+              <span class="aq-worktime-pct" style="color:var(--color-warning);">20%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Only 8h</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-2">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-2">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Approval 3: Carol Williams -->
-        <div class="approval-card" id="aq-3">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-primary));">CW</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></div>
-            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
-            <div class="aq-projects"><a href="projects.html#initech-api">Initech API</a> (36h), <a href="projects.html#internal">Internal</a> (4h)</div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value">40h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted today</div>
-            <div class="aq-actions">
+          <!-- Row 3: Carol Williams — 36h billable + 4h internal = 90% + 10% = 100% total -->
+          <div class="action-row approval-card" id="aq-3">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select Carol Williams">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-info),var(--color-primary));">CW</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Design</div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">40h</strong> total &mdash; <a href="projects.html#initech-api" style="font-size:var(--text-body-sm);">Initech API</a> (36h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (4h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="90% billable + 10% internal = 100% total work time">
+                <div class="aq-worktime-fill" style="width:90%;"></div>
+              </div>
+              <span class="aq-worktime-pct">100%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On target</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-3">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-3">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Approval 4: Marco Rossi -->
-        <div class="approval-card" id="aq-4">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-accent), var(--color-error));">MR</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a></div>
-            <div class="aq-period">Mar 30 &#8211; Apr 5, 2026</div>
-            <div class="aq-projects"><a href="projects.html#acme-web-redesign">Acme Web</a> (40h), <a href="projects.html#internal">Internal</a> (4h)</div>
-            <div style="margin-top: var(--space-1);"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Overtime</span></div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value" style="color: var(--color-warning);">44h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted today</div>
-            <div class="aq-actions">
+          <!-- Row 4: Marco Rossi — 40h billable + 4h internal = 100% + 10% = 110% total (overwork) -->
+          <div class="action-row approval-card" id="aq-4">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select Marco Rossi">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-accent),var(--color-error));">MR</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Operations</div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">44h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (40h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (4h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="100% billable + 10% internal = 110% total work time">
+                <div class="aq-worktime-fill" style="width:100%;"></div>
+                <div class="aq-worktime-overflow" style="width:8px;" title="+4h overwork"></div>
+              </div>
+              <span class="aq-worktime-pct overwork">110%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> +4h overwork</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-4">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-4">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Approval 5: Emma Laurent -->
-        <div class="approval-card" id="aq-5b">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-info), var(--color-success));">EL</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent">Emma Laurent</a></div>
-            <div class="aq-period">Mar 30 &ndash; Apr 5, 2026</div>
-            <div class="aq-projects"><a href="projects.html#internal">Internal</a> (16h), <a href="projects.html#hr-project">HR Operations</a> (24h)</div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value">40h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted today</div>
-            <div class="aq-actions">
+          <!-- Row 5: Emma Laurent — 24h billable + 16h internal = 60% + 40% = 100% total -->
+          <div class="action-row approval-card" id="aq-5b">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select Emma Laurent">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-info),var(--color-success));">EL</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent">Emma Laurent</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">HR</div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">40h</strong> total &mdash; <a href="projects.html#hr-project" style="font-size:var(--text-body-sm);">HR Operations</a> (24h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (16h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="60% billable + 40% internal = 100% total work time">
+                <div class="aq-worktime-fill" style="width:60%;"></div>
+              </div>
+              <span class="aq-worktime-pct">100%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On target</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-5b">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-5b">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Approval 6: Alice Wang -->
-        <div class="approval-card" id="aq-6">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-accent), var(--color-info));">AW</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></div>
-            <div class="aq-period">Mar 30 &ndash; Apr 5, 2026</div>
-            <div class="aq-projects"><a href="projects.html#acme-web-redesign">Acme Web</a> (38h), <a href="projects.html#internal">Internal</a> (2h)</div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value">40h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted 6h ago</div>
-            <div class="aq-actions">
+          <!-- Row 6: Alice Wang — 38h billable + 2h internal = 95% + 5% = 100% total -->
+          <div class="action-row approval-card" id="aq-6">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select Alice Wang">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-accent),var(--color-info));">AW</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering</div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">40h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (38h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (2h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="95% billable + 5% internal = 100% total work time">
+                <div class="aq-worktime-fill" style="width:95%;"></div>
+              </div>
+              <span class="aq-worktime-pct">100%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On target</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-6">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-6">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Approval 7: David Park -->
-        <div class="approval-card" id="aq-5">
-          <div class="aq-avatar">
-            <div class="avatar avatar-md" style="background: linear-gradient(135deg, var(--color-error), var(--color-accent));">DP</div>
-          </div>
-          <div class="aq-info">
-            <div class="aq-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a></div>
-            <div class="aq-period">Mar 23 &#8211; 29, 2026</div>
-            <div class="aq-projects"><a href="projects.html#globex-phase-2">Globex</a> (30h), <a href="projects.html#internal">Internal</a> (5h)</div>
-            <div style="margin-top: var(--space-1);"><span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> OVERDUE: 3 days</span></div>
-          </div>
-          <div class="aq-hours">
-            <div class="aq-hours-value" style="color: var(--color-error);">35h</div>
-            <div class="aq-hours-label">logged</div>
-          </div>
-          <div class="aq-meta">
-            <div class="aq-submitted">Submitted 4d ago</div>
-            <div class="aq-actions">
+          <!-- Row 7: David Park — 30h billable + 5h internal = 75% + 12% = 87% total — OVERDUE -->
+          <div class="action-row approval-card" id="aq-5">
+            <div class="action-row-checkbox">
+              <input type="checkbox" aria-label="Select David Park">
+            </div>
+            <div class="action-row-employee">
+              <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-error),var(--color-accent));">DP</div>
+              <div>
+                <div class="employee-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-error);">Finance &mdash; <strong>OVERDUE 3d</strong></div>
+              </div>
+            </div>
+            <div class="action-row-detail">
+              Week of Mar 23 &mdash; <strong style="font-family:var(--font-mono);">35h</strong> total &mdash; <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex</a> (30h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (5h)
+            </div>
+            <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="aq-worktime-bar" title="75% billable + 12% internal = 87% total work time">
+                <div class="aq-worktime-fill" style="width:75%;"></div>
+              </div>
+              <span class="aq-worktime-pct">87%</span>
+            </div>
+            <div class="action-row-status">
+              <span class="badge badge-error"><svg data-lucide="alert-circle" width="12" height="12"></svg> Overdue</span>
+            </div>
+            <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-5">
-                <svg data-lucide="check" width="14" height="14"></svg>
-                Approve
+                <svg data-lucide="check" width="14" height="14"></svg> Approve
               </button>
               <button class="btn btn-destructive-ghost btn-sm aq-reject-btn" data-id="aq-5">
-                <svg data-lucide="x" width="14" height="14"></svg>
-                Reject
+                <svg data-lucide="x" width="14" height="14"></svg> Reject
               </button>
             </div>
           </div>
-        </div>
+
+        </div><!-- /action-table -->
       </div>
 
       <!-- ════════════ EMPTY STATE ════════════ -->
@@ -1945,10 +1963,19 @@
     return parseFloat(text) || 0;
   }
 
+  // ── Helper: identify billable vs internal rows ──
+  // Rows with data-project containing "internal" are internal; all others are billable
+  function isInternalRow(row) {
+    var proj = (row.getAttribute('data-project') || '').toLowerCase();
+    return proj.indexOf('internal') >= 0;
+  }
+
   function recalculate() {
     var rows = document.querySelectorAll('.ts-data-row');
     var dayTotals = [0, 0, 0, 0, 0, 0, 0];
     var grandTotal = 0;
+    var billableHours = 0;
+    var internalHours = 0;
 
     rows.forEach(function(row) {
       var rowTotal = 0;
@@ -1960,6 +1987,12 @@
       });
       var rt = row.querySelector('.row-total');
       if (rt) rt.textContent = rowTotal;
+      // Accumulate billable vs internal
+      if (isInternalRow(row)) {
+        internalHours += rowTotal;
+      } else {
+        billableHours += rowTotal;
+      }
     });
 
     dayTotals.forEach(function(dt, i) {
@@ -1970,31 +2003,73 @@
 
     document.getElementById('grandTotal').textContent = grandTotal;
 
-    // Public holiday: effective target is 32h not 40h
+    // Baseline = 40h = 100% work time
+    var BASELINE = 40;
+
+    // Public holiday: effective submission target this week is 32h, but
+    // work-time % is always relative to 40h baseline.
     var weekTarget = 32;
 
+    var billablePct = Math.round((billableHours / BASELINE) * 100);
+    var internalPct = Math.round((internalHours / BASELINE) * 100);
+    var totalWorkPct = billablePct + internalPct;
+    var overworkHours = Math.max(0, grandTotal - BASELINE);
+
     // Update status bar (hidden but keep consistent)
-    var pct = Math.min(Math.round((grandTotal / weekTarget) * 100), 100);
     var remaining = Math.max(weekTarget - grandTotal, 0);
     document.getElementById('statusHours').textContent = grandTotal + 'h';
     document.getElementById('statusRemaining').textContent = remaining + 'h';
+    var barPct = Math.min(Math.round((grandTotal / BASELINE) * 100), 100);
     var progressFill = document.getElementById('statusProgressFill');
-    progressFill.style.width = pct + '%';
-    progressFill.className = 'ts-progress-fill ' + (grandTotal >= weekTarget ? 'complete' : 'warning');
-    document.getElementById('statusProgressPct').textContent = pct + '%';
+    progressFill.style.width = barPct + '%';
+    progressFill.className = 'ts-progress-fill' + (grandTotal >= BASELINE ? ' complete' : '');
+    document.getElementById('statusProgressPct').textContent = totalWorkPct + '%';
 
     // Update summary
-    var summaryFill = document.getElementById('summaryProgressFill');
-    summaryFill.style.width = pct + '%';
-    summaryFill.className = 'ts-progress-fill ' + (grandTotal >= weekTarget ? 'complete' : 'warning');
-    document.getElementById('summaryProgressPct').textContent = pct + '%';
-    // Show total hours (issue 14: "Xh / 32h" shown in HTML label)
     var summaryTotalEl = document.getElementById('summaryTotal');
     if (summaryTotalEl) summaryTotalEl.textContent = grandTotal + 'h';
-    document.getElementById('summaryBillable').textContent = grandTotal + 'h';
-    var billPct = grandTotal > 0 ? '100%' : '0%';
-    document.getElementById('summaryBillable').nextElementSibling.textContent = '(' + billPct + ')';
-    document.getElementById('summaryNonBillable').textContent = '0h';
+
+    // Progress bar: billable fills to min(billablePct, 100%), overflow if total>100%
+    var summaryFill = document.getElementById('summaryProgressFill');
+    var summaryOverflow = document.getElementById('summaryProgressOverflow');
+    var summaryPctEl = document.getElementById('summaryProgressPct');
+
+    var fillWidth = Math.min(billablePct, 100);
+    summaryFill.style.width = fillWidth + '%';
+    summaryFill.style.background = 'var(--color-primary)';
+
+    if (totalWorkPct > 100 && summaryOverflow) {
+      // Show overflow segment: width proportional to overflow but capped visually at ~15%
+      var overflowWidth = Math.min((totalWorkPct - 100) / 100 * 80, 15); // px-like percent
+      summaryOverflow.style.display = 'block';
+      summaryOverflow.style.width = Math.max(6, overflowWidth) + 'px';
+    } else if (summaryOverflow) {
+      summaryOverflow.style.display = 'none';
+    }
+
+    summaryPctEl.textContent = totalWorkPct + '%';
+    summaryPctEl.className = 'ts-progress-pct' +
+      (totalWorkPct >= 120 ? ' serious-overwork' : (totalWorkPct > 100 ? ' overwork' : ''));
+
+    // Billable + Internal breakdowns
+    document.getElementById('summaryBillable').textContent = billableHours + 'h';
+    document.getElementById('summaryBillablePct').textContent = '(' + billablePct + '%)';
+    document.getElementById('summaryNonBillable').textContent = internalHours + 'h';
+    document.getElementById('summaryInternalPct').textContent = '(' + internalPct + '%)';
+
+    // Overwork callout
+    var overworkItem = document.getElementById('summaryOverworkItem');
+    var overworkDivider = document.getElementById('summaryOverworkDivider');
+    var overworkText = document.getElementById('summaryOverworkText');
+    if (overworkHours > 0 && overworkItem) {
+      overworkItem.style.display = 'flex';
+      if (overworkDivider) overworkDivider.style.display = '';
+      overworkText.textContent = '+' + overworkHours + 'h overwork (' + totalWorkPct + '% total work time)';
+      overworkItem.style.color = totalWorkPct >= 120 ? 'var(--color-error)' : 'var(--color-warning)';
+    } else if (overworkItem) {
+      overworkItem.style.display = 'none';
+      if (overworkDivider) overworkDivider.style.display = 'none';
+    }
 
     // Update warning
     var warning = document.getElementById('tsWarning');
@@ -2273,8 +2348,17 @@
       if (completionCard) {
         var gt = parseInt(document.getElementById('grandTotal').textContent) || 0;
         var projCount = document.querySelectorAll('.ts-data-row').length;
+        // Calculate billable hours for completion card
+        var billH = 0;
+        document.querySelectorAll('.ts-data-row').forEach(function(r) {
+          if (!isInternalRow(r)) {
+            var rt = r.querySelector('.row-total');
+            billH += rt ? (parseFloat(rt.textContent) || 0) : 0;
+          }
+        });
+        var billPctVal = gt > 0 ? Math.round((billH / 40) * 100) : 0;
         document.getElementById('completionHours').textContent = gt + 'h';
-        document.getElementById('completionBillable').textContent = gt > 0 ? '100%' : '0%';
+        document.getElementById('completionBillable').textContent = billPctVal + '% billable';
         document.getElementById('completionProjects').textContent = projCount;
         completionCard.style.display = 'flex';
         lucide.createIcons({ nodes: [completionCard] });
@@ -2337,7 +2421,7 @@
       var id = approveBtn.getAttribute('data-id');
       var card = document.getElementById(id);
       if (!card) return;
-      var name = card.querySelector('.aq-name a').textContent;
+      var name = getRowEmployeeName(card);
       showToast('success', 'Timesheet Approved', name + '\'s timesheet has been approved.');
       card.classList.add('fading');
       setTimeout(function() {
@@ -2370,7 +2454,7 @@
   document.getElementById('rejectConfirmBtn').addEventListener('click', function() {
     if (!rejectTargetId) return;
     var card = document.getElementById(rejectTargetId);
-    var name = card.querySelector('.aq-name a').textContent;
+    var name = getRowEmployeeName(card);
     var reason = document.getElementById('rejectReason').value.trim();
     if (!reason) {
       document.getElementById('rejectReason').classList.add('error');
@@ -2410,6 +2494,22 @@
     }
   }
 
+  // Helper: get employee name from a row (works for both card and action-row layouts)
+  function getRowEmployeeName(card) {
+    var nameLink = card.querySelector('.aq-name a, .employee-name a');
+    return nameLink ? nameLink.textContent : 'Unknown';
+  }
+
+  // Helper: get hours display from a row
+  function getRowHoursText(card) {
+    // Try action-row: find the <strong> in action-row-detail
+    var detail = card.querySelector('.action-row-detail strong');
+    if (detail) return detail.textContent;
+    // Fallback: old card layout
+    var val = card.querySelector('.aq-hours-value');
+    return val ? val.textContent : '';
+  }
+
   // ── Approve All Modal ──
   window.openApproveAllModal = function() {
     var cards = document.querySelectorAll('.approval-card:not(.fading)');
@@ -2420,8 +2520,8 @@
     if (listEl) {
       listEl.innerHTML = '';
       cards.forEach(function(card) {
-        var name = card.querySelector('.aq-name a') ? card.querySelector('.aq-name a').textContent : 'Unknown';
-        var hours = card.querySelector('.aq-hours-value') ? card.querySelector('.aq-hours-value').textContent : '';
+        var name = getRowEmployeeName(card);
+        var hours = getRowHoursText(card);
         var item = document.createElement('div');
         item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:var(--space-1) 0;';
         item.innerHTML = '<span>' + name + '</span><span style="font-family:var(--font-mono);color:var(--color-text-1);font-weight:var(--weight-semibold);">' + hours + '</span>';

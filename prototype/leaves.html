@@ -878,98 +878,93 @@
           </div>
 
           <!-- My Leave Requests -->
-          <div class="leave-request-list">
+          <div class="action-table my-leave-request-list" style="margin-bottom:var(--space-6);">
+            <div class="action-table-header">
+              <div style="width:20px;flex-shrink:0;"></div>
+              <div style="width:32px;flex-shrink:0;"></div>
+              <div style="flex:1;">Leave Request</div>
+              <div style="flex-shrink:0;width:160px;">Balance</div>
+              <div style="flex-shrink:0;min-width:80px;text-align:right;">Status</div>
+              <div style="flex-shrink:0;width:100px;"></div>
+            </div>
 
-            <!-- Request 1: Approved -->
-            <div class="leave-request-card">
-              <div class="leave-request-icon annual">
-                <svg data-lucide="sun"></svg>
+            <!-- Request 1: Annual — Approved -->
+            <div class="action-row" data-status="Approved" data-type="Annual Leave">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+              <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
+                <svg data-lucide="sun" width="16" height="16"></svg>
               </div>
-              <div class="leave-request-body">
-                <div class="leave-request-top">
-                  <span class="leave-request-dates">Mar 22 &ndash; 26, 2026</span>
-                  <span class="leave-request-type">Annual Leave</span>
-                  <span class="leave-request-days">5 days</span>
-                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
-                </div>
-                <div class="leave-request-detail">
-                  Approved by John Smith on Mar 15 &bull; <span class="note-text">"Family vacation"</span>
-                </div>
+              <div class="action-row-detail">Annual Leave &mdash; Mar 22 &ndash; 26, 2026</div>
+              <div class="action-row-meta">5 days &bull; 18 remaining balance</div>
+              <div class="action-row-status">
+                <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+              </div>
+              <div class="action-row-actions">
+                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Approved by John Smith on Mar 15 — Family vacation')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
 
-            <!-- Request 2: Pending -->
-            <div class="leave-request-card" id="pendingRequest1">
-              <div class="leave-request-icon annual">
-                <svg data-lucide="sun"></svg>
+            <!-- Request 2: Annual — Pending -->
+            <div class="action-row" id="pendingRequest1" data-status="Pending" data-type="Annual Leave">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+              <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
+                <svg data-lucide="sun" width="16" height="16"></svg>
               </div>
-              <div class="leave-request-body">
-                <div class="leave-request-top">
-                  <span class="leave-request-dates">Apr 28 &ndash; 29, 2026</span>
-                  <span class="leave-request-type">Annual Leave</span>
-                  <span class="leave-request-days">2 days</span>
-                  <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
-                </div>
-                <div class="leave-request-detail">
-                  Submitted Apr 3 &bull; Awaiting: John Smith &bull; <span class="note-text">"Moving day"</span>
-                </div>
+              <div class="action-row-detail">Annual Leave &mdash; Apr 28 &ndash; 29, 2026</div>
+              <div class="action-row-meta">2 days &bull; 18 remaining balance</div>
+              <div class="action-row-status">
+                <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
               </div>
-              <div class="leave-request-actions">
-                <button class="btn btn-destructive-ghost btn-sm cancel-request-btn">Cancel Request</button>
+              <div class="action-row-actions always-visible">
+                <button class="btn btn-xs btn-destructive-ghost cancel-request-btn">Cancel</button>
               </div>
             </div>
 
-            <!-- Request 3: Approved Sick -->
-            <div class="leave-request-card">
-              <div class="leave-request-icon sick">
-                <svg data-lucide="thermometer"></svg>
+            <!-- Request 3: Sick — Approved -->
+            <div class="action-row" data-status="Approved" data-type="Sick Leave">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+              <div class="action-row-icon" style="background:var(--color-chart-5-muted);color:var(--color-chart-5);">
+                <svg data-lucide="thermometer" width="16" height="16"></svg>
               </div>
-              <div class="leave-request-body">
-                <div class="leave-request-top">
-                  <span class="leave-request-dates">Jan 15 &ndash; 16, 2026</span>
-                  <span class="leave-request-type">Sick Leave</span>
-                  <span class="leave-request-days">2 days</span>
-                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
-                </div>
-                <div class="leave-request-detail">
-                  Approved by John Smith on Jan 15 &bull; <span class="note-text">"Flu"</span>
-                </div>
+              <div class="action-row-detail">Sick Leave &mdash; Jan 15 &ndash; 16, 2026</div>
+              <div class="action-row-meta">2 days &bull; 10 remaining balance</div>
+              <div class="action-row-status">
+                <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+              </div>
+              <div class="action-row-actions">
+                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Approved by John Smith on Jan 15 — Flu')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
 
-            <!-- Request 4: Approved Annual -->
-            <div class="leave-request-card">
-              <div class="leave-request-icon annual">
-                <svg data-lucide="sun"></svg>
+            <!-- Request 4: Annual — Approved -->
+            <div class="action-row" data-status="Approved" data-type="Annual Leave">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+              <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
+                <svg data-lucide="sun" width="16" height="16"></svg>
               </div>
-              <div class="leave-request-body">
-                <div class="leave-request-top">
-                  <span class="leave-request-dates">Dec 24 &ndash; 31, 2025</span>
-                  <span class="leave-request-type">Annual Leave</span>
-                  <span class="leave-request-days">5 days</span>
-                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
-                </div>
-                <div class="leave-request-detail">
-                  Approved by John Smith on Dec 10 &bull; <span class="note-text">"Christmas break"</span>
-                </div>
+              <div class="action-row-detail">Annual Leave &mdash; Dec 24 &ndash; 31, 2025</div>
+              <div class="action-row-meta">5 days &bull; 23 remaining balance</div>
+              <div class="action-row-status">
+                <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+              </div>
+              <div class="action-row-actions">
+                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Approved by John Smith on Dec 10 — Christmas break')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
 
-            <!-- Request 5: Approved Personal -->
-            <div class="leave-request-card">
-              <div class="leave-request-icon personal">
-                <svg data-lucide="heart"></svg>
+            <!-- Request 5: Personal — Approved -->
+            <div class="action-row" data-status="Approved" data-type="Personal">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+              <div class="action-row-icon" style="background:var(--color-accent-muted);color:var(--color-accent);">
+                <svg data-lucide="heart" width="16" height="16"></svg>
               </div>
-              <div class="leave-request-body">
-                <div class="leave-request-top">
-                  <span class="leave-request-dates">Nov 3, 2025</span>
-                  <span class="leave-request-type">Personal</span>
-                  <span class="leave-request-days">1 day</span>
-                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
-                </div>
-                <div class="leave-request-detail">
-                  <span class="note-text">"Personal errand"</span>
-                </div>
+              <div class="action-row-detail">Personal &mdash; Nov 3, 2025</div>
+              <div class="action-row-meta">1 day &bull; 3 remaining balance</div>
+              <div class="action-row-status">
+                <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+              </div>
+              <div class="action-row-actions">
+                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Personal errand')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
           </div>
@@ -1958,16 +1953,23 @@
   window.filterMyLeaves = function() {
     var search = (document.getElementById('myLeavesSearch') || {}).value || '';
     search = search.toLowerCase();
-    var cards = document.querySelectorAll('.leave-request-list .leave-request-card');
+    var statusFilter = ((document.getElementById('myLeavesStatus') || {}).value || '').toLowerCase();
+    var typeFilter = ((document.getElementById('myLeavesType') || {}).value || '').toLowerCase();
+    var rows = document.querySelectorAll('.my-leave-request-list .action-row');
     var visible = 0;
-    cards.forEach(function(card) {
-      var text = card.textContent.toLowerCase();
-      var match = !search || text.indexOf(search) >= 0;
-      card.style.display = match ? '' : 'none';
+    rows.forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      var rowStatus = (row.dataset.status || '').toLowerCase();
+      var rowType = (row.dataset.type || '').toLowerCase();
+      var matchSearch = !search || text.indexOf(search) >= 0;
+      var matchStatus = !statusFilter || rowStatus === statusFilter;
+      var matchType = !typeFilter || rowType === typeFilter;
+      var match = matchSearch && matchStatus && matchType;
+      row.style.display = match ? '' : 'none';
       if (match) visible++;
     });
     var emptyEl = document.getElementById('myLeavesEmpty');
-    var listEl = document.querySelector('.leave-request-list');
+    var listEl = document.querySelector('.my-leave-request-list');
     if (emptyEl) emptyEl.style.display = visible === 0 ? 'block' : 'none';
     if (listEl) listEl.style.display = visible === 0 ? 'none' : '';
   };
@@ -2040,10 +2042,16 @@
       btn.classList.remove('btn-loading');
 
       // Add to the list
-      var list = document.querySelector('#my-leaves .leave-request-list');
+      var list = document.querySelector('#my-leaves .my-leave-request-list');
       if (list) {
         var iconClass = modalLeaveType.value;
         var iconMap = { annual: 'sun', sick: 'thermometer', personal: 'heart', wfh: 'home' };
+        var iconColorMap = {
+          annual: 'background:var(--color-info-muted);color:var(--color-info)',
+          sick: 'background:var(--color-chart-5-muted);color:var(--color-chart-5)',
+          personal: 'background:var(--color-accent-muted);color:var(--color-accent)',
+          wfh: 'background:var(--color-wfh-muted);color:var(--color-wfh)'
+        };
         var s = new Date(modalStartDate.value);
         var e = new Date(modalEndDate.value);
         var opts = { month: 'short', day: 'numeric', year: 'numeric' };
@@ -2054,23 +2062,26 @@
         var note = document.getElementById('modalNotes').value;
 
         var card = document.createElement('div');
-        card.className = 'leave-request-card';
+        card.className = 'action-row';
+        card.dataset.status = 'Pending';
+        card.dataset.type = typeLabel;
         card.innerHTML =
-          '<div class="leave-request-icon ' + iconClass + '"><svg data-lucide="' + iconMap[iconClass] + '"></svg></div>' +
-          '<div class="leave-request-body">' +
-            '<div class="leave-request-top">' +
-              '<span class="leave-request-dates">' + dateStr + halfLabel + '</span>' +
-              '<span class="leave-request-type">' + typeLabel + '</span>' +
-              '<span class="leave-request-days">' + days + ' day' + (days !== 1 ? 's' : '') + '</span>' +
-              '<span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>' +
-            '</div>' +
-            '<div class="leave-request-detail">Just submitted \u2022 Awaiting: John Smith' +
-              (note ? ' \u2022 <span class="note-text">\u201C' + note + '\u201D</span>' : '') +
-            '</div>' +
+          '<div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>' +
+          '<div class="action-row-icon" style="' + (iconColorMap[iconClass] || '') + '">' +
+            '<svg data-lucide="' + iconMap[iconClass] + '" width="16" height="16"></svg>' +
           '</div>' +
-          '<div class="leave-request-actions"><button class="btn btn-destructive-ghost btn-sm cancel-request-btn">Cancel Request</button></div>';
+          '<div class="action-row-detail">' + typeLabel + ' \u2014 ' + dateStr + halfLabel + '</div>' +
+          '<div class="action-row-meta">' + days + ' day' + (days !== 1 ? 's' : '') + ' \u2022 balance pending</div>' +
+          '<div class="action-row-status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></div>' +
+          '<div class="action-row-actions always-visible"><button class="btn btn-xs btn-destructive-ghost cancel-request-btn">Cancel</button></div>';
 
-        list.insertBefore(card, list.children[1]);
+        // Insert after the header row (action-table-header)
+        var headerRow = list.querySelector('.action-table-header');
+        if (headerRow && headerRow.nextSibling) {
+          list.insertBefore(card, headerRow.nextSibling);
+        } else {
+          list.appendChild(card);
+        }
         lucide.createIcons({ nodes: [card] });
         bindCancelButtons();
       }
@@ -2092,7 +2103,7 @@
   function bindCancelButtons() {
     document.querySelectorAll('.cancel-request-btn').forEach(function(btn) {
       btn.onclick = function() {
-        cancelTarget = this.closest('.leave-request-card');
+        cancelTarget = this.closest('.action-row') || this.closest('.leave-request-card');
         confirmModal.classList.add('active');
       };
     });
