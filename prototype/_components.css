@@ -182,7 +182,7 @@
   font-weight: var(--weight-medium);
   color: var(--color-text-2);
 }
-.form-label .required { color: var(--color-error); margin-left: 2px; }
+.form-label .required { color: var(--color-error); margin-left: var(--space-0-5); }
 
 .form-input,
 .form-select,
@@ -418,7 +418,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 2px var(--space-2);
+  padding: var(--space-0-5) var(--space-2);
   border-radius: var(--radius-full);
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
@@ -599,7 +599,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 2px var(--space-2);
+  padding: var(--space-0-5) var(--space-2);
   background: var(--color-primary-muted);
   color: var(--color-primary);
   border-radius: var(--radius-full);
@@ -721,14 +721,14 @@
 @keyframes toastOut {
   to { transform: translateY(-8px); opacity: 0; }
 }
-.toast-icon { flex-shrink: 0; margin-top: 2px; }
+.toast-icon { flex-shrink: 0; margin-top: var(--space-0-5); }
 .toast-content { flex: 1; }
 .toast-title { font-weight: var(--weight-semibold); font-size: var(--text-body); }
-.toast-message { font-size: var(--text-body-sm); color: var(--color-text-2); margin-top: 2px; }
+.toast-message { font-size: var(--text-body-sm); color: var(--color-text-2); margin-top: var(--space-0-5); }
 .toast-close {
   flex-shrink: 0;
   background: none; border: none; color: var(--color-text-3);
-  cursor: pointer; padding: 2px;
+  cursor: pointer; padding: var(--space-0-5);
 }
 .toast-close:hover { color: var(--color-text-1); }
 .toast-actions {
@@ -1010,7 +1010,7 @@
 }
 .cmd-palette-input input::placeholder { color: var(--color-text-3); }
 .cmd-palette-input kbd {
-  padding: 2px 6px;
+  padding: var(--space-0-5) var(--space-1-5);
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -1066,7 +1066,7 @@
   color: var(--color-text-3);
 }
 .cmd-palette-footer kbd {
-  padding: 1px 4px;
+  padding: 1px var(--space-1);
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -1794,7 +1794,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-body-sm);
   background: var(--color-surface-3);
-  padding: 2px 8px;
+  padding: var(--space-0-5) var(--space-2);
   border-radius: var(--radius-sm);
   color: var(--color-text-1);
   flex-shrink: 0;

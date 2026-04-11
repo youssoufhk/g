@@ -218,6 +218,9 @@
       gap: var(--space-2);
       font-size: var(--text-body-sm);
       color: var(--color-text-2);
+      overflow-wrap: break-word;
+      word-break: break-word;
+      min-width: 0;
     }
     .checklist-item input[type="checkbox"] {
       width: 16px;
@@ -226,6 +229,11 @@
       accent-color: var(--color-primary);
       cursor: pointer;
       flex-shrink: 0;
+    }
+    .checklist-item > span,
+    .checklist-item > label {
+      min-width: 0;
+      overflow-wrap: break-word;
     }
     .checklist-item.done {
       color: var(--color-text-3);
@@ -692,7 +700,7 @@
           <!-- Kanban Pipeline -->
           <div class="section-heading" style="flex-wrap:wrap;">
             <h3>Recruitment Pipeline</h3>
-            <div class="flex items-center gap-2" style="flex-wrap:wrap;">
+            <div class="filter-bar-standard">
               <button class="btn btn-secondary btn-sm" id="filterCandidatesBtn">
                 <svg data-lucide="filter" width="14" height="14"></svg>
                 Filter

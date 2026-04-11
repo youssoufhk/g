@@ -162,7 +162,7 @@ The leave request form has three radio buttons: "Full day", "Half day (morning)"
 
 ---
 
-## Summary
+## Summary — Round 1
 
 | Severity | Count |
 |----------|-------|
@@ -171,4 +171,118 @@ The leave request form has three radio buttons: "Full day", "Half day (morning)"
 | MEDIUM | 11 |
 | **Total** | **19** |
 
-The prototype is structurally sound and visually polished. The friction that remains is almost entirely in the **EASE** and **COMPLETENESS** dimensions: forms that should be pre-filled, AI that detects but does not auto-apply, and flows where the user configures what the app should already know. These are the exact patterns the UX philosophy identifies as Tempolia behavior. Fixing these 19 items would move GammaHR from "works well" to "feels like it works for you."
+---
+
+## Round 2 Findings — 2026-04-11
+
+---
+
+### [CRITICAL] EASE | expenses.html | Date field in Submit Expense form has no default value
+
+The date field (`<input type="date" id="formDate">`) in the Submit Expense form has no `value` attribute. Every user must manually click the date picker and select today's date for every expense. The app knows today is April 11, 2026. This is the most common date for an expense — the day you're submitting. The field should default to today (`value="2026-04-11"`), and only require user input when the expense was on a different date. Forcing the user to fill in "today" every single time is textbook Tempolia.
+
+---
+
+### [CRITICAL] EASE | invoices.html | Overdue invoices (2 items, €17,800) have no one-click "Send Reminder" action
+
+Two invoices are overdue: INV-2026-046 (Contoso, overdue since Apr 14) and INV-2026-043 (Acme, overdue since Mar 15). Neither has a direct "Send Reminder" button in the table row — only a generic "more" (ellipsis) action button. Finding the chase/reminder action requires: click more → find reminder option → confirm → send. An overdue invoice is the single most urgent action in the finance module. The reminder action should be a visible, one-click button directly on each overdue row.
+
+---
+
+### [HIGH] COMPLETENESS | approvals.html | Approval detail panel shows "No details available" for leaves
+
+The "View Details" button on leave approval cards opens a detail modal (`id="detailModal"`). For leave requests, the detail content should show the employee's remaining leave balance, the requested dates on a mini-calendar, any team members also on leave during those dates, and the approval history. Instead, the detail panel appears to use generic content. An approver is expected to make a decision without the context they need, forcing them to navigate away to the leaves page or the employee profile.
+
+---
+
+### [HIGH] EASE | timesheets.html | "Add Project Row" has no AI suggestion for which project to add
+
+When an employee clicks "Add Project Row," they get a blank dropdown — a list of all projects. The app already knows which projects the employee is assigned to. The dropdown should show assigned projects first (pre-filtered), with unassigned projects in a secondary group below. Better yet: the AI should suggest "Add Globex Phase 2?" based on the employee's current assignments — one click to add the row with correct project name already set.
+
+---
+
+### [HIGH] EASE | hr.html | Adding a candidate to the pipeline has no structured form — no position/role pre-selection
+
+The "Add Candidate" button in the recruitment Kanban shows no form in the prototype. Candidates appear in the "Applied" column but there is no visible flow for creating one. Even if a form exists, when the user is looking at a specific job posting's pipeline column, clicking "Add Candidate" should pre-fill the position field with the currently viewed role — not start from a blank form.
+
+---
+
+### [HIGH] CALM | index.html | Dashboard "Pending Approvals" stat card shows 12 but clicking it goes to all of approvals — not the urgent queue
+
+The dashboard KPI card "Pending Approvals: 12" with "3 urgent" is a link to `approvals.html`. But it navigates to the default All tab showing all 12 items in submission-date order — not filtered by urgency. A user who clicked the card because they saw "3 urgent" now has to re-filter to find those 3 items. The link should navigate to `approvals.html` with urgency sort pre-applied, or jump directly to an "Urgent" filtered view.
+
+---
+
+### [HIGH] COMPLETENESS | clients.html | Client detail page shows "No documents uploaded yet" with no upload affordance in that tab
+
+The Documents tab in the client detail panel shows an empty state with message "No documents uploaded yet" and a generic "Upload First Document" button. But when the user clicks it, there is no upload modal or file picker — the button calls `showToast('info','Upload','Document upload coming soon')`. This is a dead-end. The user does work (navigates to the tab, finds the action, clicks it) and gets nothing. A placeholder is acceptable, but the empty state should set expectations ("Document management coming in v1.2") rather than presenting a fake affordance.
+
+---
+
+### [HIGH] EASE | planning.html | "Assign to Project" modal for bench employees opens with blank project dropdown
+
+When clicking "Assign to Project" from the bench roster in planning.html, the modal (`id="assignModal"`) opens with empty dropdowns for project, start date, end date, and allocation. The planning page already knows: (1) which projects are understaffed (shown in the capacity section above), (2) the skill profile of the bench employee being assigned, (3) the date range when the project needs resources. The modal should pre-fill the best-matching project based on skill overlap and capacity gap. Showing blank dropdowns forces the planner to mentally cross-reference information the app already has.
+
+---
+
+### [MEDIUM] CALM | admin.html | Company Settings tab has no "Save Changes" button — auto-save is not indicated
+
+The Company Settings form (General, Regional, Work Rules sections) has multiple editable fields but no visible Save button in the tab. Looking at the form, there is a Save button somewhere in the footer or the user must scroll — but the page does not communicate whether changes are auto-saved or require manual save. If changes are NOT auto-saved and the user navigates away, their work is lost silently. If they ARE auto-saved, there is no feedback indicating this. This creates anxiety every time an admin edits a setting.
+
+---
+
+### [MEDIUM] EASE | account.html | Profile photo upload shows "coming soon" toast — but it's the first action in profile setup
+
+When a new user opens their Account page, the "Change Photo" button shows a `showToast('info', 'Coming soon', ...)` response. Profile photo is typically the first thing users want to set — it personalizes their presence across the app. Presenting it as "coming soon" at the primary CTA of the profile setup flow breaks trust. Either implement it (even a basic file picker) or don't show the button at all until it's functional.
+
+---
+
+### [MEDIUM] COMPLETENESS | leaves.html | Leave balance cards on "My Leaves" tab don't update after submitting a leave request
+
+When a leave request is submitted via the modal, the `updateBalanceAfter()` function updates the number inside the modal's form-calc section. But the four balance cards visible on the "My Leaves" tab (Annual: 18 days remaining, Sick: 10 days, Personal: 3 days, WFH: 5 days) do not update. The user submits a 3-day leave, closes the modal, and sees "18 days remaining" — unchanged. The app appears to ignore their submission, creating doubt about whether it worked.
+
+---
+
+### [MEDIUM] CALM | hr.html | Recruitment pipeline shows 47 active candidates in the tab badge but "Applied" column shows "15" candidates, "Screening" shows 2, etc. — total across all columns is 12, not 47
+
+The HR tab shows `Recruitment <span class="tab-count">47</span>`. The KPI card says "47 Active Candidates." But the Kanban pipeline summary bar shows: Applied 3, Screening 2, Interview 3, Offer 2, Hired 2 — totaling only 12 visible candidates. This is a data contradiction that will alarm any user: "Where are the other 35 candidates?" The Applied column header even says 15 but only 3 cards are visible. This creates confusion and distrust about the data. The numbers need to be consistent or pagination/filtering must be clearly indicated.
+
+---
+
+### [MEDIUM] EASE | calendar.html | Clicking a calendar day cell does NOT open the event creation form
+
+The calendar page philosophy is "click to create." But clicking a day cell in the monthly or weekly view does not open the New Event modal with the date pre-filled. The only way to add an event is the "+ Add Event" button in the page header, which opens the modal with today's date as default. The click-on-day flow is the most natural interaction pattern for any calendar app (iPhone, Google Calendar, Notion). Not supporting it means the most intuitive action fails silently.
+
+---
+
+### [MEDIUM] ANTICIPATION | portal/index.html | Client portal has no "What's new since your last visit" surface
+
+When a client returns to the portal, there is no indication of what changed since they last logged in (new invoices generated, timesheet entries submitted for approval, messages received, project milestones hit). The portal simply shows the same static overview. A returning client should see "Since your last visit: 1 new invoice sent, 3 timesheets submitted" — exactly like how a good banking app shows what changed overnight. This is the anticipation principle: make returning feel worthwhile.
+
+---
+
+### [MEDIUM] EASE | timesheets.html | Summary progress bar shows 67% fill (27h/40h) but label says "80%"
+
+In the Weekly Summary bar below the timesheet grid, the progress fill is set to `style="width: 67%; background: var(--color-primary);"` but the percentage label `id="summaryProgressPct"` shows "80%". These are inconsistent. The actual logged hours are 32h (per `id="summaryTotal"`), which is 80% of 40h target. The bar width at 67% corresponds to approximately 27h. This is a data rendering bug that directly contradicts the "completion is always visible" principle — the user cannot trust the progress indicator.
+
+---
+
+## Summary — Round 2
+
+| Severity | Count |
+|----------|-------|
+| CRITICAL | 2 |
+| HIGH | 6 |
+| MEDIUM | 7 |
+| **Round 2 Total** | **15** |
+
+---
+
+## Grand Total (Both Rounds)
+
+| Severity | Count |
+|----------|-------|
+| CRITICAL | 5 |
+| HIGH | 11 |
+| MEDIUM | 18 |
+| **Grand Total** | **34** |

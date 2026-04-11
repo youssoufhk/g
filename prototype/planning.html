@@ -232,8 +232,8 @@
     .scenario-chart-svg { min-width: 320px; }
 
     /* What-If SVG responsive text at small widths */
-    @media (max-width: 400px) {
-      .scenario-chart-svg { min-width: 280px; }
+    @media (max-width: 639px) {
+      .scenario-chart-svg { min-width: 0; width: 100%; }
       #scenarioChart { overflow-x: auto; -webkit-overflow-scrolling: touch; }
       .scenario-details { grid-template-columns: repeat(2, 1fr); }
       .scenario-stat-value { font-size: var(--text-body); }
@@ -1177,7 +1177,7 @@
         { label: 'FTEs Needed', value: '8' },
         { label: 'Revenue/Month', value: '+€30k', color: 'var(--color-gold)' }
       ],
-      desc: '<strong>Skills required:</strong> React ×3, Python ×2, UI/UX ×1, PM ×1, DevOps ×1. 5 FTEs available internally; 3 need to be hired (React ×1, DevOps ×1, Python ×1).',
+      desc: '5 of 8 FTEs available internally — 3 hires needed (React, DevOps, Python).',
       before: [78, 76, 74], after: [92, 91, 90],
       impact: '3 hires needed · Alice Wang & Carol Williams reallocated · Revenue +€30k/mo'
     },
@@ -1189,7 +1189,7 @@
         { label: 'New FTEs', value: '2' },
         { label: 'Capacity Impact', value: '+17%', color: 'var(--color-success)' }
       ],
-      desc: 'Adding 2 engineers in Q3 increases overall capacity by ~17% and eliminates the React skills deficit. Break-even point: ~2.5 months assuming average billing rate.',
+      desc: '+17% capacity, React gap closed — break-even in ~2.5 months.',
       before: [78, 76, 74], after: [82, 88, 91],
       impact: 'React gap closed · Bench time reduced 40% · Projected break-even Sep 2026'
     },
@@ -1201,7 +1201,7 @@
         { label: 'Capacity Drop', value: '−6%' },
         { label: 'Morale Impact', value: '↑ High', color: 'var(--color-success)' }
       ],
-      desc: 'Eliminating overtime saves €6,200/month in extra pay and reduces burnout risk. However, capacity drops by ~6% — projects with tight deadlines may need scope adjustment.',
+      desc: 'Saves €6,200/month but drops capacity ~6% — 2 projects need deadline review.',
       before: [78, 76, 74], after: [73, 71, 70],
       impact: '€6,200/mo saved · 2 projects need deadline review · Burnout risk reduced'
     },
@@ -1213,7 +1213,7 @@
         { label: 'Risk Level', value: 'Medium' },
         { label: 'Transition', value: '8 weeks' }
       ],
-      desc: 'Offshoring the DevOps role saves ~€38,400/year. Key risks: timezone coordination overhead (~2h/day), knowledge transfer (8 weeks), and dependency on external SLA.',
+      desc: 'Saves €38,400/year — medium risk from ±6h timezone gap and 8-week transition.',
       before: [78, 76, 74], after: [78, 77, 79],
       impact: '€38,400/yr saved · Coordination overhead ~2h/day · 8-week transition plan needed'
     }

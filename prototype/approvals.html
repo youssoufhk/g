@@ -96,6 +96,9 @@
       margin-bottom: var(--space-4);
       flex-wrap: wrap;
     }
+    @media (min-width: 769px) {
+      .filter-bar-approvals { flex-wrap: nowrap; }
+    }
 
     .sla-tag {
       display: inline-flex;
@@ -346,7 +349,7 @@
         <div class="card" style="padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-lg);flex-wrap:wrap;" id="aiRecommendationBanner" data-min-role="pm">
           <svg data-lucide="sparkles" width="20" height="20" style="color:var(--color-primary);flex-shrink:0;"></svg>
           <div style="flex:1;min-width:200px;">
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-1);">4 routine timesheets from Carol Williams, Marco Rossi, Liam O'Brien, and Sophie Dubois match last week's pattern and can be bulk-approved.</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-1);">4 routine timesheets match last week's pattern — bulk-approve safely.</div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="this.closest('#aiRecommendationBanner').style.display='none';showToast('success','Bulk Approved','4 routine timesheets approved.')">Bulk-Approve Routine</button>
           <button class="btn btn-ghost btn-xs" onclick="this.closest('#aiRecommendationBanner').style.display='none'" style="flex-shrink:0;">Dismiss</button>

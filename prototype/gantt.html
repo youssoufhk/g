@@ -509,7 +509,7 @@
     .gantt-bar.bar-row-2 {
       height: 14px;
       font-size: var(--text-overline);
-      top: 30px;
+      top: var(--space-8);
     }
 
     /* Warning badge on unassigned gap */
@@ -2088,6 +2088,12 @@
       var bar = e.target.closest('.gantt-bar');
       if (!bar) return;
       e.preventDefault();
+      // RBAC: employees can see "View Details" only; only pm/admin see edit actions.
+      // Hide the whole menu for employees since only View Details remains (ungated).
+      // All edit/reassign/remove items have data-min-role="pm" and are hidden by
+      // _applyRoleVisibility — but we still surface the menu for pm+ roles only.
+      var role = (typeof GHR !== 'undefined' && GHR.currentRole) ? GHR.currentRole : 'admin';
+      if (role === 'employee') return; // no context menu for employees
       showCtxMenu(e.clientX, e.clientY);
     });
     document.addEventListener('click', function() { hideCtxMenu(); });

@@ -249,44 +249,6 @@
     .mobile-search-btn:hover { background: var(--color-surface-2); }
     @media (max-width: 639px) { .mobile-search-btn { display: inline-flex; } }
 
-    /* Donut chart section */
-    .donut-section {
-      margin-top: 0;
-    }
-    .donut-wrap {
-      display: flex;
-      align-items: center;
-      gap: var(--space-6);
-      padding: var(--space-4);
-    }
-    .donut-legend {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
-    .donut-legend-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-    }
-    .donut-legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .donut-legend-label {
-      font-size: var(--text-body-sm);
-      color: var(--color-text-2);
-    }
-    .donut-legend-value {
-      font-family: var(--font-mono);
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-semibold);
-      color: var(--color-text-1);
-      margin-left: auto;
-    }
-
     /* ── Skeleton / shimmer loading ── */
     @keyframes shimmer {
       0%   { background-position: -400px 0; }
@@ -1964,35 +1926,7 @@
     });
   })();
 
-  // ── Donut chart hover interactivity ──
-  var donutSegments = document.querySelectorAll('.donut-segment');
-  var donutTooltip = document.getElementById('donutTooltip');
-  var donutCenterPct = document.getElementById('donutCenterPct');
-  var donutCenterLabel = document.getElementById('donutCenterLabel');
-
-  donutSegments.forEach(function(seg) {
-    seg.addEventListener('mouseenter', function() {
-      var label = this.getAttribute('data-label');
-      var pct = this.getAttribute('data-pct');
-      var hours = this.getAttribute('data-hours');
-      this.style.strokeWidth = '14';
-      if (donutCenterPct) donutCenterPct.textContent = pct;
-      if (donutCenterLabel) donutCenterLabel.textContent = label.toLowerCase();
-      if (donutTooltip) {
-        donutTooltip.textContent = label + ': ' + pct + ' (' + hours + ')';
-        donutTooltip.style.display = 'block';
-        donutTooltip.style.left = '50%';
-        donutTooltip.style.transform = 'translateX(-50%)';
-        donutTooltip.style.bottom = '-32px';
-      }
-    });
-    seg.addEventListener('mouseleave', function() {
-      this.style.strokeWidth = '10';
-      if (donutCenterPct) donutCenterPct.textContent = '87%';
-      if (donutCenterLabel) donutCenterLabel.textContent = 'billable';
-      if (donutTooltip) donutTooltip.style.display = 'none';
-    });
-  });
+  // (Donut chart removed — hours/capacity donuts banned by design system)
 
   // ── AI Alert Dismiss buttons (Issue 4) ──
   document.querySelectorAll('.dismiss-alert-btn').forEach(function(btn) {
