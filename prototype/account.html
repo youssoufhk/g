@@ -1562,13 +1562,6 @@
     if (e.key === 'Escape') { closeCmd(); close2FAModal(); }
   });
 
-  // ── Notification panel ──
-  if (notifBtn) notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User dropdown ──
   if (userMenuBtn) userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1577,7 +1570,6 @@
   });
 
   document.addEventListener('click', function(e) {
-    if (notifPanel && !notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
     if (userDropdown && !userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
   });
 

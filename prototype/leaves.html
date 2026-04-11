@@ -654,7 +654,7 @@
       </div>
 
       <!-- Stat Cards -->
-      <div class="leave-stats-grid perspective-container stagger-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-4);">
+      <div class="leave-stats-grid grid-4 perspective-container stagger-reveal" style="margin-bottom:var(--space-4);">
         <!-- Team Absences This Month -->
         <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
           <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Team Absences This Month</div>
@@ -1687,13 +1687,6 @@
     }
   });
 
-  // ── Notification Panel ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User Dropdown ──
   userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1703,9 +1696,6 @@
 
   // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
-      notifPanel.classList.remove('active');
-    }
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
       userDropdown.classList.remove('active');
     }

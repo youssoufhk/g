@@ -1681,13 +1681,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // ── Notification toggle ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User menu toggle ──
   userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1697,9 +1690,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    if (!notifBtn.contains(e.target) && !notifPanel.contains(e.target)) {
-      notifPanel.classList.remove('active');
-    }
     if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
       userDropdown.classList.remove('active');
     }

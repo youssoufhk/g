@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="_layout.css">
   <style>
     /* ── Dashboard-specific styles ── */
-    .greeting { margin-bottom: var(--space-8); }
+    .greeting { margin-bottom: var(--space-10); }
     .greeting h1 {
       font-size: var(--text-display-xl, var(--text-display-lg));
       font-weight: var(--weight-bold);
@@ -1702,10 +1702,6 @@
 
   // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    var np = document.getElementById('notifPanel');
-    if (np && !np.contains(e.target) && !notifBtn.contains(e.target)) {
-      np.classList.remove('active');
-    }
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
       userDropdown.classList.remove('active');
     }

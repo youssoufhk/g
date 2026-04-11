@@ -220,7 +220,7 @@
       <div class="populated-content" data-min-role="admin">
 
         <!-- KPI Stat Cards -->
-        <div class="stats-row stagger-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-5);margin-bottom:var(--space-8);perspective:1200px;" data-min-role="admin">
+        <div class="stats-row grid-4 stagger-reveal" style="gap:var(--space-5);margin-bottom:var(--space-8);perspective:1200px;" data-min-role="admin">
           <div class="perspective-container"><div class="stat-card card-interactive card-3d" style="cursor:pointer;" onclick="activateTab('tab-users');window.location.hash='tab-users';">
             <div class="stat-label">Total Users</div>
             <div class="stat-value">12</div>
@@ -1505,13 +1505,6 @@
     }
   });
 
-  // ── Notification Panel ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User Dropdown ──
   userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1521,7 +1514,6 @@
 
   // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
     // Close any open dropdown menus
     document.querySelectorAll('.dropdown-menu.active').forEach(function(menu) {

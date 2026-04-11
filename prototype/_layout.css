@@ -236,6 +236,11 @@
 .page-content {
   flex: 1;
   padding: var(--space-6);
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 .page-content-narrow {
   max-width: 1200px;
@@ -800,11 +805,7 @@ body.dev-mode .state-toggle { display: flex; }
   }
 }
 
-/* ── UI7: Consistent page content alignment across all pages ── */
-.page-content {
-  box-sizing: border-box;
-  width: 100%;
-}
+/* ── UI7: Consistent page content alignment — consolidated into .page-content above ── */
 
 
 /* ── MOBILE: Extended mobile-cards support (CRIT-1: sessions-table) ── */

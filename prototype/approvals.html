@@ -278,7 +278,7 @@
       </div>
 
       <!-- KPI Summary Row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);perspective:1200px;" class="kpi-grid-approvals stagger-reveal" data-min-role="pm">
+      <div class="kpi-grid-approvals grid-4 stagger-reveal" style="margin-bottom:var(--space-6);perspective:1200px;" data-min-role="pm">
         <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
           <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Total Pending</div>
           <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-text-1);font-family:var(--font-mono);">12</div>
@@ -918,13 +918,6 @@
     }
   });
 
-  // ── Notification Panel ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User Dropdown ──
   userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -940,7 +933,6 @@
 
   // Close dropdowns on outside click
   document.addEventListener('click', function(e) {
-    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
     if (!bulkDropdownMenu.contains(e.target) && !bulkDropdownBtn.contains(e.target)) bulkDropdownMenu.classList.remove('active');
   });

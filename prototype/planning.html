@@ -1128,9 +1128,6 @@
     if (e.key === 'Escape' && cmdPalette.classList.contains('active')) closeCmdPalette();
   });
 
-  // ── Notification Panel ──
-  notifBtn.addEventListener('click', function(e) { e.stopPropagation(); notifPanel.classList.toggle('active'); userDropdown.classList.remove('active'); });
-
   // ── User Dropdown ──
   userMenuBtn.addEventListener('click', function(e) { e.stopPropagation(); userDropdown.classList.toggle('active'); notifPanel.classList.remove('active'); });
 
@@ -1146,7 +1143,6 @@
 
   // ── Close dropdowns on outside click ──
   document.addEventListener('click', function(e) {
-    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) notifPanel.classList.remove('active');
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) userDropdown.classList.remove('active');
     if (scenarioDropdownMenu && !scenarioDropdownMenu.contains(e.target) && !scenarioDropdownBtn.contains(e.target)) scenarioDropdownMenu.classList.remove('active');
   });

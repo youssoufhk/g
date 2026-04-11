@@ -1540,13 +1540,6 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
   var listView = document.getElementById('listView');
   var detailView = document.getElementById('detailView');
 
-  // ── Notification panel ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User dropdown ──
   userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1556,9 +1549,6 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
 
   // ── Close dropdowns on outside click ──
   document.addEventListener('click', function(e) {
-    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
-      notifPanel.classList.remove('active');
-    }
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
       userDropdown.classList.remove('active');
     }

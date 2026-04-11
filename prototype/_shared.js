@@ -890,7 +890,13 @@ GHR.renderNotifications = function(filter) {
   if (closeBtn) {
     closeBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      panel.classList.remove('active');
+      if (GHR._closeNotifPanel) {
+        GHR._closeNotifPanel();
+      } else {
+        panel.classList.remove('active');
+        var backdrop = document.getElementById('notifBackdrop');
+        if (backdrop) backdrop.remove();
+      }
     });
   }
 
@@ -916,37 +922,63 @@ GHR.initNotifications = function() {
   var userDropdown = document.querySelector('.user-dropdown');
   if (!notifBtn || !notifPanel) return;
 
+  // Ensure panel has the CSS class that controls visibility (element only has an id in HTML)
+  notifPanel.classList.add('notif-panel');
+
   // Render notification items from single source of truth
   GHR.renderNotifications();
 
-  // Toggle panel — clicking bell opens OR closes (true toggle)
+  function openNotifPanel() {
+    notifPanel.classList.add('active');
+    if (userDropdown) userDropdown.classList.remove('active');
+    // Create full-screen transparent backdrop — bypasses stopPropagation on other elements
+    var existing = document.getElementById('notifBackdrop');
+    if (existing) existing.remove();
+    var backdrop = document.createElement('div');
+    backdrop.id = 'notifBackdrop';
+    backdrop.style.cssText = 'position:fixed;inset:0;z-index:499;background:transparent;';
+    backdrop.addEventListener('click', function() {
+      closeNotifPanel();
+    });
+    document.body.appendChild(backdrop);
+  }
+
+  function closeNotifPanel() {
+    notifPanel.classList.remove('active');
+    var backdrop = document.getElementById('notifBackdrop');
+    if (backdrop) backdrop.remove();
+  }
+
+  // Expose so renderNotifications close button can call it
+  GHR._closeNotifPanel = closeNotifPanel;
+
+  // Toggle panel on bell click
   notifBtn.addEventListener('click', function(e) {
     e.stopPropagation();
-    var isOpen = notifPanel.classList.contains('active');
-    if (isOpen) {
-      notifPanel.classList.remove('active');
+    if (notifPanel.classList.contains('active')) {
+      closeNotifPanel();
     } else {
-      notifPanel.classList.add('active');
-      if (userDropdown) userDropdown.classList.remove('active');
-    }
-  });
-
-  // Close on outside click — checks that click is not inside panel or bell button
-  document.addEventListener('click', function(e) {
-    if (notifPanel.classList.contains('active') &&
-        !notifPanel.contains(e.target) &&
-        !notifBtn.contains(e.target)) {
-      notifPanel.classList.remove('active');
+      openNotifPanel();
     }
   });
 
   // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && notifPanel.classList.contains('active')) {
-      notifPanel.classList.remove('active');
+      closeNotifPanel();
       notifBtn.focus();
     }
   });
+
+  // MutationObserver: if anything removes 'active' from the panel (e.g. user menu handler
+  // in page scripts calling notifPanel.classList.remove('active')), also remove the backdrop
+  var panelObserver = new MutationObserver(function() {
+    if (!notifPanel.classList.contains('active')) {
+      var backdrop = document.getElementById('notifBackdrop');
+      if (backdrop) backdrop.remove();
+    }
+  });
+  panelObserver.observe(notifPanel, { attributes: true, attributeFilter: ['class'] });
 };
 
 /* ── K-0c. "MARK ALL READ" EVENT DELEGATION ── */

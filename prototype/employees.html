@@ -2645,13 +2645,6 @@
       if (e.target === cmdPalette) closeCmdPalette();
     });
 
-    // ── Notification panel ──
-    notifBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      notifPanel.classList.toggle('active');
-      userDropdown.classList.remove('active');
-    });
-
     // ── User dropdown ──
     userBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2660,15 +2653,11 @@
     });
 
     function closeAllDropdowns() {
-      notifPanel.classList.remove('active');
       userDropdown.classList.remove('active');
     }
 
     // ── Click outside to close dropdowns ──
     document.addEventListener('click', (e) => {
-      if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
-        notifPanel.classList.remove('active');
-      }
       if (!userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
         userDropdown.classList.remove('active');
       }

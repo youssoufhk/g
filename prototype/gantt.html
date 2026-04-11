@@ -2023,13 +2023,6 @@
       }
     });
 
-    // ── NOTIFICATION PANEL ──
-    document.getElementById('notifBtn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.getElementById('notifPanel').classList.toggle('active');
-      document.getElementById('userDropdown').classList.remove('active');
-    });
-
     // ── USER DROPDOWN ──
     document.getElementById('userBtn').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2038,9 +2031,12 @@
     });
 
     // Close dropdowns on outside click
-    document.addEventListener('click', () => {
-      document.getElementById('notifPanel').classList.remove('active');
-      document.getElementById('userDropdown').classList.remove('active');
+    document.addEventListener('click', (e) => {
+      var ud = document.getElementById('userDropdown');
+      var ub = document.getElementById('userBtn');
+      if (ud && ub && !ud.contains(e.target) && !ub.contains(e.target)) {
+        ud.classList.remove('active');
+      }
     });
 
     // (Scroll sync removed — unified single-container design)

@@ -803,7 +803,7 @@
       </div>
 
       <!-- Stat Cards -->
-      <div class="ts-stats-grid perspective-container stagger-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-4);">
+      <div class="ts-stats-grid grid-4 perspective-container stagger-reveal" style="margin-bottom:var(--space-4);">
         <!-- Hours This Week -->
         <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);position:relative;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
@@ -1793,13 +1793,6 @@
     }
   });
 
-  // ── Notification panel ──
-  notifBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    notifPanel.classList.toggle('active');
-    userDropdown.classList.remove('active');
-  });
-
   // ── User dropdown ──
   userMenuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1807,9 +1800,10 @@
     notifPanel.classList.remove('active');
   });
 
-  document.addEventListener('click', function() {
-    notifPanel.classList.remove('active');
-    userDropdown.classList.remove('active');
+  document.addEventListener('click', function(e) {
+    if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
+      userDropdown.classList.remove('active');
+    }
   });
 
   // ── State toggle ──
