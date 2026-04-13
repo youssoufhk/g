@@ -858,7 +858,7 @@
     }
   </style>
 </head>
-<body>
+<body class="show-populated">
 <a href="#main-content" class="skip-to-content">Skip to content</a>
   <div class="app">
 
@@ -875,11 +875,12 @@
           <button class="mobile-menu-btn" id="mobileMenuBtn">
             <svg data-lucide="menu"></svg>
           </button>
-          <div class="header-search" id="headerSearch">
-            <svg data-lucide="search"></svg>
-            <span>Search anything...</span>
-            <kbd>Cmd+K</kbd>
-          </div>
+          <h2 class="page-title">Gantt Chart</h2>
+        </div>
+        <div class="header-search" id="headerSearch">
+          <svg data-lucide="search"></svg>
+          <span>Search anything...</span>
+          <kbd>&#8984;K</kbd>
         </div>
         <div class="header-right">
         <button class="mobile-search-btn" onclick="document.querySelector('.cmd-palette-backdrop').classList.add('active')"><svg data-lucide="search" width="20" height="20"></svg></button>
@@ -892,10 +893,10 @@
           </div>
           <div class="relative">
             <div class="header-user" id="userBtn">
-              <div class="avatar avatar-sm avatar-1">SC</div>
+              <div class="avatar avatar-sm avatar-status online">SC</div>
               <div>
                 <div class="user-name">Sarah Chen</div>
-                <div class="user-role">Project Manager</div>
+                <div class="user-role">Admin</div>
               </div>
             </div>
             <div class="user-dropdown" id="userDropdown">
@@ -927,14 +928,14 @@
         <div class="page-header">
           <div class="page-header-left">
             <h1 class="page-title">Gantt Chart</h1>
-            <p class="page-subtitle">April 2026 — Team allocation and work time overview</p>
+            <p class="page-subtitle">April 2026 - Team allocation and work time overview</p>
           </div>
           <div class="page-header-actions">
-            <button class="btn btn-secondary btn-sm" onclick="GHR && GHR.showToast ? GHR.showToast('info','Export','Exporting Gantt data as CSV...') : showToast('Exporting Gantt data as CSV...','info')">
+            <button class="btn btn-secondary btn-md" onclick="GHR && GHR.showToast ? GHR.showToast('info','Export','Exporting Gantt data as CSV...') : showToast('Exporting Gantt data as CSV...','info')">
               <svg data-lucide="download" style="width:16px;height:16px;"></svg>
               Export
             </button>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('shortcutsPanel')?.classList.toggle('open')">
+            <button class="btn btn-secondary btn-md" onclick="document.getElementById('shortcutsPanel')?.classList.toggle('open')">
               <svg data-lucide="help-circle" style="width:16px;height:16px;"></svg>
               Help
             </button>
@@ -1162,8 +1163,8 @@
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">100%</span>
               </div>
               <div class="text-caption text-2">
-                <div>Acme Web Redesign — Apr 1 to Apr 26</div>
-                <div>Initech API — Apr 20 to Apr 30</div>
+                <div>Acme Web Redesign - Apr 1 to Apr 26</div>
+                <div>Initech API - Apr 20 to Apr 30</div>
               </div>
             </div>
           </div>
@@ -1181,7 +1182,7 @@
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div class="worktime-fill overflow" style="width:100%;height:100%;border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);min-width:36px;">113%</span>
               </div>
-              <div class="text-caption text-2"><div>Globex Phase 2 — Apr 1 to Apr 30</div></div>
+              <div class="text-caption text-2"><div>Globex Phase 2 - Apr 1 to Apr 30</div></div>
             </div>
           </div>
           <!-- Alice Wang -->
@@ -1191,7 +1192,7 @@
                 <span class="avatar-status presence-leave"><div class="avatar avatar-sm avatar-3">AW</div></span>
                 <div style="flex:1;min-width:0;">
                   <a href="employees.html#profile-alice" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a>
-                  <div class="employee-role">Software Engineer — On Leave Apr 14-18</div>
+                  <div class="employee-role">Software Engineer - On Leave Apr 14-18</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
@@ -1199,8 +1200,8 @@
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">45%</span>
               </div>
               <div class="text-caption text-2">
-                <div>Annual Leave — Apr 14 to Apr 18</div>
-                <div>Acme Web Redesign — Apr 21 to Apr 30</div>
+                <div>Annual Leave - Apr 14 to Apr 18</div>
+                <div>Acme Web Redesign - Apr 21 to Apr 30</div>
               </div>
             </div>
           </div>
@@ -1211,14 +1212,14 @@
                 <span class="avatar-status presence-offline"><div class="avatar avatar-sm avatar-4">BT</div></span>
                 <div style="flex:1;min-width:0;">
                   <a href="employees.html#profile-bob" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
-                  <div class="employee-role">Backend Developer — Bench</div>
+                  <div class="employee-role">Backend Developer - Bench</div>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);">
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:0%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-error);min-width:36px;">0%</span>
               </div>
-              <div class="text-caption text-2"><div>Bench / Unassigned — Mar 20 to May 30</div></div>
+              <div class="text-caption text-2"><div>Bench / Unassigned - Mar 20 to May 30</div></div>
             </div>
           </div>
           <!-- Carol Williams -->
@@ -1235,7 +1236,7 @@
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:90%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">90%</span>
               </div>
-              <div class="text-caption text-2"><div>Initech API — Apr 1 to Apr 24</div></div>
+              <div class="text-caption text-2"><div>Initech API - Apr 1 to Apr 24</div></div>
             </div>
           </div>
           <!-- David Park -->
@@ -1253,9 +1254,9 @@
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">85%</span>
               </div>
               <div class="text-caption text-2">
-                <div>Globex Phase 2 — Apr 1 to Apr 10</div>
-                <div>Globex Phase 2 — Apr 14 to Apr 22</div>
-                <div>Globex Phase 2 — Apr 27 to Apr 30</div>
+                <div>Globex Phase 2 - Apr 1 to Apr 10</div>
+                <div>Globex Phase 2 - Apr 14 to Apr 22</div>
+                <div>Globex Phase 2 - Apr 27 to Apr 30</div>
               </div>
             </div>
           </div>
@@ -1273,7 +1274,7 @@
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:90%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">90%</span>
               </div>
-              <div class="text-caption text-2"><div>Internal — Apr 1 to Apr 30</div></div>
+              <div class="text-caption text-2"><div>Internal - Apr 1 to Apr 30</div></div>
             </div>
           </div>
           <!-- Marco Rossi -->
@@ -1290,7 +1291,7 @@
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div class="worktime-fill overflow" style="width:100%;height:100%;border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-warning);min-width:36px;">108%</span>
               </div>
-              <div class="text-caption text-2"><div>Acme Web Redesign — Apr 1 to Apr 30</div></div>
+              <div class="text-caption text-2"><div>Acme Web Redesign - Apr 1 to Apr 30</div></div>
             </div>
           </div>
           <!-- Sophie Dubois -->
@@ -1307,7 +1308,7 @@
                 <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:88%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">88%</span>
               </div>
-              <div class="text-caption text-2"><div>Umbrella Corp Deal — Apr 1 to Apr 26</div></div>
+              <div class="text-caption text-2"><div>Umbrella Corp Deal - Apr 1 to Apr 26</div></div>
             </div>
           </div>
           <!-- Liam O'Brien -->
@@ -1325,8 +1326,8 @@
                 <span style="font-family:var(--font-mono);font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-success);min-width:36px;">88%</span>
               </div>
               <div class="text-caption text-2">
-                <div>Initech API — Apr 1 to Apr 12</div>
-                <div>Initech API — Apr 16 to Apr 28</div>
+                <div>Initech API - Apr 1 to Apr 12</div>
+                <div>Initech API - Apr 16 to Apr 28</div>
               </div>
             </div>
           </div>
@@ -1692,8 +1693,8 @@
     const employeeRows = [
       { name: 'Sarah Chen',    role: 'Project Manager',    dept: 'Engineering', worktime: 100, wt: 'high', presence: 'online',  initials: 'SC', avatarCls: 'avatar-1', href: 'employees.html#profile-sarah',  skills: 'react typescript figma css-tailwind nodejs', deptColor: 'var(--color-accent)',   deptBg: 'var(--color-accent-muted)' },
       { name: 'John Smith',    role: 'Senior Developer',   dept: 'Engineering', worktime: 113, wt: 'high', presence: 'online',  initials: 'JS', avatarCls: 'avatar-2', href: 'employees.html#profile-john',  skills: 'react typescript nodejs sql',               deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
-      { name: 'Alice Wang',    role: 'Software Engineer — On Leave Apr 14-18', dept: 'Engineering', worktime: 45, wt: 'low', presence: 'leave',   initials: 'AW', avatarCls: 'avatar-3', href: 'employees.html#profile-alice', skills: 'figma react typescript',                    deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
-      { name: 'Bob Taylor',    role: 'Backend Developer — Bench',  dept: 'Engineering', worktime: 0,  wt: 'low', presence: 'offline', initials: 'BT', avatarCls: 'avatar-4', href: 'employees.html#profile-bob',   skills: 'nodejs python sql react',                   deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
+      { name: 'Alice Wang',    role: 'Software Engineer - On Leave Apr 14-18', dept: 'Engineering', worktime: 45, wt: 'low', presence: 'leave',   initials: 'AW', avatarCls: 'avatar-3', href: 'employees.html#profile-alice', skills: 'figma react typescript',                    deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
+      { name: 'Bob Taylor',    role: 'Backend Developer - Bench',  dept: 'Engineering', worktime: 0,  wt: 'low', presence: 'offline', initials: 'BT', avatarCls: 'avatar-4', href: 'employees.html#profile-bob',   skills: 'nodejs python sql react',                   deptColor: 'var(--color-primary)',  deptBg: 'var(--color-primary-muted)' },
       { name: 'Carol Williams',role: 'Design Lead',         dept: 'Design',      worktime: 100, wt: 'high', presence: 'online',  initials: 'CW', avatarCls: 'avatar-5', href: 'employees.html#profile-carol', skills: 'project-management sql figma',              deptColor: 'var(--color-info)',     deptBg: 'var(--color-info-muted)' },
       { name: 'David Park',    role: 'Finance Lead',        dept: 'Finance',     worktime: 85, wt: 'mid',  presence: 'offline', initials: 'DP', avatarCls: 'avatar-6', href: 'employees.html#profile-david', skills: 'sql project-management python',             deptColor: 'var(--color-gold)',     deptBg: 'var(--color-gold-muted)' },
       { name: 'Emma Laurent',  role: 'HR Specialist',       dept: 'HR',          worktime: 90, wt: 'high', presence: 'online',  initials: 'EL', avatarCls: 'avatar-7', href: 'employees.html#profile-emma',  skills: 'project-management',                       deptColor: 'var(--color-info)',     deptBg: 'var(--color-info-muted)' },
@@ -1792,8 +1793,11 @@
                data-hovercard data-name="${emp.name}" data-role="${emp.role}"
                data-dept="${emp.dept}" data-worktime="${emp.worktime}" data-href="${emp.href}">${emp.name}</a>
             <div class="employee-role">${emp.role}</div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+              <div style="flex:1;height:4px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;min-width:40px;max-width:60px;"><div class="worktime-fill ${emp.wt === 'over' || emp.worktime > 100 ? 'overflow' : (emp.wt === 'low' ? 'low' : '')}" style="width:${Math.min(emp.worktime,100)}%;height:100%;background:${emp.worktime > 100 ? 'var(--color-warning)' : emp.worktime >= 80 ? 'var(--color-success)' : emp.worktime >= 50 ? 'var(--color-primary)' : 'var(--color-error)'};border-radius:var(--radius-full);"></div></div>
+              <span style="font-family:var(--font-mono);font-size:9px;color:${emp.worktime > 100 ? 'var(--color-warning)' : emp.worktime >= 50 ? 'var(--color-text-2)' : 'var(--color-error)'};white-space:nowrap;">${emp.worktime}%</span>
+            </div>
           </div>
-          <span class="worktime-badge worktime-${emp.wt} font-mono">${emp.worktime}%</span>
         `;
         row.appendChild(nameCol);
 
@@ -1868,7 +1872,7 @@
             barEl.addEventListener('click', function(e) {
               e.stopPropagation();
               var empName = emp.name;
-              var msg = empName + ' — ' + bar.label + ': Apr ' + bar.start + '-' + Math.min(bar.end, 30);
+              var msg = empName + ' - ' + bar.label + ': Apr ' + bar.start + '-' + Math.min(bar.end, 30);
               if (typeof GHR !== 'undefined' && GHR.showToast) {
                 GHR.showToast('info', 'Leave Details', msg);
               } else {

@@ -415,10 +415,34 @@
         </div>
       </div>
 
+      <!-- KPI Strip -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6);" class="stats-row stagger-reveal">
+        <div class="stat-card card-interactive" data-animate>
+          <div class="stat-label">Total Capacity</div>
+          <div class="stat-value font-mono">2,076h</div>
+          <div class="stat-secondary">This month (April)</div>
+        </div>
+        <div class="stat-card card-interactive" data-animate>
+          <div class="stat-label">On Bench</div>
+          <div class="stat-value font-mono" style="color:var(--color-warning);">1</div>
+          <div class="stat-secondary">Bob Taylor - unassigned</div>
+        </div>
+        <div class="stat-card card-interactive" data-animate>
+          <div class="stat-label">Forecast Gap</div>
+          <div class="stat-value font-mono" style="color:var(--color-success);">+208h</div>
+          <div class="stat-secondary">Surplus this month</div>
+        </div>
+        <div class="stat-card card-interactive" data-animate>
+          <div class="stat-label">Open Roles</div>
+          <div class="stat-value font-mono">3</div>
+          <div class="stat-secondary">Hiring in progress</div>
+        </div>
+      </div>
+
       <!-- Section 1: Capacity Overview -->
       <div class="mb-6" data-min-role="pm">
-        <div class="capacity-grid stagger-reveal perspective-container">
-          <div class="capacity-card card-interactive card-3d" data-animate>
+        <div class="capacity-grid stagger-reveal">
+          <div class="capacity-card card-interactive" data-animate>
             <div class="capacity-card-title">April 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
@@ -428,19 +452,15 @@
               <span class="capacity-label">Allocated</span>
               <span class="capacity-value font-mono">1,872h</span>
             </div>
-            <!-- Mini bar chart: allocated/available -->
             <div style="margin:var(--space-2) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;" title="90% allocated">
               <div style="width:90%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap surplus">Gap: +208h (surplus)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-2);">
-              <svg viewBox="0 0 60 20" width="60" height="20" style="flex-shrink:0;">
-                <polyline points="2,16 12,14 22,12 32,10 42,8 52,6 58,4" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
+            <div style="display:flex;justify-content:flex-end;margin-top:var(--space-2);">
               <span style="font-size:var(--text-caption);color:var(--color-success);font-weight:var(--weight-medium);">+3% vs last month</span>
             </div>
           </div>
-          <div class="capacity-card card-interactive card-3d" data-animate>
+          <div class="capacity-card card-interactive" data-animate>
             <div class="capacity-card-title">May 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
@@ -450,19 +470,15 @@
               <span class="capacity-label">Allocated</span>
               <span class="capacity-value font-mono">1,944h</span>
             </div>
-            <!-- Mini bar chart: allocated/available -->
             <div style="margin:var(--space-2) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;" title="90% allocated">
               <div style="width:90%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap surplus">Gap: +216h (surplus)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-2);">
-              <svg viewBox="0 0 60 20" width="60" height="20" style="flex-shrink:0;">
-                <polyline points="2,14 12,13 22,11 32,10 42,8 52,6 58,5" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
+            <div style="display:flex;justify-content:flex-end;margin-top:var(--space-2);">
               <span style="font-size:var(--text-caption);color:var(--color-success);font-weight:var(--weight-medium);">+4% vs last month</span>
             </div>
           </div>
-          <div class="capacity-card card-interactive card-3d" data-animate>
+          <div class="capacity-card card-interactive" data-animate>
             <div class="capacity-card-title">June 2026</div>
             <div class="capacity-row">
               <span class="capacity-label">Available</span>
@@ -472,15 +488,11 @@
               <span class="capacity-label">Allocated</span>
               <span class="capacity-value font-mono">1,664h</span>
             </div>
-            <!-- Mini bar chart: allocated/available -->
             <div style="margin:var(--space-2) 0;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;" title="80% allocated">
               <div style="width:80%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);opacity:0.8;"></div>
             </div>
             <div class="capacity-gap warning">Gap: +416h (growing gap)</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-2);">
-              <svg viewBox="0 0 60 20" width="60" height="20" style="flex-shrink:0;">
-                <polyline points="2,8 12,10 22,11 32,12 42,14 52,15 58,16" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
+            <div style="display:flex;justify-content:flex-end;margin-top:var(--space-2);">
               <span style="font-size:var(--text-caption);color:var(--color-warning);font-weight:var(--weight-medium);">-10% vs last month</span>
             </div>
           </div>
@@ -566,7 +578,7 @@
               <span class="forecast-value">2 employees</span>
             </div>
             <div style="padding-left: var(--space-4); font-size: var(--text-caption); color: var(--color-text-3); margin-bottom: var(--space-2);">
-              <a href="employees.html#alice-wang">Alice Wang</a> &mdash; Acme ends Apr 30 &bull; <a href="employees.html#carol-williams"><strong>Carol Williams</strong></a> &mdash; Initech ends Apr 28
+              <a href="employees.html#alice-wang">Alice Wang</a> - Acme ends Apr 30 &bull; <a href="employees.html#carol-williams"><strong>Carol Williams</strong></a> - Initech ends Apr 28
             </div>
             <div class="forecast-row">
               <span class="forecast-label">Starting projects</span>
@@ -687,126 +699,161 @@
         </div>
       </div>
 
-      <!-- Section 3b: Resource Allocation Matrix -->
+      <!-- Section 3b: Capacity View - Employee Allocation Bars -->
       <div class="card card-interactive mb-6" data-min-role="pm" id="allocationMatrix" data-animate>
         <div class="card-header">
           <span class="card-title" style="display:flex;align-items:center;gap:var(--space-2);">
-            <svg data-lucide="grid" width="18" height="18" style="color:var(--color-primary);"></svg>
-            Resource Allocation Matrix
+            <svg data-lucide="bar-chart-horizontal" width="18" height="18" style="color:var(--color-primary);"></svg>
+            Team Capacity
           </span>
-          <span class="badge badge-primary">Employee × Project</span>
+          <div style="display:flex;align-items:center;gap:var(--space-2);">
+            <!-- Desktop: custom dropdown for Saved Views -->
+            <div class="saved-views-dropdown hidden md:block" style="position:relative;">
+              <button class="btn btn-ghost btn-sm" id="planSavedViewsBtn" onclick="togglePlanSavedViews()">
+                <svg data-lucide="bookmark" width="14" height="14"></svg> Views
+              </button>
+              <div id="planSavedViewsMenu" style="display:none;position:absolute;top:100%;right:0;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);min-width:200px;padding:var(--space-2);z-index:100;box-shadow:var(--shadow-3);">
+                <div style="padding:var(--space-1) var(--space-3);font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.5px;">Saved Views</div>
+                <div class="dropdown-item" onclick="document.getElementById('planSavedViewsMenu').style.display='none';showToast('View applied','success');" style="cursor:pointer;">All Employees</div>
+                <div class="dropdown-item" onclick="document.getElementById('planSavedViewsMenu').style.display='none';showToast('View applied','success');" style="cursor:pointer;">Engineering Only</div>
+                <div class="dropdown-item" onclick="document.getElementById('planSavedViewsMenu').style.display='none';showToast('View applied','success');" style="cursor:pointer;">Overloaded</div>
+                <div class="dropdown-item" onclick="document.getElementById('planSavedViewsMenu').style.display='none';showToast('View applied','success');" style="cursor:pointer;">Available Capacity</div>
+                <hr style="margin:var(--space-1) 0;border:none;border-top:1px solid var(--color-border);">
+                <button class="btn btn-ghost btn-xs" style="width:100%;text-align:left;" onclick="showToast('success','Saved','Current view saved.')">+ Save Current View</button>
+              </div>
+            </div>
+            <!-- Mobile: native select -->
+            <select class="form-select form-input-sm md:hidden" style="display:none;" id="planSavedViewsMobile" onchange="showToast('View applied','success')">
+              <option>All Employees</option>
+              <option>Engineering Only</option>
+              <option>Overloaded</option>
+              <option>Available Capacity</option>
+            </select>
+          </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="data-table alloc-matrix-table" id="allocTable">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Acme Web Redesign</th>
-                <th>Globex Phase 2</th>
-                <th>Initech API</th>
-                <th>Umbrella Corp Deal</th>
-                <th>Globex Phase 3</th>
-                <th>Infra Overhaul</th>
-                <th>Internal</th>
-                <th style="font-weight:var(--weight-bold);color:var(--color-text-1);">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100">Sarah Chen</a></td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Sarah Chen','Acme Web Redesign',60)" title="Click to edit" style="color:var(--color-primary);">60%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Globex Phase 2',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Sarah Chen','Initech API',27)" style="color:var(--color-success);">27%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">100%</td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="113">John Smith <span class="badge badge-warning" style="font-size:var(--text-overline);">Overwork</span></a></td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Acme Web Redesign',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'John Smith','Globex Phase 2',113)" style="color:var(--color-warning);">113%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">113%<div class="worktime-bar" style="margin-top:2px;"><div class="worktime-fill overflow" style="width:100%;"></div></div></td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="108">Marco Rossi <span class="badge badge-warning" style="font-size:var(--text-overline);">Overwork</span></a></td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Marco Rossi','Acme Web Redesign',108)" style="color:var(--color-warning);">108%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Globex Phase 2',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">108%<div class="worktime-bar" style="margin-top:2px;"><div class="worktime-fill overflow" style="width:100%;"></div></div></td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100">Carol Williams</a></td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Acme Web Redesign',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Globex Phase 2',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Carol Williams','Initech API',90)" style="color:var(--color-success);">90%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">90%</td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang <span class="badge badge-info" style="font-size:var(--text-overline);">On Leave</span></a></td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Alice Wang','Acme Web Redesign',45)" style="color:var(--color-warning);">45%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Globex Phase 2',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">45%</td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="85">David Park</a></td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Acme Web Redesign',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'David Park','Globex Phase 2',45)" style="color:var(--color-warning);">45%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'David Park','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">45%</td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="90">Emma Laurent</a></td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Acme Web Redesign',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Globex Phase 2',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Emma Laurent','Internal',78)" style="color:var(--color-primary);">78%</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);">78%</td>
-              </tr>
-              <tr>
-                <td><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0">Bob Taylor <span class="badge badge-warning" style="font-size:var(--text-overline);">Bench</span></a></td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Acme Web Redesign',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 2',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Umbrella Corp Deal',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 3',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Infra Overhaul',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-error);">0%</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Filter bar for capacity view -->
+        <div style="padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;">
+          <select class="form-select form-input-sm" style="min-width:140px;" id="capacityDeptFilter">
+            <option value="">All Departments</option>
+            <option>Engineering</option>
+            <option>Design</option>
+            <option>Operations</option>
+            <option>Finance</option>
+            <option>HR</option>
+          </select>
+          <select class="form-select form-input-sm" style="min-width:140px;" id="capacityPeriodFilter">
+            <option>This Week</option>
+            <option selected>This Month</option>
+            <option>Next Month</option>
+          </select>
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-left:auto;">Showing 8 of 12 employees</div>
         </div>
-        <div style="padding:var(--space-3) var(--space-4);font-size:var(--text-caption);color:var(--color-text-3);">Click any cell to edit the allocation percentage for that employee-project pair.</div>
+        <!-- Capacity rows -->
+        <div>
+          <!-- Column headers -->
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--color-border-subtle);font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.5px;color:var(--color-text-3);">
+            <div>Employee</div>
+            <div>Allocation</div>
+            <div style="text-align:right;">Hours</div>
+            <div style="text-align:right;">Work Time</div>
+          </div>
+          <!-- Employee rows -->
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-1">SC</div>
+              <div><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100" data-href="employees.html#sarah-chen" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">Sarah Chen</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">Project Manager</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:85%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);text-align:right;">34h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-success">100%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;background:var(--color-warning-muted);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-2">JS</div>
+              <div><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="113" data-href="employees.html#john-smith" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">John Smith</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">Senior Developer</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:100%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
+              <svg data-lucide="alert-triangle" width="14" height="14" style="color:var(--color-warning);flex-shrink:0;"></svg>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-warning);text-align:right;">45h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-warning">113%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;background:var(--color-warning-muted);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-8">MR</div>
+              <div><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="108" data-href="employees.html#marco-rossi" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">Marco Rossi</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">Operations Lead</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:100%;height:100%;background:var(--color-warning);border-radius:var(--radius-full);"></div></div>
+              <svg data-lucide="alert-triangle" width="14" height="14" style="color:var(--color-warning);flex-shrink:0;"></svg>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-warning);text-align:right;">43h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-warning">108%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-5">CW</div>
+              <div><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100" data-href="employees.html#carol-williams" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">Carol Williams</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">Design Lead</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:95%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);text-align:right;">40h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-success">100%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-3">AW</div>
+              <div><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">Alice Wang</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">On Leave Apr 14-18</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:45%;height:100%;background:var(--color-primary);border-radius:var(--radius-full);"></div></div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);text-align:right;">18h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-info">45%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-6">DP</div>
+              <div><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="85" data-href="employees.html#david-park" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">David Park</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">Finance Lead</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:85%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);text-align:right;">34h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-success">85%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-subtle);align-items:center;">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-7">EL</div>
+              <div><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="90" data-href="employees.html#emma-laurent" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">Emma Laurent</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">HR Specialist</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:90%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div></div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);text-align:right;">36h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-success">90%</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px 1fr 80px 100px;gap:var(--space-2);padding:var(--space-3) var(--space-4);align-items:center;background:var(--color-error-muted);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div class="avatar avatar-sm avatar-4">BT</div>
+              <div><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);">Bob Taylor</a><div style="font-size:var(--text-caption);color:var(--color-text-3);">Backend Developer</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <div style="flex:1;height:8px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:0%;height:100%;background:var(--color-error);border-radius:var(--radius-full);"></div></div>
+              <span class="badge badge-error" style="font-size:var(--text-overline);">Bench</span>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-error);text-align:right;">0h / 40h</div>
+            <div style="text-align:right;"><span class="badge badge-error">0%</span></div>
+          </div>
+        </div>
+        <div style="padding:var(--space-3) var(--space-4);font-size:var(--text-caption);color:var(--color-text-3);border-top:1px solid var(--color-border-subtle);">Click an employee name to view their full profile and allocation history.</div>
       </div>
 
-      <!-- Allocation Inline Popover (hidden by default) -->
+      <!-- Allocation Inline Popover (hidden by default) - kept for bench section -->
       <div id="allocPopover" style="display:none;position:fixed;z-index:500;background:var(--color-surface-2);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);box-shadow:var(--shadow-4);padding:var(--space-4);min-width:220px;">
         <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);" id="allocPopoverTitle">Edit Allocation</div>
         <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">
@@ -818,6 +865,7 @@
           <button class="btn btn-ghost btn-xs" onclick="closeAllocPopover()">Cancel</button>
         </div>
       </div>
+
 
       <!-- Section 4: What-If Scenarios -->
       <div class="card card-interactive mb-6" data-min-role="pm" data-animate>
@@ -892,7 +940,7 @@
               </div>
               <div class="impact-note">
                 <svg data-lucide="alert-triangle" width="14" height="14" style="display: inline-block; vertical-align: -2px; margin-right: 4px;"></svg>
-                Acme may need replacement for Alice &mdash; risk moderate. Recommend discussing with Acme PM before proceeding.
+                Acme may need replacement for Alice - risk moderate. Recommend discussing with Acme PM before proceeding.
               </div>
             </div>
           </div>
@@ -1425,6 +1473,24 @@
   document.getElementById('scenarioCompareModal') && document.getElementById('scenarioCompareModal').addEventListener('click', function(e) {
     if (e.target === this) closeScenarioCompare();
   });
+
+  // ── Saved Views toggle ──
+  window.togglePlanSavedViews = function() {
+    var menu = document.getElementById('planSavedViewsMenu');
+    if (!menu) return;
+    var open = menu.style.display !== 'none';
+    menu.style.display = open ? 'none' : 'block';
+    if (!open) {
+      setTimeout(function() {
+        document.addEventListener('click', function handler(e) {
+          if (!document.getElementById('planSavedViewsBtn').contains(e.target)) {
+            menu.style.display = 'none';
+            document.removeEventListener('click', handler);
+          }
+        });
+      }, 10);
+    }
+  };
 
   // ── initSkeletons via _shared.js ──
   document.addEventListener('DOMContentLoaded', function() {

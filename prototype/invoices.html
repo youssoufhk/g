@@ -333,7 +333,7 @@
               <div class="notif-item unread">
                 <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">INV-2026-046 is overdue (Umbrella Corp — Portal)</div>
+                  <div class="notif-title">INV-2026-046 is overdue (Umbrella Corp Portal)</div>
                   <div class="notif-time">1 hour ago</div>
                 </div>
               </div>
@@ -357,7 +357,7 @@
 
         <div class="relative">
           <div class="header-user" id="userMenuBtn">
-            <div class="avatar avatar-sm">SC</div>
+            <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
@@ -384,17 +384,16 @@
       <div class="view" id="listView">
         <div class="populated-content">
           <!-- Breadcrumb -->
-          <nav class="breadcrumbs mb-4">
+          <nav class="breadcrumb mb-4">
             <a href="index.html">Home</a>
-            <span class="separator">&rsaquo;</span>
-            <span class="current">Invoices</span>
+            <span style="color:var(--color-text-2);margin:0 var(--space-2);">/</span>
+            <span style="color:var(--color-text-1);">Invoices</span>
           </nav>
 
           <!-- Page header -->
           <div class="page-header">
             <div class="page-header-left">
               <h1 class="page-title">Invoices</h1>
-              <p class="page-subtitle">Generate, manage, and track client invoices</p>
             </div>
             <div class="page-header-actions">
               <button class="btn btn-secondary btn-md" id="exportBtn">
@@ -422,33 +421,21 @@
               <div class="stat-label">Total Outstanding</div>
               <div class="stat-value">&euro;33,400</div>
               <div class="stat-trend" style="color:var(--color-text-3);">4 invoices pending</div>
-              <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                <polyline points="0,14 10,16 20,12 30,14 40,10 50,12 60,10" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-              </svg>
             </div>
             <div class="stat-card">
               <div class="stat-label">Paid This Month</div>
               <div class="stat-value">&euro;45,200</div>
               <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +12% vs last month</div>
-              <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                <polyline points="0,18 10,15 20,13 30,10 40,8 50,5 60,3" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-              </svg>
             </div>
             <div class="stat-card">
               <div class="stat-label">Overdue</div>
               <div class="stat-value" style="color: var(--color-error);">&euro;12,800</div>
               <div class="stat-trend down"><svg data-lucide="alert-triangle" width="14" height="14"></svg> 2 invoices overdue</div>
-              <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                <polyline points="0,10 10,8 20,12 30,8 40,10 50,12 60,14" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-              </svg>
             </div>
             <div class="stat-card">
               <div class="stat-label">Avg Payment Time</div>
               <div class="stat-value">18 days</div>
               <div class="stat-trend up"><svg data-lucide="trending-down" width="14" height="14"></svg> 3 days faster</div>
-              <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                <polyline points="0,16 10,15 20,13 30,12 40,11 50,10 60,8" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-              </svg>
             </div>
           </div>
 
@@ -475,204 +462,173 @@
               <option>Globex Corp</option>
               <option>Initech</option>
               <option>Umbrella Corp</option>
-              <option>Umbrella Corp</option>
             </select>
-            <input type="date" class="form-input form-input-sm" id="filterDateFrom" style="min-width:120px;max-width:160px;" onchange="filterInvoices()">
-            <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
-            <input type="date" class="form-input form-input-sm" id="filterDateTo" style="min-width:120px;max-width:160px;" onchange="filterInvoices()">
-            <div style="display:flex;align-items:center;gap:var(--space-1);flex-shrink:0;">
-              <input type="number" class="form-input form-input-sm font-mono" id="filterAmountMin" placeholder="Min &euro;" style="width:80px;" min="0" oninput="filterInvoices()">
-              <span style="color:var(--color-text-3);font-size:var(--text-body-sm);">&ndash;</span>
-              <input type="number" class="form-input form-input-sm font-mono" id="filterAmountMax" placeholder="Max &euro;" style="width:80px;" min="0" oninput="filterInvoices()">
+            <div style="flex:1;"></div>
+            <div class="relative" style="flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.classList.toggle('active')" style="gap:var(--space-1);color:var(--color-text-2);">
+                <svg data-lucide="sliders-horizontal" width="14" height="14"></svg> Advanced Filters
+              </button>
+              <div class="user-dropdown" style="right:0;top:100%;min-width:320px;padding:var(--space-4);margin-top:var(--space-1);">
+                <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-3);">Advanced Filters</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3);">
+                  <div>
+                    <label style="font-size:var(--text-caption);color:var(--color-text-3);display:block;margin-bottom:var(--space-1);">Issue Date From</label>
+                    <input type="date" class="form-input form-input-sm" id="filterDateFrom" onchange="filterInvoices()" style="width:100%;">
+                  </div>
+                  <div>
+                    <label style="font-size:var(--text-caption);color:var(--color-text-3);display:block;margin-bottom:var(--space-1);">Issue Date To</label>
+                    <input type="date" class="form-input form-input-sm" id="filterDateTo" onchange="filterInvoices()" style="width:100%;">
+                  </div>
+                  <div>
+                    <label style="font-size:var(--text-caption);color:var(--color-text-3);display:block;margin-bottom:var(--space-1);">Min Amount</label>
+                    <input type="number" class="form-input form-input-sm font-mono" id="filterAmountMin" placeholder="&euro;0" style="width:100%;" min="0" oninput="filterInvoices()">
+                  </div>
+                  <div>
+                    <label style="font-size:var(--text-caption);color:var(--color-text-3);display:block;margin-bottom:var(--space-1);">Max Amount</label>
+                    <input type="number" class="form-input form-input-sm font-mono" id="filterAmountMax" placeholder="&euro;999,999" style="width:100%;" min="0" oninput="filterInvoices()">
+                  </div>
+                </div>
+                <button class="btn btn-secondary btn-xs" onclick="clearInvoiceFilters();this.closest('.user-dropdown').classList.remove('active')">Clear Advanced</button>
+              </div>
             </div>
           </div>
 
           <!-- Invoice table -->
           <div class="data-table-wrapper">
-            <table class="data-table mobile-cards">
+            <table class="data-table mobile-cards" id="invoiceTable">
               <thead>
                 <tr>
-                  <th>#</th>
                   <th class="sortable" data-sort="invoice">Invoice</th>
                   <th class="sortable" data-sort="client">Client</th>
                   <th>Project</th>
                   <th class="sortable" data-sort="amount">Amount</th>
                   <th class="sortable" data-sort="status">Status</th>
-                  <th class="sortable" data-sort="issue-date">Issue Date</th>
-                  <th class="sortable" data-sort="due-date">Due Date</th>
+                  <th>Dates</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr class="invoice-row" data-invoice="INV-2026-048">
-                  <td class="cell-secondary" data-label="#">1</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-048</a></td>
-                  <td data-label="Client"><a href="clients.html#acme-corp">Acme Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;12,400
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">144h @ &euro;85/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-048" data-status="sent">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-048');return false;">INV-2026-048</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/acme">Acme Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/acme-web">Acme Web Redesign</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;12,400</td>
                   <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
-                  <td data-label="Issue Date">Apr 1, 2026</td>
-                  <td data-label="Due Date">Apr 30, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Apr 1 &rarr; Apr 30, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
-                    <button class="btn btn-accent btn-xs" onclick="recordPayment(this)"><svg data-lucide="check" width="12" height="12"></svg> Pay</button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-048')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-accent btn-xs" onclick="recordPayment(this,'INV-2026-048',12400)"><svg data-lucide="check" width="12" height="12"></svg> Pay</button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-047">
-                  <td class="cell-secondary" data-label="#">2</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-047</a></td>
-                  <td data-label="Client"><a href="clients.html#globex-corp">Globex Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;8,200
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">91h @ &euro;90/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-047" data-status="sent">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-047');return false;">INV-2026-047</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/globex">Globex Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/globex-phase2">Globex ERP Integration</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;8,200</td>
                   <td data-label="Status"><span class="badge badge-info"><svg data-lucide="send" width="12" height="12"></svg> Sent</span></td>
-                  <td data-label="Issue Date">Mar 28, 2026</td>
-                  <td data-label="Due Date">Apr 28, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Mar 28 &rarr; Apr 28, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
-                    <button class="btn btn-accent btn-xs" onclick="recordPayment(this)"><svg data-lucide="check" width="12" height="12"></svg> Pay</button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-047')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-accent btn-xs" onclick="recordPayment(this,'INV-2026-047',8200)"><svg data-lucide="check" width="12" height="12"></svg> Pay</button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-046">
-                  <td class="cell-secondary" data-label="#">3</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-046</a></td>
+                <tr class="invoice-row" data-invoice="INV-2026-046" data-status="overdue">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-046');return false;">INV-2026-046</a></td>
                   <td data-label="Client"><a href="clients.html#detail/umbrella">Umbrella Corp</a></td>
                   <td data-label="Project"><a href="projects.html#detail/umbrella-portal">Umbrella Corp Portal</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;7,800
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">Fixed price</div>
-                  </td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;7,800</td>
                   <td data-label="Status"><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
-                  <td data-label="Issue Date">Mar 15, 2026</td>
-                  <td data-label="Due Date">Apr 14, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-error);">Mar 15 &rarr; Apr 14, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-046')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-secondary btn-xs" onclick="sendReminder(this,'INV-2026-046','Umbrella Corp')"><svg data-lucide="send" width="12" height="12"></svg> Remind</button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-045">
-                  <td class="cell-secondary" data-label="#">4</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-045</a></td>
-                  <td data-label="Client"><a href="clients.html#acme-corp">Acme Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#acme-crm">Acme CRM</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;11,200
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">128h @ &euro;85/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-045" data-status="paid">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-045');return false;">INV-2026-045</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/acme">Acme Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/acme-web">Acme Web Redesign</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;11,200</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                  <td data-label="Issue Date">Mar 1, 2026</td>
-                  <td data-label="Due Date">Mar 31, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Mar 1 &rarr; Mar 31, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-045')"><svg data-lucide="eye" width="14" height="14"></svg></button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-044">
-                  <td class="cell-secondary" data-label="#">5</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-044</a></td>
-                  <td data-label="Client"><a href="clients.html#globex-corp">Globex Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;9,400
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">104h @ &euro;90/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-044" data-status="paid">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-044');return false;">INV-2026-044</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/globex">Globex Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/globex-phase2">Globex ERP Integration</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;9,400</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                  <td data-label="Issue Date">Feb 28, 2026</td>
-                  <td data-label="Due Date">Mar 30, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Feb 28 &rarr; Mar 30, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-044')"><svg data-lucide="eye" width="14" height="14"></svg></button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-043">
-                  <td class="cell-secondary" data-label="#">6</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-043</a></td>
-                  <td data-label="Client"><a href="clients.html#acme-corp">Acme Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;5,000
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">58h @ &euro;85/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-043" data-status="overdue">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-043');return false;">INV-2026-043</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/acme">Acme Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/acme-web">Acme Web Redesign</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;5,000</td>
                   <td data-label="Status"><span class="badge badge-error"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overdue</span></td>
-                  <td data-label="Issue Date">Feb 15, 2026</td>
-                  <td data-label="Due Date">Mar 15, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-error);">Feb 15 &rarr; Mar 15, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-043')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-secondary btn-xs" onclick="sendReminder(this,'INV-2026-043','Acme Corp')"><svg data-lucide="send" width="12" height="12"></svg> Remind</button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-042">
-                  <td class="cell-secondary" data-label="#">7</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-042</a></td>
-                  <td data-label="Client"><a href="clients.html#initech">Initech</a></td>
-                  <td data-label="Project"><a href="projects.html#security-audit">Security Audit</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;30,000
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">Fixed price</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-042" data-status="paid">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-042');return false;">INV-2026-042</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/initech">Initech</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/initech-audit">Initech Security Audit</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;30,000</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                  <td data-label="Issue Date">Feb 1, 2026</td>
-                  <td data-label="Due Date">Mar 1, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Feb 1 &rarr; Mar 1, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-042')"><svg data-lucide="eye" width="14" height="14"></svg></button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-041">
-                  <td class="cell-secondary" data-label="#">8</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-041</a></td>
+                <tr class="invoice-row" data-invoice="INV-2026-041" data-status="paid">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-041');return false;">INV-2026-041</a></td>
                   <td data-label="Client"><a href="clients.html#detail/acme">Acme Corp</a></td>
                   <td data-label="Project"><a href="projects.html#detail/acme-crm">Acme CRM Setup</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;9,800
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">122h @ &euro;80/h</div>
-                  </td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;9,800</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                  <td data-label="Issue Date">Jan 15, 2026</td>
-                  <td data-label="Due Date">Feb 14, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Jan 15 &rarr; Feb 14, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-041')"><svg data-lucide="eye" width="14" height="14"></svg></button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-040">
-                  <td class="cell-secondary" data-label="#">9</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-040</a></td>
-                  <td data-label="Client"><a href="clients.html#globex-corp">Globex Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#globex-phase-2">Globex Phase 2</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;15,000
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">166h @ &euro;90/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-040" data-status="paid">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-040');return false;">INV-2026-040</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/globex">Globex Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/globex-phase2">Globex ERP Integration</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;15,000</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                  <td data-label="Issue Date">Jan 1, 2026</td>
-                  <td data-label="Due Date">Jan 31, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Jan 1 &rarr; Jan 31, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-040')"><svg data-lucide="eye" width="14" height="14"></svg></button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
-                <tr class="invoice-row" data-invoice="INV-2026-039">
-                  <td class="cell-secondary" data-label="#">10</td>
-                  <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-039</a></td>
-                  <td data-label="Client"><a href="clients.html#acme-corp">Acme Corp</a></td>
-                  <td data-label="Project"><a href="projects.html#acme-web-redesign">Acme Web Redesign</a></td>
-                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">
-                    &euro;8,600
-                    <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">101h @ &euro;85/h</div>
-                  </td>
+                <tr class="invoice-row" data-invoice="INV-2026-039" data-status="paid">
+                  <td data-label="Invoice"><a href="#" class="invoice-link font-mono" onclick="showInvoiceDetail('INV-2026-039');return false;">INV-2026-039</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/acme">Acme Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/acme-web">Acme Web Redesign</a></td>
+                  <td class="cell-mono" data-label="Amount" data-sensitive="financials">&euro;8,600</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
-                  <td data-label="Issue Date">Jan 15, 2026</td>
-                  <td data-label="Due Date">Feb 14, 2026</td>
+                  <td data-label="Dates" style="font-size:var(--text-caption);color:var(--color-text-2);">Jan 15 &rarr; Feb 14, 2026</td>
                   <td data-label="">
-                    <button class="btn btn-ghost btn-xs action-btn" data-action="view"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                    <button class="btn btn-ghost btn-xs" onclick="showInvoiceDetail('INV-2026-039')"><svg data-lucide="eye" width="14" height="14"></svg></button>
                     <button class="btn btn-ghost btn-xs action-btn" data-action="more"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
                   </td>
                 </tr>
@@ -714,10 +670,10 @@
 
       <!-- ═══════ DETAIL VIEW ═══════ -->
       <div class="view" id="detailView">
-        <nav class="breadcrumbs mb-4">
+        <nav class="breadcrumb mb-4">
           <a href="invoices.html">Invoices</a>
-          <span class="separator">&rsaquo;</span>
-          <span class="current">INV-2026-048</span>
+          <span style="color:var(--color-text-2);margin:0 var(--space-2);">/</span>
+          <span style="color:var(--color-text-1);" id="detail-breadcrumb-id">INV-2026-048</span>
         </nav>
 
         <button class="back-btn" id="backToList">
@@ -819,42 +775,42 @@
               </thead>
               <tbody>
                 <tr>
-                  <td class="line-item-editable">Project Manager &mdash; 48h @ &euro;85/h</td>
+                  <td class="line-item-editable">Project Manager - 48h @ &euro;85/h</td>
                   <td><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
                   <td class="font-mono line-item-editable text-right">48h</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;85.00</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;4,080.00</td>
                 </tr>
                 <tr>
-                  <td class="line-item-editable">Senior Developer &mdash; 22h @ &euro;95/h</td>
+                  <td class="line-item-editable">Senior Developer - 22h @ &euro;95/h</td>
                   <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
                   <td class="font-mono line-item-editable text-right">22h</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;95.00</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;2,090.00</td>
                 </tr>
                 <tr>
-                  <td class="line-item-editable">Software Engineer &mdash; 30h @ &euro;75/h</td>
+                  <td class="line-item-editable">Software Engineer - 30h @ &euro;75/h</td>
                   <td><a href="employees.html" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave">Alice Wang</a></td>
                   <td class="font-mono line-item-editable text-right">30h</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;75.00</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;2,250.00</td>
                 </tr>
                 <tr>
-                  <td class="line-item-editable">Operations Lead &mdash; 32h @ &euro;85/h</td>
+                  <td class="line-item-editable">Operations Lead - 32h @ &euro;85/h</td>
                   <td><a href="employees.html" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88">Marco Rossi</a></td>
                   <td class="font-mono line-item-editable text-right">32h</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;85.00</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;2,720.00</td>
                 </tr>
                 <tr>
-                  <td class="line-item-editable">Junior Developer &mdash; 12h @ &euro;65/h</td>
+                  <td class="line-item-editable">Junior Developer - 12h @ &euro;65/h</td>
                   <td><a href="employees.html" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="95">Liam O&rsquo;Brien</a></td>
                   <td class="font-mono line-item-editable text-right">12h</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;65.00</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;780.00</td>
                 </tr>
                 <tr>
-                  <td class="line-item-editable">Travel expense &mdash; client site visit</td>
+                  <td class="line-item-editable">Travel expense - client site visit</td>
                   <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
                   <td class="font-mono line-item-editable text-right">1</td>
                   <td class="font-mono line-item-editable text-right" data-sensitive="financials">&euro;480.00</td>
@@ -868,7 +824,7 @@
                 <span class="line-total-value">&euro;12,400.00</span>
               </div>
               <div class="line-total-row">
-                <span class="line-total-label">Tax (0% &mdash; B2B reverse charge)</span>
+                <span class="line-total-label">Tax (0% - B2B reverse charge)</span>
                 <span class="line-total-value">&euro;0.00</span>
               </div>
               <div class="line-total-row grand">
@@ -1049,6 +1005,11 @@
           <option>Other</option>
         </select>
       </div>
+      <div class="form-group">
+        <label class="form-label">Payment Reference</label>
+        <input type="text" class="form-input font-mono" id="paymentReferenceInput" placeholder="e.g. TXN-20260413-001">
+        <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Bank transfer ID, cheque number, or card authorization code.</div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('recordPaymentModal').classList.remove('active')">Cancel</button>
@@ -1077,7 +1038,6 @@
               <option value="acme" selected>Acme Corp</option>
               <option value="globex">Globex Corp</option>
               <option value="initech">Initech</option>
-              <option value="umbrella">Umbrella Corp</option>
               <option value="umbrella">Umbrella Corp</option>
             </select>
           </div>
@@ -1149,7 +1109,7 @@
             <span class="value" id="prevSubtotal">&euro;12,400.00</span>
           </div>
           <div class="preview-row">
-            <span class="label">Tax (0% &mdash; B2B)</span>
+            <span class="label">Tax (0% - B2B)</span>
             <span class="value" id="prevTax">&euro;0.00</span>
           </div>
           <div class="preview-row" style="font-weight: var(--weight-bold); border-top: 2px solid var(--color-border); padding-top: var(--space-3);">
@@ -1512,7 +1472,8 @@
 
   // ── Detail action buttons ──
   downloadPdfBtn.addEventListener('click', function() {
-    showToast('info', 'Download Started', 'INV-2026-048.pdf is being prepared for download...');
+    var invId = window._currentDetailInvoice || 'INV-2026-048';
+    showToast('info', 'Download Started', invId + '.pdf is being prepared for download...');
   });
 
   sendToClientBtn.addEventListener('click', function() {
@@ -1524,12 +1485,15 @@
   if (confirmSendBtn) {
     confirmSendBtn.addEventListener('click', function() {
       var modal = document.getElementById('sendToClientModal');
+      var invId = window._currentDetailInvoice || 'INV-2026-048';
+      var inv = invoiceData[invId] || {};
+      var clientName = inv.client || 'Client';
       if (window.GHR && GHR.closeModal) {
         GHR.closeModal(modal);
       } else {
         modal.classList.remove('active');
       }
-      showToast('success', 'Invoice Sent', 'INV-2026-048 has been sent to Acme Corp.');
+      showToast('success', 'Invoice Sent', invId + ' has been sent to ' + clientName + '.');
     });
   }
 
@@ -1636,11 +1600,12 @@ window.confirmRecordPayment = function() {
   var type = document.querySelector('input[name="paymentType"]:checked');
   var isPartial = type && type.value === 'partial';
   var partialVal = document.getElementById('partialAmountInput') ? document.getElementById('partialAmountInput').value : '';
+  var invoiceNum = window._currentPaymentInvoice || 'Invoice';
   document.getElementById('recordPaymentModal').classList.remove('active');
   if (isPartial && partialVal) {
-    showToast('success', 'Partial Payment Recorded', '\u20ac' + parseFloat(partialVal).toLocaleString() + ' received for INV-2026-048.');
+    showToast('success', 'Partial Payment Recorded', '\u20ac' + parseFloat(partialVal).toLocaleString() + ' received for ' + invoiceNum + '.');
   } else {
-    showToast('success', 'Payment Recorded', 'INV-2026-048 has been marked as fully paid.');
+    showToast('success', 'Payment Recorded', invoiceNum + ' has been marked as fully paid.');
   }
 };
 
@@ -1711,17 +1676,78 @@ window.sendInvoice = function(btn) {
   if (menu) menu.style.display = 'none';
 };
 
-window.recordPayment = function(btn) {
+window.recordPayment = function(btn, invoiceId, amount) {
   var row = btn.closest('tr') || btn.closest('[class*="invoice-row"]') || btn.closest('[class*="invoice-card"]') || btn.closest('tr, .invoice-row');
-  var invoiceNum = row ? (row.getAttribute('data-invoice') || '') : 'Invoice';
-  if (row) {
-    var badge = row.querySelector('.badge, [class*="status"]');
-    if (badge) { badge.textContent = 'Paid'; badge.className = badge.className.replace(/badge-\w+/g, '') + ' badge-success'; }
+  var invoiceNum = invoiceId || (row ? (row.getAttribute('data-invoice') || '') : 'Invoice');
+  var amt = amount || (row ? parseFloat((row.querySelector('[data-label="Amount"]') || {}).textContent || '0') : 0);
+  // Store for modal confirm
+  window._currentPaymentInvoice = invoiceNum;
+  window._currentPaymentAmount = amt;
+  window._currentPaymentRow = row;
+  // Update modal display
+  var partialInfo = document.querySelector('#partialAmountGroup .font-mono');
+  if (partialInfo) partialInfo.textContent = '\u20ac' + (amt ? amt.toLocaleString() : '0') + '.00';
+  // Set today's date
+  var dateInput = document.querySelector('#recordPaymentModal input[type="date"]');
+  if (dateInput && !dateInput.value) dateInput.value = '2026-04-13';
+  document.getElementById('recordPaymentModal').classList.add('active');
+  lucide.createIcons({ nodes: [document.getElementById('recordPaymentModal')] });
+};
+
+window.sendReminder = function(btn, invoiceId, clientName) {
+  showToast('success', 'Reminder Sent', 'Payment reminder for ' + invoiceId + ' sent to ' + clientName + '.');
+};
+
+// ── Invoice data map for data-driven detail view ──
+var invoiceData = {
+  'INV-2026-048': { client: 'Acme Corp', clientSlug: 'acme', project: 'Acme Web Redesign', projectSlug: 'acme-web', amount: '12,400.00', status: 'sent', statusLabel: 'Sent', statusClass: 'badge-info', statusIcon: 'send', issueDate: 'Apr 1, 2026', dueDate: 'Apr 30, 2026', email: 'jane@acme.com', notes: 'Services rendered for Acme Web Redesign project, March 2026. Includes development hours, design work, and travel expenses for on-site client workshop.' },
+  'INV-2026-047': { client: 'Globex Corp', clientSlug: 'globex', project: 'Globex ERP Integration', projectSlug: 'globex-phase2', amount: '8,200.00', status: 'sent', statusLabel: 'Sent', statusClass: 'badge-info', statusIcon: 'send', issueDate: 'Mar 28, 2026', dueDate: 'Apr 28, 2026', email: 'bob@globex.com', notes: 'ERP integration services for March 2026. Microservices migration and API gateway configuration.' },
+  'INV-2026-046': { client: 'Umbrella Corp', clientSlug: 'umbrella', project: 'Umbrella Corp Portal', projectSlug: 'umbrella-portal', amount: '7,800.00', status: 'overdue', statusLabel: 'Overdue', statusClass: 'badge-error', statusIcon: 'alert-triangle', issueDate: 'Mar 15, 2026', dueDate: 'Apr 14, 2026', email: 'wesker@umbrella.com', notes: 'Portal development milestone 1 delivery. Fixed-price engagement per SOW agreement.' },
+  'INV-2026-045': { client: 'Acme Corp', clientSlug: 'acme', project: 'Acme Web Redesign', projectSlug: 'acme-web', amount: '11,200.00', status: 'paid', statusLabel: 'Paid', statusClass: 'badge-success', statusIcon: 'check-circle', issueDate: 'Mar 1, 2026', dueDate: 'Mar 31, 2026', email: 'jane@acme.com', notes: 'Acme Web Redesign services, February 2026. Design phase and Sprint 1 development.' },
+  'INV-2026-044': { client: 'Globex Corp', clientSlug: 'globex', project: 'Globex ERP Integration', projectSlug: 'globex-phase2', amount: '9,400.00', status: 'paid', statusLabel: 'Paid', statusClass: 'badge-success', statusIcon: 'check-circle', issueDate: 'Feb 28, 2026', dueDate: 'Mar 30, 2026', email: 'bob@globex.com', notes: 'ERP integration services for February 2026. Infrastructure setup and initial data mapping.' },
+  'INV-2026-043': { client: 'Acme Corp', clientSlug: 'acme', project: 'Acme Web Redesign', projectSlug: 'acme-web', amount: '5,000.00', status: 'overdue', statusLabel: 'Overdue', statusClass: 'badge-error', statusIcon: 'alert-triangle', issueDate: 'Feb 15, 2026', dueDate: 'Mar 15, 2026', email: 'jane@acme.com', notes: 'Partial billing for Acme Web Redesign discovery phase, January 2026.' },
+  'INV-2026-042': { client: 'Initech', clientSlug: 'initech', project: 'Initech Security Audit', projectSlug: 'initech-audit', amount: '30,000.00', status: 'paid', statusLabel: 'Paid', statusClass: 'badge-success', statusIcon: 'check-circle', issueDate: 'Feb 1, 2026', dueDate: 'Mar 1, 2026', email: 'lumbergh@initech.com', notes: 'Security audit fixed-price delivery. Final payment upon report submission.' },
+  'INV-2026-041': { client: 'Acme Corp', clientSlug: 'acme', project: 'Acme CRM Setup', projectSlug: 'acme-crm', amount: '9,800.00', status: 'paid', statusLabel: 'Paid', statusClass: 'badge-success', statusIcon: 'check-circle', issueDate: 'Jan 15, 2026', dueDate: 'Feb 14, 2026', email: 'jane@acme.com', notes: 'CRM setup and configuration services, December 2025 - January 2026.' },
+  'INV-2026-040': { client: 'Globex Corp', clientSlug: 'globex', project: 'Globex ERP Integration', projectSlug: 'globex-phase2', amount: '15,000.00', status: 'paid', statusLabel: 'Paid', statusClass: 'badge-success', statusIcon: 'check-circle', issueDate: 'Jan 1, 2026', dueDate: 'Jan 31, 2026', email: 'bob@globex.com', notes: 'ERP integration kickoff and infrastructure assessment, December 2025.' },
+  'INV-2026-039': { client: 'Acme Corp', clientSlug: 'acme', project: 'Acme Web Redesign', projectSlug: 'acme-web', amount: '8,600.00', status: 'paid', statusLabel: 'Paid', statusClass: 'badge-success', statusIcon: 'check-circle', issueDate: 'Jan 15, 2026', dueDate: 'Feb 14, 2026', email: 'jane@acme.com', notes: 'Acme Web Redesign discovery and requirements phase, December 2025.' }
+};
+
+window.showInvoiceDetail = function(invoiceId) {
+  var data = invoiceData[invoiceId];
+  if (!data) {
+    showToast('warning', 'Invoice Not Found', 'Could not load details for ' + invoiceId);
+    return;
   }
-  showToast('success', 'Payment Recorded', (invoiceNum || 'Invoice') + ' marked as paid');
-  if (btn.tagName === 'BUTTON') { btn.disabled = true; btn.innerHTML = '<svg data-lucide="check" width="12" height="12"></svg> Paid'; if (window.lucide) lucide.createIcons({ nodes: [btn] }); }
-  var menu = btn.closest('[class*="menu"], .invoice-action-menu');
-  if (menu) menu.style.display = 'none';
+  // Update breadcrumb
+  var bc = document.getElementById('detail-breadcrumb-id');
+  if (bc) bc.textContent = invoiceId;
+  // Update invoice title
+  var titleEl = document.querySelector('.invoice-detail-title');
+  if (titleEl) titleEl.textContent = invoiceId;
+  // Update subtitle
+  var subEl = document.querySelector('.invoice-detail-sub');
+  if (subEl) subEl.innerHTML = 'Client: <a href="clients.html#detail/' + data.clientSlug + '">' + data.client + '</a> &middot; Project: <a href="projects.html#detail/' + data.projectSlug + '">' + data.project + '</a>';
+  // Update status badge
+  var badgeEl = document.querySelector('#detailView .invoice-detail-header .badge');
+  if (badgeEl) {
+    badgeEl.className = 'badge ' + data.statusClass + ' badge-lg';
+    badgeEl.innerHTML = '<svg data-lucide="' + data.statusIcon + '" width="14" height="14"></svg> ' + data.statusLabel;
+    lucide.createIcons({ nodes: [badgeEl] });
+  }
+  // Update info grid
+  var infoItems = document.querySelectorAll('.invoice-info-item .invoice-info-value');
+  if (infoItems[0]) infoItems[0].textContent = data.issueDate;
+  if (infoItems[1]) infoItems[1].textContent = data.dueDate;
+  // Update overdue alert
+  var overdueAlert = document.getElementById('overdueAlert');
+  if (overdueAlert) overdueAlert.style.display = (data.status === 'overdue') ? 'block' : 'none';
+  // Update notes
+  var notesEl = document.querySelector('.invoice-notes');
+  if (notesEl) notesEl.textContent = data.notes;
+  // Track current invoice for action buttons
+  window._currentDetailInvoice = invoiceId;
+  // Navigate to detail view
+  window.location.hash = 'detail';
 };
 
 window.toggleInvoiceEdit = function() {
@@ -1799,8 +1825,12 @@ window.confirmDuplicate = function() {
 
 // ── Credit Note handler (FEAT P2 fix) ──
 window.issueCreditNote = function() {
-  if (confirm('Issue a credit note for INV-2026-048 (EUR 12,400.00)? This will void the original invoice.')) {
-    showToast('success', 'Credit Note Issued', 'Credit note CN-2026-048 has been created for EUR 12,400.00. Original invoice INV-2026-048 has been voided.');
+  var invId = window._currentDetailInvoice || 'INV-2026-048';
+  var inv = invoiceData[invId] || {};
+  var amt = inv.amount || '0.00';
+  var cnId = invId.replace('INV-', 'CN-');
+  if (confirm('Issue a credit note for ' + invId + ' (EUR ' + amt + ')? This will void the original invoice.')) {
+    showToast('success', 'Credit Note Issued', 'Credit note ' + cnId + ' has been created for EUR ' + amt + '. Original invoice ' + invId + ' has been voided.');
   }
 };
 

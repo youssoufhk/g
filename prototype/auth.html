@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — GammaHR Quantum</title>
+  <title>Sign In - GammaHR Quantum</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <style>
@@ -1142,15 +1142,19 @@
           <div id="obS2" style="display:none;">
             <div class="auth-form">
               <div class="form-group">
-                <label class="form-label">Profile Photo</label>
+                <label class="form-label">Profile Photo <span style="font-size: var(--text-caption); color: var(--color-text-3);">(optional)</span></label>
+                <p style="font-size: var(--text-body-sm); color: var(--color-text-2); margin-bottom: var(--space-2);">You can add a photo later from your account settings.</p>
+                <button type="button" class="btn btn-ghost btn-sm" style="margin-bottom: var(--space-3);" onclick="onboardGoStep(3)">
+                  Set photo later - continue without
+                </button>
                 <div class="photo-upload-zone" id="photoDropZone"
                      ondragover="this.classList.add('drag-over'); event.preventDefault();"
                      ondragleave="this.classList.remove('drag-over');"
                      ondrop="this.classList.remove('drag-over'); event.preventDefault(); showToast('success','Photo uploaded','Profile photo updated successfully');"
                      onclick="showToast('info','Upload','Click to choose a file from your device')">
-                  <svg data-lucide="upload-cloud" width="32" height="32" style="color: var(--color-text-3); margin-bottom: var(--space-2);"></svg>
-                  <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Drag & drop your photo here</p>
-                  <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-1);">or click to browse · JPG, PNG up to 5MB</p>
+                  <svg data-lucide="upload-cloud" width="28" height="28" style="color: var(--color-text-3); margin-bottom: var(--space-2);"></svg>
+                  <p style="font-size: var(--text-body-sm); color: var(--color-text-2);">Drag and drop your photo here</p>
+                  <p style="font-size: var(--text-caption); color: var(--color-text-3); margin-top: var(--space-1);">or click to browse - JPG, PNG up to 5MB</p>
                 </div>
               </div>
               <div class="form-group">
@@ -1219,9 +1223,10 @@
                 <p>View colleagues, org chart, and contacts</p>
               </div>
             </div>
-            <button class="btn btn-primary btn-lg auth-submit" onclick="window.location.href='index.html'">
-              Start Exploring →
-            </button>
+            <a href="index.html" class="btn btn-primary btn-lg auth-submit" style="display:block;text-align:center;margin-bottom:var(--space-4);">
+              Go to your dashboard
+            </a>
+            <p style="text-align:center;font-size:var(--text-caption);color:var(--color-text-3);">The GammaHR mobile app is also available - we will send you a download link by email.</p>
           </div>
         </div>
       </div>

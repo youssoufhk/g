@@ -699,9 +699,7 @@
     }
     .ts-submitted-banner svg { flex-shrink: 0; }
     .ts-grid-wrapper.submitted-state {
-      opacity: 0.6;
-      pointer-events: none;
-      position: relative;
+      display: none;
     }
 
     /* ── Saved Views dropdown ── */
@@ -780,8 +778,7 @@
             <span style="margin:0 var(--space-1);">/</span>
             <span style="color:var(--color-text-2);">Timesheets</span>
           </nav>
-          <h1 class="page-title">Timesheet Management</h1>
-          <p class="page-subtitle">Track hours, review submissions, and manage team timesheets</p>
+          <h1 class="page-title">Timesheets</h1>
         </div>
         <div class="page-header-actions">
           <div style="position:relative;display:inline-block;">
@@ -798,6 +795,10 @@
               <div class="saved-view-item" onclick="showToast('info','View','My Team view applied');this.closest('.saved-views-menu').classList.remove('active');" data-min-role="pm">My Team</div>
             </div>
           </div>
+          <button class="btn btn-primary btn-md" id="copyLastWeekBtn" onclick="copyLastWeek()">
+            <svg data-lucide="copy" width="16" height="16"></svg>
+            Copy from Last Week
+          </button>
           <button class="btn btn-secondary btn-md" onclick="exportTimesheets()">
             <svg data-lucide="download" width="16" height="16"></svg>
             Export
@@ -805,71 +806,42 @@
         </div>
       </div>
 
-      <!-- Stat Cards -->
-      <div class="ts-stats-grid grid-4 perspective-container stagger-reveal" style="margin-bottom:var(--space-4);">
+      <!-- KPI Strip -->
+      <div class="ts-stats-grid grid-4" style="margin-bottom:var(--space-4);">
         <!-- Hours This Week -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);position:relative;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div>
-              <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Hours This Week</div>
-              <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">34h <span style="font-size:var(--text-body-sm);font-weight:var(--weight-regular);color:var(--color-text-3);">/ 40h</span></div>
-            </div>
-            <svg width="44" height="44" viewBox="0 0 44 44" style="flex-shrink:0;" data-animate="scale-in">
-              <circle cx="22" cy="22" r="18" fill="none" stroke="var(--color-surface-2)" stroke-width="4"/>
-              <circle cx="22" cy="22" r="18" fill="none" stroke="var(--color-warning)" stroke-width="4" stroke-dasharray="96.3 16.8" stroke-dashoffset="0" transform="rotate(-90 22 22)" stroke-linecap="round"/>
-              <text x="22" y="24" text-anchor="middle" font-size="10" font-weight="600" fill="var(--color-text-1)" font-family="var(--font-mono)">85%</text>
-            </svg>
-          </div>
-          <div style="display:flex;align-items:flex-end;gap:var(--space-2);margin-top:var(--space-2);">
-            <svg width="80" height="24" viewBox="0 0 80 24" data-animate="draw-line" style="flex-shrink:0;">
-              <polyline points="0,20 12,18 24,16 36,14 48,10 60,12 72,8 80,6" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <polyline points="0,20 12,18 24,16 36,14 48,10 60,12 72,8 80,6 80,24 0,24" fill="url(#tsSparkHours)" stroke="none"/>
-              <defs><linearGradient id="tsSparkHours" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-warning)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-warning)" stop-opacity="0"/></linearGradient></defs>
-            </svg>
-          </div>
-          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:var(--space-1);">
-            <svg data-lucide="alert-triangle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
-            6h remaining (Fri is holiday)
+        <div class="stat-card card-interactive">
+          <div class="stat-label">Hours This Week</div>
+          <div class="stat-value font-mono">34h <span style="font-size:var(--text-body-sm);font-weight:var(--weight-regular);color:var(--color-text-3);">/ 32h</span></div>
+          <div class="stat-trend" style="color:var(--color-warning);">
+            <svg data-lucide="alert-triangle" width="14" height="14"></svg>
+            Holiday week - capacity 32h (Good Friday)
           </div>
         </div>
         <!-- Billable Rate -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Billable Rate</div>
-          <div style="display:flex;align-items:flex-end;gap:var(--space-3);">
-            <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">87%</div>
-            <svg width="80" height="28" viewBox="0 0 80 28" style="margin-bottom:2px;" data-animate="draw-line">
-              <polyline points="0,22 12,18 24,20 36,14 48,16 60,10 72,6 80,8" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <polyline points="0,22 12,18 24,20 36,14 48,16 60,10 72,6 80,8" fill="url(#sparkFill1)" stroke="none"/>
-              <defs><linearGradient id="sparkFill1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/></linearGradient></defs>
-            </svg>
-          </div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
-            <svg data-lucide="trending-up" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+        <div class="stat-card card-interactive">
+          <div class="stat-label">Billable Rate</div>
+          <div class="stat-value font-mono">87%</div>
+          <div class="stat-trend up">
+            <svg data-lucide="trending-up" width="14" height="14"></svg>
             +3% vs last week
           </div>
         </div>
         <!-- Pending Approval -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Pending Approval</div>
-          <div style="display:flex;align-items:flex-end;gap:var(--space-3);">
-            <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">2</div>
-            <span class="badge badge-warning" style="margin-bottom:4px;"><svg data-lucide="clock" width="12" height="12"></svg> awaiting</span>
-          </div>
-          <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;margin-top:var(--space-2);">
-            <div style="height:100%;width:87.5%;background:var(--color-success);border-radius:var(--radius-full);transition:width 0.4s;"></div>
-          </div>
-          <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-2);">
-            <svg data-lucide="user" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
-            7/8 team submitted
+        <div class="stat-card card-interactive" onclick="window.location.href='approvals.html'">
+          <div class="stat-label">Pending Approval</div>
+          <div class="stat-value font-mono">7</div>
+          <div class="stat-trend" style="color:var(--color-text-2);">
+            <svg data-lucide="users" width="14" height="14"></svg>
+            7/8 team submitted - <a href="approvals.html" style="color:var(--color-primary);">Review in Approvals</a>
           </div>
         </div>
-        <!-- Overtime -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Overtime</div>
-          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">0h</div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
-            <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
-            No overtime this week
+        <!-- Team Work Time -->
+        <div class="stat-card card-interactive">
+          <div class="stat-label">Team Work Time</div>
+          <div class="stat-value font-mono">82%</div>
+          <div class="stat-trend" style="color:var(--color-text-2);">
+            <svg data-lucide="users" width="14" height="14"></svg>
+            2 members overwork this week
           </div>
         </div>
       </div>
@@ -878,24 +850,21 @@
         @media (max-width: 639px) { .ts-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
       </style>
 
+      <!-- Pending approval notice (replaces Approval Queue tab) -->
+      <div id="tsApprovalNotice" data-min-role="pm" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-body-sm);color:var(--color-warning);">
+        <svg data-lucide="clock" width="14" height="14" style="flex-shrink:0;"></svg>
+        <span><strong>7 timesheets</strong> pending approval. <a href="approvals.html" style="color:var(--color-warning);text-decoration:underline;font-weight:var(--weight-medium);">Review in Approvals</a></span>
+      </div>
+
       <!-- Tabs -->
       <div class="tabs mb-4">
         <button class="tab active" data-tab="week">
           <svg data-lucide="calendar-days" width="16" height="16"></svg>
           Week View
         </button>
-        <button class="tab" data-tab="month">
-          <svg data-lucide="calendar" width="16" height="16"></svg>
-          Month View
-        </button>
         <button class="tab" data-tab="previous">
           <svg data-lucide="history" width="16" height="16"></svg>
           Previous Weeks
-        </button>
-        <button class="tab" data-tab="approval" data-min-role="pm">
-          <svg data-lucide="clipboard-check" width="16" height="16"></svg>
-          Approval Queue
-          <span class="tab-count">7</span>
         </button>
       </div>
 
@@ -978,19 +947,25 @@
           </div>
         </div>
 
-        <!-- Rejection reason callout (shown if timesheet was rejected) -->
+        <!-- Rejection reason callout (shown if timesheet was rejected) — points to specific day/entry -->
         <div id="tsRejectionCallout" style="display:none;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
           <svg data-lucide="alert-circle" width="18" height="18" style="color:var(--color-error);flex-shrink:0;margin-top:1px;"></svg>
           <div>
-            <div style="font-weight:var(--weight-semibold);font-size:var(--text-body-sm);color:var(--color-error);margin-bottom:var(--space-1);">Timesheet Rejected</div>
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">Hours for Friday don't match project schedule. Please review.</div>
+            <div style="font-weight:var(--weight-semibold);font-size:var(--text-body-sm);color:var(--color-error);margin-bottom:var(--space-1);">Timesheet Rejected - Action Required</div>
+            <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">
+              <strong>Friday Apr 3 - Acme Web Redesign:</strong> Expected 8h, logged 0h. Please correct Friday's entry for Acme Web Redesign to match your project schedule.
+            </div>
+            <button class="btn btn-xs btn-secondary" style="margin-top:var(--space-2);" onclick="document.querySelector('.ts-cell[data-day=\\'4\\']').closest('td').style.outline='2px solid var(--color-error)'">Go to Friday</button>
           </div>
         </div>
 
-        <!-- Pre-populated notice -->
+        <!-- Pre-populated notice (chip attached to grid, dismissible) -->
         <div id="tsPrefilledNotice" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-primary);">
           <svg data-lucide="sparkles" width="14" height="14" style="flex-shrink:0;"></svg>
-          <span>Pre-filled from your active assignments and last week's pattern. Hours distributed based on your typical split. Review and adjust as needed.</span>
+          <span>Pre-filled from active assignments. Review and adjust as needed.</span>
+          <button style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--color-primary);padding:0;" onclick="document.getElementById('tsPrefilledNotice').style.display='none';" aria-label="Dismiss">
+            <svg data-lucide="x" width="14" height="14"></svg>
+          </button>
         </div>
 
         <!-- Auto-save indicator -->
@@ -1041,7 +1016,7 @@
               </tr>
               <!-- Row 2: Internal — GammaHR Dev (pre-populated) -->
               <tr class="ts-data-row" data-project="internal-gamahr">
-                <td><a href="projects.html#internal-gammaHR-dev" class="ts-project-link">Internal — GammaHR Dev</a></td>
+                <td><a href="projects.html#internal-gammaHR-dev" class="ts-project-link">Internal - GammaHR Dev</a></td>
                 <td class="ts-cell" data-day="0" data-tooltip="Internal -- 2 hours"><span class="ts-cell-value">2</span></td>
                 <td class="ts-cell" data-day="1" data-tooltip="Internal -- 1 hour"><span class="ts-cell-value">1</span></td>
                 <td class="ts-cell" data-day="2" data-tooltip="Internal -- 0 hours"><span class="ts-cell-value">&#8212;</span></td>
@@ -1102,11 +1077,9 @@
           </table>
         </div>
 
-        <!-- Quick-entry tip -->
-        <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-text-3);">
-          <svg data-lucide="info" width="14" height="14" style="flex-shrink:0;color:var(--color-primary);"></svg>
-          <span>Tip: Type <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 4px;font-family:var(--font-mono);">8</kbd> to fill a full day, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 4px;font-family:var(--font-mono);">4/4</kbd> to split between projects, <kbd style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 4px;font-family:var(--font-mono);">0</kbd> to clear.</span>
-        </div>
+        <!-- Quick-entry tip (collapsed to ? icon on Project column) —
+             Tip: Type 8 = full day, 4/4 = split, 0 = clear -->
+
 
         <!-- Mobile Timesheet (visible <640px) -->
         <div class="mobile-timesheet" id="mobileTimesheet">
@@ -1136,35 +1109,34 @@
           </div>
         </div>
 
-        <!-- Weekly Summary -->
+        <!-- Weekly Summary (max 3 data points) -->
         <div class="ts-summary" id="tsSummary">
           <div class="ts-summary-item">
-            <span>Hours: </span>
+            <span>Total: </span>
             <strong id="summaryTotal">32h</strong>
-            <span class="text-3" style="font-family:var(--font-mono);font-size:var(--text-body-sm);">/ 40h</span>
+            <span class="text-3" style="font-family:var(--font-mono);font-size:var(--text-body-sm);">/ 32h capacity</span>
           </div>
           <div class="ts-summary-divider"></div>
           <div class="ts-summary-progress">
             <div class="ts-progress-bar">
-              <div class="ts-progress-fill" id="summaryProgressFill" style="width: 67%;background:var(--color-primary);"></div>
+              <div class="ts-progress-fill complete" id="summaryProgressFill" style="width: 100%;"></div>
               <div class="ts-progress-overflow" id="summaryProgressOverflow" style="display:none;width:0;"></div>
             </div>
-            <span class="ts-progress-pct" id="summaryProgressPct">80%</span>
+            <span class="ts-progress-pct" id="summaryProgressPct">100%</span>
           </div>
           <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item" id="summaryBillableItem">Billable: <strong id="summaryBillable">27h</strong> <span class="text-3" id="summaryBillablePct">(67%)</span></div>
-          <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item" id="summaryInternalItem">Internal: <strong id="summaryNonBillable">5h</strong> <span class="text-3" id="summaryInternalPct">(12%)</span></div>
+          <div class="ts-summary-item" id="summaryBillableItem">Billable: <strong id="summaryBillable">27h</strong> <span class="text-3" id="summaryBillablePct">(84%)</span> - Internal: <strong id="summaryNonBillable">5h</strong></div>
           <div class="ts-summary-divider" id="summaryOverworkDivider" style="display:none;"></div>
           <div class="ts-summary-item" id="summaryOverworkItem" style="display:none;color:var(--color-warning);">
             <svg data-lucide="alert-triangle" width="12" height="12" style="margin-right:var(--space-1);flex-shrink:0;"></svg>
             <span id="summaryOverworkText">+0h overwork</span>
           </div>
-          <div class="ts-summary-divider"></div>
-          <div class="ts-summary-item" style="font-size:var(--text-caption);color:var(--color-text-3);">
-            <svg data-lucide="info" width="12" height="12" style="margin-right:var(--space-1);"></svg>
-            Fri 3 Apr is a public holiday
-          </div>
+        </div>
+
+        <!-- Auto-submit setting notice -->
+        <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);margin-bottom:var(--space-3);font-size:var(--text-caption);color:var(--color-text-3);">
+          <svg data-lucide="zap" width="12" height="12" style="flex-shrink:0;color:var(--color-primary);"></svg>
+          <span>Auto-submit: <strong style="color:var(--color-text-2);">Disabled</strong> - <a href="admin.html#settings" style="color:var(--color-primary);">Configure in Settings</a></span>
         </div>
 
         <!-- Warning -->
@@ -1175,6 +1147,10 @@
 
         <!-- Action Buttons -->
         <div class="ts-actions">
+          <button class="btn btn-ghost btn-md" id="requestChangeBtn" style="display:none;" onclick="showToast('info','Request Change','Change request sent to your manager.')">
+            <svg data-lucide="message-square" width="16" height="16"></svg>
+            Request Change
+          </button>
           <button class="btn btn-secondary btn-md" id="saveDraftBtn">
             <svg data-lucide="save" width="16" height="16"></svg>
             Save Draft
@@ -1191,12 +1167,12 @@
         <!-- Invoice confirmation area (shown after Generate Invoice) -->
         <div id="invoiceConfirmArea" style="display:none;margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-success-muted);border:1px solid var(--color-success);border-radius:var(--radius-md);font-size:var(--text-body-sm);color:var(--color-success);">
           <svg data-lucide="check-circle" width="14" height="14" style="display:inline;vertical-align:-2px;margin-right:var(--space-1);"></svg>
-          <strong>INV-2026-055</strong> draft created &mdash; Client: Acme Corp &mdash; Amount: &euro;4,200 &mdash; Status: <span class="badge badge-warning" style="font-size:var(--text-caption);">Draft</span>
+          <strong>INV-2026-055</strong> draft created - Client: Acme Corp - Amount: &euro;4,200 - Status: <span class="badge badge-warning" style="font-size:var(--text-caption);">Draft</span>
         </div>
       </div>
 
-      <!-- ════════════ TAB: MONTH VIEW ════════════ -->
-      <div class="tab-content populated-content" id="tab-month">
+      <!-- ════════════ TAB: MONTH VIEW (removed per PO) ════════════ -->
+      <div class="tab-content populated-content" id="tab-month" style="display:none">
         <div class="timesheet-month-grid">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);">
             <div class="month-header" style="font-size:var(--text-heading-2);font-weight:var(--weight-semibold);color:var(--color-text-1);">April 2026</div>
@@ -1229,9 +1205,9 @@
             <div style="font-size:var(--text-body-sm);color:var(--color-text-3);">33h remaining to meet target</div>
           </div>
           <div style="display:flex;gap:var(--space-3);margin-top:var(--space-3);flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-success);"></div> &gt;6h — Full day</div>
-            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-warning);"></div> 3–6h — Partial</div>
-            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-error);"></div> &lt;3h — Low</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-success);"></div> &gt;6h - Full day</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-warning);"></div> 3-6h - Partial</div>
+            <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-3);"><div style="width:12px;height:12px;border-radius:var(--radius-sm);background:var(--color-error);"></div> &lt;3h - Low</div>
           </div>
         </div>
       </div>
@@ -1323,8 +1299,8 @@
         </div>
       </div>
 
-      <!-- ════════════ TAB 3: APPROVAL QUEUE ════════════ -->
-      <div class="tab-content populated-content" id="tab-approval" data-min-role="pm">
+      <!-- ════════════ TAB 3: APPROVAL QUEUE (removed per PO, moved to approvals.html) ════════════ -->
+      <div class="tab-content populated-content" id="tab-approval" data-min-role="pm" style="display:none">
 
         <!-- Approval Queue Filter Bar -->
         <div class="aq-filter-bar">
@@ -1383,7 +1359,7 @@
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">45h</strong> total &mdash; <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex Phase 2</a> (40h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (5h)
+              Week of Apr 7 - <strong style="font-family:var(--font-mono);">45h</strong> total - <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex Phase 2</a> (40h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (5h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="100% billable + 12.5% internal = 112.5% total work time">
@@ -1414,11 +1390,11 @@
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-warning),var(--color-accent));">BT</div>
               <div>
                 <div class="employee-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering &mdash; Bench</div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering - Bench</div>
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">8h</strong> total &mdash; <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (8h)
+              Week of Apr 7 - <strong style="font-family:var(--font-mono);">8h</strong> total - <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (8h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="0% billable + 20% internal = 20% total work time">
@@ -1452,7 +1428,7 @@
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">40h</strong> total &mdash; <a href="projects.html#initech-api" style="font-size:var(--text-body-sm);">Initech API</a> (36h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (4h)
+              Week of Apr 7 - <strong style="font-family:var(--font-mono);">40h</strong> total - <a href="projects.html#initech-api" style="font-size:var(--text-body-sm);">Initech API</a> (36h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (4h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="90% billable + 10% internal = 100% total work time">
@@ -1486,7 +1462,7 @@
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">43h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (36h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (7h)
+              Week of Apr 7 - <strong style="font-family:var(--font-mono);">43h</strong> total - <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (36h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (7h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="90% billable + 17.5% internal = 107.5% total work time">
@@ -1521,7 +1497,7 @@
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">40h</strong> total &mdash; <a href="projects.html#hr-project" style="font-size:var(--text-body-sm);">HR Operations</a> (24h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (16h)
+              Week of Apr 7 - <strong style="font-family:var(--font-mono);">40h</strong> total - <a href="projects.html#hr-project" style="font-size:var(--text-body-sm);">HR Operations</a> (24h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (16h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="60% billable + 40% internal = 100% total work time">
@@ -1550,12 +1526,12 @@
             <div class="action-row-employee">
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-accent),var(--color-info));">AW</div>
               <div>
-                <div class="employee-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></div>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering &mdash; On Leave Apr 14&ndash;18</div>
+                <div class="employee-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14-18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering - On Leave Apr 14-18</div>
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">18h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (16h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (2h)
+              Week of Apr 7 - <strong style="font-family:var(--font-mono);">18h</strong> total - <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (16h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (2h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="40% billable + 5% internal = 45% total work time">
@@ -1585,11 +1561,11 @@
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-error),var(--color-accent));">DP</div>
               <div>
                 <div class="employee-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="85" data-href="employees.html#david-park">David Park</a></div>
-                <div style="font-size:var(--text-caption);color:var(--color-error);">Finance &mdash; <strong>OVERDUE 3d</strong></div>
+                <div style="font-size:var(--text-caption);color:var(--color-error);">Finance - <strong>OVERDUE 3d</strong></div>
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Mar 23 &mdash; <strong style="font-family:var(--font-mono);">35h</strong> total &mdash; <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex</a> (30h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (5h)
+              Week of Mar 23 - <strong style="font-family:var(--font-mono);">35h</strong> total - <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex</a> (30h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (5h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
               <div class="aq-worktime-bar" title="75% billable + 12% internal = 87% total work time">
@@ -2354,9 +2330,7 @@
     setTimeout(function() {
       btn.classList.remove('btn-loading');
       isSubmitted = true;
-      // Show submitted banner
-      document.getElementById('tsSubmittedBanner').style.display = 'flex';
-      // Show completion card with stats
+      // Show completion card with stats (submitted banner is replaced by completion card)
       var completionCard = document.getElementById('tsCompletionCard');
       if (completionCard) {
         var gt = parseInt(document.getElementById('grandTotal').textContent) || 0;
@@ -2376,8 +2350,7 @@
         completionCard.style.display = 'flex';
         lucide.createIcons({ nodes: [completionCard] });
       }
-      // Disable all cell inputs
-      document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = 'none'; });
+      // Hide the grid (clean locked state, no ghost opacity)
       document.getElementById('tsGridWrapper').classList.add('submitted-state');
       // Update approvals badge
       var approvalsBadge = document.getElementById('approvalsBadge');
@@ -2393,7 +2366,10 @@
       btn.className = 'btn btn-success btn-md';
       lucide.createIcons({ nodes: [btn] });
       // Toast confirmation
-      showToast('success', 'Submitted', 'Your timesheet has been sent for approval. Awaiting John Smith\'s review.');
+      showToast('success', 'Timesheet Approved', 'Timesheet approved - sent to client portal for review.');
+      // Show Request Change button on submitted/approved state
+      var rcBtn = document.getElementById('requestChangeBtn');
+      if (rcBtn) rcBtn.style.display = '';
     }, 1000);
   }
 
@@ -2403,10 +2379,8 @@
     setTimeout(function() {
       btn.classList.remove('btn-loading');
       isSubmitted = false;
-      document.getElementById('tsSubmittedBanner').style.display = 'none';
       var completionCard = document.getElementById('tsCompletionCard');
       if (completionCard) completionCard.style.display = 'none';
-      document.querySelectorAll('.ts-cell').forEach(function(c) { c.style.pointerEvents = ''; });
       document.getElementById('tsGridWrapper').classList.remove('submitted-state');
       btn.innerHTML = '<svg data-lucide="send" width="16" height="16"></svg> Submit for Review';
       btn.className = 'btn btn-primary btn-md';

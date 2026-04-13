@@ -462,7 +462,7 @@
     }
   </style>
 </head>
-<body>
+<body class="show-populated">
 <a href="#main-content" class="skip-to-content">Skip to content</a>
 <div class="app">
 
@@ -506,6 +506,7 @@
         <div class="relative">
           <div class="header-user" id="userMenuBtn">
             <div class="avatar avatar-sm avatar-status online">SC</div>
+
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
@@ -533,17 +534,16 @@
       <div id="listView">
 
         <!-- Breadcrumb -->
-        <nav class="breadcrumbs mb-4">
+        <nav class="breadcrumb mb-4">
           <a href="index.html">Home</a>
-          <span class="separator">&rsaquo;</span>
-          <span class="current">Projects</span>
+          <span style="color:var(--color-text-2);margin:0 var(--space-2);">/</span>
+          <span style="color:var(--color-text-1);">Projects</span>
         </nav>
 
         <!-- Page header -->
         <div class="page-header">
           <div class="page-header-left">
             <h1 class="page-title">Projects</h1>
-            <p class="page-subtitle">Manage and track all your projects</p>
           </div>
           <div class="page-header-actions">
             <button class="btn btn-secondary btn-md" id="exportBtn">
@@ -594,68 +594,13 @@
             <option value="Globex Corp">Globex Corp</option>
             <option value="Initech">Initech</option>
             <option value="Umbrella Corp">Umbrella Corp</option>
-            <option value="Umbrella Corp">Umbrella Corp</option>
             <option value="Internal">Internal</option>
-          </select>
-          <select class="form-select" id="filterBilling" onchange="filterProjects()">
-            <option value="">All Billing</option>
-            <option value="Hourly">Hourly</option>
-            <option value="Daily">Daily</option>
-            <option value="Fixed Price">Fixed Price</option>
-            <option value="Retainer">Retainer</option>
           </select>
         </div>
 
         <!-- ── Board View ── -->
         <div class="board-view" id="boardView">
           <div class="kanban-board">
-
-            <!-- Column: Planning -->
-            <div class="kanban-column">
-              <div class="kanban-column-header">
-                <div class="col-title">
-                  <svg data-lucide="circle-dashed" width="16" height="16" style="color: var(--color-info);"></svg>
-                  Planning
-                </div>
-                <span class="col-count">3</span>
-              </div>
-              <div class="kanban-cards stagger-reveal">
-
-                <div class="project-card card-interactive" data-project="umbrella-portal" onclick="showDetail('umbrella-portal')">
-                  <div class="project-card-name">Umbrella Corp Portal</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/umbrella" onclick="event.stopPropagation()">Umbrella Corp</a></div>
-                  <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="credit-card"></svg> Fixed price</span>
-                    <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
-                  </div>
-                  <span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
-                </div>
-
-                <div class="project-card card-interactive" data-project="internal-portal" onclick="showDetail('internal-portal')">
-                  <div class="project-card-name">Internal Portal v2</div>
-                  <div class="project-card-client">Internal</div>
-                  <div class="project-card-meta">
-                    <span class="meta-item"><svg data-lucide="credit-card"></svg> &mdash;</span>
-                    <span class="meta-item"><svg data-lucide="users"></svg> 0 members</span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;">
-                    <span class="badge badge-default"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
-                    <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> No team assigned</span>
-                  </div>
-                </div>
-
-                <div class="project-card card-interactive" data-project="dataviz-dashboard" onclick="showDetail('dataviz-dashboard')">
-                  <div class="project-card-name">DataViz Dashboard</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
-                  <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
-                    <span class="meta-item"><svg data-lucide="users"></svg> 1 member</span>
-                  </div>
-                  <span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
-                </div>
-
-              </div>
-            </div>
 
             <!-- Column: Active -->
             <div class="kanban-column">
@@ -664,7 +609,7 @@
                   <svg data-lucide="circle-dot" width="16" height="16" style="color: var(--color-primary);"></svg>
                   Active
                 </div>
-                <span class="col-count">4</span>
+                <span class="col-count">6</span>
               </div>
               <div class="kanban-cards stagger-reveal">
 
@@ -672,76 +617,84 @@
                   <div class="project-card-name">Acme Web Redesign</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;85/h</span></span>
-                    <span class="meta-item"><svg data-lucide="users"></svg> 5 members</span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 4 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Jan-Jun 2026</span>
                   </div>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
-                  <div class="card-budget">
-                    <div class="card-budget-header">
-                      <span class="card-budget-label">Budget</span>
-                      <span class="card-budget-pct">64%</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-bar-fill green" style="width: 64%;"></div>
-                    </div>
-                  </div>
                 </div>
 
                 <div class="project-card card-interactive" data-project="globex-phase2" onclick="showDetail('globex-phase2')">
-                  <div class="project-card-name">Globex Phase 2</div>
+                  <div class="project-card-name">Globex ERP Integration</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;90/h</span></span>
-                    <span class="meta-item"><svg data-lucide="users"></svg> 4 members</span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 3 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Feb-Aug 2026</span>
                   </div>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
-                  <div class="card-budget">
-                    <div class="card-budget-header">
-                      <span class="card-budget-label">Budget</span>
-                      <span class="card-budget-pct">35%</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-bar-fill green" style="width: 35%;"></div>
-                    </div>
-                  </div>
                 </div>
 
                 <div class="project-card card-interactive" data-project="initech-api" onclick="showDetail('initech-api')">
-                  <div class="project-card-name">Initech API Integration</div>
+                  <div class="project-card-name">Initech Mobile App</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;95/h</span></span>
-                    <span class="meta-item"><svg data-lucide="users"></svg> 3 members</span>
+                    <span class="meta-item"><svg data-lucide="users"></svg> 5 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Mar-Sep 2026</span>
                   </div>
                   <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span>
-                  <div class="card-budget">
-                    <div class="card-budget-header">
-                      <span class="card-budget-label">Budget</span>
-                      <span class="card-budget-pct">69%</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-bar-fill yellow" style="width: 69%;"></div>
-                    </div>
-                  </div>
                 </div>
 
                 <div class="project-card card-interactive" data-project="acme-mobile" onclick="showDetail('acme-mobile')">
-                  <div class="project-card-name">Acme Mobile App</div>
+                  <div class="project-card-name">Acme Analytics Dashboard</div>
                   <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
                   <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="credit-card"></svg> <span class="font-mono">&euro;85/h</span></span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Apr - Jul 2026</span>
                   </div>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
-                  <div class="card-budget">
-                    <div class="card-budget-header">
-                      <span class="card-budget-label">Budget</span>
-                      <span class="card-budget-pct">15%</span>
-                    </div>
-                    <div class="progress-bar">
-                      <div class="progress-bar-fill green" style="width: 15%;"></div>
-                    </div>
+                </div>
+
+                <div class="project-card card-interactive" data-project="umbrella-portal" onclick="showDetail('umbrella-portal')">
+                  <div class="project-card-name">Umbrella Corp Portal</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/umbrella" onclick="event.stopPropagation()">Umbrella Corp</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="users"></svg> 3 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Jan - Dec 2026</span>
                   </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+
+                <div class="project-card card-interactive" data-project="initech-audit" onclick="showDetail('initech-audit')">
+                  <div class="project-card-name">Initech Security Audit</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Mar - Apr 2026</span>
+                  </div>
+                  <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Column: At Risk -->
+            <div class="kanban-column">
+              <div class="kanban-column-header">
+                <div class="col-title">
+                  <svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-warning);"></svg>
+                  At Risk
+                </div>
+                <span class="col-count">1</span>
+              </div>
+              <div class="kanban-cards stagger-reveal">
+
+                <div class="project-card card-interactive" data-project="globex-migration" onclick="showDetail('globex-migration')">
+                  <div class="project-card-name">Globex Cloud Migration</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
+                  <div class="project-card-meta">
+                    <span class="meta-item"><svg data-lucide="users"></svg> 4 members</span>
+                    <span class="meta-item"><svg data-lucide="calendar"></svg> Jan - Oct 2026</span>
+                  </div>
+                  <span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span>
                 </div>
 
               </div>
@@ -754,46 +707,14 @@
                   <svg data-lucide="check-circle-2" width="16" height="16" style="color: var(--color-success);"></svg>
                   Completed
                 </div>
-                <span class="col-count">3</span>
+                <span class="col-count">0</span>
               </div>
-              <div class="kanban-cards stagger-reveal">
-
-                <div class="project-card card-interactive" data-project="globex-migration" onclick="showDetail('globex-migration')">
-                  <div class="project-card-name">Globex Data Migration</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></div>
-                  <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;120k</span></span>
-                  </div>
-                  <div class="card-revenue">
-                    Revenue: <span class="amount">&euro;120,000</span>
-                  </div>
-                  <div style="margin-top: var(--space-2);">
-                    <span class="card-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                  </div>
+              <div class="kanban-cards">
+                <!-- Empty state for completed column -->
+                <div style="padding:var(--space-6);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);">
+                  <svg data-lucide="check-circle-2" style="width:32px;height:32px;margin:0 auto var(--space-3);opacity:0.3;"></svg>
+                  <div>Projects you complete will appear here. Keep going.</div>
                 </div>
-
-                <div class="project-card card-interactive" data-project="acme-crm" onclick="showDetail('acme-crm')">
-                  <div class="project-card-name">Acme CRM Setup</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></div>
-                  <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> <span class="font-mono">&euro;80/h</span></span>
-                  </div>
-                  <div class="card-revenue">
-                    Revenue: <span class="amount">&euro;45,000</span>
-                  </div>
-                </div>
-
-                <div class="project-card card-interactive" data-project="initech-audit" onclick="showDetail('initech-audit')">
-                  <div class="project-card-name">Initech Security Audit</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></div>
-                  <div class="project-card-meta">
-                    <span class="meta-item" data-sensitive="billing"><svg data-lucide="banknote"></svg> Fixed <span class="font-mono">&euro;30k</span></span>
-                  </div>
-                  <div class="card-revenue">
-                    Revenue: <span class="amount">&euro;30,000</span>
-                  </div>
-                </div>
-
               </div>
             </div>
 
@@ -806,138 +727,90 @@
             <table class="data-table mobile-cards">
               <thead>
                 <tr>
-                  <th>Project Name</th>
+                  <th>Project</th>
                   <th>Client</th>
-                  <th>Billing</th>
-                  <th>Team Size</th>
-                  <th>Budget %</th>
+                  <th>Team</th>
+                  <th>Timeline</th>
                   <th>Health</th>
-                  <th>Status</th>
                   <th style="width:24px;"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="cursor-pointer" onclick="showDetail('acme-web')">
-                  <td><strong>Acme Web Redesign</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;85/h</td>
-                  <td data-label="Team Size">5</td>
-                  <td data-label="Budget %">
-                    <div style="display:flex;align-items:center;gap:var(--space-2);">
-                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill green" style="width:64%;"></div></div>
-                      <span class="font-mono" style="font-size:var(--text-caption);">64%</span>
-                    </div>
+                  <td>
+                    <div><strong>Acme Web Redesign</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp</div>
                   </td>
+                  <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
+                  <td data-label="Team">4</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Jan - Jun 2026</td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('globex-phase2')">
-                  <td><strong>Globex Phase 2</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;90/h</td>
-                  <td data-label="Team Size">4</td>
-                  <td data-label="Budget %">
-                    <div style="display:flex;align-items:center;gap:var(--space-2);">
-                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill green" style="width:35%;"></div></div>
-                      <span class="font-mono" style="font-size:var(--text-caption);">35%</span>
-                    </div>
+                  <td>
+                    <div><strong>Globex ERP Integration</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Globex Corp</div>
                   </td>
+                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
+                  <td data-label="Team">3</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Feb - Aug 2026</td>
                   <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('initech-api')">
-                  <td><strong>Initech API Integration</strong></td>
+                  <td>
+                    <div><strong>Initech Mobile App</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Initech</div>
+                  </td>
                   <td data-label="Client"><a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;95/h</td>
-                  <td data-label="Team Size">3</td>
-                  <td data-label="Budget %">
-                    <div style="display:flex;align-items:center;gap:var(--space-2);">
-                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill yellow" style="width:69%;"></div></div>
-                      <span class="font-mono" style="font-size:var(--text-caption);">69%</span>
-                    </div>
-                  </td>
+                  <td data-label="Team">5</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Mar - Sep 2026</td>
                   <td data-label="Health"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
-                  <td data-label="Status"></td>
-                  <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
-                </tr>
-                <tr class="cursor-pointer" onclick="showDetail('acme-mobile')">
-                  <td><strong>Acme Mobile App</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;85/h</td>
-                  <td data-label="Team Size">2</td>
-                  <td data-label="Budget %">
-                    <div style="display:flex;align-items:center;gap:var(--space-2);">
-                      <div class="progress-bar" style="width:80px;"><div class="progress-bar-fill green" style="width:15%;"></div></div>
-                      <span class="font-mono" style="font-size:var(--text-caption);">15%</span>
-                    </div>
-                  </td>
-                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                  <td data-label="Status"></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('umbrella-portal')">
-                  <td><strong>Umbrella Corp Portal</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/umbrella" onclick="event.stopPropagation()">Umbrella Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed price</td>
-                  <td data-label="Team Size">2</td>
-                  <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
-                  <td data-label="Health"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
-                  <td data-label="Status"></td>
-                  <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
-                </tr>
-                <tr class="cursor-pointer" onclick="showDetail('internal-portal')">
-                  <td><strong>Internal Portal v2</strong></td>
-                  <td data-label="Client">Internal</td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&mdash;</td>
-                  <td data-label="Team Size">0</td>
-                  <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
-                  <td data-label="Health">
-                    <span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span>
-                    <span class="badge badge-warning" style="margin-left:var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> No team</span>
+                  <td>
+                    <div><strong>Umbrella Corp Portal</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Umbrella Corp</div>
                   </td>
-                  <td data-label="Status"></td>
+                  <td data-label="Client"><a href="clients.html#detail/umbrella" onclick="event.stopPropagation()">Umbrella Corp</a></td>
+                  <td data-label="Team">3</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Jan - Dec 2026</td>
+                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
-                <tr class="cursor-pointer" onclick="showDetail('dataviz-dashboard')">
-                  <td><strong>DataViz Dashboard</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;95/h</td>
-                  <td data-label="Team Size">1</td>
-                  <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
-                  <td data-label="Health"><span class="badge badge-info"><svg data-lucide="circle-dashed" width="12" height="12"></svg> Planning</span></td>
-                  <td data-label="Status"></td>
+                <tr class="cursor-pointer" onclick="showDetail('acme-mobile')">
+                  <td>
+                    <div><strong>Acme Analytics Dashboard</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp</div>
+                  </td>
+                  <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
+                  <td data-label="Team">2</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Apr - Jul 2026</td>
+                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('globex-migration')">
-                  <td><strong>Globex Data Migration</strong></td>
+                  <td>
+                    <div><strong>Globex Cloud Migration</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Globex Corp</div>
+                  </td>
                   <td data-label="Client"><a href="clients.html#detail/globex" onclick="event.stopPropagation()">Globex Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed &euro;120k</td>
-                  <td data-label="Team Size">&mdash;</td>
-                  <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;120,000</span></td>
-                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
-                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                  <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
-                </tr>
-                <tr class="cursor-pointer" onclick="showDetail('acme-crm')">
-                  <td><strong>Acme CRM Setup</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/acme" onclick="event.stopPropagation()">Acme Corp</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">&euro;80/h</td>
-                  <td data-label="Team Size">&mdash;</td>
-                  <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;45,000</span></td>
-                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
-                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                  <td data-label="Team">4</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Jan - Oct 2026</td>
+                  <td data-label="Health"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
                 <tr class="cursor-pointer" onclick="showDetail('initech-audit')">
-                  <td><strong>Initech Security Audit</strong></td>
+                  <td>
+                    <div><strong>Initech Security Audit</strong></div>
+                    <div style="font-size:var(--text-caption);color:var(--color-text-3);">Initech</div>
+                  </td>
                   <td data-label="Client"><a href="clients.html#detail/initech" onclick="event.stopPropagation()">Initech</a></td>
-                  <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed &euro;30k</td>
-                  <td data-label="Team Size">&mdash;</td>
-                  <td data-label="Budget %"><span class="font-mono" style="color:var(--color-gold);font-size:var(--text-caption);">&euro;30,000</span></td>
-                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
-                  <td data-label="Status"><span class="badge badge-success"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
+                  <td data-label="Team">2</td>
+                  <td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Mar - Apr 2026</td>
+                  <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
               </tbody>
@@ -990,7 +863,7 @@
               <div class="tl-label">
                 <span class="badge badge-primary badge-xs">Active</span>
                 <strong>Acme Web Redesign</strong>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp · 5 members</div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp · 4 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
@@ -1003,12 +876,12 @@
               </div>
             </div>
 
-            <!-- Globex Phase 2: Jan–Jun (cols 1–6) -->
+            <!-- Globex ERP Integration: Jan–Jun (cols 1–6) -->
             <div class="tl-row" onclick="showDetail('globex-phase2')">
               <div class="tl-label">
                 <span class="badge badge-primary badge-xs">Active</span>
-                <strong>Globex Phase 2</strong>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Globex Corp · 4 members</div>
+                <strong>Globex ERP Integration</strong>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Globex Corp · 3 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
@@ -1020,12 +893,12 @@
               </div>
             </div>
 
-            <!-- Initech API Integration: Mar–Sep (cols 3–9) -->
+            <!-- Initech Mobile App: Mar–Sep (cols 3–9) -->
             <div class="tl-row" onclick="showDetail('initech-api')">
               <div class="tl-label">
                 <span class="badge badge-warning badge-xs">At Risk</span>
-                <strong>Initech API Integration</strong>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Initech · 3 members</div>
+                <strong>Initech Mobile App</strong>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Initech · 5 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
@@ -1038,11 +911,11 @@
               </div>
             </div>
 
-            <!-- Acme Mobile App: Apr–Oct (cols 4–10) -->
+            <!-- Acme Analytics Dashboard: Apr–Jul (cols 4–7) -->
             <div class="tl-row" onclick="showDetail('acme-mobile')">
               <div class="tl-label">
                 <span class="badge badge-primary badge-xs">Active</span>
-                <strong>Acme Mobile App</strong>
+                <strong>Acme Analytics Dashboard</strong>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Acme Corp · 2 members</div>
               </div>
               <div class="tl-bars">
@@ -1147,15 +1020,15 @@
         </a>
 
         <!-- Breadcrumbs -->
-        <nav class="breadcrumbs mb-4">
+        <nav class="breadcrumb mb-4">
           <a href="projects.html">Projects</a>
-          <span class="separator">&rsaquo;</span>
-          <span class="current" id="breadcrumb-project-name">Acme Web Redesign</span>
+          <span style="color:var(--color-text-2);margin:0 var(--space-2);">/</span>
+          <span style="color:var(--color-text-1);" id="breadcrumb-project-name">Acme Web Redesign</span>
         </nav>
 
         <!-- Project detail header -->
         <div class="project-detail-header" id="project-detail-header">
-          <div class="project-detail-title" id="detail-title">Acme Corp &mdash; Website Redesign</div>
+          <div class="project-detail-title" id="detail-title">Acme Web Redesign</div>
           <div class="project-detail-client" id="detail-client">Client: <a href="clients.html#detail/acme">Acme Corp</a></div>
 
           <div class="project-detail-badges" id="detail-badges">
@@ -1196,7 +1069,7 @@
                 <div class="progress-bar-fill blue" style="width: 55%;"></div>
               </div>
             </div>
-            <span class="progress-values">Feb 1 &mdash; Jul 31 (55%)</span>
+            <span class="progress-values">Feb 1 - Jul 31 (55%)</span>
           </div>
         </div>
 
@@ -1226,7 +1099,7 @@
             <div class="ai-insight-card mb-4" id="initech-ai-insight" style="display:none;">
               <div class="ai-header"><svg data-lucide="sparkles" width="16" height="16"></svg> AI Project Intelligence</div>
               <div class="ai-body">
-                <strong>Budget Alert:</strong> Initech API Integration is at 69% budget with timeline at 55%. Burn rate is accelerating &mdash; projected overrun of 8% if current pace continues.<br><br>
+                <strong>Budget Alert:</strong> Initech API Integration is at 69% budget with timeline at 55%. Burn rate is accelerating - projected overrun of 8% if current pace continues.<br><br>
                 <strong>Risk Assessment:</strong> Risk score 6/10. API complexity higher than estimated. 3 integration endpoints behind schedule.<br><br>
                 <strong>Recommendation:</strong> Prioritize core endpoints and defer non-critical integrations to Phase 2. Schedule technical review with Diana Park to reassess estimates.
               </div>
@@ -1636,21 +1509,21 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Mar 30 &mdash; Apr 5</td>
+                    <td>Mar 30 - Apr 5</td>
                     <td data-label="Billable Hours" class="cell-mono">38h</td>
                     <td data-label="Non-Billable" class="cell-mono">4h</td>
                     <td data-label="Total" class="cell-mono">42h</td>
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td>Mar 23 &mdash; Mar 29</td>
+                    <td>Mar 23 - Mar 29</td>
                     <td data-label="Billable Hours" class="cell-mono">40h</td>
                     <td data-label="Non-Billable" class="cell-mono">2h</td>
                     <td data-label="Total" class="cell-mono">42h</td>
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td>Mar 16 &mdash; Mar 22</td>
+                    <td>Mar 16 - Mar 22</td>
                     <td data-label="Billable Hours" class="cell-mono">36h</td>
                     <td data-label="Non-Billable" class="cell-mono">6h</td>
                     <td data-label="Total" class="cell-mono">42h</td>
@@ -1660,21 +1533,21 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Mar 9 &mdash; Mar 15</td>
+                    <td>Mar 9 - Mar 15</td>
                     <td data-label="Billable Hours" class="cell-mono">42h</td>
                     <td data-label="Non-Billable" class="cell-mono">3h</td>
                     <td data-label="Total" class="cell-mono">45h</td>
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td>Mar 2 &mdash; Mar 8</td>
+                    <td>Mar 2 - Mar 8</td>
                     <td data-label="Billable Hours" class="cell-mono">35h</td>
                     <td data-label="Non-Billable" class="cell-mono">5h</td>
                     <td data-label="Total" class="cell-mono">40h</td>
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td>Feb 16 &mdash; Feb 22</td>
+                    <td>Feb 16 - Feb 22</td>
                     <td data-label="Billable Hours" class="cell-mono">40h</td>
                     <td data-label="Non-Billable" class="cell-mono">2h</td>
                     <td data-label="Total" class="cell-mono">42h</td>
@@ -1702,21 +1575,21 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Mar 30 &mdash; Apr 5</td>
+                    <td>Mar 30 - Apr 5</td>
                     <td data-label="Billable Hours" class="cell-mono">32h</td>
                     <td data-label="Non-Billable" class="cell-mono">3h</td>
                     <td data-label="Total" class="cell-mono">35h</td>
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td>Mar 23 &mdash; Mar 29</td>
+                    <td>Mar 23 - Mar 29</td>
                     <td data-label="Billable Hours" class="cell-mono">35h</td>
                     <td data-label="Non-Billable" class="cell-mono">5h</td>
                     <td data-label="Total" class="cell-mono">40h</td>
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td>Mar 16 &mdash; Mar 22</td>
+                    <td>Mar 16 - Mar 22</td>
                     <td data-label="Billable Hours" class="cell-mono">30h</td>
                     <td data-label="Non-Billable" class="cell-mono">4h</td>
                     <td data-label="Total" class="cell-mono">34h</td>
@@ -1885,7 +1758,7 @@
                     </div>
                     <div class="milestone-content">
                       <div class="milestone-name">Discovery &amp; Requirements</div>
-                      <div class="milestone-dates">Feb 1 &mdash; Feb 14, 2026</div>
+                      <div class="milestone-dates">Feb 1 - Feb 14, 2026</div>
                       <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Complete</span>
                     </div>
                   </div>
@@ -1896,7 +1769,7 @@
                     </div>
                     <div class="milestone-content">
                       <div class="milestone-name">Design Phase</div>
-                      <div class="milestone-dates">Feb 15 &mdash; Mar 15, 2026</div>
+                      <div class="milestone-dates">Feb 15 - Mar 15, 2026</div>
                       <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Complete</span>
                     </div>
                   </div>
@@ -1907,7 +1780,7 @@
                     </div>
                     <div class="milestone-content">
                       <div class="milestone-name">Development Sprint 1</div>
-                      <div class="milestone-dates">Mar 16 &mdash; Apr 15, 2026</div>
+                      <div class="milestone-dates">Mar 16 - Apr 15, 2026</div>
                       <span class="badge badge-info"><svg data-lucide="loader" width="12" height="12"></svg> In Progress</span>
                       <div class="milestone-progress" style="margin-top:var(--space-2);">
                         <div class="progress-bar" style="height:6px;">
@@ -1924,7 +1797,7 @@
                     </div>
                     <div class="milestone-content">
                       <div class="milestone-name">Development Sprint 2</div>
-                      <div class="milestone-dates">Apr 16 &mdash; May 15, 2026</div>
+                      <div class="milestone-dates">Apr 16 - May 15, 2026</div>
                       <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span>
                     </div>
                   </div>
@@ -1935,7 +1808,7 @@
                     </div>
                     <div class="milestone-content">
                       <div class="milestone-name">Testing &amp; QA</div>
-                      <div class="milestone-dates">May 16 &mdash; Jun 15, 2026</div>
+                      <div class="milestone-dates">May 16 - Jun 15, 2026</div>
                       <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Upcoming</span>
                     </div>
                   </div>
@@ -2372,7 +2245,14 @@
       '#acme-web-redesign': '#detail/acme-web',
       '#project-acme-web': '#detail/acme-web',
       '#project-initech-api': '#detail/initech-api',
-      '#project-globex-phase2': '#detail/globex-phase2'
+      '#project-globex-phase2': '#detail/globex-phase2',
+      '#globex-phase-2': '#detail/globex-phase2',
+      '#globex-erp-integration': '#detail/globex-phase2',
+      '#initech-mobile-app': '#detail/initech-api',
+      '#acme-analytics-dashboard': '#detail/acme-mobile',
+      '#umbrella-corp-portal': '#detail/umbrella-portal',
+      '#globex-cloud-migration': '#detail/globex-migration',
+      '#initech-security-audit': '#detail/initech-audit'
     };
     if (aliasMap[hash]) {
       hash = aliasMap[hash];
@@ -2413,14 +2293,14 @@
 
   var projectData = {
     'acme-web': {
-      title: 'Acme Corp &mdash; Website Redesign',
+      title: 'Acme Web Redesign',
       client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
       budgetPct: 64,
       budgetText: '&euro;32,200 / &euro;50,000 (64%)',
       badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Feb 1, 2026</span>',
       description: 'Full website redesign including new design system, responsive layouts, and analytics dashboard.',
       status: 'active',
-      timeline: 'Feb 1 &mdash; Jul 31, 2026',
+      timeline: 'Feb 1 - Jul 31, 2026',
       timelinePct: 55,
       stats: { hours: '388h', budgetUsed: '64%', revenue: '&euro;32,200', margin: '48%', hoursTrend: '+12% this week', revTrend: '+&euro;4,800 this month', marginTrend: '+2% vs last month' },
       team: [
@@ -2439,23 +2319,23 @@
         { name: "Liam O'Brien", initials: 'LO', text: 'pushed 12 commits to <span class="highlight">feature/auth</span>', time: 'Yesterday' }
       ],
       milestones: [
-        { name: 'Discovery &amp; Requirements', dates: 'Feb 1 &mdash; Feb 14, 2026', status: 'complete' },
-        { name: 'Design Phase', dates: 'Feb 15 &mdash; Mar 15, 2026', status: 'complete' },
-        { name: 'Development Sprint 1', dates: 'Mar 16 &mdash; Apr 15, 2026', status: 'in-progress', pct: 60 },
-        { name: 'Development Sprint 2', dates: 'Apr 16 &mdash; May 15, 2026', status: 'upcoming' },
-        { name: 'Testing &amp; QA', dates: 'May 16 &mdash; Jun 15, 2026', status: 'upcoming' },
+        { name: 'Discovery &amp; Requirements', dates: 'Feb 1 - Feb 14, 2026', status: 'complete' },
+        { name: 'Design Phase', dates: 'Feb 15 - Mar 15, 2026', status: 'complete' },
+        { name: 'Development Sprint 1', dates: 'Mar 16 - Apr 15, 2026', status: 'in-progress', pct: 60 },
+        { name: 'Development Sprint 2', dates: 'Apr 16 - May 15, 2026', status: 'upcoming' },
+        { name: 'Testing &amp; QA', dates: 'May 16 - Jun 15, 2026', status: 'upcoming' },
         { name: 'Launch', dates: 'Jul 1, 2026', status: 'upcoming' }
       ]
     },
     'initech-api': {
-      title: 'Initech &mdash; API Integration',
+      title: 'Initech Mobile App',
       client: 'Client: <a href="clients.html#detail/initech">Initech</a>',
       budgetPct: 69,
       budgetText: '&euro;27,495 / &euro;40,000 (69%)',
       badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>',
       description: 'REST API integration with Initech legacy systems, including authentication, data sync, and reporting endpoints.',
       status: 'at-risk',
-      timeline: 'Mar 1 &mdash; Sep 30, 2026',
+      timeline: 'Mar 1 - Sep 30, 2026',
       timelinePct: 55,
       stats: { hours: '305h', budgetUsed: '69%', revenue: '&euro;27,495', margin: '47%', hoursTrend: '+8% this week', revTrend: '+&euro;3,100 this month', marginTrend: '+1% vs last month' },
       team: [
@@ -2463,29 +2343,29 @@
         { name: 'John Smith', initials: 'JS', role: 'Senior Developer', dept: 'Engineering', worktime: 82, hours: '145h', billRate: '&euro;95/h', revenue: '&euro;13,775', costRate: '&euro;50/h', cost: '&euro;7,250', margin: '&euro;6,525 (47%)' },
         { name: 'Bob Taylor', initials: 'BT', role: 'Backend Developer', dept: 'Engineering', worktime: 0, hours: '65h', billRate: '&euro;80/h', revenue: '&euro;5,200', costRate: '&euro;38/h', cost: '&euro;2,470', margin: '&euro;2,730 (53%)' }
       ],
-      aiInsight: '<strong>Budget Alert:</strong> Initech API Integration is at 69% budget with timeline at 55%. Burn rate is accelerating &mdash; projected overrun of 8% if current pace continues.<br><br><strong>Risk Assessment:</strong> Risk score 6/10. API complexity higher than estimated. 3 integration endpoints behind schedule.<br><br><strong>Recommendation:</strong> Prioritize core endpoints and defer non-critical integrations to Phase 2. Schedule technical review with John Smith to reassess estimates.',
+      aiInsight: '<strong>Budget Alert:</strong> Initech API Integration is at 69% budget with timeline at 55%. Burn rate is accelerating - projected overrun of 8% if current pace continues.<br><br><strong>Risk Assessment:</strong> Risk score 6/10. API complexity higher than estimated. 3 integration endpoints behind schedule.<br><br><strong>Recommendation:</strong> Prioritize core endpoints and defer non-critical integrations to Phase 2. Schedule technical review with John Smith to reassess estimates.',
       activity: [
         { name: 'John Smith', initials: 'JS', text: 'committed API auth module to <span class="highlight">feature/oauth</span>', time: '1 hour ago' },
         { name: 'Bob Taylor', initials: 'BT', text: 'filed bug report <span class="highlight">BUG-342: Rate limiting</span>', time: '3 hours ago' },
         { name: 'Sarah Chen', initials: 'SC', text: 'updated project risk status to <span class="highlight">At Risk</span>', time: 'Yesterday' }
       ],
       milestones: [
-        { name: 'API Discovery &amp; Design', dates: 'Mar 1 &mdash; Mar 21, 2026', status: 'complete' },
-        { name: 'Core Endpoints', dates: 'Mar 22 &mdash; May 15, 2026', status: 'in-progress', pct: 45 },
-        { name: 'Authentication &amp; Security', dates: 'May 16 &mdash; Jun 30, 2026', status: 'upcoming' },
-        { name: 'Integration Testing', dates: 'Jul 1 &mdash; Aug 15, 2026', status: 'upcoming' },
+        { name: 'API Discovery &amp; Design', dates: 'Mar 1 - Mar 21, 2026', status: 'complete' },
+        { name: 'Core Endpoints', dates: 'Mar 22 - May 15, 2026', status: 'in-progress', pct: 45 },
+        { name: 'Authentication &amp; Security', dates: 'May 16 - Jun 30, 2026', status: 'upcoming' },
+        { name: 'Integration Testing', dates: 'Jul 1 - Aug 15, 2026', status: 'upcoming' },
         { name: 'Go-Live', dates: 'Sep 30, 2026', status: 'upcoming' }
       ]
     },
     'globex-phase2': {
-      title: 'Globex Corp &mdash; Phase 2 Migration',
+      title: 'Globex ERP Integration',
       client: 'Client: <a href="clients.html#detail/globex">Globex Corp</a>',
       budgetPct: 35,
       budgetText: '&euro;63,000 / &euro;180,000 (35%)',
       badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;90/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 15, 2026</span>',
       description: 'Phase 2 of the Globex infrastructure migration including microservices decomposition and cloud-native deployment.',
       status: 'active',
-      timeline: 'Jan 15 &mdash; Jun 30, 2026',
+      timeline: 'Jan 15 - Jun 30, 2026',
       timelinePct: 60,
       stats: { hours: '700h', budgetUsed: '35%', revenue: '&euro;63,000', margin: '52%', hoursTrend: '+5% this week', revTrend: '+&euro;7,200 this month', marginTrend: 'Stable' },
       team: [
@@ -2502,21 +2382,21 @@
         { name: 'Carol Williams', initials: 'CW', text: 'updated dashboard wireframes in <span class="highlight">Figma</span>', time: '2 days ago' }
       ],
       milestones: [
-        { name: 'Infrastructure Setup', dates: 'Jan 15 &mdash; Feb 14, 2026', status: 'complete' },
-        { name: 'Microservices Migration', dates: 'Feb 15 &mdash; Apr 15, 2026', status: 'in-progress', pct: 75 },
-        { name: 'Data Migration', dates: 'Apr 16 &mdash; May 31, 2026', status: 'upcoming' },
-        { name: 'UAT &amp; Go-Live', dates: 'Jun 1 &mdash; Jun 30, 2026', status: 'upcoming' }
+        { name: 'Infrastructure Setup', dates: 'Jan 15 - Feb 14, 2026', status: 'complete' },
+        { name: 'Microservices Migration', dates: 'Feb 15 - Apr 15, 2026', status: 'in-progress', pct: 75 },
+        { name: 'Data Migration', dates: 'Apr 16 - May 31, 2026', status: 'upcoming' },
+        { name: 'UAT &amp; Go-Live', dates: 'Jun 1 - Jun 30, 2026', status: 'upcoming' }
       ]
     },
     'acme-mobile': {
-      title: 'Acme Corp &mdash; Mobile App',
+      title: 'Acme Analytics Dashboard',
       client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
       budgetPct: 15,
       budgetText: '&euro;14,250 / &euro;95,000 (15%)',
       badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;85/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Apr 1, 2026</span>',
       description: 'Native iOS and Android companion app for the Acme web platform. Phase 1 covers authentication, dashboard, and notifications.',
       status: 'active',
-      timeline: 'Apr 1 &mdash; Oct 31, 2026',
+      timeline: 'Apr 1 - Jul 31, 2026',
       timelinePct: 5,
       stats: { hours: '168h', budgetUsed: '15%', revenue: '&euro;14,250', margin: '51%', hoursTrend: '+22% this week', revTrend: '+&euro;5,100 this month', marginTrend: '+3% vs last month' },
       team: [
@@ -2529,27 +2409,27 @@
         { name: 'Alice Wang', initials: 'AW', text: 'set up React Native project with <span class="highlight">CI/CD pipeline</span>', time: 'Yesterday' }
       ],
       milestones: [
-        { name: 'Discovery &amp; Architecture', dates: 'Apr 1 &mdash; Apr 21, 2026', status: 'in-progress', pct: 30 },
-        { name: 'Design &amp; Prototyping', dates: 'Apr 22 &mdash; May 31, 2026', status: 'upcoming' },
-        { name: 'Development Sprint 1', dates: 'Jun 1 &mdash; Jul 15, 2026', status: 'upcoming' },
-        { name: 'Development Sprint 2', dates: 'Jul 16 &mdash; Sep 15, 2026', status: 'upcoming' },
+        { name: 'Discovery &amp; Architecture', dates: 'Apr 1 - Apr 21, 2026', status: 'in-progress', pct: 30 },
+        { name: 'Design &amp; Prototyping', dates: 'Apr 22 - May 31, 2026', status: 'upcoming' },
+        { name: 'Development Sprint 1', dates: 'Jun 1 - Jul 15, 2026', status: 'upcoming' },
+        { name: 'Development Sprint 2', dates: 'Jul 16 - Sep 15, 2026', status: 'upcoming' },
         { name: 'App Store Submission', dates: 'Oct 1, 2026', status: 'upcoming' }
       ]
     },
     'umbrella-portal': {
-      title: 'Umbrella Corp &mdash; Client Portal',
+      title: 'Umbrella Corp Portal',
       client: 'Client: <a href="clients.html#detail/umbrella">Umbrella Corp</a>',
       budgetPct: 0,
       budgetText: '&euro;0 / &euro;120,000 (0%)',
       badges: '<span class="badge badge-info badge-lg"><svg data-lucide="circle-dashed" width="14" height="14"></svg> Planning</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed Price</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: May 1, 2026</span>',
       description: 'Client portal platform for Umbrella Corp. Fixed-price engagement covering customer onboarding, account management, and reporting dashboards.',
       status: 'planning',
-      timeline: 'May 1 &mdash; Dec 31, 2026',
+      timeline: 'May 1 - Dec 31, 2026',
       timelinePct: 0,
-      stats: { hours: '0h', budgetUsed: '0%', revenue: '&euro;0', margin: '&mdash;', hoursTrend: 'Not started', revTrend: 'Not started', marginTrend: '&mdash;' },
+      stats: { hours: '0h', budgetUsed: '0%', revenue: '&euro;0', margin: '-', hoursTrend: 'Not started', revTrend: 'Not started', marginTrend: '-' },
       team: [
-        { name: 'David Park', initials: 'DP', role: 'Finance Lead', dept: 'Finance', worktime: 85, hours: '0h', billRate: '&euro;90/h', revenue: '&euro;0', costRate: '&euro;46/h', cost: '&euro;0', margin: '&mdash;' },
-        { name: 'Marco Rossi', initials: 'MR', role: 'Operations Lead', dept: 'Operations', worktime: 108, hours: '0h', billRate: '&euro;85/h', revenue: '&euro;0', costRate: '&euro;42/h', cost: '&euro;0', margin: '&mdash;' }
+        { name: 'David Park', initials: 'DP', role: 'Finance Lead', dept: 'Finance', worktime: 85, hours: '0h', billRate: '&euro;90/h', revenue: '&euro;0', costRate: '&euro;46/h', cost: '&euro;0', margin: '-' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'Operations Lead', dept: 'Operations', worktime: 108, hours: '0h', billRate: '&euro;85/h', revenue: '&euro;0', costRate: '&euro;42/h', cost: '&euro;0', margin: '-' }
       ],
       aiInsight: '<strong>Status:</strong> Umbrella Corp Portal is in planning phase. Kick-off scheduled for May 1, 2026.<br><br><strong>Staffing:</strong> David Park and Marco Rossi are assigned. Consider adding a frontend developer before sprint 1.<br><br><strong>Recommendation:</strong> Finalize SOW and milestone schedule with Umbrella Corp before May 1. Fixed-price projects benefit from tight scope definition upfront.',
       activity: [
@@ -2557,14 +2437,14 @@
         { name: 'Marco Rossi', initials: 'MR', text: 'uploaded <span class="highlight">requirements document v1</span>', time: '4 days ago' }
       ],
       milestones: [
-        { name: 'Scoping &amp; SOW', dates: 'Apr 15 &mdash; Apr 30, 2026', status: 'in-progress', pct: 20 },
-        { name: 'Phase 1: Portal Foundation', dates: 'May 1 &mdash; Jul 31, 2026', status: 'upcoming' },
-        { name: 'Phase 2: Account Management', dates: 'Aug 1 &mdash; Oct 31, 2026', status: 'upcoming' },
-        { name: 'Phase 3: Reporting &amp; Launch', dates: 'Nov 1 &mdash; Dec 31, 2026', status: 'upcoming' }
+        { name: 'Scoping &amp; SOW', dates: 'Apr 15 - Apr 30, 2026', status: 'in-progress', pct: 20 },
+        { name: 'Phase 1: Portal Foundation', dates: 'May 1 - Jul 31, 2026', status: 'upcoming' },
+        { name: 'Phase 2: Account Management', dates: 'Aug 1 - Oct 31, 2026', status: 'upcoming' },
+        { name: 'Phase 3: Reporting &amp; Launch', dates: 'Nov 1 - Dec 31, 2026', status: 'upcoming' }
       ]
     },
     'internal-portal': {
-      title: 'Internal &mdash; Employee Portal v2',
+      title: 'Internal Employee Portal v2',
       client: 'Internal',
       budgetPct: 0,
       budgetText: '&euro;0 / &euro;45,000 (0%)',
@@ -2573,7 +2453,7 @@
       status: 'planning',
       timeline: 'TBD',
       timelinePct: 0,
-      stats: { hours: '0h', budgetUsed: '0%', revenue: '&mdash;', margin: '&mdash;', hoursTrend: 'Not started', revTrend: 'Internal project', marginTrend: '&mdash;' },
+      stats: { hours: '0h', budgetUsed: '0%', revenue: '-', margin: '-', hoursTrend: 'Not started', revTrend: 'Internal project', marginTrend: '-' },
       team: [],
       aiInsight: '<strong>Status:</strong> Internal Portal v2 has no team assigned yet. This project is blocked on staffing.<br><br><strong>Recommendation:</strong> Assign at least a project lead and one developer. Bob Taylor (0% allocated) and Emma Laurent are good candidates. Prioritize this if employee satisfaction survey feedback requires it.',
       activity: [
@@ -2582,14 +2462,14 @@
       milestones: []
     },
     'dataviz-dashboard': {
-      title: 'Globex &mdash; DataViz Dashboard',
+      title: 'Globex DataViz Dashboard',
       client: 'Client: <a href="clients.html#detail/globex">Globex Corp</a>',
       budgetPct: 10,
       budgetText: '&euro;7,650 / &euro;78,000 (10%)',
       badges: '<span class="badge badge-info badge-lg"><svg data-lucide="circle-dashed" width="14" height="14"></svg> Planning</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;95/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Mar 1, 2026</span>',
       description: 'Interactive data visualization dashboard for Globex Corp executive reporting. D3.js-based charts with real-time data feeds.',
       status: 'planning',
-      timeline: 'Mar 1 &mdash; Aug 31, 2026',
+      timeline: 'Mar 1 - Aug 31, 2026',
       timelinePct: 20,
       stats: { hours: '82h', budgetUsed: '10%', revenue: '&euro;7,650', margin: '49%', hoursTrend: '+6% this week', revTrend: '+&euro;1,900 this month', marginTrend: 'Stable' },
       team: [
@@ -2601,50 +2481,53 @@
         { name: 'Carol Williams', initials: 'CW', text: 'created color palette and <span class="highlight">chart style guide</span>', time: '5 days ago' }
       ],
       milestones: [
-        { name: 'Requirements &amp; Wireframes', dates: 'Mar 1 &mdash; Apr 15, 2026', status: 'in-progress', pct: 70 },
-        { name: 'Chart Component Library', dates: 'Apr 16 &mdash; Jun 15, 2026', status: 'upcoming' },
-        { name: 'Dashboard Assembly &amp; Testing', dates: 'Jun 16 &mdash; Aug 15, 2026', status: 'upcoming' },
+        { name: 'Requirements &amp; Wireframes', dates: 'Mar 1 - Apr 15, 2026', status: 'in-progress', pct: 70 },
+        { name: 'Chart Component Library', dates: 'Apr 16 - Jun 15, 2026', status: 'upcoming' },
+        { name: 'Dashboard Assembly &amp; Testing', dates: 'Jun 16 - Aug 15, 2026', status: 'upcoming' },
         { name: 'Launch', dates: 'Aug 31, 2026', status: 'upcoming' }
       ]
     },
     'globex-migration': {
-      title: 'Globex Corp &mdash; Data Migration',
+      title: 'Globex Cloud Migration',
       client: 'Client: <a href="clients.html#detail/globex">Globex Corp</a>',
-      budgetPct: 100,
-      budgetText: '&euro;120,000 / &euro;120,000 (100%)',
-      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle-2" width="14" height="14"></svg> Completed</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed &euro;120K</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>May 2025 &ndash; Nov 2025</span>',
-      description: 'Full data migration from legacy Oracle systems to cloud-native PostgreSQL. Included ETL pipelines, data validation, and rollback procedures.',
-      status: 'completed',
-      timeline: 'May 1 &mdash; Nov 30, 2025',
-      timelinePct: 100,
-      stats: { hours: '1,420h', budgetUsed: '100%', revenue: '&euro;120,000', margin: '44%', hoursTrend: 'Project complete', revTrend: 'Final: &euro;120,000', marginTrend: 'Final: 44%' },
+      budgetPct: 58,
+      budgetText: '&euro;104,400 / &euro;180,000 (58%)',
+      badges: '<span class="badge badge-warning badge-lg"><svg data-lucide="alert-triangle" width="14" height="14"></svg> At Risk</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;90/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Jan 1, 2026</span>',
+      description: 'Full cloud infrastructure migration for Globex Corp. Moving from on-prem to AWS including network redesign, containerization, and disaster recovery.',
+      status: 'at-risk',
+      timeline: 'Jan 1 - Oct 31, 2026',
+      timelinePct: 35,
+      stats: { hours: '1,160h', budgetUsed: '58%', revenue: '&euro;104,400', margin: '41%', hoursTrend: '+3% this week', revTrend: '+&euro;9,000 this month', marginTrend: '-3% vs target' },
       team: [
-        { name: 'John Smith', initials: 'JS', role: 'Lead Developer', dept: 'Engineering', worktime: 82, hours: '480h', billRate: '&euro;90/h', revenue: '&euro;43,200', costRate: '&euro;50/h', cost: '&euro;24,000', margin: '&euro;19,200 (44%)' },
-        { name: 'Marco Rossi', initials: 'MR', role: 'DevOps Engineer', dept: 'Operations', worktime: 88, hours: '520h', billRate: '&euro;85/h', revenue: '&euro;44,200', costRate: '&euro;42/h', cost: '&euro;21,840', margin: '&euro;22,360 (51%)' },
-        { name: 'Emma Laurent', initials: 'EL', role: 'Data Analyst', dept: 'HR', worktime: 78, hours: '420h', billRate: '&euro;80/h', revenue: '&euro;33,600', costRate: '&euro;40/h', cost: '&euro;16,800', margin: '&euro;16,800 (50%)' }
+        { name: 'John Smith', initials: 'JS', role: 'Technical Lead', dept: 'Engineering', worktime: 82, hours: '420h', billRate: '&euro;95/h', revenue: '&euro;39,900', costRate: '&euro;50/h', cost: '&euro;21,000', margin: '&euro;18,900 (47%)' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'Cloud Architect', dept: 'Operations', worktime: 88, hours: '480h', billRate: '&euro;90/h', revenue: '&euro;43,200', costRate: '&euro;42/h', cost: '&euro;20,160', margin: '&euro;23,040 (53%)' },
+        { name: 'Alice Wang', initials: 'AW', role: 'DevOps Engineer', dept: 'Engineering', worktime: 45, hours: '160h', billRate: '&euro;85/h', revenue: '&euro;13,600', costRate: '&euro;40/h', cost: '&euro;6,400', margin: '&euro;7,200 (53%)' },
+        { name: 'Emma Laurent', initials: 'EL', role: 'Project Analyst', dept: 'HR', worktime: 78, hours: '100h', billRate: '&euro;75/h', revenue: '&euro;7,500', costRate: '&euro;40/h', cost: '&euro;4,000', margin: '&euro;3,500 (47%)' }
       ],
-      aiInsight: '<strong>Project Complete:</strong> Globex Data Migration finished on time and within budget. Client satisfaction: 5/5 stars.<br><br><strong>Retrospective:</strong> Strong team collaboration. ETL pipeline reusable for future migrations. Recommend templating this approach for similar engagements.<br><br><strong>Follow-up:</strong> Globex Phase 2 is the continuation project. Phase 3 scoping discussions scheduled for Q3.',
+      aiInsight: '<strong>Budget Alert:</strong> Globex Cloud Migration is at 58% budget but only 35% through the timeline. At current burn rate, budget will be exhausted by July - 3 months before deadline.<br><br><strong>Risk Assessment:</strong> Risk score 8/10. Network redesign scope significantly exceeded original estimate. Infrastructure complexity higher than anticipated.<br><br><strong>Recommendation:</strong> Schedule immediate scope review with Globex. Consider phased delivery: complete cloud migration by Aug, defer DR setup to Q4 Phase 2.',
       activity: [
-        { name: 'Sarah Chen', initials: 'SC', text: 'marked project as <span class="highlight">Completed</span>', time: 'Nov 30, 2025' },
-        { name: 'Marco Rossi', initials: 'MR', text: 'completed final <span class="highlight">data validation report</span>', time: 'Nov 28, 2025' },
-        { name: 'John Smith', initials: 'JS', text: 'deployed production migration <span class="highlight">v3.2 final</span>', time: 'Nov 25, 2025' }
+        { name: 'Marco Rossi', initials: 'MR', text: 'flagged project as <span class="highlight">At Risk</span> - budget overrun', time: '1 day ago' },
+        { name: 'John Smith', initials: 'JS', text: 'completed network diagram for <span class="highlight">VPC redesign</span>', time: '2 days ago' },
+        { name: 'Alice Wang', initials: 'AW', text: 'provisioned <span class="highlight">EKS cluster</span> in eu-west-1', time: '3 days ago' },
+        { name: 'Sarah Chen', initials: 'SC', text: 'scheduled risk review call with <span class="highlight">Globex Corp</span>', time: '5 days ago' }
       ],
       milestones: [
-        { name: 'Discovery &amp; Planning', dates: 'May 1 &mdash; May 31, 2025', status: 'complete' },
-        { name: 'ETL Pipeline Development', dates: 'Jun 1 &mdash; Aug 15, 2025', status: 'complete' },
-        { name: 'Data Migration &amp; Validation', dates: 'Aug 16 &mdash; Oct 31, 2025', status: 'complete' },
-        { name: 'Go-Live &amp; Handover', dates: 'Nov 1 &mdash; Nov 30, 2025', status: 'complete' }
+        { name: 'Infrastructure Assessment', dates: 'Jan 1 - Feb 14, 2026', status: 'complete' },
+        { name: 'Network Redesign', dates: 'Feb 15 - Apr 15, 2026', status: 'in-progress', pct: 65 },
+        { name: 'Application Migration', dates: 'Apr 16 - Jul 31, 2026', status: 'upcoming' },
+        { name: 'Data Migration &amp; Testing', dates: 'Aug 1 - Sep 30, 2026', status: 'upcoming' },
+        { name: 'Go-Live &amp; Handover', dates: 'Oct 1 - Oct 31, 2026', status: 'upcoming' }
       ]
     },
     'acme-crm': {
-      title: 'Acme Corp &mdash; CRM Setup',
+      title: 'Acme CRM Setup',
       client: 'Client: <a href="clients.html#detail/acme">Acme Corp</a>',
       budgetPct: 100,
       budgetText: '&euro;45,000 / &euro;45,000 (100%)',
       badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle-2" width="14" height="14"></svg> Completed</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Hourly &euro;80/h</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Jan &ndash; Apr 2025</span>',
       description: 'CRM implementation and customization for Acme Corp. HubSpot integration with custom workflows, reporting, and team training.',
       status: 'completed',
-      timeline: 'Jan 6 &mdash; Apr 30, 2025',
+      timeline: 'Jan 6 - Apr 30, 2025',
       timelinePct: 100,
       stats: { hours: '562h', budgetUsed: '100%', revenue: '&euro;45,000', margin: '46%', hoursTrend: 'Project complete', revTrend: 'Final: &euro;45,000', marginTrend: 'Final: 46%' },
       team: [
@@ -2659,38 +2542,38 @@
         { name: 'Bob Taylor', initials: 'BT', text: 'merged API integration for <span class="highlight">HubSpot webhooks</span>', time: 'Apr 20, 2025' }
       ],
       milestones: [
-        { name: 'Requirements Gathering', dates: 'Jan 6 &mdash; Jan 24, 2025', status: 'complete' },
-        { name: 'CRM Configuration', dates: 'Jan 27 &mdash; Mar 7, 2025', status: 'complete' },
-        { name: 'Integration &amp; Testing', dates: 'Mar 10 &mdash; Apr 11, 2025', status: 'complete' },
-        { name: 'Training &amp; Handover', dates: 'Apr 14 &mdash; Apr 30, 2025', status: 'complete' }
+        { name: 'Requirements Gathering', dates: 'Jan 6 - Jan 24, 2025', status: 'complete' },
+        { name: 'CRM Configuration', dates: 'Jan 27 - Mar 7, 2025', status: 'complete' },
+        { name: 'Integration &amp; Testing', dates: 'Mar 10 - Apr 11, 2025', status: 'complete' },
+        { name: 'Training &amp; Handover', dates: 'Apr 14 - Apr 30, 2025', status: 'complete' }
       ]
     },
     'initech-audit': {
-      title: 'Initech &mdash; Security Audit',
+      title: 'Initech Security Audit',
       client: 'Client: <a href="clients.html#detail/initech">Initech</a>',
-      budgetPct: 100,
-      budgetText: '&euro;30,000 / &euro;30,000 (100%)',
-      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle-2" width="14" height="14"></svg> Completed</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed &euro;30K</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Oct &ndash; Dec 2025</span>',
-      description: 'Comprehensive security audit of Initech infrastructure including penetration testing, code review, and compliance assessment.',
-      status: 'completed',
-      timeline: 'Oct 1 &mdash; Dec 15, 2025',
-      timelinePct: 100,
-      stats: { hours: '380h', budgetUsed: '100%', revenue: '&euro;30,000', margin: '42%', hoursTrend: 'Project complete', revTrend: 'Final: &euro;30,000', marginTrend: 'Final: 42%' },
+      budgetPct: 80,
+      budgetText: '&euro;24,000 / &euro;30,000 (80%)',
+      badges: '<span class="badge badge-success badge-lg"><svg data-lucide="check-circle" width="14" height="14"></svg> Active</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed &euro;30K</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: Mar 1, 2026</span>',
+      description: 'Annual security audit of Initech infrastructure including penetration testing, code review, and SOC 2 compliance assessment.',
+      status: 'active',
+      timeline: 'Mar 1 - Apr 30, 2026',
+      timelinePct: 80,
+      stats: { hours: '300h', budgetUsed: '80%', revenue: '&euro;24,000', margin: '42%', hoursTrend: '+4% this week', revTrend: 'Final invoice pending', marginTrend: 'On target' },
       team: [
-        { name: 'John Smith', initials: 'JS', role: 'Security Lead', dept: 'Engineering', worktime: 82, hours: '200h', billRate: '&euro;95/h', revenue: '&euro;19,000', costRate: '&euro;50/h', cost: '&euro;10,000', margin: '&euro;9,000 (47%)' },
-        { name: 'Bob Taylor', initials: 'BT', role: 'Penetration Tester', dept: 'Engineering', worktime: 0, hours: '180h', billRate: '&euro;80/h', revenue: '&euro;14,400', costRate: '&euro;38/h', cost: '&euro;6,840', margin: '&euro;7,560 (53%)' }
+        { name: 'John Smith', initials: 'JS', role: 'Security Lead', dept: 'Engineering', worktime: 82, hours: '160h', billRate: '&euro;95/h', revenue: '&euro;15,200', costRate: '&euro;50/h', cost: '&euro;8,000', margin: '&euro;7,200 (47%)' },
+        { name: 'Bob Taylor', initials: 'BT', role: 'Penetration Tester', dept: 'Engineering', worktime: 0, hours: '140h', billRate: '&euro;80/h', revenue: '&euro;11,200', costRate: '&euro;38/h', cost: '&euro;5,320', margin: '&euro;5,880 (53%)' }
       ],
-      aiInsight: '<strong>Project Complete:</strong> Initech Security Audit delivered. 12 critical vulnerabilities identified and remediated.<br><br><strong>Outcome:</strong> Initech passed SOC 2 compliance audit following our recommendations. Led directly to the API Integration project.<br><br><strong>Follow-up:</strong> Annual re-audit scheduled for Oct 2026.',
+      aiInsight: '<strong>Status:</strong> Initech Security Audit is in final phase. 80% budget consumed with timeline at 80% - on track for Apr 30 delivery.<br><br><strong>Findings so far:</strong> 8 critical vulnerabilities identified, 6 remediated. 2 remaining require Initech dev team action.<br><br><strong>Recommendation:</strong> Schedule client debrief and final report delivery for Apr 28 to allow 2 days buffer.',
       activity: [
-        { name: 'John Smith', initials: 'JS', text: 'delivered final <span class="highlight">Security Audit Report</span>', time: 'Dec 15, 2025' },
-        { name: 'Bob Taylor', initials: 'BT', text: 'completed penetration testing on <span class="highlight">production environment</span>', time: 'Dec 10, 2025' },
-        { name: 'John Smith', initials: 'JS', text: 'identified critical vulnerability in <span class="highlight">auth module</span>', time: 'Nov 20, 2025' }
+        { name: 'John Smith', initials: 'JS', text: 'submitted vulnerability report for <span class="highlight">auth module</span>', time: '2 hours ago' },
+        { name: 'Bob Taylor', initials: 'BT', text: 'completed penetration testing phase <span class="highlight">2 of 3</span>', time: 'Yesterday' },
+        { name: 'John Smith', initials: 'JS', text: 'updated risk register with <span class="highlight">6 new findings</span>', time: '3 days ago' }
       ],
       milestones: [
-        { name: 'Scope &amp; Methodology', dates: 'Oct 1 &mdash; Oct 14, 2025', status: 'complete' },
-        { name: 'Vulnerability Assessment', dates: 'Oct 15 &mdash; Nov 15, 2025', status: 'complete' },
-        { name: 'Penetration Testing', dates: 'Nov 16 &mdash; Dec 5, 2025', status: 'complete' },
-        { name: 'Report &amp; Remediation', dates: 'Dec 6 &mdash; Dec 15, 2025', status: 'complete' }
+        { name: 'Scope &amp; Methodology', dates: 'Mar 1 - Mar 14, 2026', status: 'complete' },
+        { name: 'Vulnerability Assessment', dates: 'Mar 15 - Apr 5, 2026', status: 'complete' },
+        { name: 'Penetration Testing', dates: 'Apr 6 - Apr 20, 2026', status: 'in-progress', pct: 70 },
+        { name: 'Report &amp; Remediation', dates: 'Apr 21 - Apr 30, 2026', status: 'upcoming' }
       ]
     }
   };
@@ -2849,7 +2732,7 @@
     document.getElementById('detail-badges').innerHTML = data.badges;
     document.getElementById('detail-budget-bar').style.width = data.budgetPct + '%';
     document.getElementById('detail-budget-text').innerHTML = data.budgetText;
-    document.getElementById('breadcrumb-project-name').textContent = data.title.replace(/&mdash;/g, '\u2014').replace(/&ndash;/g, '\u2013').replace(/&euro;/g, '\u20AC').replace(/&amp;/g, '&').replace(/<[^>]*>/g, '');
+    document.getElementById('breadcrumb-project-name').textContent = data.title.replace(/&ndash;/g, '\u2013').replace(/&euro;/g, '\u20AC').replace(/&amp;/g, '&').replace(/<[^>]*>/g, '');
 
     // Budget bar color
     var bar = document.getElementById('detail-budget-bar');
@@ -3009,7 +2892,7 @@
       tr.className = 'cursor-pointer';
       tr.innerHTML = '<td><strong>' + name + '</strong></td>' +
         '<td data-label="Client">' + clientName + '</td>' +
-        '<td data-label="Billing" class="cell-mono" data-sensitive="billing">&mdash;</td>' +
+        '<td data-label="Billing" class="cell-mono" data-sensitive="billing">-</td>' +
         '<td data-label="Team Size">1</td>' +
         '<td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">0%</span></td>' +
         '<td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>' +

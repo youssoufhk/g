@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Team Directory — GammaHR Quantum</title>
+  <title>Team Directory - GammaHR Quantum</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <link rel="stylesheet" href="_layout.css">
@@ -125,9 +125,9 @@
       border-radius: var(--radius-full);
       transition: width var(--motion-slow) var(--ease-out);
     }
-    .worktime-fill.green, .worktime-fill.high { background: var(--color-success); }
-    .worktime-fill.yellow, .worktime-fill.mid { background: var(--color-warning); }
-    .worktime-fill.red, .worktime-fill.low { background: var(--color-error); }
+    .worktime-fill.high { background: var(--color-success); }
+    .worktime-fill.mid { background: var(--color-warning); }
+    .worktime-fill.low { background: var(--color-error); }
     .worktime-pct {
       font-family: var(--font-mono);
       font-size: var(--text-caption);
@@ -135,9 +135,9 @@
       min-width: 36px;
       text-align: right;
     }
-    .worktime-pct.green, .worktime-pct.high { color: var(--color-success); }
-    .worktime-pct.yellow, .worktime-pct.mid { color: var(--color-warning); }
-    .worktime-pct.red, .worktime-pct.low { color: var(--color-error); }
+    .worktime-pct.high { color: var(--color-success); }
+    .worktime-pct.mid { color: var(--color-warning); }
+    .worktime-pct.low { color: var(--color-error); }
 
     .employee-card-footer {
       display: flex;
@@ -550,7 +550,7 @@
       color: var(--color-primary);
     }
 
-    /* Work Time overflow — amber/warning for overwork */
+    /* Work Time overflow - amber/warning for overwork */
     .worktime-fill.overflow {
       background: linear-gradient(90deg, var(--color-warning) 0%, var(--color-warning) 100%);
       position: relative;
@@ -570,6 +570,7 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
+    .worktime-pct.overflow { color: var(--color-warning); }
 
     /* Breadcrumbs */
     .breadcrumbs {
@@ -916,11 +917,10 @@
           <!-- Page Header -->
           <div class="page-header">
             <div class="page-header-left">
-              <h1 class="page-title">Team Directory</h1>
-              <p class="page-subtitle">13 team members across 6 departments</p>
+              <h1 class="page-title">Team Directory <span style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-3);margin-left:var(--space-2);">12</span></h1>
             </div>
             <div class="page-header-actions">
-              <button class="btn btn-secondary btn-md" id="exportBtn" onclick="GHR && GHR.showToast ? GHR.showToast('info', 'Export', 'Exporting team data as CSV...') : showToast('Export started — CSV downloading...')">
+              <button class="btn btn-secondary btn-md" id="exportBtn" onclick="GHR && GHR.showToast ? GHR.showToast('info', 'Export', 'Exporting team data as CSV...') : showToast('Export started - CSV downloading...')">
                 <svg data-lucide="download" style="width:16px;height:16px;"></svg>
                 Export
               </button>
@@ -945,13 +945,13 @@
               <svg data-lucide="search"></svg>
               <input type="text" placeholder="Search by name, title, or department..." id="employeeSearch">
             </div>
-            <select class="form-select form-input-sm">
+            <select class="form-select form-input-sm" id="deptFilter">
               <option value="">All Departments</option>
               <option>Engineering</option>
               <option>Operations</option>
               <option>Design</option>
-              <option>Analytics</option>
-              <option>Human Resources</option>
+              <option>Finance</option>
+              <option>HR</option>
               <option>Executive</option>
             </select>
             <select class="form-select form-input-sm">
@@ -968,20 +968,25 @@
               <option>Offline</option>
               <option>On Leave</option>
             </select>
-            <button class="btn btn-secondary btn-sm" id="saveViewBtn" title="Save current filter combination as a named view">
-              <svg data-lucide="bookmark" style="width:14px;height:14px;"></svg>
-              Save View
-            </button>
-            <div class="view-toggle" id="viewToggle">
-              <button class="view-toggle-btn active" data-view="grid" title="Grid view">
+            <div class="seg-control" id="viewToggle" role="group" aria-label="View mode">
+              <button class="seg-control-btn active" data-view="grid" title="Grid view">
                 <svg data-lucide="layout-grid" style="width:16px;height:16px;"></svg>
               </button>
-              <button class="view-toggle-btn" data-view="list" title="List view">
+              <button class="seg-control-btn" data-view="list" title="List view">
                 <svg data-lucide="list" style="width:16px;height:16px;"></svg>
               </button>
-              <button class="view-toggle-btn" data-view="org" title="Org Chart">
+              <button class="seg-control-btn" data-view="org" title="Org Chart">
                 <svg data-lucide="network" style="width:16px;height:16px;"></svg>
               </button>
+            </div>
+            <div class="relative">
+              <button class="btn btn-ghost btn-icon btn-sm" id="filterMoreBtn" title="More options" onclick="document.getElementById('filterMoreDropdown').classList.toggle('active')">
+                <svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg>
+              </button>
+              <div class="user-dropdown" id="filterMoreDropdown" style="right:0;left:auto;top:100%;min-width:160px;">
+                <a href="#" class="dropdown-item" onclick="event.preventDefault();var n=prompt('Name this view:','My View');if(n&&n.trim()){GHR&&GHR.showToast?GHR.showToast('success','View saved','\"'+n.trim()+'\" saved.');document.getElementById('filterMoreDropdown').classList.remove('active');}"><svg data-lucide="bookmark" width="16" height="16"></svg> Save View</a>
+                <a href="#" class="dropdown-item" onclick="event.preventDefault();GHR&&GHR.showToast?GHR.showToast('info','Export','Exporting team data as CSV...');document.getElementById('filterMoreDropdown').classList.remove('active');"><svg data-lucide="download" width="16" height="16"></svg> Export CSV</a>
+              </div>
             </div>
           </div>
 
@@ -1001,318 +1006,235 @@
           <div id="empRealGrid"><div id="gridView" class="employee-grid stagger-reveal">
 
             <!-- 1. Sarah Chen -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-sarah'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-online"><div class="avatar avatar-lg">SC</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#profile-sarah">Sarah Chen</a>
+                  <a class="employee-card-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a>
                   <div class="employee-card-title">Project Manager</div>
-                  <div class="employee-card-dept">Engineering</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Acme Web Redesign</a>
-                <a href="projects.html">Initech API</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 100%;"></div>
+                  <div class="worktime-fill high" style="width: 100%;"></div>
                 </div>
-                <span class="worktime-pct green">100%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">100%</span>
               </div>
             </div>
 
             <!-- 2. John Smith -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-john'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-online"><div class="avatar avatar-lg">JS</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#profile-john">John Smith</a>
+                  <a class="employee-card-name" data-employee="john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith">John Smith</a>
                   <div class="employee-card-title">Senior Developer</div>
-                  <div class="employee-card-dept">Engineering</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Globex Phase 2</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
                   <div class="worktime-fill overflow" style="width: 100%;"></div>
                 </div>
-                <span class="worktime-pct" style="color:var(--color-warning);">112.5%</span>
+                <span class="worktime-pct overflow">112.5%</span>
               </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+              <div class="employee-card-footer" style="padding-top:var(--space-2);border-top:1px solid var(--color-border-subtle);">
                 <span class="badge badge-warning" style="font-size:var(--text-caption);">Overwork</span>
               </div>
             </div>
 
             <!-- 3. Alice Wang -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-alice'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-leave"><div class="avatar avatar-lg">AW</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="45" data-status="on-leave" data-href="employees.html#profile-alice">Alice Wang</a>
+                  <a class="employee-card-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="45" data-status="on-leave" data-href="employees.html#alice-wang">Alice Wang</a>
                   <div class="employee-card-title">Software Engineer</div>
-                  <div class="employee-card-dept">Engineering</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Acme Web Redesign</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill red" style="width: 45%;"></div>
+                  <div class="worktime-fill low" style="width: 45%;"></div>
                 </div>
-                <span class="worktime-pct red">45%</span>
+                <span class="worktime-pct low">45%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14–18</span>
+                <span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14-18</span>
               </div>
             </div>
 
             <!-- 4. Bob Taylor -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-bob'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-lg">BT</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#profile-bob">Bob Taylor</a>
+                  <a class="employee-card-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                   <div class="employee-card-title">Backend Developer</div>
-                  <div class="employee-card-dept">Engineering</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <span style="font-size:var(--text-caption);color:var(--color-text-3);font-style:italic;">On bench — no active project</span>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill red" style="width: 0%;"></div>
+                  <div class="worktime-fill low" style="width: 0%;"></div>
                 </div>
-                <span class="worktime-pct red">0%</span>
+                <span class="worktime-pct low">0%</span>
               </div>
               <div class="employee-card-footer">
-                <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
                 <span class="badge badge-warning" style="font-size:var(--text-caption);">Bench</span>
               </div>
             </div>
 
             <!-- 5. Carol Williams -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-carol'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-online"><div class="avatar avatar-lg">CW</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#profile-carol">Carol Williams</a>
+                  <a class="employee-card-name" data-employee="carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#carol-williams">Carol Williams</a>
                   <div class="employee-card-title">Design Lead</div>
-                  <div class="employee-card-dept">Design</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Acme Web Redesign</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 100%;"></div>
+                  <div class="worktime-fill high" style="width: 100%;"></div>
                 </div>
-                <span class="worktime-pct green">100%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">100%</span>
               </div>
             </div>
 
             <!-- 6. David Park -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-david'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-offline"><div class="avatar avatar-lg">DP</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Globex Phase 2" data-worktime="85" data-href="employees.html#profile-david">David Park</a>
+                  <a class="employee-card-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Globex Phase 2" data-worktime="85" data-href="employees.html#david-park">David Park</a>
                   <div class="employee-card-title">Finance Lead</div>
-                  <div class="employee-card-dept">Finance</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Globex Phase 2</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 85%;"></div>
+                  <div class="worktime-fill high" style="width: 85%;"></div>
                 </div>
-                <span class="worktime-pct green">85%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
+                <span class="worktime-pct high">85%</span>
               </div>
             </div>
 
             <!-- 7. Emma Laurent -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-emma'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-online"><div class="avatar avatar-lg">EL</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#profile-emma">Emma Laurent</a>
+                  <a class="employee-card-name" data-employee="emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent">Emma Laurent</a>
                   <div class="employee-card-title">HR Specialist</div>
-                  <div class="employee-card-dept">HR</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Internal</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 90%;"></div>
+                  <div class="worktime-fill high" style="width: 90%;"></div>
                 </div>
-                <span class="worktime-pct green">90%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">90%</span>
               </div>
             </div>
 
             <!-- 8. Marco Rossi -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#profile-marco'">
               <div class="employee-card-top">
                 <span class="avatar-status presence-away"><div class="avatar avatar-lg">MR</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#profile-marco">Marco Rossi</a>
+                  <a class="employee-card-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi">Marco Rossi</a>
                   <div class="employee-card-title">Operations Lead</div>
-                  <div class="employee-card-dept">Operations</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Acme Web Redesign</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
                   <div class="worktime-fill overflow" style="width: 100%;"></div>
                 </div>
-                <span class="worktime-pct" style="color:var(--color-warning);">107.5%</span>
+                <span class="worktime-pct overflow">107.5%</span>
               </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Away</span>
+              <div class="employee-card-footer" style="padding-top:var(--space-2);border-top:1px solid var(--color-border-subtle);">
                 <span class="badge badge-warning" style="font-size:var(--text-caption);">Overwork</span>
               </div>
             </div>
 
             <!-- 9. Sophie Dubois -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#sophie-dubois'">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">SD</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">SD</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="UX Designer" data-dept="Design" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Sophie Dubois</a>
+                  <a class="employee-card-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="UX Designer" data-dept="Design" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#sophie-dubois">Sophie Dubois</a>
                   <div class="employee-card-title">UX Designer</div>
-                  <div class="employee-card-dept">Design</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Acme Web Redesign</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 88%;"></div>
+                  <div class="worktime-fill high" style="width: 88%;"></div>
                 </div>
-                <span class="worktime-pct green">88%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">88%</span>
               </div>
             </div>
 
             <!-- 10. Yuki Tanaka -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#yuki-tanaka'">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status offline">YT</div>
+                <span class="avatar-status presence-offline"><div class="avatar avatar-lg">YT</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html">Yuki Tanaka</a>
+                  <a class="employee-card-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html#yuki-tanaka">Yuki Tanaka</a>
                   <div class="employee-card-title">QA Engineer</div>
-                  <div class="employee-card-dept">Engineering</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Initech API</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill yellow" style="width: 70%;"></div>
+                  <div class="worktime-fill mid" style="width: 70%;"></div>
                 </div>
-                <span class="worktime-pct yellow">70%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-default"><svg data-lucide="circle" width="12" height="12"></svg> Offline</span>
+                <span class="worktime-pct mid">70%</span>
               </div>
             </div>
 
             <!-- 11. Marie Dupont -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#marie-dupont'">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">MD</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">MD</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html">Marie Dupont</a>
+                  <a class="employee-card-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html#marie-dupont">Marie Dupont</a>
                   <div class="employee-card-title">CEO</div>
-                  <div class="employee-card-dept">Executive</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Internal</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 100%;"></div>
+                  <div class="worktime-fill high" style="width: 100%;"></div>
                 </div>
-                <span class="worktime-pct green">100%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">100%</span>
               </div>
             </div>
 
             <!-- 12. Liam O'Brien -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#liam-obrien'">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">LO</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">LO</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a>
+                  <a class="employee-card-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a>
                   <div class="employee-card-title">Senior Developer</div>
-                  <div class="employee-card-dept">Engineering</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Acme Web Redesign</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 88%;"></div>
+                  <div class="worktime-fill high" style="width: 88%;"></div>
                 </div>
-                <span class="worktime-pct green">88%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">88%</span>
               </div>
             </div>
 
             <!-- 13. Lisa Martinez -->
-            <div class="card card-interactive employee-card">
+            <div class="card card-interactive employee-card" onclick="window.location.href='employees.html#lisa-martinez'">
               <div class="employee-card-top">
-                <div class="avatar avatar-lg avatar-status online">LM</div>
+                <span class="avatar-status presence-online"><div class="avatar avatar-lg">LM</div></span>
                 <div class="employee-card-info">
-                  <a class="employee-card-name" data-employee="lisa-martinez" data-hovercard data-name="Lisa Martinez" data-role="Account Manager" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html">Lisa Martinez</a>
+                  <a class="employee-card-name" data-employee="lisa-martinez" data-hovercard data-name="Lisa Martinez" data-role="Account Manager" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html#lisa-martinez">Lisa Martinez</a>
                   <div class="employee-card-title">Account Manager</div>
-                  <div class="employee-card-dept">Operations</div>
                 </div>
-              </div>
-              <div class="employee-card-projects">
-                <a href="projects.html">Initech Portal</a>
               </div>
               <div class="worktime-bar">
                 <div class="worktime-track">
-                  <div class="worktime-fill green" style="width: 88%;"></div>
+                  <div class="worktime-fill high" style="width: 88%;"></div>
                 </div>
-                <span class="worktime-pct green">88%</span>
-              </div>
-              <div class="employee-card-footer">
-                <span class="badge badge-success"><svg data-lucide="wifi" width="12" height="12"></svg> Online</span>
+                <span class="worktime-pct high">88%</span>
               </div>
             </div>
           </div>
@@ -1360,7 +1282,7 @@
                   <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
                   <td data-label="Work Time"><span class="font-mono text-error font-semibold">45%</span></td>
-                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14–18</span></td>
+                  <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave Apr 14-18</span></td>
                   <td data-label="Actions"><button class="btn btn-ghost btn-icon btn-xs"><svg data-lucide="more-horizontal" style="width:16px;height:16px;"></svg></button></td>
                 </tr>
                 <tr>
@@ -1415,7 +1337,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="UX Designer" data-dept="Design" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Sophie Dubois</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">SD</div><a class="cell-user-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="UX Designer" data-dept="Design" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#sophie-dubois">Sophie Dubois</a></div></td>
                   <td data-label="Job Title">UX Designer</td>
                   <td data-label="Department" class="cell-secondary">Design</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
@@ -1425,7 +1347,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">YT</div><a class="cell-user-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html">Yuki Tanaka</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status offline">YT</div><a class="cell-user-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html#yuki-tanaka">Yuki Tanaka</a></div></td>
                   <td data-label="Job Title">QA Engineer</td>
                   <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Initech API</a></td>
@@ -1435,7 +1357,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MD</div><a class="cell-user-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html">Marie Dupont</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">MD</div><a class="cell-user-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html#marie-dupont">Marie Dupont</a></div></td>
                   <td data-label="Job Title">CEO</td>
                   <td data-label="Department" class="cell-secondary">Executive</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Internal</a></td>
@@ -1445,7 +1367,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html">Liam O'Brien</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LO</div><a class="cell-user-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a></div></td>
                   <td data-label="Job Title">Senior Developer</td>
                   <td data-label="Department" class="cell-secondary">Engineering</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Acme Web Redesign</a></td>
@@ -1455,7 +1377,7 @@
                 </tr>
                 <tr>
                   <td class="row-check"><input type="checkbox"></td>
-                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LM</div><a class="cell-user-name" data-employee="lisa-martinez" data-hovercard data-name="Lisa Martinez" data-role="Account Manager" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html">Lisa Martinez</a></div></td>
+                  <td><div class="cell-user"><div class="avatar avatar-sm avatar-status online">LM</div><a class="cell-user-name" data-employee="lisa-martinez" data-hovercard data-name="Lisa Martinez" data-role="Account Manager" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html#lisa-martinez">Lisa Martinez</a></div></td>
                   <td data-label="Job Title">Account Manager</td>
                   <td data-label="Department" class="cell-secondary">Operations</td>
                   <td data-label="Current Project"><a href="projects.html" class="text-sm">Initech Portal</a></td>
@@ -1469,6 +1391,13 @@
 
           <!-- ===== ORG CHART VIEW ===== -->
           <div id="orgView" class="hidden">
+            <!-- Org chart empty state (shown if no reporting relationships configured) -->
+            <div id="orgEmptyState" class="hidden" style="padding:var(--space-12) var(--space-6);text-align:center;color:var(--color-text-3);">
+              <svg data-lucide="network" style="width:48px;height:48px;margin:0 auto var(--space-4);display:block;opacity:0.4;"></svg>
+              <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">No org structure defined yet</div>
+              <div style="font-size:var(--text-body);margin-bottom:var(--space-4);">Go to Admin - Users to assign reporting lines.</div>
+              <a href="admin.html" class="btn btn-secondary btn-sm">Go to Admin</a>
+            </div>
             <div class="org-chart">
               <div class="org-chart-inner">
 
@@ -1821,7 +1750,7 @@
               <div style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);">No activity yet</div>
               <div style="font-size:var(--text-body-sm);margin-top:var(--space-1);">Timeline events will appear here as activity occurs.</div>
             </div>
-            <!-- Mini Gantt — Project History -->
+            <!-- Mini Gantt - Project History -->
             <div class="profile-timeline-gantt">
               <div class="pt-header">Jan 2025 ─────────────────────────────────── Apr 2026</div>
               <div class="pt-row">
@@ -1859,22 +1788,22 @@
               <div class="timeline-item">
                 <div class="timeline-icon success"><svg data-lucide="check-circle"></svg></div>
                 <div class="timeline-date">March 28, 2026</div>
-                <div class="timeline-text">Timesheet approved for W13 &mdash; <span class="font-mono">38.5h</span> billable, <span class="font-mono">3.5h</span> internal</div>
+                <div class="timeline-text">Timesheet approved for W13 - <span class="font-mono">38.5h</span> billable, <span class="font-mono">3.5h</span> internal</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon accent"><svg data-lucide="receipt"></svg></div>
                 <div class="timeline-date">March 22, 2026</div>
-                <div class="timeline-text">Expense submitted: Conference ticket &mdash; <span class="font-mono">€450.00</span> (approved)</div>
+                <div class="timeline-text">Expense submitted: Conference ticket - <span class="font-mono">€450.00</span> (approved)</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon warning"><svg data-lucide="palm-tree"></svg></div>
                 <div class="timeline-date">March 10 - 14, 2026</div>
-                <div class="timeline-text">Annual Leave &mdash; 5 days taken (Spring break)</div>
+                <div class="timeline-text">Annual Leave - 5 days taken (Spring break)</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon success"><svg data-lucide="check-circle"></svg></div>
                 <div class="timeline-date">March 7, 2026</div>
-                <div class="timeline-text">Timesheet approved for W10 &mdash; <span class="font-mono">40h</span> billable</div>
+                <div class="timeline-text">Timesheet approved for W10 - <span class="font-mono">40h</span> billable</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon info"><svg data-lucide="star"></svg></div>
@@ -1889,22 +1818,22 @@
               <div class="timeline-item">
                 <div class="timeline-icon accent"><svg data-lucide="receipt"></svg></div>
                 <div class="timeline-date">January 18, 2026</div>
-                <div class="timeline-text">Expense submitted: Software license (JetBrains) &mdash; <span class="font-mono">€249.00</span> (approved)</div>
+                <div class="timeline-text">Expense submitted: Software license (JetBrains) - <span class="font-mono">€249.00</span> (approved)</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon error"><svg data-lucide="palm-tree"></svg></div>
                 <div class="timeline-date">January 2, 2026</div>
-                <div class="timeline-text">Sick Leave &mdash; 2 days taken</div>
+                <div class="timeline-text">Sick Leave - 2 days taken</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon"><svg data-lucide="gift"></svg></div>
                 <div class="timeline-date">December 25 - January 1, 2025-2026</div>
-                <div class="timeline-text">Company Holiday &mdash; Winter break</div>
+                <div class="timeline-text">Company Holiday - Winter break</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon success"><svg data-lucide="trophy"></svg></div>
                 <div class="timeline-date">November 20, 2025</div>
-                <div class="timeline-text">Completed <a href="projects.html">Vanguard Dashboard</a> &mdash; delivered 2 weeks ahead of schedule</div>
+                <div class="timeline-text">Completed <a href="projects.html">Vanguard Dashboard</a> - delivered 2 weeks ahead of schedule</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon info"><svg data-lucide="star"></svg></div>
@@ -1914,7 +1843,7 @@
               <div class="timeline-item">
                 <div class="timeline-icon warning"><svg data-lucide="palm-tree"></svg></div>
                 <div class="timeline-date">August 4 - 15, 2025</div>
-                <div class="timeline-text">Annual Leave &mdash; 10 days taken (Summer vacation)</div>
+                <div class="timeline-text">Annual Leave - 10 days taken (Summer vacation)</div>
               </div>
               <div class="timeline-item">
                 <div class="timeline-icon primary"><svg data-lucide="folder-kanban"></svg></div>
@@ -2171,13 +2100,13 @@
                   <tr class="ts-breakdown-row hidden" id="breakdown-apr-2026">
                     <td colspan="7" style="padding:0;">
                       <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
-                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — April 2026</div>
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown - April 2026</div>
                         <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
                           <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
                           <tbody>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 1</td><td style="padding:var(--space-1) var(--space-2);">Initech API</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 2</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">6.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
-                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 2</td><td style="padding:var(--space-1) var(--space-2);">Internal — Team meeting</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">2.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 2</td><td style="padding:var(--space-1) var(--space-2);">Internal - Team meeting</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">2.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Apr 3</td><td style="padding:var(--space-1) var(--space-2);">Initech API</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">7.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 14 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
                           </tbody>
@@ -2198,13 +2127,13 @@
                   <tr class="ts-breakdown-row hidden" id="breakdown-mar-2026">
                     <td colspan="7" style="padding:0;">
                       <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
-                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — March 2026</div>
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown - March 2026</div>
                         <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
                           <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
                           <tbody>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 3</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">8.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 4</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">7.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
-                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 4</td><td style="padding:var(--space-1) var(--space-2);">Internal — Planning</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">0.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Mar 4</td><td style="padding:var(--space-1) var(--space-2);">Internal - Planning</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">0.5h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 19 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
                           </tbody>
                         </table>
@@ -2224,7 +2153,7 @@
                   <tr class="ts-breakdown-row hidden" id="breakdown-feb-2026">
                     <td colspan="7" style="padding:0;">
                       <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
-                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — February 2026</div>
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown - February 2026</div>
                         <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
                           <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
                           <tbody>
@@ -2248,12 +2177,12 @@
                   <tr class="ts-breakdown-row hidden" id="breakdown-jan-2026">
                     <td colspan="7" style="padding:0;">
                       <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
-                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — January 2026</div>
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown - January 2026</div>
                         <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
                           <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
                           <tbody>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Jan 5</td><td style="padding:var(--space-1) var(--space-2);">Acme Web Redesign</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">6.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-success" style="font-size:10px;">Billable</span></td></tr>
-                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Jan 5</td><td style="padding:var(--space-1) var(--space-2);">Internal — Strategy</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">2.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
+                            <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-2);">Jan 5</td><td style="padding:var(--space-1) var(--space-2);">Internal - Strategy</td><td style="padding:var(--space-1) var(--space-2);text-align:right;font-family:var(--font-mono);">2.0h</td><td style="padding:var(--space-1) var(--space-2);"><span class="badge badge-default" style="font-size:10px;">Non-billable</span></td></tr>
                             <tr style="border-top:1px solid var(--color-border-subtle);"><td style="padding:var(--space-1) var(--space-2);color:var(--color-text-3);font-style:italic;" colspan="4">…and 20 more working days. <a href="timesheets.html" style="color:var(--color-primary);">View full timesheet →</a></td></tr>
                           </tbody>
                         </table>
@@ -2273,7 +2202,7 @@
                   <tr class="ts-breakdown-row hidden" id="breakdown-dec-2025">
                     <td colspan="7" style="padding:0;">
                       <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
-                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — December 2025</div>
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown - December 2025</div>
                         <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
                           <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
                           <tbody>
@@ -2297,7 +2226,7 @@
                   <tr class="ts-breakdown-row hidden" id="breakdown-nov-2025">
                     <td colspan="7" style="padding:0;">
                       <div style="background:var(--color-surface-1);border-top:1px solid var(--color-border-subtle);padding:var(--space-3) var(--space-4);">
-                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown — November 2025</div>
+                        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">Daily Breakdown - November 2025</div>
                         <table style="width:100%;font-size:var(--text-body-sm);border-collapse:collapse;">
                           <thead><tr style="color:var(--color-text-3);"><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Date</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Project</th><th style="text-align:right;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Hours</th><th style="text-align:left;padding:var(--space-1) var(--space-2);font-weight:var(--weight-medium);">Type</th></tr></thead>
                           <tbody>
@@ -2481,7 +2410,7 @@
             </div>
             <div class="section-header">
               <h3 class="section-title">Documents</h3>
-              <button class="btn btn-primary btn-sm" onclick="GHR.showToast('info','Upload Document','File picker would open — upload PDF, DOC, or image files.')">
+              <button class="btn btn-primary btn-sm" onclick="GHR.showToast('info','Upload Document','File picker would open - upload PDF, DOC, or image files.')">
                 <svg data-lucide="upload" style="width:14px;height:14px;"></svg>
                 Upload Document
               </button>
@@ -2715,9 +2644,9 @@
 
     // ── View Toggle (Grid / List / Org) ──
     const orgView = document.getElementById('orgView');
-    document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    document.querySelectorAll('.seg-control-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.seg-control-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const view = btn.dataset.view;
         gridView.classList.add('hidden');
@@ -2735,14 +2664,25 @@
       });
     });
 
+    // ── Filter More Dropdown close-on-outside-click ──
+    const filterMoreBtn = document.getElementById('filterMoreBtn');
+    const filterMoreDropdown = document.getElementById('filterMoreDropdown');
+    if (filterMoreBtn && filterMoreDropdown) {
+      document.addEventListener('click', (e) => {
+        if (!filterMoreBtn.contains(e.target) && !filterMoreDropdown.contains(e.target)) {
+          filterMoreDropdown.classList.remove('active');
+        }
+      });
+    }
+
     // ── Force card view on mobile (view toggle is hidden < 640px) ──
     const mobileViewMQ = window.matchMedia('(max-width: 639px)');
     function forceMobileCardView(e) {
       if (e.matches) {
-        const activeView = document.querySelector('.view-toggle-btn.active');
+        const activeView = document.querySelector('.seg-control-btn.active');
         if (activeView && activeView.dataset.view !== 'grid') {
-          document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
-          document.querySelector('.view-toggle-btn[data-view="grid"]').classList.add('active');
+          document.querySelectorAll('.seg-control-btn').forEach(b => b.classList.remove('active'));
+          document.querySelector('.seg-control-btn[data-view="grid"]').classList.add('active');
           gridView.classList.remove('hidden');
           listView.classList.add('hidden');
           orgView.classList.add('hidden');
@@ -2916,7 +2856,7 @@
         if (visible) visibleRows++;
       });
       // Show/hide search empty state
-      const activeViewBtn = document.querySelector('.view-toggle-btn.active');
+      const activeViewBtn = document.querySelector('.seg-control-btn.active');
       const isOrg = activeViewBtn && activeViewBtn.dataset.view === 'org';
       if (!isOrg && query && visibleCards === 0 && visibleRows === 0) {
         if (searchEmptyState) searchEmptyState.classList.remove('hidden');

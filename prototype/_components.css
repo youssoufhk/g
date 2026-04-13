@@ -2367,3 +2367,253 @@ svg circle[data-animate].chart-animate-in {
     justify-content: flex-end;
   }
 }
+
+
+/* ============================================================
+   DRAWER SYSTEM
+   Side panel that slides in from the right. Controlled by
+   GHR.openDrawer() / GHR.closeDrawer() in _shared.js.
+   ============================================================ */
+
+/* Positioning wrapper - sits outside normal flow */
+.drawer {
+  position: static;
+}
+
+/* Right-anchored outer shell - transparent, no pointer events by default */
+.drawer-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  z-index: 400;
+  display: flex;
+  pointer-events: none;
+}
+
+/* Full-screen dimming backdrop */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 399;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+/* The panel itself */
+.drawer-panel {
+  width: var(--drawer-width, 480px);
+  max-width: 100vw;
+  height: 100%;
+  background: var(--color-surface-1);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 300ms ease;
+  pointer-events: all;
+  box-shadow: var(--shadow-5);
+}
+
+/* Open state */
+.drawer.is-open .drawer-backdrop {
+  opacity: 1;
+  pointer-events: all;
+}
+.drawer.is-open .drawer-panel {
+  transform: translateX(0);
+}
+
+/* Drawer header */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  font-size: var(--text-heading-2);
+  font-weight: 600;
+  color: var(--color-text-1);
+  margin: 0;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  color: var(--color-text-2);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--motion-fast), background var(--motion-fast);
+}
+.drawer-close:hover {
+  color: var(--color-text-1);
+  background: var(--color-surface-2);
+}
+
+/* Drawer scrollable body */
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* Drawer footer with action buttons */
+.drawer-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Mobile: full-width panel */
+@media (max-width: 767px) {
+  .drawer-panel {
+    width: 100vw;
+  }
+}
+
+/* Reduced motion - disable drawer slide animation */
+@media (prefers-reduced-motion: reduce) {
+  .drawer-panel { transition: none; }
+  .drawer-backdrop { transition: none; }
+}
+
+
+/* ============================================================
+   BADGE SIZE SYSTEM - normalized
+   .badge       = default (caption size, 2/8px padding)
+   .badge-sm    = smaller (10px font, 1/6px padding)
+   .badge-lg    = larger (body-sm font, 4/12px padding)
+   ============================================================ */
+
+/* .badge-sm was missing - added here */
+.badge-sm {
+  padding: var(--space-0-5) var(--space-1-5);
+  font-size: 10px;
+}
+
+
+/* ============================================================
+   KPI-CARD - backward-compat alias for .stat-card
+   Any element using .kpi-card gets the same treatment as
+   .stat-card so the two patterns converge.
+   ============================================================ */
+.kpi-card {
+  background: var(--color-surface-0);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--motion-normal) var(--ease-out), box-shadow var(--motion-normal) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+.kpi-card .stat-label {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-1);
+}
+.kpi-card .stat-value {
+  font-size: var(--text-heading-1);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-1);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+/* Semantic accent variants for kpi-card */
+.kpi-card--success::before { background: var(--color-success); }
+.kpi-card--warning::before { background: var(--color-warning); }
+.kpi-card--error::before   { background: var(--color-error); }
+.kpi-card--info::before    { background: var(--color-info); }
+.kpi-card--primary::before { background: var(--color-primary); }
+.kpi-card--accent::before  { background: var(--color-accent); }
+.kpi-card--gold::before    { background: var(--color-gold); }
+
+
+/* ============================================================
+   SEGMENTED CONTROL (.seg-control)
+   Single canonical view-toggle / tab-switcher component.
+   Active state: filled primary (projects/calendar style).
+   ============================================================ */
+.seg-control {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  gap: 2px;
+}
+.seg-control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1-5);
+  padding: var(--space-1-5) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: var(--text-body-sm);
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-2);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  white-space: nowrap;
+}
+.seg-control-btn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+.seg-control-btn.active {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+.seg-control-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   SETTINGS SECTION TITLE - canonical cross-page standard
+   Used in account.html and admin.html settings contexts.
+   ============================================================ */
+.settings-section-title {
+  font-size: var(--text-heading-3);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-4);
+}

@@ -1,288 +1,187 @@
-# CRITIC_FEEL.md — UX Feeling Audit
+# CRITIC_FEEL.md — GammaHR v2 UX Feeling Audit
+**Critic type:** FEEL (Ease · Calm · Completeness · Anticipation)
+**Date:** 2026-04-13
 **Auditor:** Harsh UX Director
-**Date:** 2026-04-10
-**Scope:** All 19 prototype HTML files evaluated against the GammaHR UX philosophy (Ease, Calm, Completeness, Anticipation)
 
 ---
 
-## Previously Reported Issues — Verification
-
-| Issue | Status |
-|-------|--------|
-| Dashboard too packed (progressive disclosure) | FIXED. "Details" section is collapsed by default. Overview is visible. Collapsible toggles on heatmap and revenue. |
-| "Work Days" duplicated | FIXED. Appears only once, in admin.html settings. |
-| "Colleague is viewing" notification | FIXED. No "is viewing" banners anywhere. Presence is dots only. |
+## --- SECTION 1: ISSUES ---
 
 ---
 
-## New Findings
+### EASE — The app is doing the work / The user is doing the work
 
-### [CRITICAL] EASE | leaves.html | Leave request form has no date intelligence
+**[CRITICAL] | expenses.html | Receipt Scan → Form Apply | Two-step AI scan is a broken promise**
+The AI scans the receipt and shows detected fields (vendor, amount, date, category) in a preview panel — but then requires the user to click a second button "Re-apply AI Results" to actually fill the form. The AI did the work but then stopped halfway and waited for permission. After scanning, the form should be auto-filled immediately. The user should only confirm.
+*Should feel like:* Upload receipt → form fills itself → user reviews and adjusts → submit. Zero extra clicks.
 
-The leave request modal opens with **blank date fields**. The app knows the user's project schedule, the team calendar, and upcoming holidays. It should suggest the next available window (e.g., "Next gap: Apr 21-25, no team conflicts"). Instead, the user must manually pick dates, then wait for the conflict checker to react. This is Tempolia behavior — the user is doing work the app should have done.
+**[CRITICAL] | timesheets.html | Adding a project row | User must manually select a project from a blank dropdown**
+The "Add Row" button in the week view opens an empty project selector. The app already knows which projects the user is actively assigned to this week. There should be no blank rows. The app should pre-populate one row per active assignment automatically. The user's only job is filling in hours.
+*Should feel like:* Open the week → all your projects are already there, ready for hours to be entered.
 
-**Fix:** Pre-fill start/end dates with the next recommended leave window. Show a "Suggested dates" chip above the inputs. Conflict detection should be instant and visible before the user touches the form.
+**[CRITICAL] | expenses.html | Date field | Defaults to empty, not today**
+The expense submission form has an empty date field requiring the user to pick a date. Every expense being submitted today happened today or very recently. The app knows the current date. This field should always default to today. The user changes it only for past expenses.
+*Should feel like:* Date is always today. User touches it only for exceptions.
 
----
+**[HIGH] | invoices.html | Generate Invoice modal | User fills client, project, and date range from scratch even with context**
+The "Generate Invoice" button opens a modal starting from empty. But when a user arrives from a project page or has been filtering invoices by client, the context is clear. The modal should pre-populate client, project, and date range from that context. Starting from zero every time adds unnecessary steps to the billable cycle.
+*Should feel like:* Click "Generate Invoice" while viewing a project → client and project are pre-selected, period defaults to last unbilled month. User confirms and generates.
 
-### [CRITICAL] EASE | expenses.html | AI scan results require a manual "Apply to Form" step
+**[HIGH] | leaves.html | Leave type not pre-selected when clicking balance card**
+The leave balance cards (Annual Leave, Sick Leave, etc.) are tappable and call `openLeaveModalWithType()`. If this pre-selects the type correctly, it is good. But if the modal opens to "Select type..." the affordance is broken — the card click promised "I'll request this type" and the modal did not deliver. This must be verified and enforced.
+*Should feel like:* Click "Annual Leave" card → modal opens with Annual Leave pre-selected and remaining balance visible.
 
-After the AI scans a receipt and shows detected values (vendor, amount, date, category), the user must click "Apply to Expense Form" to transfer the data. This is an unnecessary confirmation gate. The form should be auto-filled the moment AI results are available, with the user reviewing/correcting rather than approving a transfer.
+**[HIGH] | approvals.html | Rejection reason is optional with no examples | Managers reject without context**
+The rejection modal requires the manager to write a reason, but the textarea has only a generic placeholder and the field appears optional. Employees receiving rejections with no reason ("") or vague reasons are left without guidance. The field should be required, with suggested quick-reasons to remove the blank-page problem.
+*Should feel like:* Rejection reason field is required, pre-loaded with common options ("Hours don't match schedule," "Missing receipt," "Wrong project allocation") so a reason takes one click, not three sentences.
 
-**Current flow:** Upload > AI scans > Results shown > Click "Apply" > Form fills
-**Correct flow:** Upload > AI scans > Form fills automatically > Banner says "Auto-filled from receipt. Please review."
+**[HIGH] | timesheets.html | "Copy Last Week" requires two clicks | Most common recurring action is buried in a dropdown**
+The most-used weekly timesheet action after week one is "copy last week." It lives inside a dropdown behind a "Copy" button with a chevron — two clicks. For the single most repeated action in the app, one click is the ceiling.
+*Should feel like:* A visible "Copy from Last Week" primary button. The dropdown hides less-common options.
 
-The `aiAutoFilledBanner` element exists but is hidden — the auto-fill path is built but not the default.
+**[HIGH] | auth.html | Onboarding step 3 — photo upload | No obvious skip with strong visual priority**
+The onboarding wizard requests a profile photo in step 3. This is high friction at the worst moment (the user just signed up and wants to see the app). A "Skip for now" link exists but competes visually with the upload controls. The skip should be the primary option, with upload as secondary.
+*Should feel like:* "Set photo later" is the large, obvious option. Upload is available but not blocking.
 
----
+**[MEDIUM] | account.html | Notification toggles | Require a separate Save action**
+The notification preferences page has toggle switches, but changes are not saved until the user scrolls to a Save button. Toggle = instant save is the 2026 standard. A Save button on toggle preferences creates anxiety ("did it save?") and extra steps.
+*Should feel like:* Toggle flips → saved instantly → a subtle "Saved" label appears next to the toggle for 2 seconds.
 
-### [CRITICAL] EASE | invoices.html | Generate Invoice modal requires manual client/project selection
-
-The "Generate Invoice" modal opens with blank Client and Project dropdowns. But the user typically arrives at this action from a specific client or project context. The app already knows which timesheets and expenses are approved and uninvoiced. The modal should pre-select the most obvious client/project and show the ready-to-bill amount immediately — user confirms, not configures.
-
-**Fix:** Pre-select the client/project with the highest uninvoiced approved hours. Show the amount. User reviews and clicks "Generate."
-
----
-
-### [HIGH] EASE | projects.html | New Project modal has no smart defaults
-
-The "New Project" modal opens with all fields blank. No default billing model (Hourly is 80%+ of projects for consulting firms), no default rate (company standard rate), no default start date (today), no default end date (3 months from now). The "Create from Template" button is in the footer as a ghost button — it should be the primary entry point, not an afterthought.
-
-**Fix:** Default billing model to "Hourly". Default rate to company standard. Default start date to today. Move template selection to a prominent step.
-
----
-
-### [HIGH] EASE | leaves.html | Leave type defaults to "Annual Leave" but no remaining balance shown in the modal header
-
-The modal shows "Balance after: 18 days remaining" at the bottom of the form, but the user needs to see their current balance at the top, before they start filling anything. They need context first, form second.
-
-**Fix:** Show balance cards (Annual: 18/25, Sick: 8/10, Personal: 2/3) at the top of the modal, above the leave type selector. Selecting a type highlights the relevant card.
-
----
-
-### [HIGH] COMPLETENESS | timesheets.html | "Pre-filled from active assignments" notice exists but Friday is not pre-filled
-
-The timesheet shows a green notice: "Pre-filled from your active assignments." But Thursday shows 8h while Friday shows "Holiday" — fair enough. However, the notice implies intelligence that is not deep enough. If the user had a meeting or half-day Friday on their calendar before the holiday, the app should have known. More critically, Wednesday shows only 7h for Acme but 0 for Internal — the AI should have predicted the full 8h split based on the user's pattern.
-
-The pre-fill is shallow (project rows only, not hour distribution). For a "the app does the work" experience, hours should be pre-filled too, not just project names.
+**[MEDIUM] | admin.html | Company Settings | One Save button covers all sections — changes lost on navigation**
+The entire Company Settings tab has a single Save button at the bottom. If a user edits fields at the top and navigates away before scrolling to Save, all changes are lost silently. Each section needs either its own save or a sticky "Unsaved changes" bar that appears when changes are detected.
+*Should feel like:* A sticky "You have unsaved changes — Save now" bar appears when any field changes. Navigating away prompts confirmation.
 
 ---
 
-### [HIGH] CALM | approvals.html | 12 approval cards with no priority guidance
+### CALM — Does anything create anxiety or confusion?
 
-The approvals page shows 12 items in a flat list. Urgent items have a red border, but there is no "Start here" guidance. The user must scan all 12 cards to decide what to do first. An AI summary like "3 urgent items need your attention. 4 routine timesheets can be bulk-approved." would reduce cognitive load dramatically.
+**[CRITICAL] | approvals.html | Reject button is an unlabeled X icon | Destructive action with no label**
+The Reject button on every approval row is an `<X>` icon with `btn-ghost text-error` — no text label, no confirmation. On a screen where approving or rejecting affects paychecks and time off for real people, a ghosted icon is not acceptable. "Approve" has a label. Reject must too. And rejecting must require confirmation.
+*Should feel like:* "Reject" label next to the X icon. Clicking opens a confirmation modal with a required reason field.
 
-**Fix:** Add an AI recommendation banner at the top: "4 routine timesheets match last week's pattern. Bulk-approve?" with a single action button.
+**[CRITICAL] | admin.html | Deactivate user button | No confirmation before irreversible action**
+The Users tab has a "Deactivate" button inline on every user row. Clicking it fires `deactivateUser(this)` with no visible confirmation modal in the prototype. Deactivating a user cuts their access immediately. This is an irreversible real-world action that must have a hard stop.
+*Should feel like:* Click Deactivate → modal: "Deactivate John Smith? They will immediately lose access and their pending approvals will be reassigned." User types name or clicks Confirm.
 
----
+**[HIGH] | timesheets.html | Submitted timesheet grid | Opacity 0.6 with pointer-events disabled = ambiguous limbo state**
+After submission, the timesheet grid renders at 60% opacity with interactions disabled. The user sees their data but cannot touch it. This is neither "done" nor "editable" — it is visual purgatory. The submitted state should cleanly replace the grid with the completion card, or clearly label every row as "Locked — Awaiting Approval."
+*Should feel like:* Submit → grid is fully replaced by the completion card. No grayed-out ghost of the form.
 
-### [HIGH] ANTICIPATION | timesheets.html | Submitted state is functional but emotionally flat
+**[HIGH] | leaves.html | Leave conflict warning | "1 conflict" visible but conflict detail requires a full detail view**
+In the approval queue, Marco Rossi's leave shows "1 conflict" inline. The manager can see a conflict exists but not who or what it is — they must navigate to the detail view to learn more. For a time-sensitive approval decision, the conflict name should be visible inline.
+*Should feel like:* Hovering or expanding the conflict tag shows: "Alice Wang is also on leave Apr 14–18."
 
-After submitting a timesheet, the user sees: a green banner "Submitted for Review — Awaiting manager approval" and the grid grays out. The toast says "Your timesheet has been sent for approval." This is correct but not rewarding. The UX philosophy demands that "completion feels like a reward" (Duolingo principle).
+**[HIGH] | invoices.html | Overdue invoices in list | No "Send Reminder" action on overdue rows**
+Two invoices are Overdue in the list. The action buttons on overdue rows are only "View" and "More." The most urgent and obvious next action — sending a payment reminder — requires clicking into the detail view first. For overdue invoices specifically, "Send Reminder" must surface in the list row.
+*Should feel like:* Overdue invoice row shows: View · Send Reminder · More. The highest-urgency action is one click from the list.
 
-**Fix:** The submitted state should show "All done for the week" with a clear, celebratory completion card — total hours, billable %, and a satisfying visual (checkmark animation, confetti-free but premium). Not just a banner that sits on top of a grayed grid.
+**[HIGH] | timesheets.html | Rejection callout | Shows a reason but does not guide the user to the problematic cell**
+The rejection callout ("Hours for Friday don't match project schedule") correctly shows a rejection reason. But the timesheet grid shows all cells identically — there is no visual link between the rejection reason and the cell that needs fixing. The user must guess.
+*Should feel like:* Rejection callout highlights the specific cell in red and says "Expected 8h, You logged 10h on Friday — Acme Corp." The fix is obvious.
 
----
+**[HIGH] | calendar.html | Day cell click | No visible action or feedback**
+Calendar day cells are `cursor: pointer` with a hover effect, clearly communicating "I am clickable." But in the prototype, clicking a day produces no result. Even in a prototype context, this creates confusion about whether the interaction is missing or broken.
+*Should feel like:* Clicking a day opens a minimal quick-view panel: who's out, any events, an "Add leave" shortcut.
 
-### [HIGH] COMPLETENESS | hr.html | Onboarding checklists are entirely manual
+**[MEDIUM] | insights.html | NL query submission | No loading state between submit and AI response**
+The natural language query bar has a submit button. If the AI response is not instant, there is a moment of silence with no loading indicator — the user doesn't know if their query registered. Even a 300ms spinner should exist between submit and response.
+*Should feel like:* Submit → loading spinner or skeleton for the response area → AI response slides in.
 
-The onboarding tab shows 8 checklist items per new hire (contract signed, equipment ordered, IT access created, etc.). Every single one must be manually checked. The system should auto-check items it can verify: "IT access created" could be auto-detected from the admin user creation. "Equipment ordered" could be linked to a procurement workflow. "Welcome email sent" should be one-click auto-send, not a manual checkbox.
-
-This is the most Tempolia-like flow in the entire app — a human checking boxes for things a system should track automatically.
-
----
-
-### [MEDIUM] CALM | index.html | AI Alerts section has 4 alerts visible simultaneously
-
-The dashboard's AI Alerts card shows 4 alerts stacked: Overwork Alert, Contract Expiry, Bench Alert, Expense Pattern. Each has a dismiss and action button. This creates decision fatigue. The AI should surface the single most important alert prominently, with "2 more alerts" expandable below.
-
-**Fix:** Show top 1-2 alerts. Collapse the rest behind "View 2 more alerts." Prioritize by urgency (contract expiry > overwork > bench > expense pattern).
-
----
-
-### [MEDIUM] EASE | clients.html | New Client modal has no field for billing rate or payment terms
-
-Creating a client requires: name, industry, website, address, notes, contact info. But no billing rate and no payment terms — the two fields that actually matter for generating invoices later. The user will have to go back and configure these somewhere else, creating a disjointed flow.
-
-**Fix:** Add default billing rate and payment terms (Net 30) to the client creation form. These are the fields that prevent friction in the invoice generation flow downstream.
-
----
-
-### [MEDIUM] ANTICIPATION | expenses.html | After submitting an expense, user lands back on "My Expenses" with no celebration
-
-The `submitExpense()` function shows a toast "Your expense of X has been submitted for approval" and switches to the My Expenses tab. The newly submitted expense appears in the list as "Pending." There is no visual acknowledgment that the user just completed something. The expense should briefly highlight (pulse animation) and the stats should update to reflect the new pending amount.
+**[MEDIUM] | expenses.html | Rejected expense resubmit | Opens a blank form, not the original data**
+The "Resubmit" button on a rejected expense navigates to the Submit Expense tab. If the form is blank, the user must re-enter all original data from memory — the amount, the date, the project, the description — while referencing the rejection reason. This is maximum friction at minimum motivation.
+*Should feel like:* Resubmit pre-fills the form with original expense data. The rejection reason appears at the top of the form. The user only edits what's wrong.
 
 ---
 
-### [MEDIUM] COMPLETENESS | planning.html | "Assign to Project" modal has no AI suggestion
+### COMPLETENESS — Does the app feel like it's working for you?
 
-The resource planning page shows bench employees and capacity gaps. When clicking "Assign to Project," a modal opens with blank dropdowns (project, dates, allocation). The system knows which projects are understaffed and what skills the bench employee has — it should pre-select the best-fit project and suggest dates/allocation.
+**[HIGH] | approvals.html | Empty queue after all items approved | No "all clear" state**
+After a manager approves or rejects all items in the queue (individually or via bulk actions), the list becomes empty, but there is no designed "all done" state — no message, no satisfaction, no context about when more items will arrive. The most important manager moment in the app ends in a void.
+*Should feel like:* Last item approved → the queue area shows: "You're all caught up. 12 items processed today. Next review expected Monday morning."
 
----
+**[HIGH] | projects.html | Kanban board | "Completed" column shows nothing for a company with no completed projects**
+The kanban board "Completed" column renders as an empty box with a header. For any new or early-stage company, this column will be empty with no guidance. Empty kanban columns must have empty states.
+*Should feel like:* Empty "Completed" column shows: "Projects you complete will appear here. Keep going."
 
-### [MEDIUM] EASE | admin.html | Invite User modal does not pre-select department or role
+**[HIGH] | hr.html | Recruitment kanban | Empty stage columns have min-height but no message**
+Each kanban stage column has `min-height: 200px`, creating visible empty boxes with no content. Empty columns without guidance feel broken, not intentional.
+*Should feel like:* Each empty stage shows a quiet message: "No candidates in Screening yet — drag from Applied or add a new applicant."
 
-The admin invite modal has blank Role and Department dropdowns. If the admin just clicked "Invite" from within a department section or after viewing a team, the app should pre-select the relevant department. The most common role (Employee) should be the default.
+**[HIGH] | timesheets.html | Previous Weeks tab | No empty state for new users who have never submitted**
+A new employee opening the "Previous Weeks" tab sees an empty table with no explanation. There is no designed empty state for first-time users.
+*Should feel like:* "Your submitted timesheets will appear here. Complete your first week to start your history."
 
-**Fix:** Default role to "Employee." If the admin was browsing a specific department, pre-select it.
+**[HIGH] | employees.html | Org chart tab | No empty state when no reporting relationships are configured**
+The org chart renders a built hierarchy. If a new company hasn't set up manager/report relationships, the chart will be blank or broken. There is no empty state guiding the admin to set it up.
+*Should feel like:* "No org structure defined yet. Go to Admin → Users to assign reporting lines."
 
----
+**[MEDIUM] | index.html (dashboard) | AI Alerts section | Disappears entirely when no alerts exist**
+When the AI monitoring system has no alerts to show, the section is simply not rendered. A well-run company might never see the AI alerts feature. The absence of the section gives no signal that the system is monitoring anything.
+*Should feel like:* When no alerts: a quiet "All clear — AI detected no anomalies this week" message confirms the system is active.
 
-### [MEDIUM] CALM | account.html | No indication of profile completeness
-
-The Account page has Profile, Security, Notifications, Preferences, and Data tabs. But there is no visual indicator of what percentage of the profile is complete or what security measures are enabled. A user returning after setup has no idea if they missed something (2FA not enabled, no profile photo, no notification preferences set).
-
-**Fix:** Add a profile completeness indicator (e.g., "Profile 70% complete — Enable 2FA to improve security") at the top of the Account page.
-
----
-
-### [MEDIUM] EASE | calendar.html | Adding an event has no flow — just a button
-
-The calendar has an "Add Event" button but the page has no visible event creation modal or flow. The user expects to click a day cell and start creating. The calendar should support click-to-create on any day cell, pre-filling the date from where the user clicked.
-
----
-
-### [MEDIUM] COMPLETENESS | portal/index.html | Client portal AI query box gives canned responses
-
-The client portal has an AI query box, but it returns keyword-matched canned responses. The portal philosophy says the AI should know the client's context (their projects, invoices, team assignments). The canned responses feel like a FAQ, not an intelligent assistant.
+**[MEDIUM] | leaves.html | Team Leaves tab | No empty state when no pending team leaves exist**
+The Team Leaves tab shows a requests list. When there are no pending requests, the tab renders an empty table with no message. This is especially jarring if a manager checks the tab expecting to see something.
+*Should feel like:* "No pending leave requests from your team. Your team is fully available this week."
 
 ---
 
-### [MEDIUM] ANTICIPATION | approvals.html | After clearing all approvals, empty state is functional but not rewarding
+### ANTICIPATION — Does completing something feel satisfying?
 
-The approvals page has a `celebratePulse` animation keyframe defined but the empty state after clearing all items likely just shows a static "No pending approvals" message. Clearing a queue of 12 items should feel like an achievement — "All caught up! 12 items processed today" with a clean, satisfying visual state.
+**[CRITICAL] | timesheets.html | Timesheet submission | Two competing post-submit elements, unclear which fires**
+The prototype defines both a `tsCompletionCard` ("All done for the week!") and a `tsSubmittedBanner` ("Submitted for Review"). Both are `display:none` by default. The prototype JS presumably shows one of them — but if both show simultaneously, or if neither fires due to a state conflict, the user submits their timesheet and sees nothing change. The submission moment must be singular, definitive, and warm.
+*Should feel like:* Submit → single, beautiful completion card replaces the form. "All done for the week, Sarah. 34h logged across 2 projects. John Smith will review by Monday."
 
----
+**[HIGH] | expenses.html | Expense submitted | Toast notification is the only feedback**
+After submitting an expense, the user gets a toast that vanishes in 3 seconds. For a financial action that may take days to be approved, the only persistent confirmation is gone in moments. The expense must immediately appear in the "My Expenses" list with a "Pending" status so the user can see their submission is in the system.
+*Should feel like:* Submit → land on My Expenses → new expense appears at the top with a "Pending" badge. The list is the receipt.
 
-### [MEDIUM] EASE | leaves.html | Half-day selector is radio buttons instead of a smarter control
+**[HIGH] | leaves.html | Cancel approved leave | No confirmation before cancellation**
+The "Cancel" button on leave request cards has no confirmation modal. Cancelling an approved leave that has been communicated to the team is a real-world impact (the manager must be notified, team availability changes). This needs a confirmation step.
+*Should feel like:* Cancel → modal: "Cancel your Annual Leave (Apr 14–18)? Your manager will be notified." → User confirms.
 
-The leave request form has three radio buttons: "Full day", "Half day (morning)", "Half day (afternoon)." For multi-day requests, the half-day option only makes sense for the first or last day — not the entire range. The current UI implies all selected days would be half-days, which is confusing.
+**[HIGH] | invoices.html | "Record Payment" | Marks invoice paid immediately with no confirmation of amount/date**
+The "Record Payment" button presumably marks the invoice paid on click. There is no modal confirming which amount was received, on what date, or asking for a payment reference. Financial records must be deliberate.
+*Should feel like:* Click "Record Payment" → modal: "Record payment of €12,400 received on [today]? Payment reference: _____" → Confirm → invoice moves to Paid.
 
-**Fix:** Show the half-day option only when the date range is 1 day. For multi-day ranges, offer "Half day on first day" and "Half day on last day" toggles instead.
+**[HIGH] | approvals.html | Approve an item | Queue count and KPI cards do not update after each approval**
+When a manager approves an item, it fades out — but the tab count badge ("All 12") and the KPI cards at the top (Total Pending: 12) remain unchanged. The progress of working through the queue is invisible. Every approval should be felt.
+*Should feel like:* Item approved → badge count decrements (12 → 11 → 10) → KPI cards update in real time. Progress is visible and satisfying.
 
----
+**[MEDIUM] | auth.html | Onboarding completion | First CTA is "Download the mobile app" not "Go to dashboard"**
+After completing the setup wizard, the success screen features app store download badges prominently. The user just set up their company and has not yet seen the dashboard. Asking them to download a mobile app before they've experienced the desktop product is the wrong priority.
+*Should feel like:* Completion screen: primary CTA "Go to your dashboard →". App download is a secondary mention or deferred to an onboarding email.
 
-## Summary — Round 1
+**[MEDIUM] | hr.html | Candidate stage change | No toast or visual confirmation of stage move**
+Moving a candidate through the recruitment kanban stages (if draggable or via a stage button) produces no visible feedback that the action succeeded — no toast, no animation completing.
+*Should feel like:* Stage change → brief toast "Emma Laurent moved to Interview." Card settles in new column with a momentary success highlight.
 
-| Severity | Count |
-|----------|-------|
-| CRITICAL | 3 |
-| HIGH | 5 |
-| MEDIUM | 11 |
-| **Total** | **19** |
-
----
-
-## Round 2 Findings — 2026-04-11
-
----
-
-### [CRITICAL] EASE | expenses.html | Date field in Submit Expense form has no default value
-
-The date field (`<input type="date" id="formDate">`) in the Submit Expense form has no `value` attribute. Every user must manually click the date picker and select today's date for every expense. The app knows today is April 11, 2026. This is the most common date for an expense — the day you're submitting. The field should default to today (`value="2026-04-11"`), and only require user input when the expense was on a different date. Forcing the user to fill in "today" every single time is textbook Tempolia.
-
----
-
-### [CRITICAL] EASE | invoices.html | Overdue invoices (2 items, €17,800) have no one-click "Send Reminder" action
-
-Two invoices are overdue: INV-2026-046 (Contoso, overdue since Apr 14) and INV-2026-043 (Acme, overdue since Mar 15). Neither has a direct "Send Reminder" button in the table row — only a generic "more" (ellipsis) action button. Finding the chase/reminder action requires: click more → find reminder option → confirm → send. An overdue invoice is the single most urgent action in the finance module. The reminder action should be a visible, one-click button directly on each overdue row.
+**[MEDIUM] | planning.html | AI "Assign" recommendation | List does not update after assigning a bench employee**
+The AI recommendation cards in the bench forecast have "Assign" buttons. After clicking, a toast fires but the bench list still shows the same employee. The list must update to reflect that the assignment was acted upon.
+*Should feel like:* Assign → employee is removed from the bench list immediately → toast: "Bob Taylor assigned to Globex Phase 2."
 
 ---
 
-### [HIGH] COMPLETENESS | approvals.html | Approval detail panel shows "No details available" for leaves
+## --- SECTION 2: OPEN QUESTIONS ---
 
-The "View Details" button on leave approval cards opens a detail modal (`id="detailModal"`). For leave requests, the detail content should show the employee's remaining leave balance, the requested dates on a mini-calendar, any team members also on leave during those dates, and the approval history. Instead, the detail panel appears to use generic content. An approver is expected to make a decision without the context they need, forcing them to navigate away to the leaves page or the employee profile.
+These issues require a product decision before they can be resolved in design.
 
----
+**1. timesheets.html — Auto-submit vs. always-manual submit**
+Should the app auto-submit a timesheet when the weekly hour target is exactly met and all days are filled? Or is "Submit" always a conscious user action? Auto-submit could deliver a delightful "You're done" moment, but could also catch users who still need to adjust entries. The entire submission UX (button visibility, completion state) depends on this.
 
-### [HIGH] EASE | timesheets.html | "Add Project Row" has no AI suggestion for which project to add
+**2. approvals.html — What criteria define "routine" timesheets for the AI bulk-approve banner?**
+The AI banner offers to "bulk-approve 4 routine timesheets matching last week's pattern." The criteria for "routine" are invisible to the manager. Without understanding the logic (same hours, same projects, within ±10% variance?), managers may distrust the recommendation. The banner needs to either explain the criteria inline or link to a settings page where the threshold is configurable.
 
-When an employee clicks "Add Project Row," they get a blank dropdown — a list of all projects. The app already knows which projects the employee is assigned to. The dropdown should show assigned projects first (pre-filtered), with unassigned projects in a secondary group below. Better yet: the AI should suggest "Add Globex Phase 2?" based on the employee's current assignments — one click to add the row with correct project name already set.
+**3. leaves.html — Should sick leave require manager approval, or be self-declared with notification only?**
+Currently all leave types go through the same approval queue. In many jurisdictions and HR cultures, sick leave is self-declared — the employee marks themselves sick and the manager is informed, not asked. If sick leave was auto-approved with notification only, it would remove a meaningless approval step and feel far more respectful of the employee. This is a product/HR policy decision that changes the entire leaves flow.
 
----
+**4. timesheets.html + invoices.html — Should approved timesheets auto-stage invoice drafts at period close?**
+The current flow: approve timesheets → manually generate invoice. But if approved timesheets for a billing period could automatically create an invoice draft (editable before sending), the most tedious step in the billable cycle disappears. This requires a product decision about automation boundaries and whether PMs want to always review before drafting.
 
-### [HIGH] EASE | hr.html | Adding a candidate to the pipeline has no structured form — no position/role pre-selection
+**5. expenses.html — Who classifies billable vs. non-billable — the employee or the approver?**
+The expense form asks employees to check "Billable expense." But employees may not know their contract billing terms well enough to classify correctly. If approvers routinely override this field, the employee classification is noise. Consider: should the billable flag be set by the approver only, with employees simply describing the expense? Or is employee classification accurate and important enough to keep?
 
-The "Add Candidate" button in the recruitment Kanban shows no form in the prototype. Candidates appear in the "Applied" column but there is no visible flow for creating one. Even if a form exists, when the user is looking at a specific job posting's pipeline column, clicking "Add Candidate" should pre-fill the position field with the currently viewed role — not start from a blank form.
+**6. admin.html — What cascades when a user is deactivated mid-cycle?**
+If a user is deactivated while they have pending timesheet submissions or are currently an approver for others' requests, what happens? Do pending submissions get auto-rejected? Do approvals get reassigned to their manager? This system behavior must be designed before the deactivation confirmation modal can be written accurately — the modal must tell the admin exactly what will happen.
 
----
-
-### [HIGH] CALM | index.html | Dashboard "Pending Approvals" stat card shows 12 but clicking it goes to all of approvals — not the urgent queue
-
-The dashboard KPI card "Pending Approvals: 12" with "3 urgent" is a link to `approvals.html`. But it navigates to the default All tab showing all 12 items in submission-date order — not filtered by urgency. A user who clicked the card because they saw "3 urgent" now has to re-filter to find those 3 items. The link should navigate to `approvals.html` with urgency sort pre-applied, or jump directly to an "Urgent" filtered view.
-
----
-
-### [HIGH] COMPLETENESS | clients.html | Client detail page shows "No documents uploaded yet" with no upload affordance in that tab
-
-The Documents tab in the client detail panel shows an empty state with message "No documents uploaded yet" and a generic "Upload First Document" button. But when the user clicks it, there is no upload modal or file picker — the button calls `showToast('info','Upload','Document upload coming soon')`. This is a dead-end. The user does work (navigates to the tab, finds the action, clicks it) and gets nothing. A placeholder is acceptable, but the empty state should set expectations ("Document management coming in v1.2") rather than presenting a fake affordance.
-
----
-
-### [HIGH] EASE | planning.html | "Assign to Project" modal for bench employees opens with blank project dropdown
-
-When clicking "Assign to Project" from the bench roster in planning.html, the modal (`id="assignModal"`) opens with empty dropdowns for project, start date, end date, and allocation. The planning page already knows: (1) which projects are understaffed (shown in the capacity section above), (2) the skill profile of the bench employee being assigned, (3) the date range when the project needs resources. The modal should pre-fill the best-matching project based on skill overlap and capacity gap. Showing blank dropdowns forces the planner to mentally cross-reference information the app already has.
-
----
-
-### [MEDIUM] CALM | admin.html | Company Settings tab has no "Save Changes" button — auto-save is not indicated
-
-The Company Settings form (General, Regional, Work Rules sections) has multiple editable fields but no visible Save button in the tab. Looking at the form, there is a Save button somewhere in the footer or the user must scroll — but the page does not communicate whether changes are auto-saved or require manual save. If changes are NOT auto-saved and the user navigates away, their work is lost silently. If they ARE auto-saved, there is no feedback indicating this. This creates anxiety every time an admin edits a setting.
-
----
-
-### [MEDIUM] EASE | account.html | Profile photo upload shows "coming soon" toast — but it's the first action in profile setup
-
-When a new user opens their Account page, the "Change Photo" button shows a `showToast('info', 'Coming soon', ...)` response. Profile photo is typically the first thing users want to set — it personalizes their presence across the app. Presenting it as "coming soon" at the primary CTA of the profile setup flow breaks trust. Either implement it (even a basic file picker) or don't show the button at all until it's functional.
-
----
-
-### [MEDIUM] COMPLETENESS | leaves.html | Leave balance cards on "My Leaves" tab don't update after submitting a leave request
-
-When a leave request is submitted via the modal, the `updateBalanceAfter()` function updates the number inside the modal's form-calc section. But the four balance cards visible on the "My Leaves" tab (Annual: 18 days remaining, Sick: 10 days, Personal: 3 days, WFH: 5 days) do not update. The user submits a 3-day leave, closes the modal, and sees "18 days remaining" — unchanged. The app appears to ignore their submission, creating doubt about whether it worked.
-
----
-
-### [MEDIUM] CALM | hr.html | Recruitment pipeline shows 47 active candidates in the tab badge but "Applied" column shows "15" candidates, "Screening" shows 2, etc. — total across all columns is 12, not 47
-
-The HR tab shows `Recruitment <span class="tab-count">47</span>`. The KPI card says "47 Active Candidates." But the Kanban pipeline summary bar shows: Applied 3, Screening 2, Interview 3, Offer 2, Hired 2 — totaling only 12 visible candidates. This is a data contradiction that will alarm any user: "Where are the other 35 candidates?" The Applied column header even says 15 but only 3 cards are visible. This creates confusion and distrust about the data. The numbers need to be consistent or pagination/filtering must be clearly indicated.
-
----
-
-### [MEDIUM] EASE | calendar.html | Clicking a calendar day cell does NOT open the event creation form
-
-The calendar page philosophy is "click to create." But clicking a day cell in the monthly or weekly view does not open the New Event modal with the date pre-filled. The only way to add an event is the "+ Add Event" button in the page header, which opens the modal with today's date as default. The click-on-day flow is the most natural interaction pattern for any calendar app (iPhone, Google Calendar, Notion). Not supporting it means the most intuitive action fails silently.
-
----
-
-### [MEDIUM] ANTICIPATION | portal/index.html | Client portal has no "What's new since your last visit" surface
-
-When a client returns to the portal, there is no indication of what changed since they last logged in (new invoices generated, timesheet entries submitted for approval, messages received, project milestones hit). The portal simply shows the same static overview. A returning client should see "Since your last visit: 1 new invoice sent, 3 timesheets submitted" — exactly like how a good banking app shows what changed overnight. This is the anticipation principle: make returning feel worthwhile.
-
----
-
-### [MEDIUM] EASE | timesheets.html | Summary progress bar shows 67% fill (27h/40h) but label says "80%"
-
-In the Weekly Summary bar below the timesheet grid, the progress fill is set to `style="width: 67%; background: var(--color-primary);"` but the percentage label `id="summaryProgressPct"` shows "80%". These are inconsistent. The actual logged hours are 32h (per `id="summaryTotal"`), which is 80% of 40h target. The bar width at 67% corresponds to approximately 27h. This is a data rendering bug that directly contradicts the "completion is always visible" principle — the user cannot trust the progress indicator.
-
----
-
-## Summary — Round 2
-
-| Severity | Count |
-|----------|-------|
-| CRITICAL | 2 |
-| HIGH | 6 |
-| MEDIUM | 7 |
-| **Round 2 Total** | **15** |
-
----
-
-## Grand Total (Both Rounds)
-
-| Severity | Count |
-|----------|-------|
-| CRITICAL | 5 |
-| HIGH | 11 |
-| MEDIUM | 18 |
-| **Grand Total** | **34** |
+**7. hr.html — Should onboarding checklists be auto-generated from role/department templates?**
+Currently, onboarding cards appear to be manually created per new hire. If the app could generate a default checklist from the assigned role (e.g., "Senior Developer" → standard list including GitHub access, Slack invite, equipment order), the HR admin would only need to confirm, not create from scratch. This would change the feature from a task tracker to a genuine onboarding accelerator. Is role-based auto-generation in scope?

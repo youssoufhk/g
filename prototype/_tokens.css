@@ -170,6 +170,7 @@
   --sidebar-collapsed:  56px;
   --header-height:      56px;
   --sidebar-wide:       256px;
+  --drawer-width:       480px;
 }
 
 /* ── Light Mode Override ── */

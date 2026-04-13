@@ -254,6 +254,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
   flex-wrap: wrap;
   gap: var(--space-3);
 }
@@ -318,6 +319,13 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
+}
+/* Auto-fit KPI strip — collapses gracefully from 4 to 2 to 1 col without media query */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
 /* Flex helpers */
@@ -808,6 +816,7 @@ body.dev-mode .state-toggle { display: flex; }
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
+    overflow-x: auto;
   }
 }
 

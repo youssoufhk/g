@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — GammaHR Quantum</title>
+  <title>Dashboard - GammaHR Quantum</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <link rel="stylesheet" href="_layout.css">
@@ -25,7 +25,7 @@
     /* KPI grid responsive override */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: var(--space-5);
       margin-bottom: var(--space-10);
     }
@@ -221,6 +221,7 @@
       background: var(--color-gold);
       transition: height var(--motion-slow);
       min-height: 4px;
+      cursor: pointer;
     }
     .revenue-bar:hover { background: var(--color-gold-hover); }
     .revenue-label {
@@ -299,7 +300,7 @@
     .heatmap-cell {
       height: 20px;
       border-radius: var(--radius-sm);
-      cursor: default;
+      cursor: pointer;
       transition: transform var(--motion-fast), box-shadow var(--motion-fast);
     }
     .heatmap-cell {
@@ -704,104 +705,31 @@
           </div>
         </a>
 
-        <!-- Billable Hours % -->
-        <a href="insights.html" class="stat-card card-interactive card-3d" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
-          <div class="stat-label">Team Work Time</div>
-          <div class="stat-row">
-            <div>
-              <div class="stat-value font-mono">82%</div>
-              <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +3% vs last month</div>
-            </div>
-          </div>
-          <div class="stat-sparkline">
-            <svg viewBox="0 0 120 32" fill="none">
-              <polyline data-animate points="0,20 20,22 40,18 60,16 80,14 100,12 120,10" stroke="var(--color-gold)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <linearGradient id="sparkGold" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--color-gold)" stop-opacity="0.3"/>
-                <stop offset="100%" stop-color="var(--color-gold)" stop-opacity="0"/>
-              </linearGradient>
-              <polygon points="0,20 20,22 40,18 60,16 80,14 100,12 120,10 120,32 0,32" fill="url(#sparkGold)"/>
-            </svg>
-          </div>
-        </a>
-
         <!-- Open Projects -->
         <a href="projects.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
           <div class="stat-label">Open Projects</div>
           <div class="stat-row">
             <div>
               <div class="stat-value font-mono">7</div>
-              <div class="stat-meta">
-                <span class="stat-warning-indicator">
-                  <svg data-lucide="alert-circle" width="12" height="12"></svg>
-                  2 at risk
-                </span>
-              </div>
+              <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +1 this month</div>
             </div>
           </div>
           <div class="stat-sparkline">
             <svg viewBox="0 0 120 32" fill="none">
-              <polyline data-animate points="0,18 20,16 40,20 60,14 80,12 100,16 120,10" stroke="var(--color-info)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline data-animate points="0,24 20,22 40,20 60,18 80,16 100,14 120,10" stroke="var(--color-info)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               <linearGradient id="sparkInfo" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="var(--color-info)" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="var(--color-info)" stop-opacity="0"/>
               </linearGradient>
-              <polygon points="0,18 20,16 40,20 60,14 80,12 100,16 120,10 120,32 0,32" fill="url(#sparkInfo)"/>
+              <polygon points="0,24 20,22 40,20 60,18 80,16 100,14 120,10 120,32 0,32" fill="url(#sparkInfo)"/>
             </svg>
           </div>
         </a>
 
-        <!-- Expenses This Month -->
-        <a href="expenses.html" class="stat-card card-interactive card-3d" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
-          <div class="stat-label">Expenses This Month</div>
-          <div class="stat-row">
-            <div>
-              <div class="stat-value font-mono">&#8364;24,380</div>
-              <div class="stat-trend down"><svg data-lucide="trending-down" width="14" height="14"></svg> -8% vs last month</div>
-            </div>
-          </div>
-          <div class="stat-sparkline">
-            <svg viewBox="0 0 120 32" fill="none">
-              <polyline data-animate points="0,12 20,14 40,10 60,18 80,20 100,22 120,24" stroke="var(--color-accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <linearGradient id="sparkAccent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.3"/>
-                <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"/>
-              </linearGradient>
-              <polygon points="0,12 20,14 40,10 60,18 80,20 100,22 120,24 120,32 0,32" fill="url(#sparkAccent)"/>
-            </svg>
-          </div>
-        </a>
-
-        <!-- Monthly Capacity -->
-        <a href="insights.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
-          <div class="stat-label">Monthly Capacity</div>
-          <div class="stat-row">
-            <div>
-              <div class="stat-value font-mono">2,076h</div>
-              <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +2% vs last month</div>
-            </div>
-          </div>
-          <div class="stat-sparkline">
-            <svg viewBox="0 0 120 32" fill="none">
-              <polyline data-animate points="0,24 20,22 40,20 60,18 80,16 100,14 120,12" stroke="var(--color-info)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <linearGradient id="sparkCapacity" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--color-info)" stop-opacity="0.3"/>
-                <stop offset="100%" stop-color="var(--color-info)" stop-opacity="0"/>
-              </linearGradient>
-              <polygon points="0,24 20,22 40,20 60,18 80,16 100,14 120,12 120,32 0,32" fill="url(#sparkCapacity)"/>
-            </svg>
-          </div>
-        </a>
       </div>
 
-      <!-- ══ OVERVIEW SECTION (visible by default) ══ -->
-      <div class="dashboard-section-header populated-content">
-        <button class="dashboard-section-toggle" onclick="toggleDashSection('overviewSection')" aria-expanded="true">
-          <svg data-lucide="chevron-down" width="16" height="16"></svg>
-          Overview
-        </button>
-      </div>
-      <div class="dashboard-section-body populated-content" id="overviewSection" style="max-height:4000px;">
+      <!-- ══ OVERVIEW SECTION ══ -->
+      <div class="populated-content" id="overviewSection">
 
       <!-- ── WEEK AT A GLANCE HERO ── -->
       <div class="card" style="margin-bottom: var(--space-10);">
@@ -815,7 +743,7 @@
         <div class="card-body">
           <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-3);">
             <!-- Monday (logged) -->
-            <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Mon')">
+            <div style="text-align:center;cursor:pointer;" onclick="window.location.href='timesheets.html'">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Mon</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">8h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
@@ -823,7 +751,7 @@
               </div>
             </div>
             <!-- Tuesday (logged) -->
-            <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Tue')">
+            <div style="text-align:center;cursor:pointer;" onclick="window.location.href='timesheets.html'">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Tue</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">8h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
@@ -831,15 +759,15 @@
               </div>
             </div>
             <!-- Wednesday (logged) -->
-            <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Wed')">
+            <div style="text-align:center;cursor:pointer;" onclick="window.location.href='timesheets.html'">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Wed</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">7h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
                 <div style="width:87%;height:100%;background:var(--color-success);border-radius:var(--radius-full);"></div>
               </div>
             </div>
-            <!-- Thursday (today — in progress) -->
-            <div class="week-day-today" style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Thu')">
+            <!-- Thursday (today - in progress) -->
+            <div class="week-day-today" style="text-align:center;cursor:pointer;" onclick="window.location.href='timesheets.html'">
               <div style="font-size:var(--text-caption);color:var(--color-primary);font-weight:var(--weight-semibold);margin-bottom:var(--space-1);">Thu</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-1);margin-bottom:var(--space-2);">5h</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
@@ -848,7 +776,7 @@
               <div style="font-size:var(--text-overline);color:var(--color-primary);margin-top:var(--space-1);">Today</div>
             </div>
             <!-- Friday (upcoming) -->
-            <div style="text-align:center;cursor:pointer;" onclick="window.showDayToast && window.showDayToast('Fri')">
+            <div style="text-align:center;cursor:pointer;" onclick="window.location.href='timesheets.html'">
               <div style="font-size:var(--text-caption);color:var(--color-text-3);font-weight:var(--weight-medium);margin-bottom:var(--space-1);">Fri</div>
               <div style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-2);">--</div>
               <div style="height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;">
@@ -870,11 +798,7 @@
               <span class="font-mono" style="font-size:var(--text-body-sm);color:var(--color-text-1);">28h / 40h</span>
             </div>
           </div>
-          <div style="display:flex;gap:var(--space-4);margin-top:var(--space-2);font-size:var(--text-overline);color:var(--color-text-3);">
-            <span><span style="color:var(--color-gold);font-weight:var(--weight-semibold);">24h</span> billable</span>
-            <span><span style="color:var(--color-text-2);font-weight:var(--weight-semibold);">4h</span> internal</span>
-            <span style="color:var(--color-success);">87% billable rate</span>
-          </div>
+          <!-- Billable breakdown removed - detail level belongs in Timesheets page -->
         </div>
       </div>
 
@@ -885,15 +809,21 @@
             <svg data-lucide="sparkles" width="18" height="18" style="color: var(--color-accent);"></svg>
             AI Alerts
           </span>
-          <span class="badge badge-accent">3 new</span>
+          <div style="display:flex;align-items:center;gap:var(--space-2);">
+            <span class="badge badge-accent" id="aiAlertCountBadge">3 alerts</span>
+            <button class="btn btn-ghost btn-xs" id="aiAlertsToggleBtn" onclick="toggleAIAlerts()" aria-expanded="true">
+              <svg data-lucide="chevron-up" width="14" height="14" id="aiAlertsChevron"></svg>
+            </button>
+          </div>
         </div>
+        <div id="aiAlertsBody">
         <div class="card-body">
           <div class="ai-alert">
             <div class="ai-alert-icon"><svg data-lucide="alert-triangle" width="18" height="18" style="color: var(--color-error);"></svg></div>
             <div class="ai-alert-body">
               <div class="ai-alert-text">
                 <span class="badge badge-error" style="margin-right: var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overwork Alert</span>
-                <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a> has averaged 47h/week for 3 consecutive weeks — consider redistribution.
+                <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a> has averaged 47h/week for 3 consecutive weeks - consider redistribution.
               </div>
               <div class="ai-alert-actions">
                 <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
@@ -920,7 +850,7 @@
               <div class="ai-alert-body">
                 <div class="ai-alert-text">
                   <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="briefcase" width="12" height="12"></svg> Bench Alert</span>
-                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a> is on bench 3 weeks — matches Globex Phase 2 backend skills.
+                  <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a> is on bench 3 weeks - matches Globex Phase 2 backend skills.
                 </div>
                 <div class="ai-alert-actions">
                   <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
@@ -933,7 +863,7 @@
               <div class="ai-alert-body">
                 <div class="ai-alert-text">
                   <span class="badge badge-info" style="margin-right: var(--space-1);"><svg data-lucide="receipt" width="12" height="12"></svg> Expense Pattern</span>
-                  Unusual hotel expense for <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a> &mdash; EUR 340 Marriott Lyon on Apr 2.
+                  Unusual hotel expense for <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a> - EUR 340 Marriott Lyon on Apr 2.
                 </div>
                 <div class="ai-alert-actions">
                   <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
@@ -946,6 +876,13 @@
             <svg data-lucide="chevron-down" width="12" height="12"></svg>
             View 2 more alerts
           </button>
+        </div>
+        </div><!-- end aiAlertsBody -->
+        <!-- All clear state (shown when no alerts remain) -->
+        <div id="aiAlertsClear" style="display:none;padding:var(--space-4);text-align:center;">
+          <svg data-lucide="check-circle" width="32" height="32" style="color:var(--color-success);margin-bottom:var(--space-2);"></svg>
+          <div style="font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);margin-bottom:var(--space-1);">All clear</div>
+          <div style="font-size:var(--text-caption);color:var(--color-text-3);">AI detected no anomalies this week. Your team is on track.</div>
         </div>
       </div>
 
@@ -966,9 +903,9 @@
             <!-- Timesheets Tab (capped at 4 items for readability) -->
             <div class="tab-content active" id="tab-timesheets" role="tabpanel">
               <div class="approval-item">
-                <div class="avatar avatar-xs">JS</div>
+                <a href="employees.html#john-smith" class="avatar avatar-xs" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith" style="text-decoration:none;">JS</a>
                 <div class="approval-info">
-                  <div class="approval-title">John Smith - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith" style="color:inherit;text-decoration:none;">John Smith</a> - Week 13</div>
                   <div class="approval-sub">40h logged - Globex Phase 2 - <span class="font-mono" data-sensitive="billing">&#8364;3,200</span></div>
                 </div>
                 <div class="approval-actions">
@@ -977,9 +914,9 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">CW</div>
+                <a href="employees.html#carol-williams" class="avatar avatar-xs" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams" style="text-decoration:none;">CW</a>
                 <div class="approval-info">
-                  <div class="approval-title">Carol Williams - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams" style="color:inherit;text-decoration:none;">Carol Williams</a> - Week 13</div>
                   <div class="approval-sub">38h logged - Umbrella Corp Portal - <span class="font-mono" data-sensitive="billing">&#8364;2,850</span></div>
                 </div>
                 <div class="approval-actions">
@@ -988,9 +925,9 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">MR</div>
+                <a href="employees.html#marco-rossi" class="avatar avatar-xs" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi" style="text-decoration:none;">MR</a>
                 <div class="approval-info">
-                  <div class="approval-title">Marco Rossi - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi" style="color:inherit;text-decoration:none;">Marco Rossi</a> - Week 13</div>
                   <div class="approval-sub">42h logged - Acme Web Redesign - <span class="font-mono" data-sensitive="billing">&#8364;3,360</span></div>
                 </div>
                 <div class="approval-actions">
@@ -999,9 +936,9 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">DP</div>
+                <a href="employees.html#david-park" class="avatar avatar-xs" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Initech API" data-worktime="85" data-href="employees.html#david-park" style="text-decoration:none;">DP</a>
                 <div class="approval-info">
-                  <div class="approval-title">David Park - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Initech API" data-worktime="85" data-href="employees.html#david-park" style="color:inherit;text-decoration:none;">David Park</a> - Week 13</div>
                   <div class="approval-sub">36h logged - Initech API - <span class="font-mono" data-sensitive="billing">&#8364;2,880</span></div>
                 </div>
                 <div class="approval-actions">
@@ -1017,9 +954,9 @@
             <!-- Leaves Tab -->
             <div class="tab-content" id="tab-leaves" role="tabpanel">
               <div class="approval-item">
-                <div class="avatar avatar-xs">AW</div>
+                <a href="employees.html#alice-wang" class="avatar avatar-xs" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang" style="text-decoration:none;">AW</a>
                 <div class="approval-info">
-                  <div class="approval-title">Alice Wang - Annual Leave</div>
+                  <div class="approval-title"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang" style="color:inherit;text-decoration:none;">Alice Wang</a> - Annual Leave</div>
                   <div class="approval-sub">Apr 14-18, 2026 (5 days)</div>
                 </div>
                 <div class="approval-actions">
@@ -1028,9 +965,9 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">BT</div>
+                <a href="employees.html#bob-taylor" class="avatar avatar-xs" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="text-decoration:none;">BT</a>
                 <div class="approval-info">
-                  <div class="approval-title">Bob Taylor - Personal</div>
+                  <div class="approval-title"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;">Bob Taylor</a> - Personal</div>
                   <div class="approval-sub">Apr 10, 2026 (1 day)</div>
                 </div>
                 <div class="approval-actions">
@@ -1039,9 +976,9 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">LO</div>
+                <a href="employees.html#liam-obrien" class="avatar avatar-xs" data-hovercard data-name="Liam O'Brien" data-role="Developer" data-dept="Engineering" data-project="" data-worktime="80" data-href="employees.html#liam-obrien" style="text-decoration:none;">LO</a>
                 <div class="approval-info">
-                  <div class="approval-title">Liam O'Brien - Sick Leave</div>
+                  <div class="approval-title"><a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Developer" data-dept="Engineering" data-project="" data-worktime="80" data-href="employees.html#liam-obrien" style="color:inherit;text-decoration:none;">Liam O'Brien</a> - Sick Leave</div>
                   <div class="approval-sub">Apr 6-7, 2026 (2 days)</div>
                 </div>
                 <div class="approval-actions">
@@ -1054,9 +991,9 @@
             <!-- Expenses Tab -->
             <div class="tab-content" id="tab-expenses" role="tabpanel">
               <div class="approval-item">
-                <div class="avatar avatar-xs">BT</div>
+                <a href="employees.html#bob-taylor" class="avatar avatar-xs" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="text-decoration:none;">BT</a>
                 <div class="approval-info">
-                  <div class="approval-title">Bob Taylor - Client Dinner</div>
+                  <div class="approval-title"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;">Bob Taylor</a> - Client Dinner</div>
                   <div class="approval-sub">Mar 30 - Helix Corp - <span class="font-mono">&#8364;186.50</span></div>
                 </div>
                 <div class="approval-actions">
@@ -1065,9 +1002,9 @@
                 </div>
               </div>
               <div class="approval-item">
-                <div class="avatar avatar-xs">EL</div>
+                <a href="employees.html#emma-laurent" class="avatar avatar-xs" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent" style="text-decoration:none;">EL</a>
                 <div class="approval-info">
-                  <div class="approval-title">Emma Laurent - Conference Fee</div>
+                  <div class="approval-title"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent" style="color:inherit;text-decoration:none;">Emma Laurent</a> - Conference Fee</div>
                   <div class="approval-sub">Apr 2 - QA Summit 2026 - <span class="font-mono">&#8364;450.00</span></div>
                 </div>
                 <div class="approval-actions">
@@ -1109,7 +1046,7 @@
                   <div class="flex-1">
                     <div class="text-sm text-1">
                       <svg data-lucide="palm-tree" width="14" height="14" style="color:var(--color-warning);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      <a href="employees.html#alice-wang" class="text-primary">Alice Wang</a> OOO (Apr 14–18)
+                      <a href="employees.html#alice-wang" class="text-primary">Alice Wang</a> OOO (Apr 14-18)
                     </div>
                   </div>
                 </div>
@@ -1120,7 +1057,7 @@
                   <div class="flex-1">
                     <div class="text-sm text-1">
                       <svg data-lucide="file-text" width="14" height="14" style="color:var(--color-gold);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      Invoice due -- <a href="clients.html#acme-corp" style="color:var(--color-gold);">Acme Corp</a>
+                      Invoice due - <a href="clients.html#acme-corp" style="color:var(--color-gold);">Acme Corp</a>
                     </div>
                   </div>
                 </div>
@@ -1131,7 +1068,7 @@
                   <div class="flex-1">
                     <div class="text-sm text-1">
                       <svg data-lucide="flag" width="14" height="14" style="color:var(--color-info);vertical-align:-2px;margin-right:var(--space-1);"></svg>
-                      Project milestone -- <a href="projects.html#globex-phase-2" style="color:var(--color-info);">Globex Phase 2</a>
+                      Project milestone - <a href="projects.html#globex-phase-2" style="color:var(--color-info);">Globex Phase 2</a>
                     </div>
                   </div>
                 </div>
@@ -1151,7 +1088,7 @@
           </div>
         </div>
       </div>
-      </div><!-- end overviewSection body -->
+      </div><!-- end overviewSection -->
 
       <!-- Empty state KPI placeholder -->
       <div class="kpi-grid empty-content" style="grid-template-columns: 1fr;">
@@ -1165,14 +1102,8 @@
         </div>
       </div>
 
-      <!-- ══ DETAILS SECTION (collapsed by default) ══ -->
-      <div class="dashboard-section-header populated-content">
-        <button class="dashboard-section-toggle collapsed" onclick="toggleDashSection('detailsSection')" aria-expanded="false">
-          <svg data-lucide="chevron-down" width="16" height="16"></svg>
-          Details
-        </button>
-      </div>
-      <div class="dashboard-section-body populated-content collapsed" id="detailsSection" style="max-height:8000px;">
+      <!-- ══ DETAILS SECTION ══ -->
+      <div class="populated-content" id="detailsSection">
 
       <!-- ── WORK TIME HEATMAP (collapsible) ── -->
       <section class="card worktime-heatmap-section" id="heatmapSection">
@@ -1181,7 +1112,7 @@
             <button class="collapsible-toggle" onclick="toggleCollapsible('heatmapSection')" aria-expanded="true" aria-controls="heatmapBody">
               <svg data-lucide="chevron-down" width="16" height="16"></svg>
             </button>
-            <h3 class="card-title">Team Work Time — Last 12 Weeks</h3>
+            <h3 class="card-title">Team Work Time - Last 12 Weeks</h3>
           </div>
           <a href="insights.html" class="btn btn-ghost btn-xs">Insights</a>
         </div>
@@ -1217,7 +1148,7 @@
             <button class="collapsible-toggle" onclick="toggleCollapsible('revSnapshotSection')" aria-expanded="true" aria-controls="revSnapshotBody">
               <svg data-lucide="chevron-down" width="16" height="16"></svg>
             </button>
-            <h3 class="card-title">Revenue Snapshot — April 2026</h3>
+            <h3 class="card-title">Revenue Snapshot - April 2026</h3>
           </div>
           <a href="insights.html" class="btn btn-ghost btn-xs">Details</a>
         </div>
@@ -1249,7 +1180,7 @@
         <!-- ═══ LEFT COLUMN (60%) ═══ -->
         <div class="flex flex-col gap-8">
 
-          <!-- Team Work Time Table — REMOVED for information density (Issue 1) -->
+          <!-- Team Work Time Table - REMOVED for information density (Issue 1) -->
           <!-- Kept code commented for reference; table was redundant with heatmap + employee page -->
 
           <!-- Mini Gantt Preview -->
@@ -1442,32 +1373,32 @@
                   <span style="font-size:var(--text-overline);color:var(--color-text-3);line-height:1;">0</span>
                 </div>
               <div class="revenue-bars" style="flex:1;">
-                <div class="revenue-bar-col">
+                <div class="revenue-bar-col" style="cursor:pointer;" onclick="window.location.href='insights.html'" title="Nov: €42k - click to view in Insights">
                   <div class="revenue-value">&#8364;42k</div>
                   <div class="revenue-bar" style="height: 74%;"></div>
                   <div class="revenue-label">Nov</div>
                 </div>
-                <div class="revenue-bar-col">
+                <div class="revenue-bar-col" style="cursor:pointer;" onclick="window.location.href='insights.html'" title="Dec: €45k - click to view in Insights">
                   <div class="revenue-value">&#8364;45k</div>
                   <div class="revenue-bar" style="height: 79%;"></div>
                   <div class="revenue-label">Dec</div>
                 </div>
-                <div class="revenue-bar-col">
+                <div class="revenue-bar-col" style="cursor:pointer;" onclick="window.location.href='insights.html'" title="Jan: €38k - click to view in Insights">
                   <div class="revenue-value">&#8364;38k</div>
                   <div class="revenue-bar" style="height: 66%;"></div>
                   <div class="revenue-label">Jan</div>
                 </div>
-                <div class="revenue-bar-col">
+                <div class="revenue-bar-col" style="cursor:pointer;" onclick="window.location.href='insights.html'" title="Feb: €51k - click to view in Insights">
                   <div class="revenue-value">&#8364;51k</div>
                   <div class="revenue-bar" style="height: 90%;"></div>
                   <div class="revenue-label">Feb</div>
                 </div>
-                <div class="revenue-bar-col">
+                <div class="revenue-bar-col" style="cursor:pointer;" onclick="window.location.href='insights.html'" title="Mar: €47k - click to view in Insights">
                   <div class="revenue-value">&#8364;47k</div>
                   <div class="revenue-bar" style="height: 82%;"></div>
                   <div class="revenue-label">Mar</div>
                 </div>
-                <div class="revenue-bar-col">
+                <div class="revenue-bar-col" style="cursor:pointer;" onclick="window.location.href='insights.html'" title="Apr: €45k - click to view in Insights">
                   <div class="revenue-value">&#8364;45k</div>
                   <div class="revenue-bar" style="height: 79%;"></div>
                   <div class="revenue-label">Apr</div>
@@ -1479,7 +1410,7 @@
 
         </div>
       </div>
-      </div><!-- end detailsSection body -->
+      </div><!-- end detailsSection -->
 
       <!-- Empty state for two-column -->
       <div class="grid-60-40 empty-content" style="grid-template-columns: 1fr;">
@@ -1820,7 +1751,7 @@
     var greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
     var el = document.getElementById('greetingHeading');
     // Contextual summary: timesheets to approve + expense flagged
-    if (el) el.textContent = greeting + ', Sarah — 3 timesheets to approve, 1 expense flagged.';
+    if (el) el.textContent = greeting + ', Sarah';
     // ── Dynamic date ──
     var dateEl = document.getElementById('greetingDate');
     if (dateEl) {
@@ -1830,9 +1761,9 @@
     }
   })();
 
-  // ── Day bar click toast (Week at a Glance) ──
+  // ── Day bar click (Week at a Glance) - navigate to timesheets ──
   window.showDayToast = function(day) {
-    showToast('info', 'Opening timesheet', 'Opening timesheet for ' + day + '...');
+    window.location.href = 'timesheets.html';
   };
 
   // ── Shared utilities init ──
@@ -1913,9 +1844,10 @@
           } else {
             cell.className = 'heatmap-cell low';
           }
-          cell.title = 'Week of ' + months[start.getMonth()] + ' ' + start.getDate() + ': ' + val + '% (' + hours + ')';
+          cell.title = 'Week of ' + months[start.getMonth()] + ' ' + start.getDate() + ': ' + val + '% (' + hours + ') - click to view timesheets';
           cell.setAttribute('data-hours', val + '% ' + hours);
         }
+        cell.addEventListener('click', function() { window.location.href = 'timesheets.html'; });
         grid.appendChild(cell);
       }
     });
@@ -1938,16 +1870,19 @@
     data.forEach(function(d) {
       var col = document.createElement('div');
       col.className = 'rev-bar-col';
+      col.style.cursor = 'pointer';
+      col.title = d.label + ': \u20AC' + (d.value / 1000).toFixed(0) + 'k' + (d.projected ? ' (projected)' : '') + ' - click to view in Insights';
+      col.addEventListener('click', function() { window.location.href = 'insights.html'; });
       var pct = Math.round((d.value / maxVal) * 100);
       col.innerHTML =
         '<div style="font-family:var(--font-mono);font-size:var(--text-overline);color:var(--color-text-2);">\u20AC' + (d.value / 1000).toFixed(0) + 'k</div>' +
-        '<div class="rev-bar ' + (d.projected ? 'projected' : 'actual') + '" style="height:' + pct + '%;" title="' + d.label + ': \u20AC' + (d.value / 1000).toFixed(0) + 'k' + (d.projected ? ' (projected)' : '') + '"></div>' +
+        '<div class="rev-bar ' + (d.projected ? 'projected' : 'actual') + '" style="height:' + pct + '%;"></div>' +
         '<div class="rev-label">' + d.label + '</div>';
       chart.appendChild(col);
     });
   })();
 
-  // (Donut chart removed — hours/capacity donuts banned by design system)
+  // (Donut chart removed - hours/capacity donuts banned by design system)
 
   // ── AI Alert Dismiss buttons (Issue 4) ──
   document.querySelectorAll('.dismiss-alert-btn').forEach(function(btn) {
@@ -1963,7 +1898,10 @@
           card.style.marginBottom = '0';
           card.style.overflow = 'hidden';
         }, 150);
-        setTimeout(function() { if (card.parentNode) card.parentNode.removeChild(card); }, 500);
+        setTimeout(function() {
+          if (card.parentNode) card.parentNode.removeChild(card);
+          checkAIAlertsClear();
+        }, 500);
       }
       showToast('info', 'Alert dismissed', 'This insight has been dismissed.');
     });
@@ -2024,6 +1962,40 @@
   })();
 
 })();
+
+// ── AI Alerts toggle and all-clear state ──
+function toggleAIAlerts() {
+  var body = document.getElementById('aiAlertsBody');
+  var chevron = document.getElementById('aiAlertsChevron');
+  var btn = document.getElementById('aiAlertsToggleBtn');
+  if (!body) return;
+  var isExpanded = btn.getAttribute('aria-expanded') === 'true';
+  if (isExpanded) {
+    body.style.display = 'none';
+    btn.setAttribute('aria-expanded', 'false');
+    if (chevron) { chevron.setAttribute('data-lucide', 'chevron-down'); if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [chevron] }); }
+  } else {
+    body.style.display = 'block';
+    btn.setAttribute('aria-expanded', 'true');
+    if (chevron) { chevron.setAttribute('data-lucide', 'chevron-up'); if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [chevron] }); }
+  }
+}
+
+function checkAIAlertsClear() {
+  var remaining = document.querySelectorAll('#aiAlertsBody .ai-alert');
+  var badge = document.getElementById('aiAlertCountBadge');
+  var clearEl = document.getElementById('aiAlertsClear');
+  var body = document.getElementById('aiAlertsBody');
+  if (badge) {
+    var count = remaining.length;
+    badge.textContent = count > 0 ? count + ' alert' + (count !== 1 ? 's' : '') : 'All clear';
+    if (count === 0) badge.className = 'badge badge-success';
+  }
+  if (remaining.length === 0) {
+    if (body) body.style.display = 'none';
+    if (clearEl) clearEl.style.display = 'block';
+  }
+}
 
 // ── Dashboard section toggle (Overview / Details) ──
 function toggleDashSection(sectionId) {

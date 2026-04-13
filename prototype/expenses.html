@@ -550,15 +550,14 @@
               <span style="margin:0 var(--space-1);">/</span>
               <span style="color:var(--color-text-2);">Expenses</span>
             </nav>
-            <h1 class="page-title">Expense Management</h1>
-            <p class="page-subtitle">Track, submit, and approve team expenses</p>
+            <h1 class="page-title">Expenses</h1>
           </div>
           <div class="page-header-actions">
-            <button class="btn btn-secondary btn-sm" onclick="exportExpenses()">
+            <button class="btn btn-secondary btn-md" onclick="exportExpenses()">
               <svg data-lucide="download" width="16" height="16"></svg>
               Export
             </button>
-            <button class="btn btn-primary btn-sm" onclick="switchTab('submit')">
+            <button class="btn btn-primary btn-md" onclick="switchTab('submit')">
               <svg data-lucide="plus" width="16" height="16"></svg>
               New Expense
             </button>
@@ -595,65 +594,37 @@
           <div class="pt-6">
 
             <!-- Stats -->
-            <div class="stats-grid perspective-container stagger-reveal">
-              <div class="stat-card card-3d card-interactive" data-animate="fade-up">
+            <div class="stats-grid">
+              <div class="stat-card card-interactive">
                 <div class="stat-label">This Month</div>
-                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
-                  <div class="stat-value">&euro;1,240</div>
-                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
-                    <polyline points="0,20 10,16 20,18 30,12 40,14 50,8 64,6" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="0,20 10,16 20,18 30,12 40,14 50,8 64,6 64,24 0,24" fill="url(#expSpark1)" stroke="none"/>
-                    <defs><linearGradient id="expSpark1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-success)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-success)" stop-opacity="0"/></linearGradient></defs>
-                  </svg>
-                </div>
+                <div class="stat-value font-mono">&euro;1,240</div>
                 <div class="stat-trend up">
                   <svg data-lucide="trending-up" width="14" height="14"></svg>
-                  +15% vs last month (&euro;1,078)
+                  +15% vs last month
                 </div>
               </div>
-              <div class="stat-card card-3d card-interactive" data-animate="fade-up">
+              <div class="stat-card card-interactive">
                 <div class="stat-label">Pending</div>
-                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
-                  <div class="stat-value" id="statPendingAmount">&euro;67.30</div>
-                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
-                    <polyline points="0,12 10,14 20,10 30,16 40,8 50,12 64,10" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="0,12 10,14 20,10 30,16 40,8 50,12 64,10 64,24 0,24" fill="url(#expSpark2)" stroke="none"/>
-                    <defs><linearGradient id="expSpark2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-warning)" stop-opacity="0.12"/><stop offset="100%" stop-color="var(--color-warning)" stop-opacity="0"/></linearGradient></defs>
-                  </svg>
-                </div>
+                <div class="stat-value font-mono" id="statPendingAmount">&euro;407.30</div>
                 <div class="stat-trend" style="color: var(--color-warning);">
                   <svg data-lucide="clock" width="14" height="14"></svg>
-                  1 item awaiting review &bull; &euro;340 last month
+                  4 items awaiting review
                 </div>
               </div>
-              <div class="stat-card">
+              <div class="stat-card card-interactive">
                 <div class="stat-label">Billable</div>
-                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
-                  <div class="stat-value">78%</div>
-                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
-                    <polyline points="0,18 10,16 20,14 30,12 40,10 50,8 64,6" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="0,18 10,16 20,14 30,12 40,10 50,8 64,6 64,24 0,24" fill="url(#expSpark3)" stroke="none"/>
-                    <defs><linearGradient id="expSpark3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.12"/><stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/></linearGradient></defs>
-                  </svg>
-                </div>
+                <div class="stat-value font-mono">78%</div>
                 <div class="stat-trend" style="color:var(--color-text-2);">
                   <svg data-lucide="trending-up" width="14" height="14"></svg>
-                  +5% vs last month (73%)
+                  +5% vs last month
                 </div>
               </div>
-              <div class="stat-card">
+              <div class="stat-card card-interactive">
                 <div class="stat-label">Top Category</div>
-                <div style="display:flex;align-items:flex-end;justify-content:space-between;">
-                  <div class="stat-value" style="font-family: var(--font-sans); font-size: var(--text-heading-2);">Travel</div>
-                  <svg width="64" height="24" viewBox="0 0 64 24" style="flex-shrink:0;">
-                    <polyline points="0,14 10,18 20,12 30,16 40,6 50,10 64,4" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="0,14 10,18 20,12 30,16 40,6 50,10 64,4 64,24 0,24" fill="url(#expSpark4)" stroke="none"/>
-                    <defs><linearGradient id="expSpark4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-info)" stop-opacity="0.12"/><stop offset="100%" stop-color="var(--color-info)" stop-opacity="0"/></linearGradient></defs>
-                  </svg>
-                </div>
+                <div class="stat-value" style="font-size:var(--text-heading-2);">Travel</div>
                 <div class="stat-trend" style="color:var(--color-text-2);">
                   <svg data-lucide="plane" width="14" height="14"></svg>
-                  &euro;450 this month &bull; &euro;320 last month
+                  &euro;450 this month
                 </div>
               </div>
             </div>
@@ -710,7 +681,7 @@
             <div class="expense-list" id="expenseList">
 
               <!-- 1. Travel - Approved -->
-              <div class="expense-item">
+              <div class="expense-item" style="cursor:pointer;" onclick="openExpenseDrawer({desc:'Travel - Client site visit Paris to Lyon round trip',amount:'€450.00',category:'Travel',project:'Acme Web Redesign',projectHref:'projects.html#detail/acme-web',billable:true,date:'Feb 15, 2026',submittedBy:'Sarah Chen',status:'Approved',approver:'John Smith',approvalNote:'Confirmed with client',receipt:'receipt.pdf'})">
                 <div class="expense-icon" style="background: var(--color-info-muted); color: var(--color-info);">
                   <svg data-lucide="plane"></svg>
                 </div>
@@ -720,7 +691,7 @@
                   <div class="expense-meta">
                     <span>Feb 15, 2026</span>
                     <span class="meta-sep"></span>
-                    <a href="projects.html#detail">Acme Web Redesign</a>
+                    <a href="projects.html#detail/acme-web" onclick="event.stopPropagation()">Acme Web Redesign</a>
                   </div>
                   <div class="expense-desc">Client site visit - Paris to Lyon round trip</div>
                 </div>
@@ -738,8 +709,8 @@
               </div>
 
               <!-- 3. Software - Approved -->
-              <div class="expense-item">
-                <div class="expense-icon" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);">
+              <div class="expense-item" style="cursor:pointer;" onclick="openExpenseDrawer({desc:'Software - Figma annual license renewal',amount:'€120.00',category:'Software',project:null,billable:false,date:'Jan 20, 2026',submittedBy:'Sarah Chen',status:'Approved',approver:'John Smith',approvalNote:'Approved for team use',receipt:null})">
+                <div class="expense-icon" style="background: var(--color-primary-muted); color: var(--color-primary);">
                   <svg data-lucide="monitor"></svg>
                 </div>
                 <div class="expense-amount">&euro;120.00</div>
@@ -747,8 +718,6 @@
                   <div class="expense-type">Software</div>
                   <div class="expense-meta">
                     <span>Jan 20, 2026</span>
-                    <span class="meta-sep"></span>
-                    <span class="text-3">&mdash;</span>
                   </div>
                   <div class="expense-desc">Figma annual license renewal</div>
                 </div>
@@ -762,8 +731,8 @@
               </div>
 
               <!-- 4. Meals - Approved -->
-              <div class="expense-item">
-                <div class="expense-icon" style="background: var(--color-gold-muted); color: var(--color-gold);">
+              <div class="expense-item" style="cursor:pointer;" onclick="openExpenseDrawer({desc:'Meals - Client lunch quarterly review meeting',amount:'€85.50',category:'Meals',project:'Globex Phase 2',projectHref:'projects.html#detail/globex-phase2',billable:true,date:'Mar 10, 2026',submittedBy:'Sarah Chen',status:'Approved',approver:'John Smith',approvalNote:'',receipt:'receipt.pdf'})">
+                <div class="expense-icon" style="background: var(--color-warning-muted); color: var(--color-warning);">
                   <svg data-lucide="utensils"></svg>
                 </div>
                 <div class="expense-amount">&euro;85.50</div>
@@ -772,7 +741,7 @@
                   <div class="expense-meta">
                     <span>Mar 10, 2026</span>
                     <span class="meta-sep"></span>
-                    <a href="projects.html#detail">Globex Phase 2</a>
+                    <a href="projects.html#detail/globex-phase2" onclick="event.stopPropagation()">Globex Phase 2</a>
                   </div>
                   <div class="expense-desc">Client lunch - quarterly review meeting</div>
                 </div>
@@ -790,17 +759,15 @@
               </div>
 
               <!-- 5. Equipment - Rejected -->
-              <div class="expense-item">
+              <div class="expense-item" style="cursor:pointer;border-color:var(--color-error-muted);" onclick="openExpenseDrawer({desc:'Equipment - External monitor Dell UltraSharp 27\"',amount:'€1,200.00',category:'Equipment',project:null,billable:false,date:'Mar 25, 2026',submittedBy:'Sarah Chen',status:'Rejected',approver:'John Smith',approvalNote:'Over budget limit without pre-approval',receipt:null,rejected:true})">
                 <div class="expense-icon" style="background: var(--color-error-muted); color: var(--color-error);">
                   <svg data-lucide="laptop"></svg>
                 </div>
-                <div class="expense-amount">&euro;1,200.00</div>
+                <div class="expense-amount" style="color:var(--color-error);">&euro;1,200.00</div>
                 <div class="expense-details">
                   <div class="expense-type">Equipment</div>
                   <div class="expense-meta">
                     <span>Mar 25, 2026</span>
-                    <span class="meta-sep"></span>
-                    <span class="text-3">&mdash;</span>
                   </div>
                   <div class="expense-desc">External monitor - Dell UltraSharp 27"</div>
                   <div class="rejection-reason">
@@ -814,7 +781,7 @@
                     <svg data-lucide="x-circle" width="12" height="12"></svg>
                     Rejected
                   </span>
-                  <button class="btn btn-xs btn-primary" onclick="resubmitExpense(this)">
+                  <button class="btn btn-xs btn-primary" onclick="event.stopPropagation();resubmitExpense(this)">
                     <svg data-lucide="refresh-cw" width="12" height="12"></svg>
                     Resubmit
                   </button>
@@ -822,7 +789,7 @@
               </div>
 
               <!-- 6. Transport - Pending -->
-              <div class="expense-item">
+              <div class="expense-item" style="cursor:pointer;" onclick="openExpenseDrawer({desc:'Transport - Taxi to client office integration kickoff',amount:'€67.30',category:'Transport',project:'Initech API',projectHref:'projects.html#detail/initech-api',billable:true,date:'Apr 1, 2026',submittedBy:'Sarah Chen',status:'Pending',approver:'John Smith',approvalNote:null,receipt:null})">
                 <div class="expense-icon" style="background: var(--color-primary-muted); color: var(--color-primary);">
                   <svg data-lucide="car"></svg>
                 </div>
@@ -832,7 +799,7 @@
                   <div class="expense-meta">
                     <span>Apr 1, 2026</span>
                     <span class="meta-sep"></span>
-                    <a href="projects.html#detail">Initech API</a>
+                    <a href="projects.html#detail/initech-api" onclick="event.stopPropagation()">Initech API</a>
                   </div>
                   <div class="expense-desc">Taxi to client office - integration kickoff</div>
                 </div>
@@ -925,12 +892,8 @@
                   </div>
                   <div id="aiAutoFilledBanner" style="display:none;margin-top:var(--space-3);padding:var(--space-2) var(--space-3);background:var(--color-success-muted);border:1px solid var(--color-success);border-radius:var(--radius-sm);font-size:var(--text-caption);color:var(--color-success);">
                     <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:var(--space-1);"></svg>
-                    Form auto-filled from receipt. Please review.
+                    Form auto-filled from receipt. Please review and confirm.
                   </div>
-                  <button class="btn btn-secondary btn-sm" style="margin-top:var(--space-3);width:100%;" onclick="applyAiToForm()">
-                    <svg data-lucide="refresh-cw" width="16" height="16"></svg>
-                    Re-apply AI Results
-                  </button>
                 </div>
 
                 <!-- Policy checks -->
@@ -1001,6 +964,12 @@
                       <span>Billable expense</span>
                     </label>
                     <div class="form-helper">Check if this expense should be invoiced to the client</div>
+                    <!-- AI suggestion for billable -->
+                    <div id="aiBillableSuggestion" style="display:none;margin-top:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-sm);font-size:var(--text-caption);color:var(--color-primary);display:flex;align-items:center;gap:var(--space-2);">
+                      <svg data-lucide="sparkles" width="12" height="12" style="flex-shrink:0;"></svg>
+                      <span>AI suggested: Billable to <strong>Acme Corp</strong> based on Marriott Lyon receipt</span>
+                      <button class="btn btn-xs btn-ghost" style="margin-left:auto;font-size:var(--text-overline);" onclick="document.getElementById('aiBillableSuggestion').style.display='none'">Override</button>
+                    </div>
                   </div>
 
                   <div class="form-group">
@@ -1068,44 +1037,44 @@
               </div>
 
               <!-- Sarah Chen — Travel -->
-              <div class="action-row" data-type="Travel" data-status="Approved" data-employee="Sarah Chen">
-                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Sarah Chen expense"></div>
+              <div class="action-row" data-type="Travel" data-status="Approved" data-employee="Sarah Chen" style="cursor:pointer;" onclick="openExpenseDrawer({desc:'Travel - Client site visit Paris to Lyon round trip',amount:'€450.00',category:'Travel',project:'Acme Web Redesign',projectHref:'projects.html#detail/acme-web',billable:true,date:'Feb 15, 2026',submittedBy:'Sarah Chen',status:'Approved',approver:'John Smith',approvalNote:'Confirmed with client',receipt:'receipt.pdf'})">
+                <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Sarah Chen expense" onclick="event.stopPropagation()"></div>
                 <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
                   <svg data-lucide="plane" width="16" height="16"></svg>
                 </div>
                 <div class="action-row-employee">
                   <div class="avatar avatar-xs">SC</div>
-                  <span class="employee-name"><a href="employees.html#sarah-chen" style="color:inherit;text-decoration:none;">Sarah Chen</a></span>
+                  <span class="employee-name"><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Admin" data-dept="Management" data-worktime="85" data-href="employees.html#sarah-chen" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Sarah Chen</a></span>
                 </div>
-                <div class="action-row-detail">Travel &mdash; Client site visit Paris&ndash;Lyon</div>
-                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Acme Web Redesign</a> &bull; Feb 15, 2026</div>
+                <div class="action-row-detail">Travel - Client site visit Paris-Lyon</div>
+                <div class="action-row-meta"><a href="projects.html#detail/acme-web" style="color:var(--color-primary);text-decoration:none;" onclick="event.stopPropagation()">Acme Web Redesign</a> &bull; Feb 15, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;450.00</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
                 </div>
                 <div class="action-row-actions">
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','Receipt','Viewing receipt for Sarah Chen')"><svg data-lucide="paperclip" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer({desc:'Travel - Client site visit Paris to Lyon round trip',amount:'€450.00',category:'Travel',project:'Acme Web Redesign',projectHref:'projects.html#detail/acme-web',billable:true,date:'Feb 15, 2026',submittedBy:'Sarah Chen',status:'Approved',approver:'John Smith',approvalNote:'Confirmed with client',receipt:'receipt.pdf'})"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
               <!-- John Smith — Meals -->
               <div class="action-row" data-type="Meals" data-status="Approved" data-employee="John Smith">
                 <div class="action-row-checkbox"><input type="checkbox" aria-label="Select John Smith expense"></div>
-                <div class="action-row-icon" style="background:var(--color-gold-muted);color:var(--color-gold);">
+                <div class="action-row-icon" style="background:var(--color-warning-muted);color:var(--color-warning);">
                   <svg data-lucide="utensils" width="16" height="16"></svg>
                 </div>
                 <div class="action-row-employee">
                   <div class="avatar avatar-xs">JS</div>
                   <span class="employee-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" data-href="employees.html#john-smith" style="color:inherit;text-decoration:none;">John Smith</a></span>
                 </div>
-                <div class="action-row-detail">Meals &mdash; Client lunch quarterly review</div>
-                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Globex Phase 2</a> &bull; Mar 5, 2026</div>
+                <div class="action-row-detail">Meals - Client lunch quarterly review</div>
+                <div class="action-row-meta"><a href="projects.html#detail/globex-phase2" style="color:var(--color-primary);text-decoration:none;">Globex Phase 2</a> &bull; Mar 5, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;120.00</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
                 </div>
                 <div class="action-row-actions">
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
@@ -1119,8 +1088,8 @@
                   <div class="avatar avatar-xs">BT</div>
                   <span class="employee-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;">Bob Taylor</a></span>
                 </div>
-                <div class="action-row-detail">Hotel &mdash; Marriott Lyon</div>
-                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Acme Web Redesign</a> &bull; Apr 2, 2026</div>
+                <div class="action-row-detail">Hotel - Marriott Lyon</div>
+                <div class="action-row-meta"><a href="projects.html#detail/acme-web" style="color:var(--color-primary);text-decoration:none;">Acme Web Redesign</a> &bull; Apr 2, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;340.00</span>
                   <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
@@ -1128,28 +1097,28 @@
                 <div class="action-row-actions">
                   <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
                   <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
               <!-- Carol Williams — Software -->
               <div class="action-row" data-type="Software" data-status="Approved" data-employee="Carol Williams">
                 <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Carol Williams expense"></div>
-                <div class="action-row-icon" style="background:var(--color-chart-5-muted);color:var(--color-chart-5);">
+                <div class="action-row-icon" style="background:var(--color-primary-muted);color:var(--color-primary);">
                   <svg data-lucide="monitor" width="16" height="16"></svg>
                 </div>
                 <div class="action-row-employee">
                   <div class="avatar avatar-xs">CW</div>
                   <span class="employee-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams" style="color:inherit;text-decoration:none;">Carol Williams</a></span>
                 </div>
-                <div class="action-row-detail">Software &mdash; Figma annual license</div>
-                <div class="action-row-meta"><span style="color:var(--color-text-3);">&mdash;</span> &bull; Jan 10, 2026</div>
+                <div class="action-row-detail">Software - Figma annual license</div>
+                <div class="action-row-meta"><span style="color:var(--color-text-3);">-</span> &bull; Jan 10, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;89.00</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
                 </div>
                 <div class="action-row-actions">
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
@@ -1163,8 +1132,8 @@
                   <div class="avatar avatar-xs">DP</div>
                   <span class="employee-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park" style="color:inherit;text-decoration:none;">David Park</a></span>
                 </div>
-                <div class="action-row-detail">Equipment &mdash; Dell UltraSharp 27" monitor</div>
-                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Globex Phase 2</a> &bull; Apr 3, 2026</div>
+                <div class="action-row-detail">Equipment - Dell UltraSharp 27" monitor</div>
+                <div class="action-row-meta"><a href="projects.html#detail/globex-phase2" style="color:var(--color-primary);text-decoration:none;">Globex Phase 2</a> &bull; Apr 3, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-error);">&euro;1,450.00</span>
                   <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
@@ -1172,7 +1141,7 @@
                 <div class="action-row-actions">
                   <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
                   <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
@@ -1186,29 +1155,29 @@
                   <div class="avatar avatar-xs">EL</div>
                   <span class="employee-name"><a href="employees.html#emma-laurent" style="color:inherit;text-decoration:none;">Emma Laurent</a></span>
                 </div>
-                <div class="action-row-detail">Transport &mdash; Taxi to client office</div>
-                <div class="action-row-meta"><span style="color:var(--color-text-3);">&mdash;</span> &bull; Mar 20, 2026</div>
+                <div class="action-row-detail">Transport - Taxi to client office</div>
+                <div class="action-row-meta"><span style="color:var(--color-text-3);">-</span> &bull; Mar 20, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;45.00</span>
                   <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
                 </div>
                 <div class="action-row-actions">
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
               <!-- Alice Wang — Meals (Pending) -->
               <div class="action-row" data-type="Meals" data-status="Pending" data-employee="Alice Wang">
                 <div class="action-row-checkbox"><input type="checkbox" aria-label="Select Alice Wang expense"></div>
-                <div class="action-row-icon" style="background:var(--color-gold-muted);color:var(--color-gold);">
+                <div class="action-row-icon" style="background:var(--color-warning-muted);color:var(--color-warning);">
                   <svg data-lucide="utensils" width="16" height="16"></svg>
                 </div>
                 <div class="action-row-employee">
                   <div class="avatar avatar-xs">AW</div>
                   <span class="employee-name"><a href="employees.html#alice-wang" style="color:inherit;text-decoration:none;">Alice Wang</a></span>
                 </div>
-                <div class="action-row-detail">Meals &mdash; Lunch client meeting</div>
-                <div class="action-row-meta"><a href="projects.html#detail" style="color:var(--color-primary);text-decoration:none;">Initech API</a> &bull; Apr 1, 2026</div>
+                <div class="action-row-detail">Meals - Lunch client meeting</div>
+                <div class="action-row-meta"><a href="projects.html#detail/initech-api" style="color:var(--color-primary);text-decoration:none;">Initech API</a> &bull; Apr 1, 2026</div>
                 <div class="action-row-status" style="justify-content:flex-end;gap:var(--space-2);">
                   <span style="font-family:var(--font-mono);font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-text-1);">&euro;67.30</span>
                   <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
@@ -1216,7 +1185,7 @@
                 <div class="action-row-actions">
                   <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
                   <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
-                  <button class="btn btn-xs btn-ghost" onclick="showToast('info','View','Viewing expense')"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
                 </div>
               </div>
 
@@ -1256,7 +1225,7 @@
                     <span class="badge badge-default"><svg data-lucide="building" width="12" height="12"></svg> Hotel</span>
                     <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Apr 2, 2026</span>
                     <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
-                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
+                    <a href="projects.html#detail/acme-web" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
                   </div>
                   <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
                     <div class="receipt-indicator">
@@ -1296,7 +1265,7 @@
                     <span class="badge badge-default"><svg data-lucide="utensils" width="12" height="12"></svg> Meals</span>
                     <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Mar 28, 2026</span>
                     <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
-                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Initech API</a>
+                    <a href="projects.html#detail/initech-api" style="font-size: var(--text-body-sm);">Initech API</a>
                   </div>
                   <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
                     <div class="receipt-indicator">
@@ -1336,7 +1305,7 @@
                     <span class="badge badge-default"><svg data-lucide="monitor" width="12" height="12"></svg> Equipment</span>
                     <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Apr 3, 2026</span>
                     <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
-                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Globex Phase 2</a>
+                    <a href="projects.html#detail/globex-phase2" style="font-size: var(--text-body-sm);">Globex Phase 2</a>
                   </div>
                   <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
                     <div class="receipt-indicator">
@@ -1376,7 +1345,7 @@
                     <span class="badge badge-default"><svg data-lucide="car" width="12" height="12"></svg> Transport</span>
                     <span style="font-size: var(--text-body-sm); color: var(--color-text-2);">Apr 1, 2026</span>
                     <span class="meta-sep" style="width:3px;height:3px;border-radius:50%;background:var(--color-text-3);"></span>
-                    <a href="projects.html#detail" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
+                    <a href="projects.html#detail/acme-web" style="font-size: var(--text-body-sm);">Acme Web Redesign</a>
                   </div>
                   <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
                     <div class="receipt-indicator" class="text-3">
@@ -1638,6 +1607,32 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════════ EXPENSE DETAIL DRAWER ════════════════════════════════════════ -->
+<div class="drawer drawer-right" id="expenseDetailDrawer">
+  <div class="drawer-backdrop" onclick="closeExpenseDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3 class="drawer-title" id="expDrawerTitle">Expense Details</h3>
+      <button class="drawer-close" onclick="closeExpenseDrawer()">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="expDrawerBody">
+      <!-- Populated by JS -->
+    </div>
+    <div class="drawer-footer" id="expDrawerFooter" style="display:none;">
+      <button class="btn btn-destructive-ghost btn-md" onclick="closeExpenseDrawer();setTimeout(function(){openRejectModal(document.querySelector('.approval-item'))},100)">
+        <svg data-lucide="x" width="14" height="14"></svg>
+        Reject
+      </button>
+      <button class="btn btn-primary btn-md" onclick="closeExpenseDrawer();showToast('success','Approved','Expense approved.')">
+        <svg data-lucide="check" width="14" height="14"></svg>
+        Approve
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════════ TOAST CONTAINER ════════════════════════════════════════ -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -1789,7 +1784,10 @@
       banner.style.display = 'block';
       lucide.createIcons({ nodes: [banner] });
     }
-    showToast('success', 'Form Auto-filled', 'Receipt data applied to the form. Please review before submitting.');
+    // Show AI billable suggestion
+    var billSugg = document.getElementById('aiBillableSuggestion');
+    if (billSugg) { billSugg.style.display = 'flex'; lucide.createIcons({ nodes: [billSugg] }); }
+    showToast('success', 'Form Auto-filled', 'AI detected: €340 - Hotel - Marriott Lyon. Form filled. Please review.');
   };
 
   // ── Upload zone drag/drop ──
@@ -1899,7 +1897,7 @@
           '<div class="expense-type">' + typeText + '</div>' +
           '<div class="expense-meta">' +
             '<span>' + dateStr + '</span>' +
-            (projectText && projectText !== 'None' ? '<span class="meta-sep"></span><a href="projects.html#detail">' + projectText + '</a>' : '') +
+            (projectText && projectText !== 'None' ? '<span class="meta-sep"></span><a href="projects.html">' + projectText + '</a>' : '') +
           '</div>' +
           (desc ? '<div class="expense-desc">' + desc + '</div>' : '') +
         '</div>' +
@@ -2000,14 +1998,36 @@
   window.resubmitExpense = function(btn) {
     var item = btn.closest('.expense-item');
     if (!item) return;
-    var badge = item.querySelector('.badge-error');
-    if (badge) {
-      badge.className = 'badge badge-warning';
-      badge.innerHTML = '<svg data-lucide="clock" width="12" height="12"></svg> Pending Review';
-      lucide.createIcons({ nodes: [badge] });
-    }
-    btn.remove();
-    showToast('success', 'Resubmitted', 'Expense resubmitted for review.');
+    // Pre-fill the submit form with rejected expense data
+    var amountText = item.querySelector('.expense-amount') ? item.querySelector('.expense-amount').textContent.replace('€','').trim() : '';
+    var descText = item.querySelector('.expense-desc') ? item.querySelector('.expense-desc').textContent.trim() : '';
+    var typeText = item.querySelector('.expense-type') ? item.querySelector('.expense-type').textContent.trim().toLowerCase() : '';
+    var rejReasonEl = item.querySelector('.rejection-reason');
+    var rejReason = rejReasonEl ? rejReasonEl.textContent.replace('Reason:','').trim() : '';
+    // Switch to submit tab and pre-fill
+    switchTab('submit');
+    setTimeout(function() {
+      var formAmount = document.getElementById('formAmount');
+      var formDesc = document.getElementById('formDesc');
+      var formType = document.getElementById('formType');
+      var formDate = document.getElementById('formDate');
+      if (formAmount) formAmount.value = amountText.replace(',','');
+      if (formDesc) formDesc.value = descText;
+      if (formType && typeText) formType.value = typeText;
+      if (formDate) formDate.value = new Date().toISOString().split('T')[0];
+      // Show rejection reason at top of form
+      var notice = document.getElementById('resubmitNotice');
+      if (!notice) {
+        notice = document.createElement('div');
+        notice.id = 'resubmitNotice';
+        notice.style.cssText = 'display:flex;align-items:flex-start;gap:var(--space-2);padding:var(--space-3);background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-md);margin-bottom:var(--space-4);font-size:var(--text-body-sm);color:var(--color-error);';
+        var form = document.querySelector('.expense-form');
+        if (form) form.insertBefore(notice, form.firstChild);
+      }
+      notice.innerHTML = '<svg data-lucide="alert-circle" width="16" height="16" style="flex-shrink:0;margin-top:1px;"></svg><div><strong>Previous rejection reason:</strong> ' + rejReason + '<br>Please address this before resubmitting.</div>';
+      lucide.createIcons({ nodes: [notice] });
+      showToast('info', 'Resubmit', 'Form pre-filled with your rejected expense. Correct the issue and resubmit.');
+    }, 100);
   };
 
   // ── Approval actions ──
@@ -2217,6 +2237,68 @@
 </nav>
 <script src="_shared.js"></script>
 <script>
+// ── Expense Detail Drawer ──
+window.openExpenseDrawer = function(data) {
+  var drawer = document.getElementById('expenseDetailDrawer');
+  var title = document.getElementById('expDrawerTitle');
+  var body = document.getElementById('expDrawerBody');
+  var footer = document.getElementById('expDrawerFooter');
+  if (!data) return;
+  title.textContent = (data.category || 'Expense') + ' - ' + (data.amount || '');
+  var statusColor = data.status === 'Approved' ? 'badge-success' : data.status === 'Pending' ? 'badge-warning' : 'badge-error';
+  var rejectionNote = data.rejected && data.approvalNote ? '<div style="background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-4);font-size:var(--text-body-sm);color:var(--color-error);"><strong>Rejection reason:</strong> ' + data.approvalNote + '</div>' : '';
+  var receiptHtml = data.receipt ? '<div style="border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-4);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);cursor:pointer;margin-top:var(--space-3);" onclick="showToast(\'info\',\'Receipt\',\'Opening ' + data.receipt + '\')"><svg data-lucide="file" width="24" height="24" style="margin:0 auto var(--space-2);display:block;"></svg>' + data.receipt + '</div>' : '<div style="border:1px dashed var(--color-border);border-radius:var(--radius-md);padding:var(--space-4);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);margin-top:var(--space-3);">No receipt attached</div>';
+  body.innerHTML = rejectionNote +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-4);">' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Amount</div><div class="font-mono" style="font-weight:var(--weight-bold);font-size:var(--text-heading-3);color:var(--color-text-1);">' + (data.amount || '-') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Status</div><div><span class="badge ' + statusColor + '">' + (data.status || '-') + '</span></div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Category</div><div style="font-weight:var(--weight-medium);">' + (data.category || '-') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Date</div><div style="font-weight:var(--weight-medium);">' + (data.date || '-') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Project</div><div>' + (data.project ? '<a href="' + (data.projectHref || 'projects.html') + '" style="color:var(--color-primary);">' + data.project + '</a>' : '<span style="color:var(--color-text-3);">None</span>') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Billable</div><div>' + (data.billable ? '<span class="badge badge-info">Billable</span>' : '<span class="badge badge-default">Non-billable</span>') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Submitted by</div><div style="font-weight:var(--weight-medium);">' + (data.submittedBy || '-') + '</div></div>' +
+      '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Approver</div><div style="font-weight:var(--weight-medium);">' + (data.approver || '-') + '</div></div>' +
+    '</div>' +
+    (data.desc ? '<div class="form-group"><label class="form-label">Description</label><div style="background:var(--color-surface-1);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--text-body-sm);color:var(--color-text-2);">' + data.desc + '</div></div>' : '') +
+    '<div class="form-group" style="margin-top:var(--space-3);"><label class="form-label">Receipt</label>' + receiptHtml + '</div>';
+  lucide.createIcons({ nodes: [body] });
+  footer.style.display = data.status === 'Pending' ? 'flex' : 'none';
+  drawer.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeExpenseDrawer = function() {
+  var drawer = document.getElementById('expenseDetailDrawer');
+  drawer.classList.remove('is-open');
+  document.body.style.overflow = '';
+};
+
+// Helper to extract data from a table row for the drawer
+window.getRowExpenseData = function(btn) {
+  var row = btn.closest('.action-row') || btn.closest('.approval-item');
+  if (!row) return {};
+  var detail = row.querySelector('.action-row-detail, .approval-amount');
+  var meta = row.querySelector('.action-row-meta, .info-row');
+  var amountEl = row.querySelector('[class*="font-mono"]') || row.querySelector('.approval-amount');
+  var statusBadge = row.querySelector('.badge-success, .badge-warning, .badge-error');
+  var empEl = row.querySelector('.action-row-employee a, .emp-name a');
+  var projEl = row.querySelector('.action-row-meta a, .info-row a');
+  return {
+    desc: detail ? detail.textContent.trim() : '',
+    amount: amountEl ? amountEl.textContent.trim() : '',
+    category: row.dataset.type || '',
+    project: projEl ? projEl.textContent.trim() : null,
+    projectHref: projEl ? projEl.getAttribute('href') : null,
+    billable: row.querySelector('.billable-tag.billable') !== null,
+    date: meta ? meta.textContent.replace(projEl ? projEl.textContent : '', '').replace('•', '').trim() : '',
+    submittedBy: empEl ? empEl.textContent.trim() : '',
+    status: row.dataset.status || (statusBadge ? statusBadge.textContent.trim() : ''),
+    approver: 'John Smith',
+    approvalNote: null,
+    receipt: row.querySelector('[data-lucide="paperclip"]') ? 'receipt.pdf' : null
+  };
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   if (window.GHR) {
     GHR.initHoverCard && GHR.initHoverCard();
@@ -2225,6 +2307,11 @@ document.addEventListener('DOMContentLoaded', function() {
     GHR.initKeyboardShortcuts && GHR.initKeyboardShortcuts();
     GHR.initSkeletons && GHR.initSkeletons();
   }
+  // Show AI billable suggestion after scan
+  document.addEventListener('aiScanComplete', function() {
+    var sugg = document.getElementById('aiBillableSuggestion');
+    if (sugg) sugg.style.display = 'flex';
+  });
 });
 </script>
 </body>
