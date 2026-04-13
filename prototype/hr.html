@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HR — GammaHR Quantum</title>
+  <title>HR - GammaHR Quantum</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <link rel="stylesheet" href="_layout.css">
@@ -579,7 +579,6 @@
             <span style="color:var(--color-text-2);">Human Resources</span>
           </nav>
           <h1 class="page-title">Human Resources</h1>
-          <p class="page-subtitle">Manage recruitment, onboarding, offboarding, and employee lifecycle</p>
         </div>
         <div class="page-header-actions">
           <button class="btn btn-primary btn-md" id="newJobBtn">
@@ -653,49 +652,7 @@
             </div>
           </div>
 
-          <!-- Pipeline KPI Summary Row -->
-          <div class="grid-4 mb-6 perspective-container stagger-reveal">
-            <div class="stat-card card-3d">
-              <div class="stat-label">Open Roles</div>
-              <div class="stat-value">3</div>
-              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Open roles trend">
-                <polyline points="0,18 13,14 27,16 40,12 53,10 67,8 80,6" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-                <polyline points="0,18 13,14 27,16 40,12 53,10 67,8 80,6 80,24 0,24" fill="var(--color-primary-muted)" stroke="none"/>
-              </svg>
-            </div>
-            <div class="stat-card card-3d">
-              <div class="stat-label">Total Candidates</div>
-              <div class="stat-value">12</div>
-              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Candidates trend">
-                <polyline points="0,20 13,18 27,14 40,16 53,10 67,8 80,4" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-                <polyline points="0,20 13,18 27,14 40,16 53,10 67,8 80,4 80,24 0,24" fill="var(--color-info-muted)" stroke="none"/>
-              </svg>
-            </div>
-            <div class="stat-card card-3d">
-              <div class="stat-label">Offers Pending</div>
-              <div class="stat-value">2</div>
-              <div class="stat-trend" style="color:var(--color-warning);">
-                <svg data-lucide="clock" width="14" height="14"></svg>
-                Awaiting response
-              </div>
-              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Offers trend">
-                <polyline points="0,12 13,16 27,10 40,14 53,8 67,12 80,10" fill="none" stroke="var(--color-warning)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-                <polyline points="0,12 13,16 27,10 40,14 53,8 67,12 80,10 80,24 0,24" fill="var(--color-warning-muted)" stroke="none"/>
-              </svg>
-            </div>
-            <div class="stat-card card-3d">
-              <div class="stat-label">Avg Time-to-Hire</div>
-              <div class="stat-value">18<span style="font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-text-2);"> days</span></div>
-              <div class="stat-trend up">
-                <svg data-lucide="trending-down" width="14" height="14"></svg>
-                -4 days vs Q1
-              </div>
-              <svg viewBox="0 0 80 24" preserveAspectRatio="none" style="width:100%;height:24px;margin-top:var(--space-2);" aria-label="Time-to-hire trend">
-                <polyline points="0,4 13,8 27,6 40,10 53,12 67,16 80,18" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-                <polyline points="0,4 13,8 27,6 40,10 53,12 67,16 80,18 80,24 0,24" fill="var(--color-success-muted)" stroke="none"/>
-              </svg>
-            </div>
-          </div>
+          <!-- (Pipeline KPI summary removed - consolidated into the 3-card strip above) -->
 
           <!-- Kanban Pipeline -->
           <div class="section-heading" style="flex-wrap:wrap;">
@@ -709,7 +666,7 @@
                 <svg data-lucide="download" width="14" height="14"></svg>
                 Export
               </button>
-              <button class="btn btn-primary btn-sm" id="addCandidateBtn">
+              <button class="btn btn-primary btn-sm" id="addCandidateBtn" onclick="document.getElementById('addCandidateInlineModal').style.display='flex'">
                 <svg data-lucide="user-plus" width="14" height="14"></svg>
                 Add Candidate
               </button>
@@ -731,19 +688,7 @@
             <button class="kanban-stage-tab" data-stage-idx="4">Hired (2)</button>
           </div>
 
-          <!-- Candidate count summary bar -->
-          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-md);margin-bottom:var(--space-4);flex-wrap:wrap;font-size:var(--text-body-sm);color:var(--color-text-2);" id="kanbanSummaryBar">
-            <span style="font-weight:var(--weight-semibold);color:var(--color-text-1);">Pipeline:</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-info);margin-right:var(--space-1);"></span>Applied: <strong>3</strong></span>
-            <span style="color:var(--color-border-strong);">|</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-warning);margin-right:var(--space-1);"></span>Screening: <strong>2</strong></span>
-            <span style="color:var(--color-border-strong);">|</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-accent);margin-right:var(--space-1);"></span>Interview: <strong>3</strong></span>
-            <span style="color:var(--color-border-strong);">|</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-chart-5);margin-right:var(--space-1);"></span>Offer: <strong>2</strong></span>
-            <span style="color:var(--color-border-strong);">|</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-success);margin-right:var(--space-1);"></span>Hired: <strong>2</strong></span>
-          </div>
+          <!-- (Candidate pipeline summary removed - column headers already show counts) -->
 
           <div style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
           <div class="kanban stagger-reveal">
@@ -752,10 +697,10 @@
             <div class="kanban-column stage-applied">
               <div class="kanban-header">
                 <span class="col-title">Applied</span>
-                <span class="col-count">15</span>
+                <span class="col-count">3</span>
               </div>
               <div class="kanban-body" data-stage="Applied">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Maria Santos', 'Senior Frontend Developer', 91, ['React','TypeScript','CSS','Figma','Jest'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">MS</div>
                     <div>
@@ -769,13 +714,14 @@
                     <span class="source-tag linkedin"><svg data-lucide="linkedin" width="10" height="10"></svg> LinkedIn</span>
                   </div>
                   <div class="days-in-stage">In stage: 5 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Liam O\'Brien', 'DevOps Engineer', 78, ['CI/CD Pipelines','Docker','Kubernetes','AWS','Linux'])">
                   <div class="cand-top">
-                    <div class="avatar avatar-sm">JW</div>
+                    <div class="avatar avatar-sm">LO</div>
                     <div>
-                      <div class="cand-name">James Wilson</div>
+                      <div class="cand-name">Liam O'Brien</div>
                     </div>
                   </div>
                   <div class="cand-position">DevOps Engineer</div>
@@ -785,9 +731,10 @@
                     <span class="source-tag referral"><svg data-lucide="user-check" width="10" height="10"></svg> Referral: Sarah Chen</span>
                   </div>
                   <div class="days-in-stage">In stage: 9 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Aisha Patel', 'UX Designer', 84, ['Figma','User Research','Prototyping','Design Systems'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">AP</div>
                     <div>
@@ -801,6 +748,7 @@
                     <span class="source-tag website"><svg data-lucide="globe" width="10" height="10"></svg> Website</span>
                   </div>
                   <div class="days-in-stage">In stage: 12 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -809,10 +757,10 @@
             <div class="kanban-column stage-screening">
               <div class="kanban-header">
                 <span class="col-title">Screening</span>
-                <span class="col-count">8</span>
+                <span class="col-count">2</span>
               </div>
               <div class="kanban-body" data-stage="Screening">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Thomas Mueller', 'Backend Developer', 85, ['Node.js','PostgreSQL','REST APIs','Docker','Python'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">TM</div>
                     <div>
@@ -829,9 +777,10 @@
                     <span class="score-badge badge-success" title="AI-scored on skills, experience, and role fit"><svg data-lucide="star" width="10" height="10"></svg> 85/100</span>
                   </div>
                   <div class="days-in-stage">In stage: 15 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Lucia Sanchez', 'Marketing Manager', 72, ['Digital Marketing','SEO','Campaign Management','Salesforce'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">LS</div>
                     <div>
@@ -848,6 +797,7 @@
                     <span class="score-badge badge-warning" title="AI-scored on skills, experience, and role fit"><svg data-lucide="star" width="10" height="10"></svg> 72/100</span>
                   </div>
                   <div class="days-in-stage">In stage: 17 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -856,10 +806,10 @@
             <div class="kanban-column stage-interview">
               <div class="kanban-header">
                 <span class="col-title">Interview</span>
-                <span class="col-count">12</span>
+                <span class="col-count">3</span>
               </div>
               <div class="kanban-body" data-stage="Interview">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Elena Kowalski', 'Project Manager', 88, ['Agile','Scrum','JIRA','Stakeholder Management','PMP'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">EK</div>
                     <div>
@@ -875,9 +825,10 @@
                     <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: John Smith</div>
                   </div>
                   <div class="days-in-stage">In stage: 21 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Nina Karlsson', 'Senior Backend Developer', 93, ['Go','PostgreSQL','Microservices','Kafka','AWS'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">NK</div>
                     <div>
@@ -893,9 +844,10 @@
                     <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: David Park</div>
                   </div>
                   <div class="days-in-stage">In stage: 14 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Pierre Martin', 'Data Engineer', 87, ['Python','Spark','Airflow','BigQuery','dbt'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">PM</div>
                     <div>
@@ -911,6 +863,7 @@
                     <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: Sarah Chen</div>
                   </div>
                   <div class="days-in-stage">In stage: 8 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -919,10 +872,10 @@
             <div class="kanban-column stage-offer">
               <div class="kanban-header">
                 <span class="col-title">Offer</span>
-                <span class="col-count">4</span>
+                <span class="col-count">2</span>
               </div>
               <div class="kanban-body" data-stage="Offer">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Raj Krishnan', 'Data Analyst', 82, ['SQL','Python','Tableau','Power BI','Excel'], 55000)">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">RK</div>
                     <div>
@@ -930,14 +883,15 @@
                     </div>
                   </div>
                   <div class="cand-position">Data Analyst</div>
-                  <div class="offer-amount">&euro;55,000<span style="font-size: var(--text-caption); font-weight: var(--weight-regular); color: var(--color-text-3);"> / yr</span></div>
                   <div class="cand-meta" style="margin-top: var(--space-2);">
+                    <span class="source-tag linkedin"><svg data-lucide="linkedin" width="10" height="10"></svg> LinkedIn</span>
                     <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
                   </div>
                   <div class="days-in-stage">In stage: 4 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Sofia Oliveira', 'Product Designer', 90, ['Figma','Sketch','Design Systems','User Testing','Prototyping'], 62000)">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">SO</div>
                     <div>
@@ -945,11 +899,12 @@
                     </div>
                   </div>
                   <div class="cand-position">Product Designer</div>
-                  <div class="offer-amount">&euro;62,000<span style="font-size: var(--text-caption); font-weight: var(--weight-regular); color: var(--color-text-3);"> / yr</span></div>
                   <div class="cand-meta" style="margin-top: var(--space-2);">
+                    <span class="source-tag referral"><svg data-lucide="user-check" width="10" height="10"></svg> Referral</span>
                     <span class="badge badge-success"><svg data-lucide="circle" width="12" height="12"></svg> Accepted</span>
                   </div>
                   <div class="days-in-stage">In stage: 7 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -958,10 +913,10 @@
             <div class="kanban-column stage-hired">
               <div class="kanban-header">
                 <span class="col-title">Hired</span>
-                <span class="col-count">8</span>
+                <span class="col-count">2</span>
               </div>
               <div class="kanban-body" data-stage="Hired">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Yuki Tanaka', 'QA Engineer', 89, ['Selenium','Cypress','JIRA','Manual Testing','API Testing'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">YT</div>
                     <div>
@@ -975,9 +930,10 @@
                     <span>Engineering</span>
                   </div>
                   <div class="days-in-stage">In stage: 11 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Ahmed Hassan', 'Sales Executive', 86, ['B2B Sales','Salesforce','Negotiation','Account Management'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">AH</div>
                     <div>
@@ -991,6 +947,7 @@
                     <span>Sales</span>
                   </div>
                   <div class="days-in-stage">In stage: 18 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -1004,7 +961,7 @@
 
           <div class="section-heading mt-4">
             <h3>Active Onboardings</h3>
-            <button class="btn btn-secondary btn-sm" onclick="showToast('info','Start Onboarding','Onboarding wizard would open here — select a new hire to begin.')">
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('onboardingName').textContent='New Hire';document.getElementById('onboardingModal').style.display='flex'">
               <svg data-lucide="plus" width="14" height="14"></svg>
               Start Onboarding
             </button>
@@ -1018,17 +975,14 @@
           </div>
 
           <div class="grid-3 mb-6">
-            <!-- Yuki Tanaka -->
-            <div class="onboard-card">
+            <!-- Yuki Tanaka - click card to open full checklist in drawer -->
+            <div class="onboard-card card-interactive" style="cursor:pointer;" onclick="openOnboardDrawer('Yuki Tanaka','QA Engineer','Engineering','Apr 1, 2026',62,'yuki')">
               <div class="onboard-card-header">
                 <div class="avatar avatar-md">YT</div>
                 <div class="onboard-info">
                   <div class="onboard-name">Yuki Tanaka</div>
-                  <div class="onboard-role">QA Engineer &mdash; Engineering</div>
+                  <div class="onboard-role">QA Engineer - Engineering</div>
                   <div class="onboard-date">Started Apr 1, 2026</div>
-                  <div style="margin-top:var(--space-1);">
-                    <span class="probation-warning"><svg data-lucide="shield-alert" width="12" height="12" style="margin-right:3px;"></svg> Probation ends Apr 18 &mdash; 12 days</span>
-                  </div>
                 </div>
               </div>
               <div class="onboard-card-body">
@@ -1037,28 +991,19 @@
                   <span class="progress-pct">62%</span>
                 </div>
                 <div class="progress-bar">
-                  <div class="progress-fill" style="width: 62.5%;"></div>
+                  <div class="progress-fill" style="width: 62%;"></div>
                 </div>
-                <div class="checklist">
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Contract signed <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-verified from DocuSign">Auto-verified</span></label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment ordered <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-tracked from procurement system">Auto-tracked</span></label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> IT access created <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-detected from admin user creation">Auto-detected</span></label>
-                  <label class="checklist-item"><input type="checkbox"> Welcome email sent <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Yuki Tanaka'):showToast('Welcome email sent')">Send now</button></label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Buddy assigned: <span class="buddy-name">Sophie Dubois</span> <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="AI-suggested based on department and availability">AI-suggested</span></label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> First day orientation scheduled <span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);" title="Auto-scheduled from calendar">Auto-scheduled</span></label>
-                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
-                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
-                </div>
+                <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">Click to manage checklist</div>
               </div>
             </div>
 
-            <!-- Ahmed Hassan -->
-            <div class="onboard-card">
+            <!-- Ahmed Hassan - click card to open full checklist in drawer -->
+            <div class="onboard-card card-interactive" style="cursor:pointer;" onclick="openOnboardDrawer('Ahmed Hassan','Sales Executive','Sales','Apr 14, 2026',25,'ahmed')">
               <div class="onboard-card-header">
                 <div class="avatar avatar-md">AH</div>
                 <div class="onboard-info">
                   <div class="onboard-name">Ahmed Hassan</div>
-                  <div class="onboard-role">Sales Executive &mdash; Sales</div>
+                  <div class="onboard-role">Sales Executive - Sales</div>
                   <div class="onboard-date">Starts Apr 14, 2026</div>
                 </div>
               </div>
@@ -1070,35 +1015,21 @@
                 <div class="progress-bar">
                   <div class="progress-fill warning" style="width: 25%;"></div>
                 </div>
-                <div class="checklist">
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Contract signed</label>
-                  <label class="checklist-item done"><input type="checkbox" checked disabled> Equipment ordered</label>
-                  <label class="checklist-item"><input type="checkbox"> IT access created</label>
-                  <label class="checklist-item"><input type="checkbox"> Welcome email sent</label>
-                  <label class="checklist-item"><input type="checkbox"> Buddy assigned</label>
-                  <label class="checklist-item"><input type="checkbox"> First day orientation scheduled</label>
-                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled</label>
-                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled</label>
-                </div>
+                <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">Click to manage checklist</div>
               </div>
             </div>
 
-            <!-- Clara Bergmann -->
-            <div class="onboard-card" style="border-color: var(--color-warning);">
+            <!-- Clara Bergmann - click card to open full checklist in drawer -->
+            <div class="onboard-card card-interactive" style="cursor:pointer;border-color:var(--color-warning);" onclick="openOnboardDrawer('Clara Bergmann','Junior Developer','Engineering','Apr 21, 2026',0,'clara')">
               <div class="onboard-card-header">
                 <div class="avatar avatar-md">CB</div>
                 <div class="onboard-info">
                   <div class="onboard-name">Clara Bergmann</div>
-                  <div class="onboard-role">Junior Developer &mdash; Engineering</div>
+                  <div class="onboard-role">Junior Developer - Engineering</div>
                   <div class="onboard-date">Starts Apr 21, 2026</div>
                 </div>
               </div>
               <div class="onboard-card-body">
-                <!-- Alert: no tasks started, start date 15 days away -->
-                <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--color-warning-muted);border-radius:var(--radius-md);margin-bottom:var(--space-3);">
-                  <svg data-lucide="alert-triangle" width="16" height="16" style="color:var(--color-warning);flex-shrink:0;"></svg>
-                  <span style="font-size:var(--text-body-sm);color:var(--color-warning);font-weight:var(--weight-medium);">No tasks started — start date in 15 days</span>
-                </div>
                 <div class="progress-label">
                   <span>0 of 8 tasks complete</span>
                   <span class="progress-pct">0%</span>
@@ -1106,20 +1037,9 @@
                 <div class="progress-bar">
                   <div class="progress-fill" style="width: 0%;"></div>
                 </div>
-                <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--color-info-muted);border-radius:var(--radius-md);margin-bottom:var(--space-3);">
-                  <svg data-lucide="sparkles" width="16" height="16" style="color:var(--color-info);flex-shrink:0;"></svg>
-                  <span style="font-size:var(--text-body-sm);color:var(--color-info);flex:1;">AI can auto-complete 5 of 8 tasks based on your workflow settings.</span>
-                  <button class="btn btn-primary btn-xs" onclick="var items=this.closest('.onboard-card-body').querySelectorAll('.checklist-item:not(.done)');var count=0;items.forEach(function(it){var btn=it.querySelector('.btn');if(btn){btn.click();count++;}});GHR&&GHR.showToast?GHR.showToast('success','Auto-completed',count+' tasks processed automatically'):showToast(count+' tasks auto-completed')">Auto-complete all</button>
-                </div>
-                <div class="checklist">
-                  <label class="checklist-item"><input type="checkbox"> Contract signed <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Sent','DocuSign request sent to Clara Bergmann'):showToast('DocuSign sent')">Send DocuSign</button></label>
-                  <label class="checklist-item"><input type="checkbox"> Equipment ordered <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Ordered','Standard dev kit ordered via procurement'):showToast('Equipment ordered')">Order standard kit</button></label>
-                  <label class="checklist-item"><input type="checkbox"> IT access created <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Engineering template'):showToast('IT access created')">Provision from template</button></label>
-                  <label class="checklist-item"><input type="checkbox"> Welcome email sent <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Clara Bergmann'):showToast('Welcome email sent')">Send now</button></label>
-                  <label class="checklist-item"><input type="checkbox"> Buddy assigned <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests John Smith (Engineering, available)'):showToast('Buddy assigned')">AI suggest</button></label>
-                  <label class="checklist-item"><input type="checkbox"> First day orientation scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 21 calendar'):showToast('Scheduled')">Auto-schedule</button></label>
-                  <label class="checklist-item"><input type="checkbox"> Week 1 check-in scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
-                  <label class="checklist-item"><input type="checkbox"> 30-day review scheduled <button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" onclick="event.preventDefault();this.closest('.checklist-item').classList.add('done');this.closest('.checklist-item').querySelector('input').checked=true;GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):showToast('Scheduled')">Auto-schedule</button></label>
+                <div style="margin-top:var(--space-2);display:flex;align-items:center;gap:var(--space-1);font-size:var(--text-caption);color:var(--color-warning);">
+                  <svg data-lucide="alert-triangle" width="12" height="12"></svg>
+                  No tasks started - start date in 15 days
                 </div>
               </div>
             </div>
@@ -1128,7 +1048,7 @@
           <!-- Onboarding Templates -->
           <div class="section-heading">
             <h3>Onboarding Templates</h3>
-            <button class="btn btn-ghost btn-sm" onclick="showToast('info','New Template','Template builder would open here — define tasks, timelines, and assignees.')">
+            <button class="btn btn-ghost btn-sm" onclick="showToast('info','New Template','Template builder would open here - define tasks, timelines, and assignees.')">
               <svg data-lucide="plus" width="14" height="14"></svg>
               New Template
             </button>
@@ -1171,14 +1091,14 @@
               </div>
               <div class="card-body" style="display:flex;flex-direction:column;gap:var(--space-4);">
 
-                <!-- James Wilson offboarding -->
+                <!-- Liam O'Brien offboarding (contractor) -->
                 <div class="offboarding-item" id="offboardJW" style="border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4)">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);">
                     <div style="display:flex;align-items:center;gap:var(--space-3)">
-                      <div class="avatar" style="background:var(--color-chart-4)">JW</div>
+                      <div class="avatar" style="background:var(--color-chart-4)">LO</div>
                       <div>
-                        <div class="font-semibold">James Wilson</div>
-                        <div class="text-3">DevOps Engineer &mdash; Last day: Apr 30, 2026</div>
+                        <div class="font-semibold">Liam O'Brien</div>
+                        <div class="text-3">DevOps Engineer - Last day: Apr 30, 2026</div>
                       </div>
                     </div>
                     <span class="badge badge-warning">In Progress</span>
@@ -1242,7 +1162,7 @@
                       <div class="avatar" style="background:var(--color-chart-2)">ML</div>
                       <div>
                         <div class="font-semibold">Marc Lefevre</div>
-                        <div class="text-3">Senior Consultant &mdash; Last day: Apr 15, 2026</div>
+                        <div class="text-3">Senior Consultant - Last day: Apr 15, 2026</div>
                       </div>
                     </div>
                     <span class="badge badge-warning">In Progress</span>
@@ -1383,7 +1303,7 @@
           <!-- Lifecycle Events -->
           <div class="section-heading">
             <h3>Recent Lifecycle Events</h3>
-            <button class="btn btn-secondary btn-sm" onclick="showToast('info','Filter','Filter by event type, date range, or department — coming soon.')">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('info','Filter','Filter by event type, date range, or department - coming soon.')">
               <svg data-lucide="filter" width="14" height="14"></svg>
               Filter
             </button>
@@ -1736,13 +1656,7 @@
     }
   });
 
-  // ── Candidate Card Click ──
-  document.querySelectorAll('.candidate-card').forEach(function(card) {
-    card.addEventListener('click', function() {
-      var name = this.querySelector('.cand-name').textContent;
-      showToast('info', 'Candidate Profile', 'Opening ' + name + "'s full profile...");
-    });
-  });
+  // ── Candidate Card Click ── handled via onclick attributes on each card
 
   // ── Onboarding Checkbox interactivity ──
   document.querySelectorAll('.checklist-item input[type="checkbox"]:not([disabled])').forEach(function(cb) {
@@ -1847,14 +1761,8 @@
     });
   }
 
-  // ── Add Candidate Modal ──
-  var addCandidateBtn = document.getElementById('addCandidateBtn');
-  if (addCandidateBtn) {
-    addCandidateBtn.addEventListener('click', function() {
-      var modal = document.getElementById('addCandidateModal');
-      if (modal) modal.classList.add('active');
-    });
-  }
+  // ── Add Candidate Modal - handled via onclick on button ──
+  // addCandidateBtn onclick opens addCandidateInlineModal (inline style modal)
   var addCandidateModalClose = document.getElementById('addCandidateModalClose');
   var addCandidateModalCancel = document.getElementById('addCandidateModalCancel');
   var addCandidateForm = document.getElementById('addCandidateForm');
@@ -1888,7 +1796,7 @@
   var uploadDocBtn = document.getElementById('uploadDocBtn');
   var uploadArea = document.getElementById('uploadArea');
   function triggerDocUpload() {
-    showToast('info', 'Document Upload', 'Document upload — coming soon in production.');
+    showToast('info', 'Document Upload', 'Document upload - coming soon in production.');
   }
   if (uploadDocBtn) uploadDocBtn.addEventListener('click', triggerDocUpload);
   if (uploadArea) {
@@ -1960,6 +1868,7 @@
     });
   }
   updateKanbanEmptyStates();
+  window.updateKanbanEmptyStates = updateKanbanEmptyStates;
 
   // ── Mobile Stage Tab Switching ──
   (function() {
@@ -2159,5 +2068,400 @@ document.addEventListener('DOMContentLoaded', function() {
   <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+
+<!-- ── Candidate Slide-over Drawer ── -->
+<div id="candidateDrawer" style="position:fixed;top:0;right:0;height:100%;width:min(480px,100%);background:var(--color-surface-0);border-left:1px solid var(--color-border);z-index:200;transform:translateX(100%);transition:transform 0.25s ease;overflow-y:auto;padding:var(--space-6);">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-4);">
+    <div>
+      <h2 id="drawerName" style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);"></h2>
+      <p id="drawerRole" style="color:var(--color-text-2);margin-bottom:var(--space-1);font-size:var(--text-body-sm);"></p>
+      <div id="drawerFitBadge" style="margin-bottom:var(--space-2);"></div>
+    </div>
+    <button onclick="closeCandidateDrawer()" style="background:none;border:none;cursor:pointer;color:var(--color-text-2);font-size:var(--text-body-lg);line-height:1;padding:var(--space-1);flex-shrink:0;">&#x2715;</button>
+  </div>
+
+  <!-- T2 Fields -->
+  <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+    <div id="drawerSkills"></div>
+
+    <div>
+      <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-2);">Source</div>
+      <div id="drawerSource" style="font-size:var(--text-body-sm);color:var(--color-text-1);"></div>
+    </div>
+
+    <div id="drawerOfferSection" style="display:none;">
+      <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-2);">Offer Amount</div>
+      <div id="drawerOfferAmount" style="font-family:var(--font-mono);font-size:var(--text-body-lg);font-weight:var(--weight-bold);color:var(--color-text-1);"></div>
+    </div>
+
+    <div>
+      <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-2);">Work History (Last 2 Roles)</div>
+      <div id="drawerHistory" style="font-size:var(--text-body-sm);color:var(--color-text-2);display:flex;flex-direction:column;gap:var(--space-1);"></div>
+    </div>
+
+    <div style="display:flex;gap:var(--space-4);">
+      <div style="flex:1;">
+        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-1);">Availability</div>
+        <div id="drawerAvailability" style="font-size:var(--text-body-sm);color:var(--color-text-1);"></div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-1);">Expected Salary</div>
+        <div id="drawerExpectedSalary" style="font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--color-text-1);"></div>
+      </div>
+    </div>
+
+    <div>
+      <a id="drawerResume" href="#" onclick="event.preventDefault();GHR&&GHR.showToast?GHR.showToast('info','Resume','Resume download would open here.'):null" style="display:inline-flex;align-items:center;gap:var(--space-1);color:var(--color-primary);font-size:var(--text-body-sm);text-decoration:none;">
+        <svg data-lucide="file-text" width="14" height="14"></svg> View Resume / Portfolio
+      </a>
+    </div>
+
+    <div>
+      <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-2);">Interview Notes</div>
+      <textarea id="drawerNotes" placeholder="Add interview notes..." style="width:100%;min-height:80px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);color:var(--color-text-1);resize:vertical;font-family:var(--font-sans);font-size:var(--text-body-sm);box-sizing:border-box;"></textarea>
+    </div>
+
+    <!-- Stage Move -->
+    <div>
+      <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-2);">Move to Stage</div>
+      <select id="drawerStageSel" style="width:100%;padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);margin-bottom:var(--space-3);">
+        <option value="">Select stage...</option>
+        <option value="Applied">Applied</option>
+        <option value="Screening">Screening</option>
+        <option value="Interview">Interview</option>
+        <option value="Offer">Offer</option>
+        <option value="Hired">Hired</option>
+      </select>
+      <!-- Offer salary field (shown only when Offer stage selected) -->
+      <div id="drawerOfferInput" style="display:none;margin-bottom:var(--space-3);">
+        <label style="display:block;font-size:var(--text-body-sm);font-weight:var(--weight-medium);color:var(--color-text-1);margin-bottom:var(--space-1);">Salary Offer Amount <span style="color:var(--color-error);">*</span></label>
+        <div style="display:flex;align-items:center;gap:var(--space-2);">
+          <span style="font-size:var(--text-body);color:var(--color-text-2);">&euro;</span>
+          <input type="number" id="drawerOfferSalary" placeholder="e.g. 65000" min="0" style="flex:1;padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-mono);font-size:var(--text-body-sm);" />
+          <span style="font-size:var(--text-caption);color:var(--color-text-3);">/ yr</span>
+        </div>
+        <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Required to move candidate to Offer stage.</div>
+      </div>
+      <button onclick="confirmStageMove()" style="width:100%;padding:var(--space-3);background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-weight:var(--weight-semibold);font-family:var(--font-sans);font-size:var(--text-body-sm);">Confirm Stage Move</button>
+    </div>
+  </div>
+</div>
+<div id="drawerOverlay" onclick="closeCandidateDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;"></div>
+
+<!-- ── Onboarding Detail Drawer ── -->
+<div id="onboardDrawer" style="position:fixed;top:0;right:0;height:100%;width:min(520px,100%);background:var(--color-surface-0);border-left:1px solid var(--color-border);z-index:200;transform:translateX(100%);transition:transform 0.25s ease;overflow-y:auto;padding:var(--space-6);">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+    <h2 id="onboardDrawerName" style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);color:var(--color-text-1);"></h2>
+    <button onclick="document.getElementById('onboardDrawer').style.transform='translateX(100%)';document.getElementById('drawerOverlay').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--color-text-2);font-size:var(--text-body-lg);line-height:1;padding:var(--space-1);">&#x2715;</button>
+  </div>
+  <div id="onboardDrawerMeta" style="font-size:var(--text-body-sm);color:var(--color-text-2);margin-bottom:var(--space-4);"></div>
+  <div id="onboardDrawerProgress" style="margin-bottom:var(--space-4);"></div>
+  <div id="onboardDrawerChecklist"></div>
+  <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-border);">
+    <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-3);">Checklist Creation</div>
+    <div style="display:flex;gap:var(--space-2);">
+      <button class="btn btn-secondary btn-sm" onclick="GHR&&GHR.showToast?GHR.showToast('info','Template','Auto-generating checklist from Engineering role template...'):null">
+        <svg data-lucide="sparkles" width="14" height="14"></svg>
+        Auto-generate from Role Template
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="GHR&&GHR.showToast?GHR.showToast('info','Manual','Manual task creation mode - coming soon.'):null">
+        <svg data-lucide="plus" width="14" height="14"></svg>
+        Add Task Manually
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Start Onboarding Modal ── -->
+<div id="onboardingModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--color-surface-0);border-radius:var(--radius-lg);padding:var(--space-6);max-width:400px;width:90%;box-shadow:var(--shadow-3);">
+    <h3 style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);color:var(--color-text-1);">Start Onboarding</h3>
+    <p style="margin-bottom:var(--space-4);color:var(--color-text-2);font-size:var(--text-body-sm);">Start onboarding for <strong id="onboardingName"></strong>?</p>
+    <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+      <button onclick="document.getElementById('onboardingModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);">Cancel</button>
+      <button onclick="GHR.showToast('success','Onboarding Started','Onboarding checklist created successfully');document.getElementById('onboardingModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-sans);font-size:var(--text-body-sm);">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Candidate Inline Modal ── -->
+<div id="addCandidateInlineModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--color-surface-0);border-radius:var(--radius-lg);padding:var(--space-6);max-width:420px;width:90%;box-shadow:var(--shadow-3);">
+    <h3 style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);color:var(--color-text-1);">Add Candidate</h3>
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-4);">
+      <input id="candNameNew" placeholder="Full name" style="padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);"/>
+      <input id="candRoleNew" placeholder="Role applied for" style="padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);"/>
+      <input id="candSourceNew" placeholder="Source (LinkedIn, Referral, etc.)" style="padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);"/>
+    </div>
+    <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+      <button onclick="document.getElementById('addCandidateInlineModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);">Cancel</button>
+      <button onclick="addCandidateNew()" style="padding:var(--space-2) var(--space-4);background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-sans);font-size:var(--text-body-sm);">Add Candidate</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Move Kanban Card (via inline select on card) ──
+function moveKanbanCard(sel) {
+  if (!sel.value) return;
+  var card = sel.closest('.candidate-card');
+  var targetStage = sel.value;
+  var candName = card.querySelector('.cand-name') ? card.querySelector('.cand-name').textContent : 'Candidate';
+  sel.value = '';
+
+  if (targetStage === 'Offer') {
+    // Require salary amount for Offer stage
+    var salary = window.prompt('Salary offer amount (EUR/yr) - required to move to Offer:', '');
+    if (!salary || !salary.trim() || isNaN(parseFloat(salary))) {
+      GHR && GHR.showToast ? GHR.showToast('warning', 'Salary Required', 'A salary offer amount is required before moving to the Offer stage.') : null;
+      return;
+    }
+  }
+
+  var target = document.querySelector('.kanban-body[data-stage="' + targetStage + '"]');
+  if (target && card) {
+    target.appendChild(card);
+    // Update column header counts
+    document.querySelectorAll('.kanban-column').forEach(function(col) {
+      var body = col.querySelector('.kanban-body');
+      var countEl = col.querySelector('.col-count');
+      if (body && countEl) {
+        countEl.textContent = body.querySelectorAll('.candidate-card').length;
+      }
+    });
+    GHR && GHR.showToast ? GHR.showToast('success', candName + ' moved to ' + targetStage, '') : null;
+    if (typeof updateKanbanEmptyStates === 'function') updateKanbanEmptyStates();
+  }
+}
+window.moveKanbanCard = moveKanbanCard;
+
+// ── Current drawer candidate name (for stage move) ──
+var _drawerCandName = '';
+
+// ── Close candidate drawer ──
+function closeCandidateDrawer() {
+  document.getElementById('candidateDrawer').style.transform = 'translateX(100%)';
+  document.getElementById('drawerOverlay').style.display = 'none';
+}
+window.closeCandidateDrawer = closeCandidateDrawer;
+
+// ── Confirm Stage Move from Drawer ──
+function confirmStageMove() {
+  var sel = document.getElementById('drawerStageSel');
+  var targetStage = sel ? sel.value : '';
+  if (!targetStage) {
+    GHR && GHR.showToast ? GHR.showToast('warning', 'Select a stage', 'Please select a stage to move to.') : null;
+    return;
+  }
+  if (targetStage === 'Offer') {
+    var salaryInput = document.getElementById('drawerOfferSalary');
+    if (!salaryInput || !salaryInput.value || isNaN(parseFloat(salaryInput.value))) {
+      GHR && GHR.showToast ? GHR.showToast('warning', 'Salary Required', 'A salary offer amount is required before moving to the Offer stage.') : null;
+      salaryInput && salaryInput.focus();
+      return;
+    }
+  }
+  GHR && GHR.showToast ? GHR.showToast('success', _drawerCandName + ' moved to ' + targetStage, '') : null;
+  closeCandidateDrawer();
+  if (sel) sel.value = '';
+}
+window.confirmStageMove = confirmStageMove;
+
+// ── Show/hide offer salary input based on selected stage ──
+document.addEventListener('DOMContentLoaded', function() {
+  var stageSel = document.getElementById('drawerStageSel');
+  if (stageSel) {
+    stageSel.addEventListener('change', function() {
+      var offerInput = document.getElementById('drawerOfferInput');
+      if (offerInput) offerInput.style.display = this.value === 'Offer' ? 'block' : 'none';
+    });
+  }
+});
+
+// ── Candidate drawer ──
+var CANDIDATE_DATA = {
+  'Maria Santos': { source: 'LinkedIn', history: ['Frontend Lead at TechCorp (2023-2025)', 'UI Developer at StartupXY (2021-2023)'], availability: 'May 1, 2026', salary: '&euro;70,000-80,000 / yr' },
+  'Liam O\'Brien': { source: 'Referral - Sarah Chen', history: ['DevOps Eng. at CloudSys (2022-2025)', 'SysAdmin at NetOps (2019-2022)'], availability: 'Immediate', salary: '&euro;60,000-70,000 / yr' },
+  'Aisha Patel': { source: 'Website', history: ['UX Lead at DesignStudio (2023-2025)', 'UX Designer at Agency (2021-2023)'], availability: 'Apr 28, 2026', salary: '&euro;55,000-65,000 / yr' },
+  'Thomas Mueller': { source: 'LinkedIn', history: ['Backend Dev at FinTech AG (2021-2025)', 'Junior Dev at WebAgency (2019-2021)'], availability: 'Immediate', salary: '&euro;65,000-75,000 / yr' },
+  'Lucia Sanchez': { source: 'Referral', history: ['Marketing Mgr at BrandCo (2022-2025)', 'Mktg Exec at Agency (2020-2022)'], availability: 'May 15, 2026', salary: '&euro;55,000-65,000 / yr' },
+  'Elena Kowalski': { source: 'LinkedIn', history: ['PM at ConsultCo (2020-2025)', 'Associate PM at TechGroup (2018-2020)'], availability: 'Immediate', salary: '&euro;70,000-85,000 / yr' },
+  'Nina Karlsson': { source: 'LinkedIn', history: ['Senior Backend at NordTech (2022-2025)', 'Backend Dev at StartupAB (2019-2022)'], availability: 'May 1, 2026', salary: '&euro;80,000-95,000 / yr' },
+  'Pierre Martin': { source: 'Referral - Sarah Chen', history: ['Data Eng at DataCo (2021-2025)', 'Analyst at BI Agency (2019-2021)'], availability: 'Immediate', salary: '&euro;70,000-80,000 / yr' },
+  'Raj Krishnan': { source: 'LinkedIn', history: ['Data Analyst at FinanceCo (2022-2025)', 'Jr Analyst at Analytics (2020-2022)'], availability: 'Immediate', salary: '&euro;50,000-60,000 / yr', offerAmount: 55000 },
+  'Sofia Oliveira': { source: 'Referral', history: ['Product Designer at DesignLab (2021-2025)', 'UI Designer at Agency (2019-2021)'], availability: 'May 5, 2026', salary: '&euro;60,000-70,000 / yr', offerAmount: 62000 },
+  'Yuki Tanaka': { source: 'LinkedIn', history: ['QA Lead at TestCo (2022-2025)', 'QA Eng at SoftGroup (2020-2022)'], availability: 'Immediate', salary: '&euro;55,000-65,000 / yr' },
+  'Ahmed Hassan': { source: 'LinkedIn', history: ['Sales Exec at SalesCo (2021-2025)', 'BDR at StartupSales (2019-2021)'], availability: 'Immediate', salary: '&euro;50,000-60,000 / yr' }
+};
+
+function openCandidateDrawer(name, role, fit, skills, offerAmount) {
+  _drawerCandName = name;
+  document.getElementById('drawerName').textContent = name;
+  document.getElementById('drawerRole').textContent = role;
+  document.getElementById('drawerFitBadge').innerHTML =
+    '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;background:var(--color-warning-muted);color:var(--color-warning);border-radius:var(--radius-full);font-size:var(--text-caption);font-weight:var(--weight-semibold);font-family:var(--font-mono);">AI Fit: ' + fit + '/100</span>';
+
+  var skillHtml = '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-3);margin-bottom:var(--space-2);">Key Skills</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:var(--space-1);">' +
+    skills.map(function(s) { return '<span style="display:inline-block;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px 10px;font-size:var(--text-body-sm);color:var(--color-text-1);">' + s + '</span>'; }).join('') +
+    '</div>';
+  document.getElementById('drawerSkills').innerHTML = skillHtml;
+
+  var data = CANDIDATE_DATA[name] || {};
+  document.getElementById('drawerSource').textContent = data.source || 'Direct application';
+  document.getElementById('drawerHistory').innerHTML = (data.history || ['No history available']).map(function(h) { return '<div>' + h + '</div>'; }).join('');
+  document.getElementById('drawerAvailability').textContent = data.availability || 'Not specified';
+  document.getElementById('drawerExpectedSalary').innerHTML = data.salary || 'Not specified';
+
+  var offerSection = document.getElementById('drawerOfferSection');
+  var offerAmt = offerAmount || (data && data.offerAmount) || null;
+  if (offerAmt) {
+    document.getElementById('drawerOfferAmount').textContent = '\u20ac' + offerAmt.toLocaleString() + ' / yr';
+    offerSection.style.display = 'block';
+  } else {
+    offerSection.style.display = 'none';
+  }
+
+  document.getElementById('drawerNotes').value = '';
+  var stageSel = document.getElementById('drawerStageSel');
+  if (stageSel) stageSel.value = '';
+  var offerInput = document.getElementById('drawerOfferInput');
+  if (offerInput) offerInput.style.display = 'none';
+  var salarySel = document.getElementById('drawerOfferSalary');
+  if (salarySel) salarySel.value = '';
+
+  document.getElementById('drawerOverlay').style.display = 'block';
+  document.getElementById('candidateDrawer').style.transform = 'translateX(0)';
+  if (window.lucide) lucide.createIcons({ nodes: [document.getElementById('candidateDrawer')] });
+}
+window.openCandidateDrawer = openCandidateDrawer;
+
+// ── Onboarding Detail Drawer ──
+var ONBOARD_DATA = {
+  'yuki': {
+    tasks: [
+      { label: 'Contract signed', done: true, tag: 'Auto-verified' },
+      { label: 'Equipment ordered', done: true, tag: 'Auto-tracked' },
+      { label: 'IT access created', done: true, tag: 'Auto-detected' },
+      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function(cb) { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Yuki Tanaka'):null; } },
+      { label: 'Buddy assigned: Sophie Dubois', done: true, tag: 'AI-suggested' },
+      { label: 'First day orientation scheduled', done: true, tag: 'Auto-scheduled' },
+      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; } },
+      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; } }
+    ]
+  },
+  'ahmed': {
+    tasks: [
+      { label: 'Contract signed', done: true },
+      { label: 'Equipment ordered', done: true },
+      { label: 'IT access created', done: false, action: 'Provision from template', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Sales template'):null; } },
+      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Ahmed Hassan'):null; } },
+      { label: 'Buddy assigned', done: false, action: 'AI suggest', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests Marco Rossi (Operations, available)'):null; } },
+      { label: 'First day orientation scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 14 calendar'):null; } },
+      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; } },
+      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; } }
+    ]
+  },
+  'clara': {
+    tasks: [
+      { label: 'Contract signed', done: false, action: 'Send DocuSign', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','DocuSign request sent to Clara Bergmann'):null; } },
+      { label: 'Equipment ordered', done: false, action: 'Order standard kit', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Ordered','Standard dev kit ordered via procurement'):null; } },
+      { label: 'IT access created', done: false, action: 'Provision from template', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Engineering template'):null; } },
+      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Clara Bergmann'):null; } },
+      { label: 'Buddy assigned', done: false, action: 'AI suggest', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests John Smith (Engineering, available)'):null; } },
+      { label: 'First day orientation scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 21 calendar'):null; } },
+      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; } },
+      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; } }
+    ]
+  }
+};
+
+function openOnboardDrawer(name, role, dept, startDate, pct, key) {
+  var drawer = document.getElementById('onboardDrawer');
+  if (!drawer) return;
+  document.getElementById('onboardDrawerName').textContent = name;
+  document.getElementById('onboardDrawerMeta').innerHTML =
+    '<strong>' + role + '</strong> - ' + dept + '<br><span style="color:var(--color-text-3);">Start date: ' + startDate + '</span>';
+
+  var data = ONBOARD_DATA[key] || { tasks: [] };
+  var done = data.tasks.filter(function(t) { return t.done; }).length;
+  var total = data.tasks.length;
+
+  document.getElementById('onboardDrawerProgress').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2);font-size:var(--text-body-sm);">' +
+    '<span>' + done + ' of ' + total + ' tasks complete</span>' +
+    '<span style="font-family:var(--font-mono);font-weight:var(--weight-semibold);">' + pct + '%</span>' +
+    '</div>' +
+    '<div class="progress-bar"><div class="progress-fill' + (pct < 50 ? ' warning' : '') + '" style="width:' + pct + '%;"></div></div>';
+
+  var checklistHtml = '<div class="checklist">';
+  data.tasks.forEach(function(task, idx) {
+    checklistHtml += '<label class="checklist-item' + (task.done ? ' done' : '') + '" style="cursor:pointer;">' +
+      '<input type="checkbox"' + (task.done ? ' checked disabled' : '') + ' data-task-idx="' + idx + '" data-task-key="' + key + '"> ' +
+      '<span style="flex:1;">' + task.label + '</span>';
+    if (task.tag) {
+      checklistHtml += '<span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);">' + task.tag + '</span>';
+    }
+    if (task.action && !task.done) {
+      checklistHtml += '<button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" data-action-idx="' + idx + '" data-action-key="' + key + '" onclick="event.preventDefault();event.stopPropagation();executeOnboardAction(\'' + key + '\',' + idx + ',this)">' + task.action + '</button>';
+    }
+    checklistHtml += '</label>';
+  });
+  checklistHtml += '</div>';
+  document.getElementById('onboardDrawerChecklist').innerHTML = checklistHtml;
+
+  document.getElementById('drawerOverlay').style.display = 'block';
+  drawer.style.transform = 'translateX(0)';
+}
+window.openOnboardDrawer = openOnboardDrawer;
+
+function executeOnboardAction(key, idx, btn) {
+  var task = ONBOARD_DATA[key] && ONBOARD_DATA[key].tasks[idx];
+  if (!task) return;
+  if (task.actionFn) task.actionFn();
+  task.done = true;
+  var item = btn.closest('.checklist-item');
+  if (item) {
+    item.classList.add('done');
+    var cb = item.querySelector('input[type="checkbox"]');
+    if (cb) { cb.checked = true; cb.disabled = true; }
+    btn.remove();
+  }
+}
+window.executeOnboardAction = executeOnboardAction;
+
+// ── Add candidate (inline modal) ──
+function addCandidateNew() {
+  var name = document.getElementById('candNameNew').value.trim();
+  var role = document.getElementById('candRoleNew').value.trim();
+  var source = document.getElementById('candSourceNew').value.trim();
+  if (!name) { return; }
+  var firstCol = document.querySelector('.kanban-body[data-stage="Applied"]');
+  if (firstCol) {
+    var card = document.createElement('div');
+    card.className = 'candidate-card card-interactive';
+    card.setAttribute('draggable', 'true');
+    card.style.cssText = 'cursor:pointer;';
+    var initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
+    card.innerHTML =
+      '<div class="cand-top"><div class="avatar avatar-sm">' + initials + '</div><div><div class="cand-name">' + name + '</div></div></div>' +
+      '<div class="cand-position">' + (role || 'Role TBD') + '</div>' +
+      '<div class="cand-meta"><span>' + (source || 'Direct') + '</span></div>' +
+      '<div class="days-in-stage">In stage: 0 days</div>';
+    card.onclick = function() { openCandidateDrawer(name, role || 'Role TBD', 75, ['TBD']); };
+    firstCol.prepend(card);
+    // Update Applied count
+    var appliedCount = firstCol.querySelectorAll('.candidate-card').length;
+    var appliedHeader = document.querySelector('.stage-applied .col-count');
+    if (appliedHeader) appliedHeader.textContent = appliedCount;
+  }
+  document.getElementById('addCandidateInlineModal').style.display = 'none';
+  GHR.showToast('success', 'Candidate Added', name + ' added to pipeline');
+  document.getElementById('candNameNew').value = '';
+  document.getElementById('candRoleNew').value = '';
+  document.getElementById('candSourceNew').value = '';
+}
+window.addCandidateNew = addCandidateNew;
+</script>
 </body>
 </html>

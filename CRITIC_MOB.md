@@ -1,157 +1,94 @@
-# CRITIC_MOB — Mobile QA Audit
-**Generated:** 2026-04-11
-**Tested viewports:** 320px, 390px, 768px
+# CRITIC: Mobile, Responsive & Visual Polish
+
+## Verdict: CONDITIONAL — Would pay €50/user? MAYBE
+
+The design system foundation is genuinely good: strong dark theme, coherent token set, thoughtful component library. But real-world mobile usage of 6+ pages would frustrate users enough to question the price tag. The CSS shows evidence of rapid reactive patching (FIX-38, CRIT-1 through CRIT-5, HIGH-6 through HIGH-10, MED-11 through MED-18) rather than mobile-first thinking. Many patches are brittle attribute selectors that break the instant an inline width changes by one character. A €50/seat product cannot have QA debt this visible in the source.
 
 ---
 
-## MOB-01 — CRITICAL — timesheets.html — 320px/390px
-**Approval Queue filter bar inputs are 32px tall on mobile — below 44px touch target**
+## Definite overflow/breakage at mobile
 
-`.aq-filter-bar .form-select` and `.form-input` are hardcoded to `height: 32px` in the page `<style>` block (line 680). This overrides the global `_layout.css` mobile fix (`.form-input-sm { min-height: 44px }` at 640px) because the selects carry class `form-select` only, not `form-input-sm`. The `.btn-xs, .btn-sm, .btn-md { min-height: 44px }` rule does not cover `.form-select` explicitly when a page-level `height: 32px` rule exists with equal selector specificity. On mobile at 320px, the three dropdowns in the Approval Queue tab are untappable.
+1. **Gantt controls bar (gantt.html) — 320px**: `.gantt-inner` has `min-width: 1120px` inside a scroll container (correct). The `.gantt-controls` bar above it — zoom group, nav buttons, date range label, Today button — is a flex row with no wrap and no overflow container. At 320px the date label and Today button clip off-screen with no scroll affordance.
 
----
+2. **Timesheets week grid — tablet dead zone 640px–768px**: The mobile fallback (`.mobile-timesheet`) only activates below 639px. At 640–768px the desktop `.ts-grid` shows: 200px project column + 7 day columns + 70px total. The wrapper has `overflow: hidden` — columns are clipped silently, not scrollable. Data loss, not degradation.
 
-## MOB-02 — CRITICAL — expenses.html — 320px/390px
-**Approval queue items have no mobile stacking — `.approval-employee` has `min-width: 160px` and `.approval-actions` has `min-width: 140px` with no @media override**
+3. **Leaves quarter view (leaves.html) — 320px, 390px**: `grid-template-columns: repeat(3,1fr)` with zero breakpoints. At 320px each month column is approximately 95px. Inner 7-column day grids with fixed 18px circles push outside their columns. No overflow wrapper exists.
 
-The `.approval-employee` element (line 313 in page `<style>`) is set to `min-width: 160px` with no mobile breakpoint. The `.approval-actions` block (line 358) uses `min-width: 140px` with no mobile override. At 320px, the flex row of `approval-employee + approval-info + approval-amount + approval-actions` has a minimum content width of ~560px, causing horizontal overflow that `body { overflow-x: hidden }` clips silently — the approval items are cut off and buttons are unreachable.
+4. **Leaves heatmap — 639px–768px**: The 32-column heatmap (`40px + repeat(31, 1fr)`) is hidden below 639px but fully visible at 640–768px with no horizontal scroll container. On a 768px viewport with 56px sidebar = 712px usable, 32 columns compress to approximately 22px each — untappable and unreadable.
 
----
+5. **Insights filter bar with forced `flex-wrap: nowrap` (insights.html) — 320px**: A page-level inline style on `.filter-bar-standard` overrides the global 768px wrap rule. The global `min-width: 769px` rule forces `nowrap` only at wide viewports, but the inline style sets it at all widths. At 320px the bar overflows horizontally with no scroll affordance.
 
-## MOB-03 — CRITICAL — invoices.html — 320px
-**Line totals block overflows on 320px — no mobile override for `line-total-row` gap and min-widths**
+6. **HR Kanban — 640px–1023px**: `flex-wrap: nowrap` + `min-width: 160px` per column at `max-width: 1023px`. With 6+ pipeline stages, minimum content width is approximately 960px at 640px viewport. Full-page horizontal scroll appears before the mobile column-switcher activates at 639px. A demo on iPad portrait mode shows a broken kanban.
 
-`.line-total-row` uses `gap: var(--space-8)` (32px) and contains `.line-total-label` at `min-width: 100px` and `.line-total-value` at `min-width: 120px`. At 320px the content width after padding is 272px. The grand total row containing label ("Tax (0% — B2B reverse charge)") at 100px min + value at 120px min + 32px gap = 252px minimum before text overflow. On 320px the `.line-totals` section clips visually with no scroll. There is no `@media` rule on the page for this component.
+7. **Leaves modal balance chips — 320px**: Four leave-type chips each have `flex: 1; min-width: 100px`. Four × 100px = 400px minimum inside a 320px full-screen modal. These overflow without a scroll wrapper.
 
----
+8. **Planning scenario SVG — 320px**: The HIGH-7 fix applies `min-width: 280px` via an attribute selector targeting inline `min-width: 320px`. At 320px viewport the SVG is 280px in a space providing 296px (320 − 24px total padding). One browser rounding event from overflow. Documented as fixed but structurally fragile.
 
-## MOB-04 — CRITICAL — employees.html — 320px/390px
-**Org chart `min-width: 700px` is un-scrollable on mobile — `body { overflow-x: hidden }` clips it without a scroll handle**
+9. **Timesheets inline edit cell input — mobile**: `.ts-cell-input` is `height: 28px` with no mobile override. The global rule upsizes `.form-input` to `min-height: 44px` but `.ts-cell-input` is a custom class not covered. A user tapping a timesheet cell gets a 28px edit field.
 
-`.org-chart-inner` has `min-width: 700px` (line 391). The parent `.org-chart` has `overflow-x: auto`. However, `body { overflow-x: hidden }` in `_layout.css` prevents the horizontal scroll from activating. The org chart becomes a 700px element silently clipped at the viewport edge with no user escape. The CSS rule hiding `.view-org` on mobile applies only to the toggle button, not the tab content — if the org tab is the active tab when at mobile size, users see a broken layout with no way to exit.
+10. **Notification panel anchor at 320px (all pages)**: The mobile override positions the panel at `right: calc(-1 * var(--space-2))` = −8px outside the `header-right` container. On a 320px screen the 316px-wide panel can clip its left edge off-screen depending on where `header-right` sits.
 
----
+11. **Employees org view — tablet 640px–1023px**: Org chart view is correctly hidden below 639px by the MED-17 fix. At 640–1023px there is no responsive handling for org chart node widths and absolute-positioned connector lines. These overflow at tablet width.
 
-## MOB-05 — CRITICAL — gantt.html — 768px (tablet)
-**Gantt chart `min-width: 1120px` inner element is trapped inside `.gantt-wrapper { overflow: hidden }` at tablet width**
-
-`.gantt-inner` has `min-width: 1120px` (line 223 in page `<style>`). The wrapping `.gantt-outer` uses `overflow-x: auto`. But `.gantt-wrapper` (line 209) has `overflow: hidden` — this clips the scrollable `.gantt-outer` at the wrapper level. At 768px the main content area is ~704px wide. The `.gantt-mobile-view` fallback only shows at 639px and below. At 768px the user sees the full Gantt UI but overflow-clipped with no horizontal scroll accessible through the wrapper's `overflow: hidden`.
+12. **`grid-6` collapses to 3 columns on mobile — too many at 320px**: At 320px in a `.grid-6` layout, 3 columns with 16px gaps = approximately 93px per column. Card content with icon + label stacks awkwardly. At 320px this should collapse to 2-col or 1-col.
 
 ---
 
-## MOB-06 — HIGH — timesheets.html — 390px
-**`ts-progress-wrap` has `min-width: 180px` — combines with `flex-shrink: 0` on status text to push content past viewport on 320px**
+## Touch target failures
 
-`.ts-progress-wrap` is set to `min-width: 180px` (line 38 in page style). `.ts-status-text` uses `flex-shrink: 0`. On the status bar row, the text + 180px progress bar + action buttons require approximately 480px minimum before the `flex-wrap` rule activates. The wrapped layout places the progress bar on its own line but its `min-width: 180px` exceeds the 272px content width on 320px — the progress percentage label visually clips outside the right edge of the bar.
+13. **`header-icon-btn` at 36px — all pages, 640px–1023px**: The element is 36×36px at base. The 44px minimum override only applies at `max-width: 639px`. On every page at tablet width the notification bell, theme toggle, and header icon buttons are 36px — 8px short of minimum. Every page, every tablet user.
 
----
+14. **`btn-xs` approve/reject/detail in approvals table rows — 768px**: `btn-xs` = 28px height. The upsizing rule applies only below 639px. At 768px the primary action buttons on the most critical workflow page miss the touch target floor by 16px.
 
-## MOB-07 — HIGH — planning.html — 320px
-**Allocation popover is `position: fixed` with `min-width: 220px` and no mobile positioning clamp**
+15. **Pagination buttons mismatched class — all pages, mobile**: Buttons are `width: 32px; height: 32px` inside `.pagination-buttons` using generic `button` elements. The mobile upsizing rule targets the class `.pagination-btn`. The class selector does not match the actual elements. The fix never applies. Pagination stays at 32px on mobile for all users.
 
-`#allocPopover` (line 810 in HTML) uses inline `position:fixed;min-width:220px`. The popover is positioned via click coordinates with no viewport-edge clamping. On 320px the popover can render fully off-screen to the right with no detection logic in the JavaScript. There is no `max-width: calc(100vw - 32px)` or right-edge guard.
+16. **`modal-close` at 32px — all modals, 640px–768px**: 32×32px at base. Mobile fix applies 44×44px minimum only below 639px. At 640–768px every modal close button is 32×32px — difficult to reliably tap on a tablet.
 
----
+17. **Bottom nav label text at hardcoded 10px (all mobile pages)**: `font-size: 10px` is below the 12px legibility floor and below the `--text-overline` token (11px) already in the system. With accessibility font scaling the text scales but the nav item does not expand, causing label clipping.
 
-## MOB-08 — HIGH — invoices.html — 320px/390px
-**Invoice detail header action button row has no mobile stacking rule**
-
-The `.invoice-detail-header` wraps with `flex-wrap: wrap` but the right-side actions container holds three buttons in a non-wrapping `display: flex; gap: var(--space-3)` row. At 320px this button group (Edit / Record Payment / More) cannot fit alongside the invoice title block and no `@media` rule splits the button group onto separate lines or reduces it to an icon-only row.
+18. **Gantt zoom buttons base height approximately 25px**: Computed height = 13px font + 6px top/bottom padding = approximately 25px. The `_layout.css` rule `.zoom-btn { min-height: 44px }` should fix this, but the base is so far below 44px that any specificity conflict produces an untappable button in primary Gantt navigation.
 
 ---
 
-## MOB-09 — HIGH — calendar.html — 320px
-**Leave popup is `position: fixed; right: var(--space-4); width: 280px` — at 320px it overflows left edge**
+## Visual polish gaps (looks like a prototype, not a product)
 
-`.leave-popup` is `width: 280px` + `right: 16px (space-4)` = requires 296px from the right edge, leaving only 24px on the left of a 320px viewport. The popup has internal padding and text content that worsens the overflow. The mobile breakpoint override for this element only adjusts `bottom` position (line 540), not `width` or `right`. The popup is functionally unusable at 320px.
+19. **`--text-overline` at 11px used 69 times across 12 files**: Applied to sidebar section labels, badge counts, Gantt day-column headers, heatmap day letters, chart group labels, and calendar weekday abbreviations. The Gantt day-column headers are the worst case — users must squint to read dates they need to tap in the primary time-tracking UI.
 
----
+20. **Quarter calendar built from 120 lines of inline style attributes (leaves.html)**: Each day cell is a `<span>` with a complete inline style declaration covering background, border-radius, width, height, display, align-items, justify-content, margin, and color. Unmaintainable, unthemeable (light mode breaks because dark-mode colors are hardcoded inline), and the single most visible prototype artifact in the codebase.
 
-## MOB-10 — HIGH — hr.html — 390px
-**Recruitment Kanban collapses columns to `display: none` on mobile with no stage-switching UI**
+21. **Patch comments visible in production stylesheet**: `FIX-38`, `CRIT-2`, `HIGH-6`, `MED-15` scattered through `_layout.css` signal reactive patchwork to any engineer reviewing the code. These should be replaced with descriptive comments or moved to a changelog before any external review.
 
-At 639px the kanban columns switch to `display: none` with only the first visible column rendered (Applied). There is no tab bar, select, or horizontal swipe indicator to navigate between the 5 recruitment stages (Applied, Screening, Interview, Offer, Hired). The stage summary pill row (showing counts for all stages) at lines 729–737 is visible but is not interactive — it does not switch the displayed column. On 390px a recruiter can see the "Applied" column only with no path to Interview or Offer stages.
+22. **`color-mix()` used for Gantt alternating rows**: `color-mix(in srgb, ...)` is unsupported in Firefox before version 113 and Samsung Internet. HR enterprise users frequently use managed browsers on older Windows systems. Silent fallback means no zebra striping on the primary timeline view.
 
----
+23. **Collapsed sidebar badge `font-size: 8px` — all tablet views**: At 640–1023px the sidebar is always collapsed, always showing nav badges at `font-size: 8px`. The pending approvals count is approximately 2mm tall on a 10-inch iPad. A blob with no readable number is not a notification badge.
 
-## MOB-11 — HIGH — clients.html — 390px
-**Client detail "Team" tab flex header has `min-width:min(100%,140px)` + `min-width:min(100%,180px)` + `min-width:min(100%,120px)` columns = 440px minimum at 390px content width**
+24. **Bottom nav active state is color-only, no shape indicator**: `.bottom-nav-item.active` changes only text and icon color to sage green. No background pill, indicator bar, or underline. Color-only active state fails WCAG 1.4.1 for users with color vision deficiency — unacceptable for enterprise HR at this price point.
 
-The team member rows (lines 1060–1064) use three inline-styled flex columns. The CSS `min()` function with `100%` resolves to the element's own percentage width — at 390px content width the three minimums still sum to 140+180+120 = 440px, overflowing the 358px available. This section has no `@media` override or responsive collapse logic.
+25. **Dashboard greeting pushes KPI data below fold on mobile (index.html)**: 36px display headline plus `margin-bottom: 40px` means the first KPI card appears well below the fold on an iPhone SE. A manager opening the app before a meeting sees a decorative greeting and must scroll to see any data.
 
----
+26. **`state-toggle` dev tool present in every page DOM**: Every HTML file ships a `.state-toggle` button triggered by `Shift+E`. The comment labels it a prototype demo tool. Leaving it in the DOM during any customer-facing review is a credibility risk that must not reach a sales demo.
 
-## MOB-12 — HIGH — admin.html — 390px
-**Roles and Permissions table missing `mobile-cards` class — renders as unreadable horizontal-scroll table on mobile**
+27. **Light mode toggle implementation inconsistency**: The complete light mode token override exists in `_tokens.css` but its activation via `data-theme="light"` is not uniformly wired across all pages. Users who apply the theme mid-navigation may encounter pages where the toggle is absent.
 
-The Roles & Permissions tab table (lines 768–856) sits inside an `.overflow-x-auto` wrapper but the `<table>` element has no `mobile-cards` class. At 390px this table has 5 columns (Permission, Description, Admin, PM, Employee) and does not transform to stacked card layout. The user must scroll horizontally within a small, unmarked scroll zone to see all columns. Every other data table in the admin page correctly uses `mobile-cards`.
+28. **Inline style proliferation creates unthemeable one-offs**: Particularly in `clients.html`, `employees.html`, and `leaves.html`, inline styles mix hardcoded pixel values with token references. A future palette update propagates through class-based rules but leaves inline token references stranded next to hardcoded dimensions.
 
----
+29. **No loading or error states for SVG charts**: All charts are static hardcoded SVG in the HTML source. There is no pattern for loading, API error, or empty data states. This visual gap was never designed and will be jarring in production.
 
-## MOB-13 — MEDIUM — account.html — 320px
-**MFA setup step internal 2-column layout has no mobile breakpoint in page `<style>`**
-
-The MFA modal step contains a QR code (`width: 180px; height: 180px`) and accompanying setup instructions in a side-by-side layout. The global `_layout.css` forces `.modal` to full-screen on mobile, but the internal grid columns within the modal body have no `@media (max-width: 639px)` single-column override in account.html's style block. At 320px (288px modal body width after padding), the 180px QR image overflows its column.
+30. **`modal-xl` (960px) has no tablet treatment at 768px viewport**: At 768px, `modal-xl` collapses to `calc(100vw - 32px)` = 736px. Content designed for 960px is compressed into 736px with no layout adjustment. Side-by-side form fields inside `modal-xl` will overflow or stack without a tablet-specific breakpoint.
 
 ---
 
-## MOB-14 — MEDIUM — timesheets.html — 768px
-**`aq-filter-bar` has `min-width: 140px` on selects — at 768px tablet the bar wraps awkwardly, putting "Saved Views" on its own line**
+## Pages that look production-ready
 
-At 768px the `aq-filter-bar` is set to `flex-wrap: wrap` (only locks to `nowrap` at `min-width: 769px`). Three selects at `min-width: 140px` each (420px) plus a "Clear" button and "Saved Views" dropdown button exhaust the 704px available content width. The "Saved Views" button wraps to a second line in isolation, making the filter bar look broken at tablet width.
-
----
-
-## MOB-15 — MEDIUM — leaves.html — 320px
-**Leave request modal balance selector: four cards with `min-width: 100px` in a flex row with no `flex-wrap` — overflows at 320px**
-
-Lines 1427–1439: four balance cards with `flex:1; min-width:100px` in a row. At 320px content width ~272px, four cards at 100px minimum = 400px required. The flex container has no `flex-wrap: wrap` attribute on the parent div and no `@media` override in the page style block. The four cards compress below their minimums and overlap.
+- **employees.html** — Three-view toggle (card/list/org), mobile-cards fallback on all data tables, profile slide panel, and well-structured filter system. The strongest mobile handling of any page in the product.
+- **approvals.html** — The action-row pattern is information-dense and clever. Bulk action bar handles mobile positioning with the bottom nav correctly. Empty and all-caught-up states are polished.
+- **account.html** — Clean settings tab structure, form-row grid with correct mobile collapse, session management table with proper overflow handling.
+- **leaves.html (month view only)** — Leave balance cards with type-coded accents, progress bars, and the request submission flow are cohesive with the design system.
 
 ---
 
-## MOB-16 — MEDIUM — projects.html — 390px
-**Project detail header has no `@media` override — `padding: var(--space-6)` on all sides and no mobile font-size reduction for the heading**
+## Overall design system consistency verdict
 
-`.project-detail-header` uses `padding: var(--space-6)` (24px sides = 48px total horizontal padding). `.project-detail-title` uses `var(--text-heading-1)`. At 390px, a title like "Acme Corp — Website Redesign" wraps to 3 lines with these constraints. The `.project-detail-badges` flex row of 5+ items with no mobile wrap rule overflows. No `@media` rule in the page or `_components.css` addresses this component at mobile widths.
+The token layer in `_tokens.css` is the standout strength: the Earth/Sage palette is distinctive and internally consistent, the 4px spacing grid is disciplined throughout, the semantic color set is thorough, and the shadow ramp is well-calibrated for dark mode. The component library handles most desktop interactions correctly. Where the system breaks down is the enforcement gap between having design tokens and actually using them. Page-level style blocks freely shadow system classes, introduce one-off component names such as `filter-bar-approvals`, `kanban-stage-tabs`, `ts-status-bar`, and `heatmap-grid`, and reach for hardcoded pixel values when tokens exist. There is no mechanism preventing this drift, and the proliferation of per-page micro-fixes in `_layout.css` is the consequence.
 
----
-
-## MOB-17 — MEDIUM — insights.html — 390px
-**Date range filter inputs outside `.filter-bar-standard` use `max-width: 140px` with no mobile wrapping rule**
-
-Multiple insight tab filter rows (e.g. lines 840–842, 988–990) use two date inputs at `max-width: 140px` each in a flex container that also contains a label and apply button. These date inputs are NOT inside `.filter-bar-standard`, so the `_layout.css` override rule for `filter-bar-standard input[type="date"]` does not apply. At 390px the flex rows overflow before wrapping, misaligning the Apply button outside the visible area.
-
----
-
-## MOB-18 — MEDIUM — _layout.css — global
-**`body { overflow-x: hidden }` is a masking pattern — it silently clips all overflowing content instead of fixing it**
-
-The checklist marks this as "fixed" but it is a suppression technique. Every overflow bug listed in MOB-01 through MOB-05 is hidden behind this rule, not corrected. Users on 320px lose access to clipped interactive elements (form controls, buttons, table columns) with zero visual feedback that anything is missing. This rule must stay only as a last-resort safety net, not as the primary fix for any specific overflow.
-
----
-
-## MOB-19 — MEDIUM — gantt.html — 390px
-**Gantt mobile view cards have no action buttons — users cannot navigate to projects, employees, or take any action**
-
-The `.gantt-mobile-view` cards (lines 1149+) show employee name, work-time bar, and project date text only. There are zero CTAs — no "View", no "→ Project", no "See Details" links. The desktop Gantt has drag, resize, and right-click context menus, none of which are replaced on the mobile fallback. The mobile Gantt is a read-only list with no discoverability or actionability.
-
----
-
-## MOB-20 — MEDIUM — approvals.html — 320px
-**Static timesheet detail table in approval modal has no `overflow-x: auto` wrapper**
-
-At line 768 in approvals.html, the static approval detail view has a `<table style="width:100%;...">` with no wrapping `overflow-x: auto` container. At 320px inside the full-screen modal, the detail grid table (showing Mon–Sun timesheet entries per project) clips without scrolling. The dynamically injected version (line 1137) does have the scroll wrapper, but the static version in the HTML does not.
-
----
-
-## MOB-21 — MEDIUM — index.html — 320px
-**Heatmap `.heatmap-day-header` cells have no mobile font-size reduction — at 320px the 48px-wide day columns clip their header labels**
-
-The `@media (max-width: 639px)` rule on the dashboard heatmap (line 394) reduces cell height and week label size but does NOT reduce `.heatmap-day-header` font-size. At 320px each day column is approximately 48px wide. Day header labels ("Mon", "Tue", "Wed") at the default `var(--text-overline)` size with `letter-spacing: 0.06em` collide with adjacent cells on narrow columns.
-
----
-
-## MOB-22 — LOW — account.html — mobile
-**Sessions table `mobile-cards` functionality depends on dual class `sessions-table data-table mobile-cards` — fragile coupling that will silently break if either class is removed**
-
-The `_layout.css` defines duplicate rules for `.data-table.mobile-cards` AND `.sessions-table.mobile-cards` as two separate class selectors. The account.html sessions table (line 993) uses all three classes. If the `data-table` class is ever removed during a refactor, the `.data-table.mobile-cards` rule silently stops applying — there is no single source of truth for which selector governs the mobile card transform behavior for this table.
+The responsive story is the most damaging issue for the €50/user price point. The FIX-N/CRIT-N/HIGH-N/MED-N comment trail in `_layout.css` documents a desktop-built product being retrofitted for mobile rather than designed mobile-first. The attribute selector targeting inline style strings for `min-width` values is the clearest signal: the stylesheet is trying to override HTML it cannot control. Until inline-style proliferation in HTML files is replaced with utility or component classes governed by the shared system, mobile stability will remain brittle. The product is 65% of the way to €50/seat readiness. The token system, component library, and primary desktop UX are there. The mobile layer needs a structural pass, not more targeted patches.

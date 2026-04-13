@@ -10,22 +10,6 @@
   <style>
     /* ── Account page specific styles ── */
 
-    /* Page header */
-    .account-page-header {
-      margin-bottom: var(--space-6);
-    }
-    .account-page-header h1 {
-      font-size: var(--text-display-lg);
-      font-weight: var(--weight-bold);
-      color: var(--color-text-1);
-      line-height: 1.2;
-    }
-    .account-page-header p {
-      font-size: var(--text-body);
-      color: var(--color-text-2);
-      margin-top: var(--space-1);
-    }
-
     /* Tab nav for account */
     .account-tabs {
       display: flex;
@@ -100,10 +84,12 @@
       padding-bottom: 0;
     }
     .settings-section-title {
-      font-size: var(--text-body);
+      font-size: var(--text-heading-3);
       font-weight: var(--weight-semibold);
       color: var(--color-text-1);
-      margin-bottom: var(--space-1);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
     .settings-section-desc {
       font-size: var(--text-body-sm);
@@ -733,9 +719,10 @@
     <main class="page-content" id="main-content">
 
       <div class="populated-content">
-      <div class="account-page-header">
-        <h1>Account &amp; Settings</h1>
-        <p>Manage your profile, security, preferences and privacy settings.</p>
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Account &amp; Settings</h1>
+        </div>
       </div>
 
       <!-- Profile Completeness Indicator -->
@@ -1073,7 +1060,7 @@
                 <div class="toggle-title">Enable Do Not Disturb</div>
                 <div class="toggle-desc">Silence all email and in-app notifications until you turn this off</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" id="dndToggle" onchange="if(this.checked){showToast('info','DND Enabled','Notifications are now paused.')}else{showToast('success','DND Off','Notifications resumed.')}"><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="dndToggle" onchange="if(this.checked){showToast('info','DND enabled','All notifications are paused.')}else{showToast('success','DND off','Notifications resumed.')}"><span class="toggle-slider"></span></label>
             </div>
           </div>
 
@@ -1087,35 +1074,35 @@
                 <div class="toggle-title">Leave approvals</div>
                 <div class="toggle-desc">When a leave request is approved or rejected</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">Timesheet reminders</div>
                 <div class="toggle-desc">Reminder to submit your timesheet before the deadline</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">Project updates</div>
                 <div class="toggle-desc">When a project milestone is reached or status changes</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">Invoice status</div>
                 <div class="toggle-desc">Invoice sent, paid, or overdue notifications</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">System announcements</div>
                 <div class="toggle-desc">Platform updates, maintenance windows, and feature releases</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
           </div>
 
@@ -1129,35 +1116,35 @@
                 <div class="toggle-title">Leave approvals</div>
                 <div class="toggle-desc">Real-time in-app alerts for leave decisions</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">Timesheet reminders</div>
                 <div class="toggle-desc">In-app banner reminders</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">Project updates</div>
-                <div class="toggle-desc">Notifications when you're @mentioned or assigned</div>
+                <div class="toggle-desc">Notifications when you are @mentioned or assigned</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">Invoice status</div>
                 <div class="toggle-desc">Invoice workflow updates</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
             <div class="toggle-row">
               <div class="toggle-info">
                 <div class="toggle-title">System announcements</div>
                 <div class="toggle-desc">Platform-wide announcements</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
           </div>
 
@@ -1171,7 +1158,7 @@
                 <div class="toggle-title">Send weekly digest</div>
                 <div class="toggle-desc">A summary of timesheets, leaves, and project highlights</div>
               </div>
-              <label class="toggle-switch"><input type="checkbox" id="digestToggle" checked><span class="toggle-slider"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="digestToggle" checked onchange="saveNotifPref(this)"><span class="toggle-slider"></span></label>
             </div>
 
             <div id="digestDayWrap">
@@ -1184,13 +1171,6 @@
                 <button class="day-btn" onclick="toggleDay(this)">Fr</button>
               </div>
             </div>
-          </div>
-
-          <div>
-            <button class="btn btn-primary btn-md" onclick="showToast('success','Saved','Notification preferences updated.')">
-              <svg data-lucide="save" width="16" height="16"></svg>
-              Save Preferences
-            </button>
           </div>
 
         </div>
@@ -1290,8 +1270,68 @@
             </div>
           </div>
 
+          <!-- Timesheets -->
+          <div class="settings-section">
+            <div class="settings-section-title">Timesheets</div>
+            <div class="settings-section-desc">Control how your weekly timesheets behave.</div>
+
+            <div class="toggle-row" style="margin-bottom:var(--space-4);">
+              <div class="toggle-info">
+                <div class="toggle-title">Auto-submit when target hours are met</div>
+                <div class="toggle-desc">If you fill all days and reach your weekly target (e.g. 40h), the timesheet is submitted automatically. You can still edit and resubmit before approval.</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="autoSubmitToggle" onchange="showToast('success','Saved','Timesheet auto-submit ' + (this.checked ? 'enabled' : 'disabled') + '.')"><span class="toggle-slider"></span></label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="defaultProject">Default Project</label>
+              <select id="defaultProject" class="form-select">
+                <option value="">None - select each week</option>
+                <option value="acme-web">Acme Web Redesign</option>
+                <option value="globex-phase2">Globex Platform Phase 2</option>
+                <option value="initech-api">Initech API Integration</option>
+              </select>
+              <div class="form-hint">Pre-select this project when opening a new week.</div>
+            </div>
+          </div>
+
+          <!-- AI Approvals -->
+          <div class="settings-section">
+            <div class="settings-section-title">AI Approval Assistant</div>
+            <div class="settings-section-desc">Configure when the AI can recommend bulk-approving routine timesheets on your behalf (manager role only).</div>
+
+            <div class="toggle-row" style="margin-bottom:var(--space-4);">
+              <div class="toggle-info">
+                <div class="toggle-title">Enable AI bulk-approve suggestions</div>
+                <div class="toggle-desc">Show an AI banner when timesheets match the pattern of previous approved weeks. You always confirm before anything is approved.</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="aiBulkApproveToggle" checked onchange="showToast('success','Saved','AI bulk-approve suggestions ' + (this.checked ? 'enabled' : 'disabled') + '.')"><span class="toggle-slider"></span></label>
+            </div>
+
+            <div id="aiBulkCriteriaWrap">
+              <div class="form-group">
+                <label class="form-label" for="aiBulkVariance">Variance threshold</label>
+                <select id="aiBulkVariance" class="form-select">
+                  <option value="5">Identical hours only (0% variance)</option>
+                  <option value="10" selected>Within 10% of last approved week</option>
+                  <option value="20">Within 20% of last approved week</option>
+                </select>
+                <div class="form-hint">Timesheets within this range of the employee's last approved week are considered "routine."</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="aiBulkConsecutive">Consecutive approved weeks required</label>
+                <select id="aiBulkConsecutive" class="form-select">
+                  <option value="1">1 week (any approved history)</option>
+                  <option value="2" selected>2 consecutive weeks</option>
+                  <option value="4">4 consecutive weeks</option>
+                </select>
+                <div class="form-hint">Minimum pattern history before the AI will suggest bulk approval for an employee.</div>
+              </div>
+            </div>
+          </div>
+
           <div>
-            <button class="btn btn-primary btn-md" onclick="showToast('success','Saved','Preferences updated.')">
+            <button class="btn btn-primary btn-md" onclick="savePreferences()">
               <svg data-lucide="save" width="16" height="16"></svg>
               Save Preferences
             </button>
@@ -1756,7 +1796,7 @@
     } else if (theme === 'system') {
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-      showToast('success', 'Theme', 'System theme applied — following your OS preference.');
+      showToast('success', 'Theme', 'System theme applied - following your OS preference.');
     } else {
       root.removeAttribute('data-theme');
       showToast('success', 'Theme', 'Dark theme applied.');
@@ -1838,6 +1878,30 @@
     if (deleteInput) deleteInput.value = '';
     if (deleteBtn) deleteBtn.disabled = true;
   };
+
+  // ── Instant-save for notification toggles ──
+  window.saveNotifPref = function(checkbox) {
+    var label = checkbox.closest('.toggle-row') ? checkbox.closest('.toggle-row').querySelector('.toggle-title') : null;
+    var name = label ? label.textContent.trim() : 'Preference';
+    var state = checkbox.checked ? 'on' : 'off';
+    showToast('success', 'Saved', name + ' turned ' + state + '.');
+  };
+
+  // ── Save Preferences (language/timezone/locale selects) ──
+  window.savePreferences = function() {
+    showToast('success', 'Saved', 'Language, timezone, and timesheet preferences updated.');
+  };
+
+  // ── AI bulk approve toggle show/hide criteria ──
+  var aiBulkToggle = document.getElementById('aiBulkApproveToggle');
+  var aiBulkCriteria = document.getElementById('aiBulkCriteriaWrap');
+  if (aiBulkToggle && aiBulkCriteria) {
+    function updateAiBulkCriteria() {
+      aiBulkCriteria.style.display = aiBulkToggle.checked ? '' : 'none';
+    }
+    aiBulkToggle.addEventListener('change', updateAiBulkCriteria);
+    updateAiBulkCriteria();
+  }
 
   // ── Empty State Toggle ──
   var stateToggle = document.getElementById('stateToggle');

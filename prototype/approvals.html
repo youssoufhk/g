@@ -186,6 +186,40 @@
       50% { transform: scale(1.15); }
       100% { transform: scale(1); opacity: 1; }
     }
+
+    /* T2 Drawer styles (fallback if not in _components.css) */
+    .drawer { display: contents; }
+    .drawer-right .drawer-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400;
+      opacity: 0; pointer-events: none; transition: opacity var(--motion-normal);
+    }
+    .drawer-right.is-open .drawer-backdrop { opacity: 1; pointer-events: all; }
+    .drawer-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(480px, 100vw);
+      background: var(--color-surface-1); border-left: 1px solid var(--color-border);
+      z-index: 401; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform var(--motion-normal) var(--ease-out);
+      box-shadow: var(--shadow-5);
+    }
+    .drawer-right.is-open .drawer-panel { transform: translateX(0); }
+    .drawer-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-border-subtle);
+      gap: var(--space-3); flex-shrink: 0;
+    }
+    .drawer-title { font-size: var(--text-body-lg); font-weight: var(--weight-semibold); color: var(--color-text-1); }
+    .drawer-close {
+      background: none; border: none; color: var(--color-text-3); cursor: pointer;
+      padding: var(--space-1); border-radius: var(--radius-sm); flex-shrink: 0;
+      transition: color var(--motion-fast);
+    }
+    .drawer-close:hover { color: var(--color-text-1); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: var(--space-5) var(--space-6); }
+    .drawer-footer {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-border-subtle);
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body class="show-populated">
@@ -261,7 +295,6 @@
       <div class="page-header">
         <div class="page-header-left">
           <h1 class="page-title">Approvals</h1>
-          <p class="page-subtitle">Review and approve pending requests from your team</p>
         </div>
         <div class="page-header-actions">
           <div class="dropdown" data-min-role="pm">
@@ -281,57 +314,27 @@
       </div>
 
       <!-- KPI Summary Row -->
-      <div class="kpi-grid-approvals grid-4 stagger-reveal" style="margin-bottom:var(--space-6);perspective:1200px;" data-min-role="pm">
-        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Total Pending</div>
-          <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-text-1);font-family:var(--font-mono);">12</div>
-          <!-- Mini donut: 7 timesheets, 3 leaves, 2 expenses -->
-          <svg width="48" height="48" viewBox="0 0 48 48" style="margin:var(--space-1) auto 0;display:block;" aria-label="Pending breakdown: 7 timesheets, 3 leaves, 2 expenses">
-            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-border)" stroke-width="6"/>
-            <!-- Timesheets 7/12 = 58.3% = stroke-dasharray 66 47 -->
-            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-info)" stroke-width="6"
-              stroke-dasharray="66 47" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 24 24)"/>
-            <!-- Leaves 3/12 = 25% = stroke-dasharray 28.3 84.7 -->
-            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-success)" stroke-width="6"
-              stroke-dasharray="28 85" stroke-dashoffset="-66" stroke-linecap="round" transform="rotate(-90 24 24)"/>
-            <!-- Expenses 2/12 = 16.7% = remainder -->
-            <circle cx="24" cy="24" r="18" fill="none" stroke="var(--color-gold)" stroke-width="6"
-              stroke-dasharray="19 94" stroke-dashoffset="-94" stroke-linecap="round" transform="rotate(-90 24 24)"/>
-          </svg>
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">7 timesheets &middot; 3 leaves &middot; 2 expenses</div>
-          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">2 overdue</div>
-          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
-            <polyline points="0,16 10,12 20,14 30,8 40,10 50,6 60,4" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div style="font-size:var(--text-caption);color:var(--color-error);margin-top:2px;">+3 vs last week</div>
-        </div></div>
-        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Timesheets</div>
-          <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-info);font-family:var(--font-mono);">7</div>
-          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
-            <polyline points="0,14 10,10 20,12 30,8 40,6 50,9 60,4" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">294h total logged</div>
-          <div style="font-size:var(--text-caption);color:var(--color-warning);margin-top:2px;">+2 vs last week</div>
-        </div></div>
-        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Leaves</div>
-          <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-success);font-family:var(--font-mono);">3</div>
-          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
-            <polyline points="0,8 10,10 20,6 30,12 40,8 50,14 60,10" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">8 days requested</div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">-1 vs last week</div>
-        </div></div>
-        <div class="perspective-container"><div class="card card-interactive card-3d" style="padding:var(--space-4);text-align:center;">
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Expenses</div>
-          <div style="font-size:var(--text-heading-1);font-weight:var(--weight-bold);color:var(--color-gold);font-family:var(--font-mono);">2</div>
-          <svg width="60" height="20" viewBox="0 0 60 20" style="margin:var(--space-1) auto 0;display:block;" aria-hidden="true">
-            <polyline points="0,12 10,14 20,10 30,16 40,12 50,8 60,6" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">€425.50 total</div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">Same as last week</div>
-        </div></div>
+      <div class="kpi-grid-approvals grid-4 stagger-reveal" style="margin-bottom:var(--space-6);" data-min-role="pm">
+        <div class="stat-card card-interactive" id="kpiTotalPending">
+          <div class="stat-label">Total Pending</div>
+          <div class="stat-value font-mono" id="kpiPendingCount">12</div>
+          <div class="stat-meta"><span style="color:var(--color-text-3);">7 timesheets &middot; 3 leaves &middot; 2 expenses</span></div>
+        </div>
+        <div class="stat-card card-interactive" id="kpiTimesheets">
+          <div class="stat-label">Timesheets</div>
+          <div class="stat-value font-mono" style="color:var(--color-info);" id="kpiTimesheetCount">7</div>
+          <div class="stat-meta"><span style="color:var(--color-text-3);">294h total logged</span></div>
+        </div>
+        <div class="stat-card card-interactive" id="kpiLeaves">
+          <div class="stat-label">Leaves</div>
+          <div class="stat-value font-mono" style="color:var(--color-success);" id="kpiLeaveCount">3</div>
+          <div class="stat-meta"><span style="color:var(--color-text-3);">8 days requested</span></div>
+        </div>
+        <div class="stat-card card-interactive" id="kpiExpenses">
+          <div class="stat-label">Expenses</div>
+          <div class="stat-value font-mono" style="color:var(--color-gold);" id="kpiExpenseCount">2</div>
+          <div class="stat-meta"><span style="color:var(--color-text-3);">&euro;425.50 total</span></div>
+        </div>
       </div>
 
       <!-- Populated content -->
@@ -346,13 +349,14 @@
         </div>
 
         <!-- AI Recommendation Banner -->
-        <div class="card" style="padding:var(--space-3) var(--space-4);margin-bottom:var(--space-4);display:flex;align-items:center;gap:var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-lg);flex-wrap:wrap;" id="aiRecommendationBanner" data-min-role="pm">
-          <svg data-lucide="sparkles" width="20" height="20" style="color:var(--color-primary);flex-shrink:0;"></svg>
-          <div style="flex:1;min-width:200px;">
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-1);">4 routine timesheets match last week's pattern — bulk-approve safely.</div>
+        <div style="padding:var(--space-2) var(--space-4);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-3);background:var(--color-primary-muted);border:1px solid var(--color-primary);border-radius:var(--radius-lg);flex-wrap:wrap;" id="aiRecommendationBanner" data-min-role="pm">
+          <svg data-lucide="sparkles" width="16" height="16" style="color:var(--color-primary);flex-shrink:0;"></svg>
+          <div style="flex:1;min-width:200px;font-size:var(--text-body-sm);color:var(--color-text-1);">
+            4 routine timesheets match last week's pattern.
+            <a href="account.html#preferences" style="color:var(--color-primary);font-size:var(--text-caption);margin-left:var(--space-2);">Configure criteria in Settings</a>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="this.closest('#aiRecommendationBanner').style.display='none';showToast('success','Bulk Approved','4 routine timesheets approved.')">Bulk-Approve Routine</button>
-          <button class="btn btn-ghost btn-xs" onclick="this.closest('#aiRecommendationBanner').style.display='none'" style="flex-shrink:0;">Dismiss</button>
+          <button class="btn btn-primary btn-sm" onclick="this.closest('[id]').style.display='none';showToast('success','Bulk Approved','4 routine timesheets approved.')">Bulk-Approve Routine</button>
+          <button class="btn btn-ghost btn-xs" onclick="this.closest('[id]').style.display='none'" style="flex-shrink:0;">Dismiss</button>
         </div>
 
         <!-- Filter Bar — horizontal row (UI20) -->
@@ -403,7 +407,7 @@
           <!-- ── URGENT section label ── -->
           <div class="section-label urgent" id="urgentLabelInner">
             <span class="section-dot"></span>
-            URGENT — Overdue
+            URGENT - Overdue
             <span class="badge badge-error" style="margin-left:var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> 2</span>
           </div>
 
@@ -424,7 +428,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -438,7 +442,7 @@
               <a href="employees.html#david-park" class="employee-name" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a>
             </div>
             <div class="action-row-detail card-details">
-              Week Mar 23–29 <span class="detail-sep">&middot;</span> <span class="font-mono font-semibold" style="color:var(--color-text-1);">35h</span> <span class="detail-sep">&middot;</span> Globex Corp (30h), Internal (5h) <span class="warning-tag" style="margin-left:var(--space-2);"><svg data-lucide="alert-triangle"></svg> −5h under</span>
+              Week Mar 23–29 <span class="detail-sep">&middot;</span> <span class="font-mono font-semibold" style="color:var(--color-text-1);">35h</span> <span class="detail-sep">&middot;</span> Globex Corp (30h), Internal (5h) <span class="warning-tag" style="margin-left:var(--space-2);"><svg data-lucide="alert-triangle"></svg> -5h under</span>
             </div>
             <div class="action-row-meta">Finance <span style="color:var(--color-warning);margin-left:var(--space-2);">4d ago</span></div>
             <div class="action-row-status">
@@ -446,7 +450,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -467,7 +471,7 @@
               <a href="employees.html#alice-wang" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#alice-wang">Alice Wang</a>
             </div>
             <div class="action-row-detail card-details">
-              Annual Leave Apr 28–29 <span class="detail-sep">&middot;</span> 2 days <span class="detail-sep">&middot;</span> Balance after: 16 days
+              Annual Leave Apr 14–18 <span class="detail-sep">&middot;</span> 5 days <span class="detail-sep">&middot;</span> Balance after: 13 days
             </div>
             <div class="action-row-meta">Engineering <span style="color:var(--color-text-3);margin-left:var(--space-2);">Today</span></div>
             <div class="action-row-status">
@@ -475,7 +479,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -497,7 +501,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -519,7 +523,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -533,7 +537,7 @@
               <a href="employees.html#bob-taylor" class="employee-name" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
             </div>
             <div class="action-row-detail card-details">
-              Hotel — <span class="font-mono font-semibold" style="color:var(--color-text-1);">&euro;340.00</span> <span class="detail-sep">&middot;</span> Acme Corp project <span class="detail-sep">&middot;</span> Receipt attached
+              Hotel - <span class="font-mono font-semibold" style="color:var(--color-text-1);">&euro;340.00</span> <span class="detail-sep">&middot;</span> Acme Corp project <span class="detail-sep">&middot;</span> Receipt attached
             </div>
             <div class="action-row-meta">Engineering <span style="color:var(--color-text-3);margin-left:var(--space-2);">Today</span></div>
             <div class="action-row-status">
@@ -541,7 +545,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -555,7 +559,7 @@
               <a href="employees.html#carol-williams" class="employee-name" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a>
             </div>
             <div class="action-row-detail card-details">
-              Meals — <span class="font-mono font-semibold" style="color:var(--color-text-1);">&euro;85.50</span> <span class="detail-sep">&middot;</span> Initech API project <span class="detail-sep">&middot;</span> Receipt attached
+              Meals - <span class="font-mono font-semibold" style="color:var(--color-text-1);">&euro;85.50</span> <span class="detail-sep">&middot;</span> Initech API project <span class="detail-sep">&middot;</span> Receipt attached
             </div>
             <div class="action-row-meta">Design <span style="color:var(--color-text-3);margin-left:var(--space-2);">Today</span></div>
             <div class="action-row-status">
@@ -563,7 +567,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -585,7 +589,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -607,7 +611,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -629,7 +633,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -651,7 +655,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -665,7 +669,7 @@
               <a href="employees.html#sophie-dubois" class="employee-name" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-worktime="82" data-href="employees.html#sophie-dubois">Sophie Dubois</a>
             </div>
             <div class="action-row-detail card-details">
-              Week Mar 30–Apr 5 <span class="detail-sep">&middot;</span> <span class="font-mono font-semibold" style="color:var(--color-success);">38h</span> <span class="detail-sep">&middot;</span> Contoso Inc (34h), Internal (4h)
+              Week Mar 30–Apr 5 <span class="detail-sep">&middot;</span> <span class="font-mono font-semibold" style="color:var(--color-success);">38h</span> <span class="detail-sep">&middot;</span> Umbrella Corp (34h), Internal (4h)
             </div>
             <div class="action-row-meta">Operations <span style="color:var(--color-text-3);margin-left:var(--space-2);">Today</span></div>
             <div class="action-row-status">
@@ -673,7 +677,7 @@
             </div>
             <div class="action-row-actions">
               <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" title="Approve"><svg data-lucide="check" width="13" height="13"></svg> Approve</button>
-              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg></button>
+              <button class="btn btn-ghost btn-xs reject-btn text-error" data-min-role="pm" title="Reject"><svg data-lucide="x" width="13" height="13"></svg> Reject</button>
               <button class="btn btn-ghost btn-xs detail-btn" title="View Details"><svg data-lucide="eye" width="13" height="13"></svg></button>
             </div>
           </div>
@@ -698,7 +702,7 @@
           <svg data-lucide="check-circle-2" width="48" height="48" style="color:var(--color-success);opacity:1;"></svg>
         </div>
         <h2 style="color:var(--color-success);">All caught up!</h2>
-        <p>No pending approvals right now. Your team is running smoothly. New requests will appear here automatically.</p>
+        <p>You are all caught up - 12 items processed today. Check back Monday for new requests.</p>
         <div style="display:flex;gap:var(--space-3);margin-top:var(--space-2);">
           <a href="timesheets.html" class="btn btn-secondary btn-sm"><svg data-lucide="clock" width="14" height="14"></svg> View Timesheets</a>
           <a href="leaves.html" class="btn btn-secondary btn-sm"><svg data-lucide="palm-tree" width="14" height="14"></svg> View Leaves</a>
@@ -859,6 +863,71 @@
     <div class="modal-footer">
       <button class="btn btn-secondary btn-md" onclick="closeModal('rejectAllModal')">Cancel</button>
       <button class="btn btn-destructive btn-md" id="rejectAllConfirmBtn">Reject Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- T2 Approval Detail Drawer -->
+<div class="drawer drawer-right" id="approvalDetailDrawer">
+  <div class="drawer-backdrop" onclick="GHR && GHR.closeDrawer ? GHR.closeDrawer('approvalDetailDrawer') : document.getElementById('approvalDetailDrawer').classList.remove('is-open')"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="drawerTitle">Request Details</div>
+        <div id="drawerSubtitle" style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:2px;"></div>
+      </div>
+      <button class="drawer-close" onclick="document.getElementById('approvalDetailDrawer').classList.remove('is-open')" aria-label="Close">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+      <!-- Dynamically populated -->
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-destructive-ghost btn-md" id="drawerRejectBtn"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
+      <div style="margin-left:auto;display:flex;gap:var(--space-2);">
+        <button class="btn btn-secondary btn-md" onclick="document.getElementById('approvalDetailDrawer').classList.remove('is-open')">Close</button>
+        <button class="btn btn-primary btn-md" id="drawerApproveBtn"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Reason (Drawer) Modal -->
+<div class="modal-backdrop" id="rejectDrawerModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 class="modal-title">Rejection Reason</h3>
+      <button class="modal-close" onclick="closeModal('rejectDrawerModal')"><svg data-lucide="x" width="18" height="18"></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--color-text-2);margin-bottom:var(--space-3);">Common reasons:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-3);">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('drawerRejectReason').value='Hours do not match the agreed schedule.'">Hours mismatch</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('drawerRejectReason').value='Missing or incorrect receipt attached.'">Missing receipt</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('drawerRejectReason').value='Wrong project allocation - please resubmit against the correct project.'">Wrong project</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason <span class="required">*</span></label>
+        <textarea class="form-textarea" id="drawerRejectReason" rows="3" placeholder="Provide a reason for rejection..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-md" onclick="closeModal('rejectDrawerModal')">Cancel</button>
+      <button class="btn btn-destructive btn-md" id="drawerRejectConfirmBtn">Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Reject Modal (from bulk action bar) -->
+<div id="bulkRejectModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--bg-card, var(--color-surface-2));border-radius:var(--radius-lg);padding:var(--space-6);max-width:420px;width:90%;">
+    <h3 style="font-size:var(--text-lg, var(--text-body-lg));font-weight:var(--weight-semibold);margin-bottom:var(--space-4);color:var(--text-primary, var(--color-text-1));">Reject Selected</h3>
+    <p style="color:var(--text-secondary, var(--color-text-2));margin-bottom:var(--space-3);">Please provide a reason for rejection:</p>
+    <textarea id="bulkRejectReason" placeholder="Rejection reason..." style="width:100%;min-height:80px;background:var(--bg-secondary, var(--color-surface-1));border:1px solid var(--border-default, var(--color-border));border-radius:var(--radius-md);padding:var(--space-2);color:var(--text-primary, var(--color-text-1));margin-bottom:var(--space-4);resize:vertical;box-sizing:border-box;font-family:var(--font-sans);font-size:var(--text-body-sm);"></textarea>
+    <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+      <button onclick="document.getElementById('bulkRejectModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--bg-secondary, var(--color-surface-2));border:1px solid var(--border-default, var(--color-border));border-radius:var(--radius-md);cursor:pointer;color:var(--text-primary, var(--color-text-1));font-size:var(--text-body-sm);">Cancel</button>
+      <button onclick="completeBulkReject()" style="padding:var(--space-2) var(--space-4);background:var(--color-error, #e53e3e);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-size:var(--text-body-sm);">Reject</button>
     </div>
   </div>
 </div>
@@ -1031,16 +1100,47 @@
   // ── Approve / Reject Actions ──
   var rejectTargetCard = null;
 
+  function decrementKpi(type) {
+    // Decrement total
+    var totalEl = document.getElementById('kpiPendingCount');
+    if (totalEl) {
+      var total = parseInt(totalEl.textContent) || 0;
+      if (total > 0) totalEl.textContent = total - 1;
+    }
+    // Decrement type-specific
+    var typeMap = { timesheet: 'kpiTimesheetCount', leave: 'kpiLeaveCount', expense: 'kpiExpenseCount' };
+    var typeEl = document.getElementById(typeMap[type]);
+    if (typeEl) {
+      var count = parseInt(typeEl.textContent) || 0;
+      if (count > 0) typeEl.textContent = count - 1;
+    }
+    // Decrement tab count
+    var tabMap = { timesheet: '[data-tab="timesheets"] .tab-count', leave: '[data-tab="leaves"] .tab-count' };
+    var tabCountEl = document.querySelector('[data-tab="all"] .tab-count');
+    if (tabCountEl) {
+      var tc = parseInt(tabCountEl.textContent) || 0;
+      if (tc > 0) tabCountEl.textContent = tc - 1;
+    }
+    var specificTabEl = type === 'timesheet' ? document.querySelector('[data-tab="timesheets"] .tab-count') :
+                        type === 'leave' ? document.querySelector('[data-tab="leaves"] .tab-count') :
+                        type === 'expense' ? document.querySelector('[data-tab="expenses"] .tab-count') : null;
+    if (specificTabEl) {
+      var stc = parseInt(specificTabEl.textContent) || 0;
+      if (stc > 0) specificTabEl.textContent = stc - 1;
+    }
+  }
+
   function approveCard(card) {
     var name = card.querySelector('.card-employee a').textContent;
     var type = card.getAttribute('data-type');
+    decrementKpi(type);
     card.classList.add('removing-item');
     setTimeout(function() {
       card.style.display = 'none';
       card.classList.remove('removing-item');
       checkFilterEmptyState();
     }, 300);
-    var typeMsg = type === 'timesheet' ? 'Approved — timesheet status will update in real time.' :
+    var typeMsg = type === 'timesheet' ? 'Approved - timesheet status will update in real time.' :
                   type === 'leave' ? 'Leave approved. Employee will be notified.' :
                   'Expense approved. Finance will be updated.';
     showToast('success', 'Approved', name + ': ' + typeMsg);
@@ -1064,7 +1164,7 @@
         var emptyTitle = document.getElementById('filterEmptyTitle');
         var checkmark = document.getElementById('filterEmptyCheckmark');
         var configs = {
-          'all': { title: clearedCount > 0 ? 'You cleared ' + clearedCount + ' approval' + (clearedCount > 1 ? 's' : '') + ' \u2014 great work, Sarah!' : 'All approvals cleared', msg: 'No pending approvals right now.', cta: '' },
+          'all': { title: clearedCount > 0 ? 'You cleared ' + clearedCount + ' approval' + (clearedCount > 1 ? 's' : '') + ' - great work, Sarah!' : 'All approvals cleared', msg: 'You are all caught up - ' + clearedCount + ' items processed today. Check back Monday for new requests.', cta: '' },
           'timesheet': { title: 'Timesheets clear!', msg: 'No timesheet approvals match your filters.', cta: '<a href="timesheets.html" class="btn btn-secondary btn-sm"><svg data-lucide="clock" width="14" height="14"></svg> Go to Timesheets</a>' },
           'leave': { title: 'Leaves clear!', msg: 'No leave approvals match your filters.', cta: '<a href="leaves.html" class="btn btn-secondary btn-sm"><svg data-lucide="palm-tree" width="14" height="14"></svg> Go to Leaves</a>' },
           'expense': { title: 'Expenses clear!', msg: 'No expense approvals match your filters.', cta: '<a href="expenses.html" class="btn btn-secondary btn-sm"><svg data-lucide="receipt" width="14" height="14"></svg> Go to Expenses</a>' }
@@ -1113,15 +1213,17 @@
       btn.classList.remove('btn-loading');
       if (rejectTargetCard) {
         var name = rejectTargetCard.querySelector('.card-employee a').textContent;
+        var type = rejectTargetCard.getAttribute('data-type');
+        decrementKpi(type);
         rejectTargetCard.classList.add('removing-item');
         var card = rejectTargetCard;
-        setTimeout(function() { card.style.display = 'none'; }, 300);
+        setTimeout(function() { card.style.display = 'none'; checkFilterEmptyState(); }, 300);
         showToast('error', 'Rejected', name + "'s request has been rejected.");
         showToast('info', 'Notification Sent', 'Employee will be notified of the rejection reason.');
       }
       closeRejectModal();
       updateBulkBar();
-    }, 1000);
+    }, 600);
   });
 
   // ── Type-specific detail modal content (ISSUE-19) ──
@@ -1248,6 +1350,71 @@
     if (e.target === this) closeModal('approveNoteModal');
   });
 
+  // ── Open T2 approval detail drawer ──
+  var drawerTargetCard = null;
+
+  function openApprovalDrawer(card) {
+    drawerTargetCard = card;
+    var name = card.querySelector('.card-employee a').textContent;
+    var type = card.getAttribute('data-type');
+    var typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+    document.getElementById('drawerTitle').textContent = name + ' - ' + typeLabel;
+    document.getElementById('drawerSubtitle').textContent = card.querySelector('.card-details').textContent.trim().replace(/\s+/g,' ');
+
+    var bodyContent = '';
+    if (type === 'timesheet') bodyContent = buildTimesheetDetail(card);
+    else if (type === 'leave') bodyContent = buildLeaveDetail(card);
+    else if (type === 'expense') bodyContent = buildExpenseDetail(card);
+    else bodyContent = '<p style="color:var(--color-text-2);">Details not available.</p>';
+
+    document.getElementById('drawerBody').innerHTML = bodyContent;
+    document.getElementById('approvalDetailDrawer').classList.add('is-open');
+    lucide.createIcons({ nodes: [document.getElementById('approvalDetailDrawer')] });
+  }
+
+  // Drawer approve/reject buttons
+  document.getElementById('drawerApproveBtn').addEventListener('click', function() {
+    if (drawerTargetCard) {
+      document.getElementById('approvalDetailDrawer').classList.remove('is-open');
+      approveCard(drawerTargetCard);
+      drawerTargetCard = null;
+    }
+  });
+
+  document.getElementById('drawerRejectBtn').addEventListener('click', function() {
+    if (drawerTargetCard) {
+      document.getElementById('drawerRejectReason').value = '';
+      document.getElementById('rejectDrawerModal').classList.add('active');
+      document.getElementById('drawerRejectReason').focus();
+    }
+  });
+
+  document.getElementById('drawerRejectConfirmBtn').addEventListener('click', function() {
+    var reason = document.getElementById('drawerRejectReason').value.trim();
+    if (!reason) {
+      document.getElementById('drawerRejectReason').style.borderColor = 'var(--color-error)';
+      return;
+    }
+    closeModal('rejectDrawerModal');
+    document.getElementById('approvalDetailDrawer').classList.remove('is-open');
+    if (drawerTargetCard) {
+      var name = drawerTargetCard.querySelector('.card-employee a').textContent;
+      var type = drawerTargetCard.getAttribute('data-type');
+      decrementKpi(type);
+      drawerTargetCard.classList.add('removing-item');
+      var _card = drawerTargetCard;
+      setTimeout(function() { _card.style.display = 'none'; checkFilterEmptyState(); }, 300);
+      showToast('error', 'Rejected', name + "'s request has been rejected.");
+      showToast('info', 'Notification Sent', 'Employee will be notified of the rejection reason.');
+      drawerTargetCard = null;
+      updateBulkBar();
+    }
+  });
+
+  document.getElementById('rejectDrawerModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('rejectDrawerModal');
+  });
+
   // Event delegation for approve/reject/detail buttons
   document.getElementById('approvalList').addEventListener('click', function(e) {
     // Approve with Note
@@ -1266,7 +1433,7 @@
       setTimeout(function() {
         btn.classList.remove('btn-loading');
         approveCard(card);
-      }, 1000);
+      }, 600);
       return;
     }
     btn = e.target.closest('.reject-btn');
@@ -1276,20 +1443,13 @@
     }
     btn = e.target.closest('.detail-btn');
     if (btn) {
-      var card = btn.closest('.approval-card');
-      var name = card.querySelector('.card-employee a').textContent;
-      var type = card.getAttribute('data-type');
-      document.getElementById('detailModalTitle').textContent = name + ' - ' + type.charAt(0).toUpperCase() + type.slice(1) + ' Details';
-
-      var bodyContent = '';
-      if (type === 'timesheet') bodyContent = buildTimesheetDetail(card);
-      else if (type === 'leave') bodyContent = buildLeaveDetail(card);
-      else if (type === 'expense') bodyContent = buildExpenseDetail(card);
-      else bodyContent = '<p style="color:var(--color-text-2);">Details not available.</p>';
-
-      document.getElementById('detailModalBody').innerHTML = bodyContent;
-      document.getElementById('detailModal').classList.add('active');
-      lucide.createIcons({ nodes: [document.getElementById('detailModalBody')] });
+      openApprovalDrawer(btn.closest('.approval-card'));
+      return;
+    }
+    // Row click (not on buttons/checkboxes/links) opens drawer
+    var row = e.target.closest('.approval-card');
+    if (row && !e.target.closest('button') && !e.target.closest('a') && !e.target.closest('input')) {
+      openApprovalDrawer(row);
       return;
     }
   });
@@ -1316,20 +1476,32 @@
     });
   });
 
-  // Bulk reject
+  // Bulk reject — opens modal for rejection reason
   document.getElementById('bulkRejectBtn').addEventListener('click', function() {
+    var checked = document.querySelectorAll('.item-check:checked');
+    if (checked.length === 0) { showToast('warning', 'None Selected', 'Please select at least one item to reject.'); return; }
+    document.getElementById('bulkRejectReason').value = '';
+    document.getElementById('bulkRejectModal').style.display = 'flex';
+  });
+
+  // completeBulkReject — called by modal confirm button
+  window.completeBulkReject = function() {
+    var reason = document.getElementById('bulkRejectReason').value.trim();
+    if (!reason) { GHR.showToast('warning', 'Required', 'Please enter a rejection reason'); return; }
     var checked = document.querySelectorAll('.item-check:checked');
     var count = checked.length;
     checked.forEach(function(cb) {
       var card = cb.closest('.approval-card');
       if (card) {
         card.classList.add('removing-item');
-        setTimeout(function() { card.style.display = 'none'; }, 300);
+        setTimeout(function() { card.style.display = 'none'; checkFilterEmptyState(); }, 300);
       }
     });
-    showToast('error', 'Rejected', count + ' request(s) have been rejected.');
+    showToast('success', 'Rejected', count + ' request(s) have been rejected.');
+    document.getElementById('bulkRejectModal').style.display = 'none';
+    document.getElementById('bulkRejectReason').value = '';
     setTimeout(updateBulkBar, 350);
-  });
+  };
 
   // Approve all visible (no toast here — called by modal confirm which shows toast)
   window.approveAllVisible = function() {

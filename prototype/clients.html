@@ -353,7 +353,7 @@
               <div class="notif-item unread">
                 <div class="notif-icon"><svg data-lucide="building-2" width="16" height="16" style="color: var(--color-info);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">New client onboarded: Contoso Inc added to your portfolio</div>
+                  <div class="notif-title">New client onboarded: Umbrella Corp added to your portfolio</div>
                   <div class="notif-time">30 minutes ago</div>
                 </div>
               </div>
@@ -377,7 +377,7 @@
 
         <div class="relative">
           <div class="header-user" id="userMenuBtn">
-            <div class="avatar avatar-sm">SC</div>
+            <div class="avatar avatar-sm avatar-status online">SC</div>
             <div>
               <div class="user-name">Sarah Chen</div>
               <div class="user-role">Admin</div>
@@ -404,17 +404,16 @@
       <div class="view" id="listView">
         <div class="populated-content">
           <!-- Breadcrumb -->
-          <nav class="breadcrumbs mb-4">
+          <nav class="breadcrumb mb-4">
             <a href="index.html">Home</a>
-            <span class="separator">&rsaquo;</span>
-            <span class="current">Clients</span>
+            <span style="color:var(--color-text-2);margin:0 var(--space-2);">/</span>
+            <span style="color:var(--color-text-1);">Clients</span>
           </nav>
 
           <!-- Page header -->
           <div class="page-header">
             <div class="page-header-left">
               <h1 class="page-title">Clients</h1>
-              <p class="page-subtitle">Manage your client relationships and projects</p>
             </div>
             <div class="page-header-actions">
               <button class="btn btn-secondary btn-md" id="exportBtn">
@@ -480,7 +479,7 @@
               <div class="client-info">
                 <div class="client-name">Acme Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 5 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 3 projects</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 12 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Jane Doe (jane@acme.com)</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Jan 2024</span>
@@ -491,10 +490,7 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;95,900</span>
                 <div class="client-revenue-label">YTD Revenue</div>
-                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
-                  <polyline points="0,18 10,14 20,12 30,10 40,7 50,5 60,3" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                </svg>
-                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">&#9650; +18% vs last year</div>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">&#9650; +18% YoY</div>
               </div>
             </div>
 
@@ -504,7 +500,7 @@
               <div class="client-info">
                 <div class="client-name">Globex Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 projects</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 6 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Bob Smith</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since May 2025</span>
@@ -515,10 +511,7 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;89,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
-                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
-                  <polyline points="0,16 10,14 20,10 30,8 40,6 50,4 60,2" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                </svg>
-                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">&#9650; +24% vs last year</div>
+                <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:2px;">&#9650; +24% YoY</div>
               </div>
             </div>
 
@@ -528,7 +521,7 @@
               <div class="client-info">
                 <div class="client-name">Initech</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 active project</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 3 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Bill Lumbergh</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Sep 2025</span>
@@ -539,30 +532,7 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;42,000</span>
                 <div class="client-revenue-label">YTD Revenue</div>
-                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
-                  <polyline points="0,18 10,16 20,14 30,10 40,8 50,6 60,6" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                </svg>
                 <div style="font-size:var(--text-caption);color:var(--color-info);margin-top:2px;">New client</div>
-              </div>
-            </div>
-
-            <!-- Contoso Inc -->
-            <div class="client-card card-interactive" data-client="contoso">
-              <div class="client-logo" style="background: var(--color-primary);">CO</div>
-              <div class="client-info">
-                <div class="client-name">Contoso Inc</div>
-                <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project (planning)</span>
-                  <span class="client-meta-item"><svg data-lucide="users"></svg> 2 team members</span>
-                  <span class="client-meta-item"><svg data-lucide="user"></svg> Michael Scott</span>
-                  <span class="badge badge-info"><svg data-lucide="sparkles" width="12" height="12"></svg> New</span>
-                  <a href="portal/index.html" target="_blank" class="badge badge-default" onclick="event.stopPropagation()" style="text-decoration:none;"><svg data-lucide="external-link" width="10" height="10"></svg> Portal</a>
-                </div>
-              </div>
-              <div class="client-revenue" data-sensitive="financials">
-                <span class="font-mono">&euro;0</span>
-                <div class="client-revenue-label">YTD Revenue</div>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Planning phase</div>
               </div>
             </div>
 
@@ -572,7 +542,7 @@
               <div class="client-info">
                 <div class="client-name">Umbrella Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 4 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Albert Wesker</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Mar 2026</span>
@@ -583,35 +553,10 @@
               <div class="client-revenue" data-sensitive="financials">
                 <span class="font-mono">&euro;47,880</span>
                 <div class="client-revenue-label">YTD Revenue</div>
-                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
-                  <polyline points="0,18 10,16 20,12 30,10 40,8 50,6 60,4" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                </svg>
                 <div style="font-size:var(--text-caption);color:var(--color-info);margin-top:2px;">New client</div>
               </div>
             </div>
 
-            <!-- Stark Industries -->
-            <div class="client-card card-interactive" data-client="stark">
-              <div class="client-logo" style="background: var(--color-surface-3);">SI</div>
-              <div class="client-info">
-                <div class="client-name">Stark Industries</div>
-                <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 0 active projects</span>
-                  <span class="client-meta-item"><svg data-lucide="users"></svg> 0 team members</span>
-                  <span class="client-meta-item"><svg data-lucide="user"></svg> Pepper Potts</span>
-                  <span class="client-meta-item"><svg data-lucide="calendar"></svg> Last project: Dec 2025</span>
-                  <span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Inactive</span>
-                </div>
-              </div>
-              <div class="client-revenue" data-sensitive="financials">
-                <span class="font-mono">&euro;67,000</span>
-                <div class="client-revenue-label">YTD Revenue</div>
-                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
-                  <polyline points="0,4 10,6 20,8 30,10 40,14 50,16 60,18" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-                </svg>
-                <div style="font-size:var(--text-caption);color:var(--color-error);margin-top:2px;">&#9660; &minus;100% (inactive)</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -630,10 +575,10 @@
 
       <!-- ═══════ DETAIL VIEW ═══════ -->
       <div class="view" id="detailView">
-        <nav class="breadcrumbs mb-4">
+        <nav class="breadcrumb mb-4">
           <a href="clients.html">Clients</a>
-          <span class="separator">›</span>
-          <span class="current">Acme Corp</span>
+          <span style="color:var(--color-text-2);margin:0 var(--space-2);">/</span>
+          <span style="color:var(--color-text-1);">Acme Corp</span>
         </nav>
         <button class="back-btn" id="backToList">
           <svg data-lucide="arrow-left"></svg>
@@ -774,33 +719,21 @@
                   <div class="stat-label">Total Revenue</div>
                   <div class="stat-value font-mono" id="detail-total-revenue">&euro;95,900</div>
                   <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +18% vs last year</div>
-                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                    <polyline points="0,18 10,14 20,12 30,10 40,7 50,5 60,3" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                  </svg>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Active Projects</div>
                   <div class="stat-value">3</div>
                   <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> 1 new this quarter</div>
-                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                    <polyline points="0,18 10,18 20,14 30,14 40,10 50,10 60,10" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                  </svg>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Team Members</div>
                   <div class="stat-value">12</div>
                   <div class="stat-trend" style="color:var(--color-text-3);">Across all projects</div>
-                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                    <polyline points="0,16 10,16 20,12 30,12 40,10 50,8 60,8" fill="none" stroke="var(--color-info)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                  </svg>
                 </div>
                 <div class="stat-card">
                   <div class="stat-label">Avg Project Health</div>
                   <div class="stat-value" style="font-size: var(--text-heading-2);">On Track</div>
                   <div class="stat-trend up"><svg data-lucide="check-circle" width="14" height="14"></svg> All projects healthy</div>
-                  <svg viewBox="0 0 60 20" style="width:100%;height:20px;margin-top:var(--space-2);">
-                    <polyline points="0,10 10,10 20,8 30,8 40,6 50,6 60,6" fill="none" stroke="var(--color-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-                  </svg>
                 </div>
               </div>
 
@@ -918,8 +851,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <table class="data-table mobile-cards">
                   <thead>
                     <tr>
-                      <th>Project Name</th>
-                      <th>Status</th>
+                      <th>Project</th>
                       <th>Revenue</th>
                       <th>Budget Used</th>
                       <th>Margin</th>
@@ -928,53 +860,33 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><a href="projects.html#detail/acme-web">Web Redesign</a></td>
-                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
+                      <td><a href="projects.html#detail/acme-web">Acme Web Redesign</a></td>
                       <td data-label="Revenue" class="font-mono">&euro;32,200</td>
                       <td data-label="Budget Used" class="font-mono">64%</td>
                       <td data-label="Margin" class="font-mono">48%</td>
                       <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
-                      <td><a href="projects.html#detail/acme-mobile">Mobile App</a></td>
-                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;18,500</td>
-                      <td data-label="Budget Used" class="font-mono">45%</td>
-                      <td data-label="Margin" class="font-mono">42%</td>
+                      <td><a href="projects.html#detail/acme-mobile">Acme Analytics Dashboard</a></td>
+                      <td data-label="Revenue" class="font-mono">&euro;14,250</td>
+                      <td data-label="Budget Used" class="font-mono">15%</td>
+                      <td data-label="Margin" class="font-mono">51%</td>
                       <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
-                      <td><a href="projects.html">CRM Integration</a></td>
-                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;24,800</td>
-                      <td data-label="Budget Used" class="font-mono">72%</td>
-                      <td data-label="Margin" class="font-mono">38%</td>
-                      <td data-label="Health"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
-                    </tr>
-                    <tr>
-                      <td><a href="projects.html">Brand Guidelines</a></td>
-                      <td data-label="Status"><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;8,400</td>
+                      <td><a href="projects.html#detail/acme-crm">Acme CRM Setup</a> <span class="badge badge-default" style="font-size:var(--text-overline);">Completed</span></td>
+                      <td data-label="Revenue" class="font-mono">&euro;45,000</td>
                       <td data-label="Budget Used" class="font-mono">100%</td>
-                      <td data-label="Margin" class="font-mono">52%</td>
-                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
-                    </tr>
-                    <tr>
-                      <td><a href="projects.html">Security Audit</a></td>
-                      <td data-label="Status"><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;12,000</td>
-                      <td data-label="Budget Used" class="font-mono">100%</td>
-                      <td data-label="Margin" class="font-mono">55%</td>
+                      <td data-label="Margin" class="font-mono">46%</td>
                       <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
                       <td><strong>TOTAL</strong></td>
-                      <td data-label="Status"></td>
-                      <td data-label="Revenue" class="font-mono"><strong>&euro;95,900</strong></td>
+                      <td data-label="Revenue" class="font-mono"><strong>&euro;91,450</strong></td>
                       <td data-label="Budget Used"></td>
-                      <td data-label="Margin" class="font-mono"><strong>45%</strong></td>
+                      <td data-label="Margin" class="font-mono"><strong>48%</strong></td>
                       <td data-label="Health"></td>
                     </tr>
                   </tfoot>
@@ -994,8 +906,7 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                 <table class="data-table mobile-cards">
                   <thead>
                     <tr>
-                      <th>Project Name</th>
-                      <th>Status</th>
+                      <th>Project</th>
                       <th>Revenue</th>
                       <th>Budget Used</th>
                       <th>Margin</th>
@@ -1004,37 +915,26 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><a href="projects.html#detail/globex-phase2">Phase 2</a></td>
-                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;22,400</td>
+                      <td><a href="projects.html#detail/globex-phase2">Globex ERP Integration</a></td>
+                      <td data-label="Revenue" class="font-mono">&euro;63,000</td>
                       <td data-label="Budget Used" class="font-mono">35%</td>
-                      <td data-label="Margin" class="font-mono">44%</td>
+                      <td data-label="Margin" class="font-mono">52%</td>
                       <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
                     </tr>
                     <tr>
-                      <td><a href="projects.html">DataViz Dashboard</a></td>
-                      <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;8,600</td>
-                      <td data-label="Budget Used" class="font-mono">18%</td>
-                      <td data-label="Margin" class="font-mono">46%</td>
-                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On Track</span></td>
-                    </tr>
-                    <tr>
-                      <td><a href="projects.html">Data Migration</a></td>
-                      <td data-label="Status"><span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Completed</span></td>
-                      <td data-label="Revenue" class="font-mono">&euro;120,000</td>
-                      <td data-label="Budget Used" class="font-mono">100%</td>
-                      <td data-label="Margin" class="font-mono">38%</td>
-                      <td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle-2" width="12" height="12"></svg> Complete</span></td>
+                      <td><a href="projects.html#detail/globex-migration">Globex Cloud Migration</a></td>
+                      <td data-label="Revenue" class="font-mono">&euro;104,400</td>
+                      <td data-label="Budget Used" class="font-mono">58%</td>
+                      <td data-label="Margin" class="font-mono">41%</td>
+                      <td data-label="Health"><span class="badge badge-warning"><svg data-lucide="alert-triangle" width="12" height="12"></svg> At Risk</span></td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr style="font-weight:var(--weight-bold);border-top:2px solid var(--color-border);">
                       <td><strong>TOTAL</strong></td>
-                      <td data-label="Status"></td>
-                      <td data-label="Revenue" class="font-mono"><strong>&euro;151,000</strong></td>
+                      <td data-label="Revenue" class="font-mono"><strong>&euro;167,400</strong></td>
                       <td data-label="Budget Used"></td>
-                      <td data-label="Margin" class="font-mono"><strong>40%</strong></td>
+                      <td data-label="Margin" class="font-mono"><strong>47%</strong></td>
                       <td data-label="Health"></td>
                     </tr>
                   </tfoot>
@@ -1892,6 +1792,18 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
     // Reset all cards to visible
     document.querySelectorAll('#clientList .client-card').forEach(function(c) { c.style.display = ''; });
   };
+
+  // ── Triple-dot action menus on client cards ──
+  document.querySelectorAll('.project-actions-btn, [data-menu], .more-btn, button[aria-label*="more"], button[aria-label*="action"]').forEach(function(btn) {
+    if (!btn.onclick && !btn.dataset.bound) {
+      btn.dataset.bound = '1';
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        var menu = btn.nextElementSibling || btn.parentElement.querySelector('.dropdown-menu, .action-menu');
+        if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      };
+    }
+  });
 
 })();
 </script>

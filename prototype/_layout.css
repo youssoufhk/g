@@ -191,7 +191,7 @@
 }
 
 .header-icon-btn {
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
   background: transparent;
   border: none;
@@ -254,6 +254,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
   flex-wrap: wrap;
   gap: var(--space-3);
 }
@@ -318,6 +319,13 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
+}
+/* Auto-fit KPI strip — collapses gracefully from 4 to 2 to 1 col without media query */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
 /* Flex helpers */
@@ -614,6 +622,11 @@ body.dev-mode .state-toggle { display: flex; }
 .bottom-nav-item.active {
   color: var(--color-primary);
 }
+/* WCAG 1.4.1: non-color visual indicator for active nav item */
+.bottom-nav-item.active {
+  font-weight: var(--weight-semibold);
+  border-top: 2px solid var(--color-primary);
+}
 .bottom-nav-item .bnav-badge {
   position: absolute;
   top: 4px;
@@ -644,6 +657,7 @@ body.dev-mode .state-toggle { display: flex; }
   .mobile-menu-btn { min-width: 44px; min-height: 44px; }
   .modal-close { min-width: 44px; min-height: 44px; }
   .pagination-btn { min-width: 44px; min-height: 44px; }
+  .pagination-buttons button { min-width: 44px; min-height: 44px; }
   .tab { min-height: 44px; }
   .toggle { min-height: 44px; min-width: 52px; }
   .dropdown-item { min-height: 44px; }
@@ -802,6 +816,7 @@ body.dev-mode .state-toggle { display: flex; }
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
+    overflow-x: auto;
   }
 }
 

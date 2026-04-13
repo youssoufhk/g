@@ -820,7 +820,7 @@ GHR.notificationItems = [
   { icon: 'clock',       color: 'var(--color-primary)', title: 'Sarah Chen submitted 40h timesheet for review',             time: '10 min ago',  unread: true,  href: 'timesheets.html' },
   { icon: 'check-circle',color: 'var(--color-success)', title: 'Expense report #1847 approved by Finance',                  time: '25 min ago',  unread: true,  href: 'expenses.html' },
   { icon: 'calendar',    color: 'var(--color-info)',     title: 'Marco Rossi requested annual leave (Jun 15-22)',            time: '1 hour ago',  unread: true,  href: 'leaves.html' },
-  { icon: 'alert-circle',color: 'var(--color-warning)',  title: 'Invoice INV-2026-046 overdue — Contoso (EUR 8,750)',     time: '2 hours ago', unread: false, href: 'invoices.html', minRole: 'pm' },
+  { icon: 'alert-circle',color: 'var(--color-warning)',  title: 'Invoice INV-2026-046 overdue — Umbrella Corp (EUR 8,750)', time: '2 hours ago', unread: false, href: 'invoices.html', minRole: 'pm' },
   { icon: 'users',       color: 'var(--color-primary)',  title: 'New hire onboarding: Yuki Tanaka starts Monday',           time: '3 hours ago', unread: false, href: 'hr.html', minRole: 'pm' },
   { icon: 'trending-up', color: 'var(--color-success)',  title: 'Monthly Insights report is ready to view',                 time: '5 hours ago', unread: false, href: 'insights.html' }
 ];
@@ -1226,6 +1226,37 @@ GHR.initExpenseAutoFill = function() {
 };
 
 
+/* ── O. DRAWER MANAGEMENT ────────────────────────────────── */
+
+/* Open a drawer by id. Optionally pass data; if GHR._populateDrawer exists
+   it will be called with the drawer element and data before opening. */
+GHR.openDrawer = function(drawerId, data) {
+  var drawer = document.getElementById(drawerId);
+  if (!drawer) return;
+  if (data && typeof GHR._populateDrawer === 'function') {
+    GHR._populateDrawer(drawer, data);
+  }
+  drawer.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+};
+
+/* Close a single drawer by id. */
+GHR.closeDrawer = function(drawerId) {
+  var drawer = document.getElementById(drawerId);
+  if (!drawer) return;
+  drawer.classList.remove('is-open');
+  document.body.style.overflow = '';
+};
+
+/* Close all open drawers. */
+GHR.closeAllDrawers = function() {
+  document.querySelectorAll('.drawer.is-open').forEach(function(d) {
+    d.classList.remove('is-open');
+  });
+  document.body.style.overflow = '';
+};
+
+
 /* ── AUTO-INIT ────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   GHR.renderSidebar();
@@ -1239,5 +1270,22 @@ document.addEventListener('DOMContentLoaded', function() {
   GHR.initAiAlertsCollapse();
   GHR.initInviteModalDefaults();
   GHR.initExpenseAutoFill();
-  // GHR.initSkeletons();  — opt-in per page
+  // GHR.initSkeletons();  - opt-in per page
+
+  /* Drawer event listeners - guarded against double-registration */
+  if (!window._ghrDrawerListenersRegistered) {
+    window._ghrDrawerListenersRegistered = true;
+
+    /* Escape key closes any open drawer */
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') GHR.closeAllDrawers();
+    });
+
+    /* Backdrop click closes the drawer */
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList && e.target.classList.contains('drawer-backdrop')) {
+        GHR.closeAllDrawers();
+      }
+    });
+  }
 });

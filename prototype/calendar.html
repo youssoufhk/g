@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar — GammaHR Quantum</title>
+  <title>Calendar - GammaHR Quantum</title>
   <link rel="stylesheet" href="_tokens.css">
   <link rel="stylesheet" href="_components.css">
   <link rel="stylesheet" href="_layout.css">
@@ -544,7 +544,7 @@
     }
   </style>
 </head>
-<body>
+<body class="show-populated">
 <a href="#main-content" class="skip-to-content">Skip to content</a>
 
 <div class="app">
@@ -588,7 +588,7 @@
               <div class="notif-item unread">
                 <div class="notif-icon"><svg data-lucide="calendar" width="16" height="16" style="color: var(--color-primary);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">Emma Laurent's annual leave (Apr 14-18) starts next week</div>
+                  <div class="notif-title">Alice Wang's annual leave (Apr 14-18) starts next week</div>
                   <div class="notif-time">2 hours ago</div>
                 </div>
               </div>
@@ -602,7 +602,7 @@
               <div class="notif-item">
                 <div class="notif-icon"><svg data-lucide="star" width="16" height="16" style="color: var(--color-gold);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">Easter Monday (Apr 1) — Company holiday</div>
+                  <div class="notif-title">Easter Monday (Apr 1) - Company holiday</div>
                   <div class="notif-time">Mar 28, 2026</div>
                 </div>
               </div>
@@ -648,12 +648,12 @@
           <p class="page-subtitle">Company-wide schedule and events</p>
         </div>
         <div class="page-header-actions">
-          <div class="cal-view-toggle" id="viewToggle">
-            <button data-view="day"><span class="view-label">Day</span></button>
-            <button class="active" data-view="month"><span class="view-label">Month</span></button>
-            <button data-view="week"><span class="view-label">Week</span></button>
-            <button data-view="quarter"><span class="view-label">Quarter</span></button>
-            <button data-view="year"><span class="view-label">Year</span></button>
+          <div class="seg-control" id="viewToggle" role="group" aria-label="Calendar view">
+            <button class="seg-control-btn" data-view="day">Day</button>
+            <button class="seg-control-btn active" data-view="month">Month</button>
+            <button class="seg-control-btn" data-view="week">Week</button>
+            <button class="seg-control-btn" data-view="quarter">Quarter</button>
+            <button class="seg-control-btn" data-view="year">Year</button>
           </div>
           <button class="btn btn-secondary btn-md" onclick="document.getElementById('addEventModal').classList.add('active');document.getElementById('newEventType').value='leave';lucide.createIcons();">
             <svg data-lucide="palm-tree" width="16" height="16"></svg>
@@ -902,10 +902,12 @@
         <label class="form-label">Type</label>
         <select class="form-select" id="newEventType">
           <option value="meeting">Meeting</option>
+          <option value="project-time">Project Time</option>
           <option value="leave">Leave</option>
           <option value="holiday">Holiday</option>
           <option value="deadline">Deadline</option>
           <option value="milestone">Milestone</option>
+          <option value="other">Other</option>
         </select>
       </div>
       <div class="form-group mb-0">
@@ -1085,16 +1087,35 @@ document.addEventListener('DOMContentLoaded', function() {
   const DAY_NAMES   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+  // ── Person Lookup (for data-hovercard links in day detail panel) ──
+  const personData = {
+    'Alice Wang':     { slug: 'alice-wang',     role: 'Software Engineer',  dept: 'Engineering', worktime: '45'  },
+    'David Park':     { slug: 'david-park',     role: 'Finance Lead',       dept: 'Finance',     worktime: '85'  },
+    'Bob Taylor':     { slug: 'bob-taylor',     role: 'Backend Developer',  dept: 'Engineering', worktime: '0'   },
+    'Marco Rossi':    { slug: 'marco-rossi',    role: 'Operations Lead',    dept: 'Operations',  worktime: '108' },
+    'Sarah Chen':     { slug: 'sarah-chen',     role: 'Project Manager',    dept: 'Engineering', worktime: '100' },
+    'Emma Laurent':   { slug: 'emma-laurent',   role: 'HR Specialist',      dept: 'HR',          worktime: '90'  },
+    'Carol Williams': { slug: 'carol-williams', role: 'Design Lead',        dept: 'Design',      worktime: '100' },
+    'John Smith':     { slug: 'john-smith',     role: 'Senior Developer',   dept: 'Engineering', worktime: '113' },
+    "Liam O'Brien":   { slug: 'liam-obrien',    role: 'DevOps Engineer',    dept: 'Engineering', worktime: '80'  }
+  };
+
+  function personLink(name) {
+    var pd = personData[name];
+    if (!pd) return name;
+    return '<a href="employees.html#' + pd.slug + '" data-hovercard data-name="' + name +
+      '" data-role="' + pd.role + '" data-dept="' + pd.dept + '" data-worktime="' + pd.worktime + '">' + name + '</a>';
+  }
+
   // ── Events Data ──
   const events = [
     { id: 1,  type: 'holiday',   title: 'Easter Monday',                      person: null,           start: '2026-04-01', end: '2026-04-01', desc: 'Public holiday' },
-    { id: 2,  type: 'leave',     title: 'Annual Leave',                       person: 'Emma Laurent', start: '2026-04-14', end: '2026-04-18', desc: 'Annual Leave', initials: 'EL' },
     { id: 3,  type: 'milestone', title: 'End of Probation',                   person: 'David Park',   start: '2026-04-10', end: '2026-04-10', desc: 'Probation review complete', initials: 'DP' },
     { id: 4,  type: 'leave',     title: 'Annual Leave',                       person: 'Alice Wang',   start: '2026-04-14', end: '2026-04-18', desc: 'Annual Leave (approved)', initials: 'AW' },
     { id: 9,  type: 'leave',     title: 'Sick Leave',                         person: "Liam O'Brien", start: '2026-04-06', end: '2026-04-07', desc: 'Sick Leave (approved)', initials: 'LO' },
-    { id: 5,  type: 'deadline',  title: 'Sprint 3 Deadline',                  person: 'Acme Web Redesign', start: '2026-04-15', end: '2026-04-15', desc: 'Acme Web Redesign — Sprint 3 Deadline' },
+    { id: 5,  type: 'deadline',  title: 'Sprint 3 Deadline',                  person: 'Acme Web Redesign', start: '2026-04-15', end: '2026-04-15', desc: 'Acme Web Redesign - Sprint 3 Deadline' },
     { id: 6,  type: 'leave',     title: 'Personal Leave',                     person: 'Bob Taylor',   start: '2026-04-21', end: '2026-04-25', desc: 'Personal Leave', initials: 'BT' },
-    { id: 7,  type: 'milestone', title: 'Milestone: API Complete',            person: 'Globex Phase 2', start: '2026-04-22', end: '2026-04-22', desc: 'Globex Phase 2 — API Complete' },
+    { id: 7,  type: 'milestone', title: 'Milestone: API Complete',            person: 'Globex Phase 2', start: '2026-04-22', end: '2026-04-22', desc: 'Globex Phase 2 - API Complete' },
     { id: 8,  type: 'leave',     title: 'Sick Leave',                         person: 'Alice Wang',   start: '2026-04-28', end: '2026-04-29', desc: 'Sick Leave (2 days)', initials: 'AW' },
   ];
 
@@ -1215,7 +1236,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var ev = dayEvents[i];
         var badge = document.createElement('div');
         badge.className = 'cal-event ' + ev.type;
-        badge.textContent = ev.person ? ev.person.split(' ')[0] + ' — ' + ev.title : ev.title;
+        badge.textContent = ev.person ? ev.person.split(' ')[0] + ' - ' + ev.title : ev.title;
         badge.title = ev.person ? ev.person + ': ' + ev.title : ev.title;
         cell.appendChild(badge);
 
@@ -1306,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', function() {
       eventEl.innerHTML =
         '<div class="ddp-icon ' + ev.type + '"><svg data-lucide="' + iconForType(ev.type) + '"></svg></div>' +
         '<div class="ddp-info">' +
-          (ev.person ? '<div class="ddp-name">' + ev.person + statusDot + '</div>' : '') +
+          (ev.person ? '<div class="ddp-name">' + personLink(ev.person) + statusDot + '</div>' : '') +
           '<div class="ddp-desc">' + ev.desc + '</div>' +
           '<div class="ddp-duration">' + dateRange + ' (' + durationText + ')</div>' +
         '</div>';

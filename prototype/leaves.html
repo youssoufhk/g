@@ -41,9 +41,9 @@
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
     .balance-card.type-annual::before  { background: var(--color-info); }
-    .balance-card.type-sick::before    { background: var(--color-chart-5); }
+    .balance-card.type-sick::before    { background: var(--color-warning); }
     .balance-card.type-personal::before { background: var(--color-accent); }
-    .balance-card.type-wfh::before     { background: var(--color-wfh); }
+    .balance-card.type-wfh::before     { background: var(--color-success); }
 
     .balance-card-header {
       display: flex;
@@ -61,9 +61,9 @@
     }
     .balance-card-type svg { width: 18px; height: 18px; }
     .type-annual .balance-card-type svg  { color: var(--color-info); }
-    .type-sick .balance-card-type svg    { color: var(--color-chart-5); }
+    .type-sick .balance-card-type svg    { color: var(--color-warning); }
     .type-personal .balance-card-type svg { color: var(--color-accent); }
-    .type-wfh .balance-card-type svg     { color: var(--color-wfh); }
+    .type-wfh .balance-card-type svg     { color: var(--color-success); }
 
     .balance-remaining {
       font-size: var(--text-display-lg);
@@ -107,9 +107,9 @@
       transition: width var(--motion-slow) var(--ease-out);
     }
     .type-annual .balance-bar-fill  { background: var(--color-info); }
-    .type-sick .balance-bar-fill    { background: var(--color-chart-5); }
+    .type-sick .balance-bar-fill    { background: var(--color-warning); }
     .type-personal .balance-bar-fill { background: var(--color-accent); }
-    .type-wfh .balance-bar-fill     { background: var(--color-wfh); }
+    .type-wfh .balance-bar-fill     { background: var(--color-success); }
 
     /* Filter bar — uses canonical .filter-bar-standard from _layout.css */
 
@@ -145,9 +145,9 @@
     }
     .leave-request-icon svg { width: 20px; height: 20px; }
     .leave-request-icon.annual  { background: var(--color-info-muted); color: var(--color-info); }
-    .leave-request-icon.sick    { background: var(--color-chart-5-muted); color: var(--color-chart-5); }
+    .leave-request-icon.sick    { background: var(--color-warning-muted); color: var(--color-warning); }
     .leave-request-icon.personal { background: var(--color-accent-muted); color: var(--color-accent); }
-    .leave-request-icon.wfh     { background: var(--color-wfh-muted); color: var(--color-wfh); }
+    .leave-request-icon.wfh     { background: var(--color-success-muted); color: var(--color-success); }
 
     .leave-request-body { flex: 1; min-width: 0; }
     .leave-request-top {
@@ -224,9 +224,9 @@
       min-width: 0;
     }
     .heatmap-cell.annual  { background: var(--color-info); }
-    .heatmap-cell.sick    { background: var(--color-chart-5); }
+    .heatmap-cell.sick    { background: var(--color-warning); }
     .heatmap-cell.personal { background: var(--color-accent); }
-    .heatmap-cell.wfh     { background: var(--color-wfh); }
+    .heatmap-cell.wfh     { background: var(--color-success); }
     .heatmap-cell.empty   { background: transparent; }
 
     .heatmap-legend {
@@ -248,9 +248,9 @@
       border-radius: var(--radius-sm);
     }
     .heatmap-legend-dot.annual  { background: var(--color-info); }
-    .heatmap-legend-dot.sick    { background: var(--color-chart-5); }
+    .heatmap-legend-dot.sick    { background: var(--color-warning); }
     .heatmap-legend-dot.personal { background: var(--color-accent); }
-    .heatmap-legend-dot.wfh     { background: var(--color-wfh); }
+    .heatmap-legend-dot.wfh     { background: var(--color-success); }
 
     /* Heatmap mobile responsiveness */
     .heatmap-mobile-summary { display: none; }
@@ -291,9 +291,9 @@
         font-weight: var(--weight-medium);
       }
       .heatmap-mobile-pill.annual  { background: var(--color-info-muted); color: var(--color-info); }
-      .heatmap-mobile-pill.sick    { background: var(--color-chart-5-muted); color: var(--color-chart-5); }
+      .heatmap-mobile-pill.sick    { background: var(--color-warning-muted); color: var(--color-warning); }
       .heatmap-mobile-pill.personal { background: var(--color-accent-muted); color: var(--color-accent); }
-      .heatmap-mobile-pill.wfh     { background: var(--color-wfh-muted); color: var(--color-wfh); }
+      .heatmap-mobile-pill.wfh     { background: var(--color-success-muted); color: var(--color-success); }
     }
 
     /* Worked-days summary row */
@@ -450,9 +450,9 @@
       line-height: 1.6;
     }
     .calendar-event.annual  { background: var(--color-info-muted); color: var(--color-info); }
-    .calendar-event.sick    { background: var(--color-chart-5-muted); color: var(--color-chart-5); }
+    .calendar-event.sick    { background: var(--color-warning-muted); color: var(--color-warning); }
     .calendar-event.personal { background: var(--color-accent-muted); color: var(--color-accent); }
-    .calendar-event.wfh     { background: var(--color-wfh-muted); color: var(--color-wfh); }
+    .calendar-event.wfh     { background: var(--color-success-muted); color: var(--color-success); }
     .calendar-event.pending {
       border: 1px dashed currentColor;
       background: transparent;
@@ -552,6 +552,27 @@
     .saved-views-menu.active { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; }
     .saved-view-item { padding: var(--space-2) var(--space-3); font-size: var(--text-body-sm); color: var(--color-text-1); cursor: pointer; }
     .saved-view-item:hover { background: var(--color-surface-2); }
+
+    /* ── Quarter view grid mobile fix ── */
+    @media (max-width: 480px) {
+      .quarter-grid, [class*="quarter"], #leaveCalQuarter > div:first-child {
+        grid-template-columns: repeat(1, 1fr) !important;
+      }
+    }
+
+    /* ── Leave balance chips in modal: flex-wrap to prevent overflow ── */
+    #modalBalanceSummary {
+      flex-wrap: wrap !important;
+    }
+    #modalBalAnnual, #modalBalSick, #modalBalPersonal, #modalBalWfh {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+    }
+    @media (max-width: 400px) {
+      #modalBalAnnual, #modalBalSick, #modalBalPersonal, #modalBalWfh {
+        flex: 1 1 calc(50% - var(--space-3)) !important;
+      }
+    }
   </style>
 </head>
 <body class="show-populated">
@@ -625,7 +646,6 @@
             <span style="color:var(--color-text-2);">Leaves</span>
           </nav>
           <h1 class="page-title">Leaves</h1>
-          <p class="page-subtitle">Manage leave requests, balances, and team availability</p>
         </div>
         <div class="page-header-actions">
           <div style="position:relative;display:inline-block;">
@@ -653,58 +673,24 @@
         </div>
       </div>
 
-      <!-- Stat Cards -->
-      <div class="leave-stats-grid grid-4 perspective-container stagger-reveal" style="margin-bottom:var(--space-4);">
-        <!-- Team Absences This Month -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Team Absences This Month</div>
-          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">8 <span style="font-size:var(--text-body-sm);font-weight:var(--weight-regular);color:var(--color-text-3);">days</span></div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
-            <svg data-lucide="trending-down" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
+      <!-- KPI Strip (2 cards: Team Absences + Upcoming) -->
+      <div class="grid-2" style="margin-bottom:var(--space-4);">
+        <div class="stat-card card-interactive">
+          <div class="stat-label">Team Absences This Month</div>
+          <div class="stat-value font-mono">8 <span style="font-size:var(--text-body-sm);font-weight:var(--weight-regular);color:var(--color-text-3);">days</span></div>
+          <div class="stat-trend" style="color:var(--color-success);">
+            <svg data-lucide="trending-down" width="14" height="14"></svg>
             -3 days vs last month
           </div>
         </div>
-        <!-- Approval Rate -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Approval Rate</div>
-          <div style="display:flex;align-items:flex-end;gap:var(--space-3);">
-            <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">94%</div>
-            <svg width="80" height="28" viewBox="0 0 80 28" style="margin-bottom:2px;" data-animate="draw-line">
-              <polyline points="0,20 12,18 24,22 36,14 48,12 60,10 72,8 80,6" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <polyline points="0,20 12,18 24,22 36,14 48,12 60,10 72,8 80,6 80,28 0,28" fill="url(#leaveSparkFill)" stroke="none"/>
-              <defs><linearGradient id="leaveSparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--color-success)" stop-opacity="0.15"/><stop offset="100%" stop-color="var(--color-success)" stop-opacity="0"/></linearGradient></defs>
-            </svg>
-          </div>
-          <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-2);">
-            <svg data-lucide="check-circle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;color:var(--color-success);"></svg>
-            Consistent over 6 months
-          </div>
-        </div>
-        <!-- Upcoming -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Upcoming (Next 2 Weeks)</div>
-          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">3</div>
-          <div style="display:flex;gap:var(--space-1);margin-top:var(--space-2);">
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--color-info);display:inline-block;" title="Alice Wang - Apr 14-18"></span>
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent);display:inline-block;" title="Bob Taylor - Apr 21-25"></span>
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent);display:inline-block;" title="Yuki Tanaka - Apr 10"></span>
-          </div>
-          <div style="font-size:var(--text-caption);color:var(--color-text-2);margin-top:var(--space-1);">Alice, Bob, Yuki</div>
-        </div>
-        <!-- Avg Response Time -->
-        <div class="card-3d card-interactive" data-animate="fade-up" style="background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);">
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-medium);color:var(--color-text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:var(--space-2);">Avg Response Time</div>
-          <div style="font-family:var(--font-mono);font-size:var(--text-display-lg);font-weight:var(--weight-bold);color:var(--color-text-1);line-height:1;">4h</div>
-          <div style="font-size:var(--text-caption);color:var(--color-success);margin-top:var(--space-2);">
-            <svg data-lucide="trending-down" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
-            -2h vs last month (faster)
+        <div class="stat-card card-interactive">
+          <div class="stat-label">Upcoming (Next 2 Weeks)</div>
+          <div class="stat-value font-mono">3</div>
+          <div class="stat-trend" style="color:var(--color-text-2);">
+            Alice Wang, Bob Taylor, Yuki Tanaka
           </div>
         </div>
       </div>
-      <style>
-        @media (max-width: 1023px) { .leave-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-        @media (max-width: 639px) { .leave-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-      </style>
 
       <!-- Tabs -->
       <div class="tabs mb-6">
@@ -753,9 +739,11 @@
                 <svg data-lucide="alert-triangle" width="12" height="12" style="display:inline;vertical-align:-1px;margin-right:2px;"></svg>
                 8 days expire on Dec 31, 2026
               </div>
-              <!-- Year-over-year comparison -->
-              <div style="margin-top:var(--space-1);font-size:var(--text-caption);color:var(--color-text-3);">
-                Last year at this point: 10 used
+              <!-- Year N/N-1/N-2 breakdown -->
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);display:flex;flex-direction:column;gap:2px;">
+                <span>2026: 5/25 used</span>
+                <span>2025: 3 days carried over</span>
+                <span>2024: 0 days carried over</span>
               </div>
             </div>
 
@@ -777,8 +765,10 @@
               <div class="balance-bar">
                 <div class="balance-bar-fill" style="width: 83%; background: var(--color-success);"></div>
               </div>
-              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
-                Last year at this point: 4 used
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);display:flex;flex-direction:column;gap:2px;">
+                <span>2026: 2/12 used</span>
+                <span>2025: 0 days carried over</span>
+                <span>2024: 1 day carried over</span>
               </div>
             </div>
 
@@ -800,8 +790,10 @@
               <div class="balance-bar">
                 <div class="balance-bar-fill" style="width: 100%; background: var(--color-success);"></div>
               </div>
-              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
-                Last year at this point: 1 used
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);display:flex;flex-direction:column;gap:2px;">
+                <span>2026: 0/3 used</span>
+                <span>2025: 1 day carried over</span>
+                <span>2024: 0 days carried over</span>
               </div>
             </div>
 
@@ -823,20 +815,25 @@
               <div class="balance-bar">
                 <div class="balance-bar-fill" style="width: 100%; background: var(--color-success);"></div>
               </div>
-              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);">
-                Last year at this point: 2 used
+              <div style="margin-top:var(--space-2);font-size:var(--text-caption);color:var(--color-text-3);display:flex;flex-direction:column;gap:2px;">
+                <span>2026: 0/5 used</span>
+                <span>2025: 0 days carried over</span>
+                <span>2024: 0 days carried over</span>
               </div>
             </div>
           </div>
 
-          <!-- Smart suggestion nudge card (issue 24) -->
-          <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-info-muted);border:1px solid var(--color-info);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
+          <!-- Smart suggestion nudge card (dismissible) -->
+          <div id="leaveNudgeBanner" style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-info-muted);border:1px solid var(--color-info);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
             <svg data-lucide="lightbulb" width="18" height="18" style="color:var(--color-info);flex-shrink:0;margin-top:1px;"></svg>
             <div style="flex:1;min-width:0;">
               <div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-info);margin-bottom:var(--space-0-5);">Book your remaining days soon</div>
-              <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">You have <strong>8 days remaining</strong> and 3 bank holidays in December — consider booking before year-end.</div>
+              <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">You have <strong>8 days remaining</strong> and 3 bank holidays in December - consider booking before year-end.</div>
             </div>
             <button class="btn btn-xs btn-secondary" onclick="document.getElementById('requestLeaveBtn').click()">Book now</button>
+            <button class="btn btn-xs btn-ghost" aria-label="Dismiss" onclick="dismissLeaveNudge()" style="flex-shrink:0;padding:var(--space-1);">
+              <svg data-lucide="x" width="14" height="14"></svg>
+            </button>
           </div>
 
           <!-- Filters (issue 22: default to current year) -->
@@ -883,95 +880,89 @@
               <div style="width:20px;flex-shrink:0;"></div>
               <div style="width:32px;flex-shrink:0;"></div>
               <div style="flex:1;">Leave Request</div>
-              <div style="flex-shrink:0;width:160px;">Balance</div>
               <div style="flex-shrink:0;min-width:80px;text-align:right;">Status</div>
               <div style="flex-shrink:0;width:100px;"></div>
             </div>
 
             <!-- Request 1: Annual — Approved -->
-            <div class="action-row" data-status="Approved" data-type="Annual Leave">
-              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+            <div class="action-row" data-status="Approved" data-type="Annual Leave" style="cursor:pointer;" onclick="openLeaveDetailDrawer({type:'Annual Leave',dates:'Mar 22-26, 2026',days:5,status:'Approved',approver:'John Smith',approvalDate:'Mar 15, 2026',note:'Family vacation',balanceBefore:23,balanceAfter:18,leaveType:'annual'})">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request" onclick="event.stopPropagation()"></div>
               <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
                 <svg data-lucide="sun" width="16" height="16"></svg>
               </div>
-              <div class="action-row-detail">Annual Leave &mdash; Mar 22 &ndash; 26, 2026</div>
-              <div class="action-row-meta">5 days &bull; 18 remaining balance</div>
+              <div class="action-row-detail">Annual Leave - Mar 22-26, 2026 <span style="color:var(--color-text-3);font-size:var(--text-caption);margin-left:var(--space-2);">5 days</span></div>
               <div class="action-row-status">
                 <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
               </div>
               <div class="action-row-actions">
-                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Approved by John Smith on Mar 15 — Family vacation')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openLeaveDetailDrawer({type:'Annual Leave',dates:'Mar 22-26, 2026',days:5,status:'Approved',approver:'John Smith',approvalDate:'Mar 15, 2026',note:'Family vacation',balanceBefore:23,balanceAfter:18,leaveType:'annual'})" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
 
             <!-- Request 2: Annual — Pending -->
-            <div class="action-row" id="pendingRequest1" data-status="Pending" data-type="Annual Leave">
-              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+            <div class="action-row" id="pendingRequest1" data-status="Pending" data-type="Annual Leave" style="cursor:pointer;" onclick="openLeaveDetailDrawer({type:'Annual Leave',dates:'Apr 28-29, 2026',days:2,status:'Pending',approver:'John Smith',approvalDate:null,note:'',balanceBefore:18,balanceAfter:16,leaveType:'annual'})">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request" onclick="event.stopPropagation()"></div>
               <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
                 <svg data-lucide="sun" width="16" height="16"></svg>
               </div>
-              <div class="action-row-detail">Annual Leave &mdash; Apr 28 &ndash; 29, 2026</div>
-              <div class="action-row-meta">2 days &bull; 18 remaining balance</div>
+              <div class="action-row-detail">Annual Leave - Apr 28-29, 2026 <span style="color:var(--color-text-3);font-size:var(--text-caption);margin-left:var(--space-2);">2 days</span></div>
               <div class="action-row-status">
                 <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
               </div>
               <div class="action-row-actions always-visible">
-                <button class="btn btn-xs btn-destructive-ghost cancel-request-btn">Cancel</button>
+                <button class="btn btn-xs btn-destructive-ghost cancel-request-btn" onclick="event.stopPropagation();confirmCancelLeave(this)">Cancel</button>
               </div>
             </div>
 
-            <!-- Request 3: Sick — Approved -->
-            <div class="action-row" data-status="Approved" data-type="Sick Leave">
-              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
-              <div class="action-row-icon" style="background:var(--color-chart-5-muted);color:var(--color-chart-5);">
+            <!-- Request 3: Sick — Self-declared (no manager approval needed) -->
+            <div class="action-row" data-status="Approved" data-type="Sick Leave" style="cursor:pointer;" onclick="openLeaveDetailDrawer({type:'Sick Leave',dates:'Jan 15-16, 2026',days:2,status:'Self-declared',approver:'HR notified',approvalDate:'Jan 15, 2026',note:'Flu',balanceBefore:12,balanceAfter:10,leaveType:'sick',selfDeclared:true})">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request" onclick="event.stopPropagation()"></div>
+              <div class="action-row-icon" style="background:var(--color-warning-muted);color:var(--color-warning);">
                 <svg data-lucide="thermometer" width="16" height="16"></svg>
               </div>
-              <div class="action-row-detail">Sick Leave &mdash; Jan 15 &ndash; 16, 2026</div>
-              <div class="action-row-meta">2 days &bull; 10 remaining balance</div>
+              <div class="action-row-detail">Sick Leave - Jan 15-16, 2026 <span style="color:var(--color-text-3);font-size:var(--text-caption);margin-left:var(--space-2);">2 days</span></div>
               <div class="action-row-status">
-                <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
+                <span class="badge" style="background:var(--color-warning-muted);color:var(--color-warning);"><svg data-lucide="check-circle" width="12" height="12"></svg> HR Notified</span>
               </div>
               <div class="action-row-actions">
-                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Approved by John Smith on Jan 15 — Flu')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openLeaveDetailDrawer({type:'Sick Leave',dates:'Jan 15-16, 2026',days:2,status:'Self-declared',approver:'HR notified',approvalDate:'Jan 15, 2026',note:'Flu',balanceBefore:12,balanceAfter:10,leaveType:'sick',selfDeclared:true})" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
 
             <!-- Request 4: Annual — Approved -->
-            <div class="action-row" data-status="Approved" data-type="Annual Leave">
-              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+            <div class="action-row" data-status="Approved" data-type="Annual Leave" style="cursor:pointer;" onclick="openLeaveDetailDrawer({type:'Annual Leave',dates:'Dec 24-31, 2025',days:5,status:'Approved',approver:'John Smith',approvalDate:'Dec 10, 2025',note:'Christmas break',balanceBefore:28,balanceAfter:23,leaveType:'annual'})">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request" onclick="event.stopPropagation()"></div>
               <div class="action-row-icon" style="background:var(--color-info-muted);color:var(--color-info);">
                 <svg data-lucide="sun" width="16" height="16"></svg>
               </div>
-              <div class="action-row-detail">Annual Leave &mdash; Dec 24 &ndash; 31, 2025</div>
-              <div class="action-row-meta">5 days &bull; 23 remaining balance</div>
+              <div class="action-row-detail">Annual Leave - Dec 24-31, 2025 <span style="color:var(--color-text-3);font-size:var(--text-caption);margin-left:var(--space-2);">5 days</span></div>
               <div class="action-row-status">
                 <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
               </div>
               <div class="action-row-actions">
-                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Approved by John Smith on Dec 10 — Christmas break')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openLeaveDetailDrawer({type:'Annual Leave',dates:'Dec 24-31, 2025',days:5,status:'Approved',approver:'John Smith',approvalDate:'Dec 10, 2025',note:'Christmas break',balanceBefore:28,balanceAfter:23,leaveType:'annual'})" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
 
             <!-- Request 5: Personal — Approved -->
-            <div class="action-row" data-status="Approved" data-type="Personal">
-              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request"></div>
+            <div class="action-row" data-status="Approved" data-type="Personal" style="cursor:pointer;" onclick="openLeaveDetailDrawer({type:'Personal',dates:'Nov 3, 2025',days:1,status:'Approved',approver:'John Smith',approvalDate:'Nov 1, 2025',note:'Personal errand',balanceBefore:3,balanceAfter:2,leaveType:'personal'})">
+              <div class="action-row-checkbox"><input type="checkbox" aria-label="Select leave request" onclick="event.stopPropagation()"></div>
               <div class="action-row-icon" style="background:var(--color-accent-muted);color:var(--color-accent);">
                 <svg data-lucide="heart" width="16" height="16"></svg>
               </div>
-              <div class="action-row-detail">Personal &mdash; Nov 3, 2025</div>
-              <div class="action-row-meta">1 day &bull; 3 remaining balance</div>
+              <div class="action-row-detail">Personal - Nov 3, 2025 <span style="color:var(--color-text-3);font-size:var(--text-caption);margin-left:var(--space-2);">1 day</span></div>
               <div class="action-row-status">
                 <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span>
               </div>
               <div class="action-row-actions">
-                <button class="btn btn-xs btn-ghost" onclick="showToast('info','Details','Personal errand')" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openLeaveDetailDrawer({type:'Personal',dates:'Nov 3, 2025',days:1,status:'Approved',approver:'John Smith',approvalDate:'Nov 1, 2025',note:'Personal errand',balanceBefore:3,balanceAfter:2,leaveType:'personal'})" title="View details"><svg data-lucide="eye" width="14" height="14"></svg></button>
               </div>
             </div>
           </div>
 
           <!-- Mini Heatmap Calendar -->
           <div class="heatmap-section">
-            <div class="section-title">Leave History &mdash; 2025/2026</div>
+            <div class="section-title">Leave History - 2025/2026</div>
             <div class="heatmap-grid" id="heatmapGrid">
               <!-- Generated by JS -->
             </div>
@@ -1061,11 +1052,11 @@
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">AW</div>
-                      <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
+                      <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14-18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">Apr 14 &ndash; 18</td>
+                  <td data-label="Dates">Apr 14 - 18</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
@@ -1086,7 +1077,7 @@
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
-                  <td data-label="Dates">Apr 21 &ndash; 25</td>
+                  <td data-label="Dates">Apr 21 - 25</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
@@ -1101,8 +1092,8 @@
                       <a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
                     </div>
                   </td>
-                  <td data-label="Type"><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
-                  <td data-label="Dates">Apr 7 &ndash; 8</td>
+                  <td data-label="Type"><span class="badge" style="background: var(--color-warning-muted); color: var(--color-warning);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
+                  <td data-label="Dates">Apr 7 - 8</td>
                   <td data-label="Days" class="cell-mono">2</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
@@ -1118,7 +1109,7 @@
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">Apr 21 &ndash; 25</td>
+                  <td data-label="Dates">Apr 21 - 25</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
@@ -1154,7 +1145,7 @@
                       <a href="employees.html#maria-rodriguez" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Maria Rodriguez</a>
                     </div>
                   </td>
-                  <td data-label="Type"><span class="badge" style="background: var(--color-wfh-muted); color: var(--color-wfh);"><svg data-lucide="home" width="12" height="12"></svg> Remote Work</span></td>
+                  <td data-label="Type"><span class="badge" style="background: var(--color-success-muted); color: var(--color-success);"><svg data-lucide="home" width="12" height="12"></svg> Remote Work</span></td>
                   <td data-label="Dates">Apr 15</td>
                   <td data-label="Days" class="cell-mono">1</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
@@ -1171,7 +1162,7 @@
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">May 5 &ndash; 9</td>
+                  <td data-label="Dates">May 5 - 9</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
@@ -1191,7 +1182,7 @@
                       <a href="employees.html#lisa-nguyen" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Lisa Nguyen</a>
                     </div>
                   </td>
-                  <td data-label="Type"><span class="badge" style="background: var(--color-chart-5-muted); color: var(--color-chart-5);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
+                  <td data-label="Type"><span class="badge" style="background: var(--color-warning-muted); color: var(--color-warning);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
                   <td data-label="Dates">Apr 3</td>
                   <td data-label="Days" class="cell-mono">1</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
@@ -1305,13 +1296,13 @@
                 <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-primary);display:inline-block;"></span> Today
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-warning);display:inline-block;"></span> Alice Wang — On Leave
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-warning);display:inline-block;"></span> Alice Wang - On Leave
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-chart-1);display:inline-block;opacity:0.7;"></span> Your Annual Leave (pending)
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-info);display:inline-block;opacity:0.7;"></span> Your Annual Leave (pending)
               </div>
               <div style="display:flex;align-items:center;gap:var(--space-1-5);font-size:var(--text-caption);color:var(--color-text-2);">
-                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-chart-4);display:inline-block;opacity:0.7;"></span> Bob Taylor — Bank Holiday
+                <span style="width:10px;height:10px;border-radius:var(--radius-sm);background:var(--color-error-muted);display:inline-block;opacity:0.7;"></span> Bank Holiday
               </div>
             </div>
           </div>
@@ -1424,20 +1415,20 @@
       <div class="flex-col gap-4">
         <!-- Balance summary at top of modal (FEEL fix) -->
         <div id="modalBalanceSummary" style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-2);">
-          <div id="modalBalAnnual" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-info-muted);border:2px solid var(--color-info);text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='annual';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+          <div id="modalBalAnnual" style="flex:1;min-width:0;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-info-muted);border:2px solid var(--color-info);text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='annual';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
             <div style="font-size:var(--text-caption);color:var(--color-info);font-weight:var(--weight-medium);">Annual</div>
             <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">18<span style="font-size:var(--text-caption);color:var(--color-text-3);">/25</span></div>
           </div>
-          <div id="modalBalSick" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='sick';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
-            <div style="font-size:var(--text-caption);color:var(--color-chart-5);font-weight:var(--weight-medium);">Sick</div>
+          <div id="modalBalSick" style="flex:1;min-width:0;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='sick';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+            <div style="font-size:var(--text-caption);color:var(--color-warning);font-weight:var(--weight-medium);">Sick</div>
             <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">10<span style="font-size:var(--text-caption);color:var(--color-text-3);">/12</span></div>
           </div>
-          <div id="modalBalPersonal" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='personal';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+          <div id="modalBalPersonal" style="flex:1;min-width:0;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='personal';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
             <div style="font-size:var(--text-caption);color:var(--color-accent);font-weight:var(--weight-medium);">Personal</div>
             <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">3<span style="font-size:var(--text-caption);color:var(--color-text-3);">/3</span></div>
           </div>
-          <div id="modalBalWfh" style="flex:1;min-width:100px;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='wfh';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
-            <div style="font-size:var(--text-caption);color:var(--color-wfh, var(--color-text-2));font-weight:var(--weight-medium);">WFH</div>
+          <div id="modalBalWfh" style="flex:1;min-width:0;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-1);border:2px solid transparent;text-align:center;cursor:pointer;" onclick="document.getElementById('modalLeaveType').value='wfh';document.getElementById('modalLeaveType').dispatchEvent(new Event('change'));updateModalBalanceHighlight();">
+            <div style="font-size:var(--text-caption);color:var(--color-success);font-weight:var(--weight-medium);">WFH</div>
             <div style="font-family:var(--font-mono);font-size:var(--text-heading-3);font-weight:var(--weight-bold);color:var(--color-text-1);">5<span style="font-size:var(--text-caption);color:var(--color-text-3);">/5</span></div>
           </div>
         </div>
@@ -1534,7 +1525,7 @@
       <div class="confirm-body">
         <svg data-lucide="alert-triangle" width="48" height="48"></svg>
         <h3 style="font-size: var(--text-heading-3); color: var(--color-text-1);">Are you sure?</h3>
-        <p>This will cancel your leave request for Apr 28 &ndash; 29, 2026. This action cannot be undone.</p>
+        <p>This will cancel your leave request for Apr 28 - 29, 2026. This action cannot be undone.</p>
       </div>
     </div>
     <div class="modal-footer">
@@ -1588,6 +1579,22 @@
       <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
       <span><kbd>&crarr;</kbd> Open</span>
       <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ LEAVE DETAIL DRAWER ════════════════════════════════════════ -->
+<div class="drawer drawer-right" id="leaveDetailDrawer">
+  <div class="drawer-backdrop" onclick="closeLeaveDetailDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3 class="drawer-title" id="leaveDrawerTitle">Leave Details</h3>
+      <button class="drawer-close" onclick="closeLeaveDetailDrawer()">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="leaveDrawerBody">
+      <!-- Populated by JS -->
     </div>
   </div>
 </div>
@@ -1816,7 +1823,7 @@
   // ── Balance highlight in modal ──
   window.updateModalBalanceHighlight = function() {
     var typeMap = { annual: 'modalBalAnnual', sick: 'modalBalSick', personal: 'modalBalPersonal', wfh: 'modalBalWfh' };
-    var colorMap = { annual: 'var(--color-info)', sick: 'var(--color-chart-5)', personal: 'var(--color-accent)', wfh: 'var(--color-wfh, var(--color-text-2))' };
+    var colorMap = { annual: 'var(--color-info)', sick: 'var(--color-warning)', personal: 'var(--color-accent)', wfh: 'var(--color-success)' };
     var type = modalLeaveType ? modalLeaveType.value : 'annual';
     Object.keys(typeMap).forEach(function(key) {
       var el = document.getElementById(typeMap[key]);
@@ -1824,7 +1831,7 @@
         if (key === type) {
           el.style.borderColor = colorMap[key];
           el.style.background = key === 'annual' ? 'var(--color-info-muted)' :
-                                key === 'sick' ? 'var(--color-chart-5-muted)' :
+                                key === 'sick' ? 'var(--color-warning-muted)' :
                                 key === 'personal' ? 'var(--color-accent-muted)' :
                                 'var(--color-surface-2)';
         } else {
@@ -1920,7 +1927,7 @@
     var conflictDiv = document.getElementById('leaveConflictWarning');
     if (!conflictDiv || !startDate || !endDate) return;
     var conflicts = [
-      { name: 'Alice Wang', dates: 'Apr 14\u201318', type: 'Annual Leave', start: '2026-04-14', end: '2026-04-18' },
+      { name: 'Alice Wang', dates: 'Apr 14-18', type: 'Annual Leave', start: '2026-04-14', end: '2026-04-18' },
       { name: 'Marco Rossi', dates: 'Apr 20-21', type: 'Personal', start: '2026-04-20', end: '2026-04-21' }
     ];
     var s = new Date(startDate);
@@ -2038,16 +2045,16 @@
         var iconMap = { annual: 'sun', sick: 'thermometer', personal: 'heart', wfh: 'home' };
         var iconColorMap = {
           annual: 'background:var(--color-info-muted);color:var(--color-info)',
-          sick: 'background:var(--color-chart-5-muted);color:var(--color-chart-5)',
+          sick: 'background:var(--color-warning-muted);color:var(--color-warning)',
           personal: 'background:var(--color-accent-muted);color:var(--color-accent)',
-          wfh: 'background:var(--color-wfh-muted);color:var(--color-wfh)'
+          wfh: 'background:var(--color-success-muted);color:var(--color-success)'
         };
         var s = new Date(modalStartDate.value);
         var e = new Date(modalEndDate.value);
         var opts = { month: 'short', day: 'numeric', year: 'numeric' };
         var dateStr = s.toLocaleDateString('en-US', opts);
         if (modalStartDate.value !== modalEndDate.value) {
-          dateStr += ' \u2013 ' + e.toLocaleDateString('en-US', opts);
+          dateStr += ' - ' + e.toLocaleDateString('en-US', opts);
         }
         var note = document.getElementById('modalNotes').value;
 
@@ -2060,7 +2067,7 @@
           '<div class="action-row-icon" style="' + (iconColorMap[iconClass] || '') + '">' +
             '<svg data-lucide="' + iconMap[iconClass] + '" width="16" height="16"></svg>' +
           '</div>' +
-          '<div class="action-row-detail">' + typeLabel + ' \u2014 ' + dateStr + halfLabel + '</div>' +
+          '<div class="action-row-detail">' + typeLabel + ' - ' + dateStr + halfLabel + '</div>' +
           '<div class="action-row-meta">' + days + ' day' + (days !== 1 ? 's' : '') + ' \u2022 balance pending</div>' +
           '<div class="action-row-status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></div>' +
           '<div class="action-row-actions always-visible"><button class="btn btn-xs btn-destructive-ghost cancel-request-btn">Cancel</button></div>';
@@ -2501,6 +2508,62 @@
   document.getElementById('exportBtn').addEventListener('click', function() {
     showToast('info', 'Export Started', 'Your leave data is being exported as CSV...');
   });
+
+  // ── Leave Detail Drawer ──
+  window.openLeaveDetailDrawer = function(data) {
+    var drawer = document.getElementById('leaveDetailDrawer');
+    var title = document.getElementById('leaveDrawerTitle');
+    var body = document.getElementById('leaveDrawerBody');
+    title.textContent = data.type + ' - ' + data.dates;
+    var statusColor = data.status === 'Approved' ? 'badge-success' : data.status === 'Pending' ? 'badge-warning' : data.status === 'Self-declared' ? 'badge-info' : 'badge-error';
+    var sickNotice = data.selfDeclared ? '<div style="background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-4);font-size:var(--text-body-sm);color:var(--color-text-2);"><strong style="color:var(--color-warning);">Self-declared sick leave</strong><br>HR has been notified for payroll. Your manager received a notification only. No approval required.</div>' : '';
+    var docUpload = data.selfDeclared ? '<div class="form-group" style="margin-top:var(--space-4);"><label class="form-label">Medical certificate</label><div style="border:1px dashed var(--color-border);border-radius:var(--radius-md);padding:var(--space-4);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);cursor:pointer;" onclick="showToast(\'info\',\'Upload\',\'File upload not wired in prototype\')"><svg data-lucide="upload" width="20" height="20" style="margin:0 auto var(--space-2);display:block;"></svg>Upload medical certificate (PDF, JPG)</div></div>' : '';
+    body.innerHTML = sickNotice +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-4);">' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Type</div><div style="font-weight:var(--weight-medium);">' + data.type + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Status</div><div><span class="badge ' + statusColor + '">' + data.status + '</span></div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Date range</div><div style="font-weight:var(--weight-medium);">' + data.dates + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Duration</div><div class="font-mono" style="font-weight:var(--weight-medium);">' + data.days + ' day' + (data.days !== 1 ? 's' : '') + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">' + (data.selfDeclared ? 'Notified' : 'Approver') + '</div><div style="font-weight:var(--weight-medium);">' + data.approver + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">' + (data.selfDeclared ? 'Declared on' : 'Approved on') + '</div><div style="font-weight:var(--weight-medium);">' + (data.approvalDate || 'Pending') + '</div></div>' +
+      '</div>' +
+      (data.note ? '<div class="form-group"><label class="form-label">Note</label><div style="background:var(--color-surface-1);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--text-body-sm);color:var(--color-text-2);">' + data.note + '</div></div>' : '') +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-top:var(--space-4);padding:var(--space-3);background:var(--color-surface-1);border-radius:var(--radius-md);">' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Balance before</div><div class="font-mono" style="font-weight:var(--weight-semibold);color:var(--color-text-1);">' + data.balanceBefore + ' days</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);">Balance after</div><div class="font-mono" style="font-weight:var(--weight-semibold);color:var(--color-text-1);">' + data.balanceAfter + ' days</div></div>' +
+      '</div>' +
+      docUpload;
+    lucide.createIcons({ nodes: [body] });
+    drawer.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeLeaveDetailDrawer = function() {
+    var drawer = document.getElementById('leaveDetailDrawer');
+    drawer.classList.remove('is-open');
+    document.body.style.overflow = '';
+  };
+
+  // ── Dismiss nudge banner ──
+  window.dismissLeaveNudge = function() {
+    try { localStorage.setItem('leaveNudgeDismissed', '1'); } catch(e) {}
+    var banner = document.getElementById('leaveNudgeBanner');
+    if (banner) { banner.style.transition = 'opacity 0.3s'; banner.style.opacity = '0'; setTimeout(function(){ banner.style.display = 'none'; }, 300); }
+  };
+  // Restore dismiss on load
+  try { if (localStorage.getItem('leaveNudgeDismissed') === '1') { var nb = document.getElementById('leaveNudgeBanner'); if (nb) nb.style.display = 'none'; } } catch(e) {}
+
+  // ── Confirm cancel leave with modal ──
+  window.confirmCancelLeave = function(btn) {
+    var row = btn.closest('.action-row');
+    // open existing confirmModal
+    if (window._cancelTarget !== undefined) window._cancelTarget = row;
+    var confirmModal = document.getElementById('confirmModal');
+    if (confirmModal) {
+      window._pendingCancelRow = row;
+      confirmModal.classList.add('active');
+    }
+  };
 
   // ── Initialize Lucide Icons ──
   lucide.createIcons();
