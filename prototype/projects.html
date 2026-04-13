@@ -593,7 +593,7 @@
             <option value="Acme Corp">Acme Corp</option>
             <option value="Globex Corp">Globex Corp</option>
             <option value="Initech">Initech</option>
-            <option value="Contoso Inc">Contoso Inc</option>
+            <option value="Umbrella Corp">Umbrella Corp</option>
             <option value="Umbrella Corp">Umbrella Corp</option>
             <option value="Internal">Internal</option>
           </select>
@@ -621,9 +621,9 @@
               </div>
               <div class="kanban-cards stagger-reveal">
 
-                <div class="project-card card-interactive" data-project="contoso-deal" onclick="showDetail('contoso-deal')">
-                  <div class="project-card-name">Contoso Deal</div>
-                  <div class="project-card-client">Client: <a href="clients.html#detail/contoso" onclick="event.stopPropagation()">Contoso Inc</a></div>
+                <div class="project-card card-interactive" data-project="umbrella-portal" onclick="showDetail('umbrella-portal')">
+                  <div class="project-card-name">Umbrella Corp Portal</div>
+                  <div class="project-card-client">Client: <a href="clients.html#detail/umbrella" onclick="event.stopPropagation()">Umbrella Corp</a></div>
                   <div class="project-card-meta">
                     <span class="meta-item"><svg data-lucide="credit-card"></svg> Fixed price</span>
                     <span class="meta-item"><svg data-lucide="users"></svg> 2 members</span>
@@ -877,9 +877,9 @@
                   <td data-label="Status"></td>
                   <td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>
                 </tr>
-                <tr class="cursor-pointer" onclick="showDetail('contoso-deal')">
-                  <td><strong>Contoso Deal</strong></td>
-                  <td data-label="Client"><a href="clients.html#detail/contoso" onclick="event.stopPropagation()">Contoso Inc</a></td>
+                <tr class="cursor-pointer" onclick="showDetail('umbrella-portal')">
+                  <td><strong>Umbrella Corp Portal</strong></td>
+                  <td data-label="Client"><a href="clients.html#detail/umbrella" onclick="event.stopPropagation()">Umbrella Corp</a></td>
                   <td data-label="Billing" class="cell-mono" data-sensitive="billing">Fixed price</td>
                   <td data-label="Team Size">2</td>
                   <td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">&mdash;</span></td>
@@ -1056,17 +1056,17 @@
               </div>
             </div>
 
-            <!-- Contoso Deal: May–Dec (cols 5–12) — Planning -->
-            <div class="tl-row" onclick="showDetail('contoso-deal')">
+            <!-- Umbrella Corp Portal: May–Dec (cols 5–12) — Planning -->
+            <div class="tl-row" onclick="showDetail('umbrella-portal')">
               <div class="tl-label">
                 <span class="badge badge-info badge-xs">Planning</span>
-                <strong>Contoso Deal</strong>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Contoso Inc · 2 members</div>
+                <strong>Umbrella Corp Portal</strong>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Umbrella Corp · 2 members</div>
               </div>
               <div class="tl-bars">
                 <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;height:36px;align-items:center;">
                   <div></div><div></div><div></div><div></div><!-- Jan–Apr -->
-                  <div style="grid-column:5/13;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:var(--weight-semibold);opacity:0.75;border:1px dashed rgba(255,255,255,0.4);" title="Contoso Deal — May 1 – Dec 31, 2026 (Planning)">
+                  <div style="grid-column:5/13;background:var(--color-info);border-radius:4px;height:24px;display:flex;align-items:center;padding:0 8px;font-size:var(--text-overline);color:var(--color-text-on-primary);font-weight:var(--weight-semibold);opacity:0.75;border:1px dashed rgba(255,255,255,0.4);" title="Umbrella Corp Portal — May 1 – Dec 31, 2026 (Planning)">
                     May 1 – Dec 31 (planned)
                   </div>
                 </div>
@@ -1401,7 +1401,7 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm">SC</div>
-                        <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Sarah Chen</a>
+                        <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Sarah Chen</a>
                       </div>
                     </td>
                     <td data-label="Role">Project Manager</td>
@@ -1416,7 +1416,7 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm" style="background:var(--color-info);">JS</div>
-                        <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82" style="font-weight:var(--weight-medium);color:var(--color-text-1);">John Smith</a>
+                        <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="113" style="font-weight:var(--weight-medium);color:var(--color-text-1);">John Smith</a>
                       </div>
                     </td>
                     <td data-label="Role">Senior Developer</td>
@@ -1446,7 +1446,7 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm" style="background:var(--color-error);">MR</div>
-                        <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Marco Rossi</a>
+                        <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="108" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Marco Rossi</a>
                       </div>
                     </td>
                     <td data-label="Role">Operations Lead</td>
@@ -1461,7 +1461,7 @@
                     <td>
                       <div class="team-member-row">
                         <div class="avatar avatar-sm" style="background:var(--color-primary);">LO</div>
-                        <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="95" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Liam O&rsquo;Brien</a>
+                        <a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Junior Developer" data-dept="Engineering" data-worktime="88" style="font-weight:var(--weight-medium);color:var(--color-text-1);">Liam O&rsquo;Brien</a>
                       </div>
                     </td>
                     <td data-label="Role">Junior Developer</td>
@@ -1591,14 +1591,14 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><a href="employees.html#profile-sarah" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                    <td><a href="employees.html#profile-sarah" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100">Sarah Chen</a></td>
                     <td data-label="Week">Week 13</td>
                     <td data-label="Hours" class="font-mono">32h</td>
                     <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;2,720</td>
                     <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html#profile-john" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                    <td><a href="employees.html#profile-john" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="113">John Smith</a></td>
                     <td data-label="Week">Week 13</td>
                     <td data-label="Hours" class="font-mono">38h</td>
                     <td data-label="Billable" class="font-mono" data-sensitive="financials">&euro;3,230</td>
@@ -1755,7 +1755,7 @@
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                    <td><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100">Sarah Chen</a></td>
                     <td data-label="Date">Mar 28</td>
                     <td data-label="Category">Travel</td>
                     <td data-label="Description">Train Paris&ndash;Lyon</td>
@@ -1771,7 +1771,7 @@
                     <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   </tr>
                   <tr>
-                    <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                    <td><a href="employees.html" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="113">John Smith</a></td>
                     <td data-label="Date">Mar 28</td>
                     <td data-label="Category">Travel</td>
                     <td data-label="Description">Client site visit</td>
@@ -2146,7 +2146,7 @@
             <option>Acme Corp</option>
             <option>Globex Corp</option>
             <option>Initech</option>
-            <option>Contoso Inc</option>
+            <option>Umbrella Corp</option>
           </select>
         </div>
         <div class="form-group">
@@ -2536,30 +2536,30 @@
         { name: 'App Store Submission', dates: 'Oct 1, 2026', status: 'upcoming' }
       ]
     },
-    'contoso-deal': {
-      title: 'Contoso Inc &mdash; Deal Platform',
-      client: 'Client: <a href="clients.html#detail/contoso">Contoso Inc</a>',
+    'umbrella-portal': {
+      title: 'Umbrella Corp &mdash; Client Portal',
+      client: 'Client: <a href="clients.html#detail/umbrella">Umbrella Corp</a>',
       budgetPct: 0,
       budgetText: '&euro;0 / &euro;120,000 (0%)',
       badges: '<span class="badge badge-info badge-lg"><svg data-lucide="circle-dashed" width="14" height="14"></svg> Planning</span><span class="separator"></span><span class="detail-badge" data-sensitive="billing"><svg data-lucide="credit-card"></svg><span class="font-mono">Fixed Price</span></span><span class="separator"></span><span class="detail-badge"><svg data-lucide="calendar"></svg>Start: May 1, 2026</span>',
-      description: 'Deal management platform for Contoso Inc. Fixed-price engagement covering CRM integration, deal pipeline, and reporting.',
+      description: 'Client portal platform for Umbrella Corp. Fixed-price engagement covering customer onboarding, account management, and reporting dashboards.',
       status: 'planning',
       timeline: 'May 1 &mdash; Dec 31, 2026',
       timelinePct: 0,
       stats: { hours: '0h', budgetUsed: '0%', revenue: '&euro;0', margin: '&mdash;', hoursTrend: 'Not started', revTrend: 'Not started', marginTrend: '&mdash;' },
       team: [
-        { name: 'David Park', initials: 'DP', role: 'Finance Lead', dept: 'Finance', worktime: 45, hours: '0h', billRate: '&euro;90/h', revenue: '&euro;0', costRate: '&euro;46/h', cost: '&euro;0', margin: '&mdash;' },
-        { name: 'Marco Rossi', initials: 'MR', role: 'Operations Lead', dept: 'Operations', worktime: 88, hours: '0h', billRate: '&euro;85/h', revenue: '&euro;0', costRate: '&euro;42/h', cost: '&euro;0', margin: '&mdash;' }
+        { name: 'David Park', initials: 'DP', role: 'Finance Lead', dept: 'Finance', worktime: 85, hours: '0h', billRate: '&euro;90/h', revenue: '&euro;0', costRate: '&euro;46/h', cost: '&euro;0', margin: '&mdash;' },
+        { name: 'Marco Rossi', initials: 'MR', role: 'Operations Lead', dept: 'Operations', worktime: 108, hours: '0h', billRate: '&euro;85/h', revenue: '&euro;0', costRate: '&euro;42/h', cost: '&euro;0', margin: '&mdash;' }
       ],
-      aiInsight: '<strong>Status:</strong> Contoso Deal Platform is in planning phase. Kick-off scheduled for May 1, 2026.<br><br><strong>Staffing:</strong> David Park and Marco Rossi are assigned. Consider adding a frontend developer before sprint 1.<br><br><strong>Recommendation:</strong> Finalize SOW and milestone schedule with Contoso before May 1. Fixed-price projects benefit from tight scope definition upfront.',
+      aiInsight: '<strong>Status:</strong> Umbrella Corp Portal is in planning phase. Kick-off scheduled for May 1, 2026.<br><br><strong>Staffing:</strong> David Park and Marco Rossi are assigned. Consider adding a frontend developer before sprint 1.<br><br><strong>Recommendation:</strong> Finalize SOW and milestone schedule with Umbrella Corp before May 1. Fixed-price projects benefit from tight scope definition upfront.',
       activity: [
         { name: 'David Park', initials: 'DP', text: 'created project and set budget to <span class="highlight">&euro;120,000</span>', time: '3 days ago' },
         { name: 'Marco Rossi', initials: 'MR', text: 'uploaded <span class="highlight">requirements document v1</span>', time: '4 days ago' }
       ],
       milestones: [
         { name: 'Scoping &amp; SOW', dates: 'Apr 15 &mdash; Apr 30, 2026', status: 'in-progress', pct: 20 },
-        { name: 'Phase 1: CRM Integration', dates: 'May 1 &mdash; Jul 31, 2026', status: 'upcoming' },
-        { name: 'Phase 2: Deal Pipeline', dates: 'Aug 1 &mdash; Oct 31, 2026', status: 'upcoming' },
+        { name: 'Phase 1: Portal Foundation', dates: 'May 1 &mdash; Jul 31, 2026', status: 'upcoming' },
+        { name: 'Phase 2: Account Management', dates: 'Aug 1 &mdash; Oct 31, 2026', status: 'upcoming' },
         { name: 'Phase 3: Reporting &amp; Launch', dates: 'Nov 1 &mdash; Dec 31, 2026', status: 'upcoming' }
       ]
     },
@@ -2974,13 +2974,50 @@
       if (nameInput) nameInput.focus();
       return;
     }
+    var clientSelect = newProjectModal.querySelector('select');
+    var clientName = (clientSelect && clientSelect.value) ? clientSelect.value : 'Acme Corp';
     var btn = document.getElementById('createProjectBtn');
     if (btn) { btn.disabled = true; btn.innerHTML = '<svg data-lucide="loader" width="16" height="16"></svg> Creating...'; lucide.createIcons({ nodes: [btn] }); }
     setTimeout(function() {
       if (btn) { btn.disabled = false; btn.innerHTML = '<svg data-lucide="plus" width="16" height="16"></svg> Create Project'; lucide.createIcons({ nodes: [btn] }); }
       closeModal();
-      showToast('success', 'Project Created', name + ' has been created and added to Gantt chart.');
+      showToast('success', 'Project Created', name + ' has been created and added to the board.');
+      appendProjectCard(name, clientName);
     }, 1200);
+  };
+
+  window.appendProjectCard = function(name, clientName) {
+    name = name || 'New Project';
+    clientName = clientName || 'Acme Corp';
+    // Append to kanban Active column cards
+    var activeCards = document.querySelector('.kanban-column:nth-child(2) .kanban-cards');
+    if (activeCards) {
+      var card = document.createElement('div');
+      card.className = 'project-card card-interactive';
+      card.style.cssText = 'background:var(--bg-card,var(--color-surface-0));border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);';
+      card.innerHTML = '<div class="project-card-name" style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">' + name + '</div>' +
+        '<div class="project-card-client" style="font-size:var(--text-caption);color:var(--color-text-2);margin-bottom:var(--space-3);">' + clientName + '</div>' +
+        '<span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span>' +
+        '<div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-2);">Apr 2026</div>';
+      activeCards.appendChild(card);
+      if (window.lucide) lucide.createIcons({ nodes: [card] });
+    }
+    // Also append to list view tbody
+    var tbody = document.querySelector('#listViewTable tbody');
+    if (tbody) {
+      var tr = document.createElement('tr');
+      tr.className = 'cursor-pointer';
+      tr.innerHTML = '<td><strong>' + name + '</strong></td>' +
+        '<td data-label="Client">' + clientName + '</td>' +
+        '<td data-label="Billing" class="cell-mono" data-sensitive="billing">&mdash;</td>' +
+        '<td data-label="Team Size">1</td>' +
+        '<td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">0%</span></td>' +
+        '<td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>' +
+        '<td data-label="Status"></td>' +
+        '<td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>';
+      tbody.appendChild(tr);
+      if (window.lucide) lucide.createIcons({ nodes: [tr] });
+    }
   };
 
   // ── Color swatch picker ──
@@ -3148,6 +3185,18 @@
     document.getElementById('addTeamMemberModal').classList.remove('active');
     showToast('success', 'Team Updated', member + ' has been added to the project as ' + (role || 'Team Member') + '.');
   };
+
+  // ── Triple-dot action menus on project rows/cards ──
+  document.querySelectorAll('.project-actions-btn, [data-menu], .more-btn, button[aria-label*="more"], button[aria-label*="action"]').forEach(function(btn) {
+    if (!btn.onclick && !btn.dataset.bound) {
+      btn.dataset.bound = '1';
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        var menu = btn.nextElementSibling || btn.parentElement.querySelector('.dropdown-menu, .action-menu');
+        if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      };
+    }
+  });
 
   // ── Empty State Toggle ──
   stateToggle.addEventListener('click', function() {

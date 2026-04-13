@@ -1,8 +1,112 @@
-# GammaHR v2 — Feature Completeness Audit
-**Date:** 2026-04-11
-**Auditor:** Product Manager Critic (Harsh Mode)
-**Scope:** Every section of `specs/APP_BLUEPRINT.md` vs every HTML file in `prototype/`
-**Prior issues retained, new issues appended. Re-audited from scratch.**
+# CRITIC: Feature Completeness & Correctness
+
+## Verdict: CONDITIONAL — Would pay €50/user? MAYBE
+
+The prototype has genuine bones. Core workflows (submit expense, request leave, submit timesheet, approve/reject, create project, generate invoice) are all actually wired up with JS and produce toast confirmations. The UI is coherent enough for a first-look demo. But the canonical data contract is violated in systematic, demo-killing ways, and several blueprint-required features are either shimmed or missing entirely.
+
+---
+
+## Critical Issues (would kill a demo)
+
+1. **John Smith and Marco Rossi are not overworked — anywhere.** The canonical data contract defines John Smith at 112.5% OVERWORK and Marco Rossi at 107.5% OVERWORK. Every single page that touches these employees shows John at 82% and Marco at 88%. The `data-worktime` attributes, bar fills, percentage labels, hovercard tooltips, and the Gantt JS data array (gantt.html line 1694) all use wrong values. The "detect overwork before burnout" value prop is dead because no one in the demo is actually overworked.
+
+2. **Sarah Chen's work time is 87% everywhere, not 100%.** The canonical data says 100% (full allocation). She shows 87% across employees.html, gantt.html, insights.html, admin.html, and all hovercard `data-worktime` attributes. The dashboard AI Alert says she "averaged 47h/week for 3 consecutive weeks" but her bar shows 87% — incoherent. A prospect asking "where does the overwork alert come from?" gets no satisfying answer.
+
+3. **David Park's work time is 45%, not 85%.** Canonical says 85%, all pages show 45% — the same value as Alice Wang who is on leave. Finance Lead looks perpetually half-absent with no explanation.
+
+4. **Emma Laurent's work time is 78%, not 90%.** Every page — employees, gantt, insights, admin — shows 78%. Canonical contract says 90%.
+
+5. **"Contoso Inc" is a phantom 5th client.** Canonical data says exactly 4 clients: Acme Corp, Globex Corp, Initech, Umbrella Corp. "Contoso Inc" appears throughout the prototype: clients.html (client card), invoices.html (INV-2026-046 overdue notification and multiple invoice rows), projects.html (Contoso Deal project card), planning.html (allocation table column), gantt.html, and insights.html ("Contoso CRM" in revenue-by-project chart at €68,000). Any prospect who has read the client list catches this immediately.
+
+6. **The 82% "Team Work Time" KPI has no dedicated dashboard card.** Dashboard KPI cards cover Active Employees, Hours This Week, Pending Approvals, Billable Hours %, Open Projects, and Expenses This Month — NOT Team Work Time (82%). Canonical lists this as a headline KPI. It appears only inside a collapsible heatmap section and in AI insights text.
+
+7. **James Wilson is a ghost employee.** The Gantt chart JS employee array (gantt.html lines 1693–1702) has "James Wilson, DevOps Engineer" as the 10th employee. James Wilson does not appear in employees.html. Canonical data lists Liam O'Brien as a named employee — the Gantt uses a completely invented name.
+
+8. **"Generate Invoice from Timesheets" is a pure stub.** The Generate Invoice button fires `showToast('success','Invoice Generated','Draft invoice INV-2026-049 has been created.')` — no draft invoice appears in the table, no modal collects client/project/rate, and the row count does not increment. Blueprint §11 specifies this as a core workflow.
+
+---
+
+## High Issues (would lose the deal in week 2)
+
+9. **No "Invite/Add Employee" flow in employees.html.** The blueprint (§4) specifies an invite modal. The employees page has no Add or Invite button in the main list view. The admin.html invite table is present but has no functional form.
+
+10. **Project creation does not add to any list.** The `createProject()` function (projects.html line 2982) fires a success toast and closes the modal — the new project never appears in the card grid or table view.
+
+11. **Atlas Redesign and Contoso CRM appear in insights.html "Revenue by Project" chart but do not exist in projects.html.** The top-5 revenue chart includes "Atlas Redesign" (€35,000) and "Contoso CRM" (€68,000). Neither project exists in the project list. Navigating from Insights → Projects to drill down breaks.
+
+12. **Timesheet submission does not update the dashboard "Hours This Week" KPI.** The 394h dashboard counter is hardcoded. State does not flow between pages.
+
+13. **Leave submission does not appear on the calendar.** Submitting a leave request correctly adds it to "My Requests" and toasts "Once approved it will appear in the team calendar" — but the calendar page shows only the hardcoded Alice Wang OOO block. The new request never appears even after navigation.
+
+14. **The "Monthly Capacity" KPI (2,076h) is absent from the dashboard.** Canonical data lists this as a headline KPI. It is correct in planning.html but invisible on the dashboard.
+
+15. **Marie Dupont (CEO, Executive dept) is not in the canonical 8 named employees.** She appears on employees.html (card #11), admin.html (user list), and gantt.html. The canonical list names Liam O'Brien, Sophie Dubois, Lisa Martinez, and one unnamed as the 4 non-primary employees. Marie Dupont is an invented name that inflates confusion about who is in scope.
+
+16. **Approvals "Bulk Approve" fires hardcoded "4 routine timesheets approved" regardless of actual count.** The AI banner button `onclick="showToast(...'4 routine timesheets approved')"` always says "4" no matter how many items are pending or selected.
+
+17. **AI Insights NL query engine is a keyword matcher, not AI.** Querying "who is overworked?" returns the generic fallback response because the keyword list lacks "overwork." Querying "capacity" returns a canned response mentioning "James Wilson" (ghost employee). Expected for a prototype, but the mismatch with canonical employees will be caught in any demo where someone types freely.
+
+18. **INV-2026-046 notification references "Contoso Inc — Deal Platform".** "Contoso Inc" is a non-canonical client and "Deal Platform" is not a real project name anywhere in the prototype. A prospect clicking this notification finds nothing.
+
+---
+
+## Medium Issues (friction but not fatal)
+
+19. **The 2,076h monthly capacity is mathematically suspicious.** 12 employees × ~173h/month = 2,076h. But Bob Taylor is on bench (0%), Alice Wang is at 45%, and David Park is at 45% — effective capacity should be well below 2,076h. No explanation is provided.
+
+20. **Insights "Work Time by Employee" table still shows wrong canonical values** (Sarah 87%, John 82%, Marco 88%, Carol 90%, David 45%, Emma 78%). Even in the dedicated analytics section, no one exceeds 100% and no overflow CSS is applied. The overwork narrative is completely invisible.
+
+21. **Client portal (portal/index.html) is hardcoded to Acme Corp.** Header reads "You are viewing as Acme Corp." No mechanism to switch clients or simulate a different login. A multi-client agency cannot demo this generically.
+
+22. **"Resubmit" on a rejected expense does not update the status badge.** `resubmitExpense()` fires a toast but the badge remains red "Rejected." The item looks stuck.
+
+23. **Export buttons on employees.html, timesheets.html, and leaves.html are stubs.** All fire `showToast("Export started")` with no file produced. Blueprint §1.3 requires CSV/PDF/clipboard export.
+
+24. **Calendar event creation has no form.** Clicking an empty day fires a toast with title "New event" — no modal collects title, type, attendees, or time. Blueprint §12 requires a full event creation modal.
+
+25. **HR "Post Job" button has no validation.** Clicking with all fields empty fires a success toast. Required fields (job title, department, salary range) are ignored.
+
+26. **Gantt drag-and-resize is non-functional.** Blueprint §5 specifies draggable bars. CSS sets `cursor:move` on bars but there are no drag event handlers. Nothing moves.
+
+27. **Three pages maintain separate inconsistent employee data arrays.** gantt.html has 10 employees including "James Wilson"; planning.html has 11 including "Lisa Martinez"; employees.html has 11 including "Marie Dupont" and "Yuki Tanaka." There is no shared data source. Cross-page navigation produces an incoherent team roster.
+
+28. **"Saved Views" in filter bars is UI-only.** Clicking "Save View" fires a toast; the saved view does not appear in the dropdown on any subsequent interaction.
+
+29. **`data-sensitive="financials"` role-hiding does not work in the client portal.** Financial figures remain visible with no role-switcher present. Cannot demo "client view vs PM view."
+
+30. **The revenue bar chart in insights.html shows Apr revenue at €45k but the dashboard Revenue Snapshot for April shows €68,400 actual.** The same month shows two different revenue figures across two pages. No explanation.
+
+---
+
+## Pages that genuinely impress
+
+- **expenses.html** — Full submit workflow (form validation, type/currency/billable inputs, toast, new item rendered with correct icon) works end-to-end. Reject + resubmit UI is present. Most functional page in the prototype.
+
+- **leaves.html** — Leave request modal is fully wired: date picker, working-days calculation, half-day toggle, balance deduction update, conflict detection, toast sequence, new card rendered in list, cancel confirmation modal. Well above prototype fidelity.
+
+- **timesheets.html** — Weekly time-entry grid with add-project-row, per-day input, total calculation, submit/recall toggle, and approval queue with approve/reject-with-reason modal all work. Monthly heatmap is visually strong.
+
+- **approvals.html** — Multi-type unified approval queue (timesheets, leaves, expenses, invoices) with bulk-approve, reject-with-reason modal, and AI recommendation banner is a genuine selling point and works functionally.
+
+- **auth.html** — Company setup wizard (4 steps), employee onboarding wizard (3 steps with password strength meter), and MFA TOTP setup all have proper step navigation, validation feedback, and animations. Passkey/SSO buttons are present.
+
+---
+
+## Pages that would embarrass you in a demo
+
+- **gantt.html** — Drag-and-drop is completely non-functional. "James Wilson" replaces a canonical employee. No bars exceed 100% despite the overwork premise. Any prospect who tries to drag a bar goes home unimpressed.
+
+- **projects.html** — Creating a project produces a toast but the project never appears in the list. "Contoso Deal" and "Contoso Inc" references will be caught by anyone who read the client list. The AI insight says "Sarah Chen's overallocation (assigned to 2 other projects simultaneously)" while her work-time bar shows a healthy 87% — direct contradiction in the same tooltip.
+
+- **insights.html** — "Revenue by Project" chart includes "Contoso CRM" (€68k) and "Atlas Redesign" (€35k) — projects that do not exist in projects.html. NL query for "who is overworked" returns the generic fallback. April revenue shown here (€45k) contradicts the dashboard (€68,400). The page looks rich but falls apart on any drill-down.
+
+- **planning.html** — John Smith at 82% and Marco Rossi at 88% — neither reflects canonical overwork. "Contoso Deal" column references the phantom client. The allocation matrix is visually impressive but data integrity is zero.
+
+---
+
+*Original audit content archived below this line.*
+
+---
 
 ---
 

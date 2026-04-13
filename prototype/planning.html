@@ -401,7 +401,7 @@
             </button>
             <div class="dropdown-menu" id="scenarioDropdownMenu">
               <div class="dropdown-label">Saved Scenarios</div>
-              <button class="dropdown-item">Contoso Deal (Win)</button>
+              <button class="dropdown-item">Umbrella Corp Deal (Win)</button>
               <button class="dropdown-item">Q3 Hiring Freeze</button>
               <button class="dropdown-item">Acme Expansion</button>
               <div class="dropdown-divider"></div>
@@ -537,13 +537,13 @@
             <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Bob Taylor')">Assign</button>
           </div>
           <div class="bench-item">
-            <div class="avatar avatar-sm">JW</div>
+            <div class="avatar avatar-sm">LO</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html" data-hovercard data-name="James Wilson" data-role="DevOps Engineer" data-dept="Engineering" data-worktime="20%" data-href="employees.html">James Wilson</a> <span class="badge badge-default" style="font-size: var(--text-caption);">Contract</span></div>
-              <div class="bench-detail">DevOps Engineer &bull; AWS, Docker, Kubernetes</div>
+              <div class="bench-name"><a href="employees.html" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-worktime="88" data-href="employees.html">Liam O'Brien</a></div>
+              <div class="bench-detail">Senior Developer &bull; TypeScript, React, Node.js</div>
             </div>
             <div class="bench-days">14 days</div>
-            <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('James Wilson')">Assign</button>
+            <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject(&quot;Liam O'Brien&quot;)">Assign</button>
           </div>
           <div class="bench-item">
             <div class="avatar avatar-sm">LM</div>
@@ -603,7 +603,7 @@
           <div class="ai-rec" id="benchRec2">
             <div class="ai-rec-icon"><svg data-lucide="sparkles" width="16" height="16"></svg></div>
             <div class="ai-rec-body">
-              <div class="ai-rec-text"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a> could support Acme Web Redesign (design expertise + data analytics needed)</div>
+              <div class="ai-rec-text"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100">Carol Williams</a> could support Acme Web Redesign (design expertise + data analytics needed)</div>
               <div class="ai-rec-actions">
                 <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Carol Williams')">Assign</button>
                 <button class="btn btn-ghost btn-xs" onclick="showToast('info','Opening Profile','Loading Carol Williams profile...')">View Profile</button>
@@ -704,7 +704,7 @@
                 <th>Acme Web Redesign</th>
                 <th>Globex Phase 2</th>
                 <th>Initech API</th>
-                <th>Contoso Deal</th>
+                <th>Umbrella Corp Deal</th>
                 <th>Globex Phase 3</th>
                 <th>Infra Overhaul</th>
                 <th>Internal</th>
@@ -713,44 +713,44 @@
             </thead>
             <tbody>
               <tr>
-                <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="87">Sarah Chen</a></td>
+                <td><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100">Sarah Chen</a></td>
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Sarah Chen','Acme Web Redesign',60)" title="Click to edit" style="color:var(--color-primary);">60%</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Sarah Chen','Initech API',27)" style="color:var(--color-success);">27%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Sarah Chen','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">87%</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">100%</td>
               </tr>
               <tr>
-                <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="82">John Smith</a></td>
+                <td><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="113">John Smith <span class="badge badge-warning" style="font-size:var(--text-overline);">Overwork</span></a></td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Acme Web Redesign',0)">—</td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'John Smith','Globex Phase 2',82)" style="color:var(--color-primary);">82%</td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'John Smith','Globex Phase 2',113)" style="color:var(--color-warning);">113%</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'John Smith','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">82%</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">113%<div class="worktime-bar" style="margin-top:2px;"><div class="worktime-fill overflow" style="width:100%;"></div></div></td>
               </tr>
               <tr>
-                <td><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88">Marco Rossi</a></td>
-                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Marco Rossi','Acme Web Redesign',88)" style="color:var(--color-primary);">88%</td>
+                <td><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="108">Marco Rossi <span class="badge badge-warning" style="font-size:var(--text-overline);">Overwork</span></a></td>
+                <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Marco Rossi','Acme Web Redesign',108)" style="color:var(--color-warning);">108%</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Marco Rossi','Internal',0)">—</td>
-                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-success);">88%</td>
+                <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">108%<div class="worktime-bar" style="margin-top:2px;"><div class="worktime-fill overflow" style="width:100%;"></div></div></td>
               </tr>
               <tr>
-                <td><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a></td>
+                <td><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100">Carol Williams</a></td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Acme Web Redesign',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Carol Williams','Initech API',90)" style="color:var(--color-success);">90%</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Carol Williams','Internal',0)">—</td>
@@ -761,29 +761,29 @@
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Alice Wang','Acme Web Redesign',45)" style="color:var(--color-warning);">45%</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Alice Wang','Internal',0)">—</td>
                 <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">45%</td>
               </tr>
               <tr>
-                <td><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45">David Park</a></td>
+                <td><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="85">David Park</a></td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Acme Web Redesign',0)">—</td>
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'David Park','Globex Phase 2',45)" style="color:var(--color-warning);">45%</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'David Park','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'David Park','Internal',0)">—</td>
                 <td style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--color-warning);">45%</td>
               </tr>
               <tr>
-                <td><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78">Emma Laurent</a></td>
+                <td><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="90">Emma Laurent</a></td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Acme Web Redesign',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Emma Laurent','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell has-alloc" onclick="openAllocPopover(this,'Emma Laurent','Internal',78)" style="color:var(--color-primary);">78%</td>
@@ -794,7 +794,7 @@
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Acme Web Redesign',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 2',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Initech API',0)">—</td>
-                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Contoso Deal',0)">—</td>
+                <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Umbrella Corp Deal',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Globex Phase 3',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Infra Overhaul',0)">—</td>
                 <td class="alloc-cell" onclick="openAllocPopover(this,'Bob Taylor','Internal',0)">—</td>
@@ -831,7 +831,7 @@
           <div class="form-group mb-4">
             <label class="form-label">Scenario</label>
             <select class="form-select" id="scenarioSelect">
-              <option value="contoso">What if we win the Contoso deal?</option>
+              <option value="umbrella">What if we win the Umbrella Corp deal?</option>
               <option value="hire-2">What if we hire 2 engineers in Q3?</option>
               <option value="no-overtime">What if we eliminate overtime?</option>
               <option value="offshore">What if we offshore the DevOps role?</option>
@@ -884,7 +884,7 @@
               </div>
               <div class="impact-row">
                 <span class="impact-label">Reallocation needed</span>
-                <span class="impact-value">Alice Wang from Acme, <a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90">Carol Williams</a> from Initech</span>
+                <span class="impact-value">Alice Wang from Acme, <a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100">Carol Williams</a> from Initech</span>
               </div>
               <div class="impact-row">
                 <span class="impact-label">Revenue projection</span>
@@ -1009,7 +1009,7 @@
           <option value="globex-phase-3">Globex Phase 3</option>
           <option value="acme-redesign">Acme Web Redesign</option>
           <option value="initech-api">Initech API</option>
-          <option value="contoso-portal">Contoso Portal</option>
+          <option value="umbrella-portal">Umbrella Portal</option>
           <option value="infra-overhaul">Infra Overhaul</option>
         </select>
       </div>
@@ -1169,8 +1169,8 @@
 
   // ── Scenario Data ──
   var scenariosData = {
-    'contoso': {
-      label: 'Win Contoso Deal',
+    'umbrella': {
+      label: 'Win Umbrella Corp Deal',
       stats: [
         { label: 'Deal Size', value: '€180,000' },
         { label: 'Duration', value: '6 months' },
@@ -1220,7 +1220,7 @@
   };
 
   function renderScenarioProjection(key) {
-    var s = scenariosData[key] || scenariosData['contoso'];
+    var s = scenariosData[key] || scenariosData['umbrella'];
     // Stats
     var statsEl = document.getElementById('scenarioStats');
     if (statsEl) {
@@ -1260,7 +1260,7 @@
   }
 
   // Initialize projection on load
-  renderScenarioProjection('contoso');
+  renderScenarioProjection('umbrella');
 
   var scenarioSelect = document.getElementById('scenarioSelect');
   if (scenarioSelect) {
@@ -1307,7 +1307,7 @@
     // AI suggestion: pre-select best-fit project based on employee skills
     var suggestions = {
       'Bob Taylor': { project: 'initech-api', alloc: 80, note: 'AI pre-filled: 85% skill match with Initech API backend module (Python, Node.js).' },
-      'James Wilson': { project: 'initech-api', alloc: 60, note: 'AI pre-filled: DevOps skills match Initech API infrastructure needs.' },
+      "Liam O'Brien": { project: 'initech-api', alloc: 60, note: "AI pre-filled: Liam O'Brien's TypeScript and Node.js skills match Initech API infrastructure needs." },
       'Lisa Martinez': { project: 'initech-api', alloc: 70, note: 'AI pre-filled: 92% skill match with Initech API analytics phase.' },
       'Alice Wang': { project: 'globex-phase-3', alloc: 80, note: 'AI pre-filled: UI/UX and React skills match Globex Phase 3.' },
       'Carol Williams': { project: 'acme-redesign', alloc: 50, note: 'AI pre-filled: Design expertise needed for Acme Web Redesign.' }
@@ -1537,7 +1537,7 @@
           </div>
         </div>
         <div>
-          <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-3);">Win Contoso Deal</div>
+          <div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);color:var(--color-primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-3);">Win Umbrella Corp Deal</div>
           <div class="card" style="padding:var(--space-4);border-color:var(--color-primary);">
             <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:var(--space-1);">Team Work Time</div>
             <div style="font-size:var(--text-heading-2);font-weight:var(--weight-bold);color:var(--color-error);" class="font-mono">98%</div>
@@ -1553,12 +1553,12 @@
       </div>
       <div style="margin-top:var(--space-4);padding:var(--space-3);background:var(--color-warning-muted);border-radius:var(--radius-md);display:flex;gap:var(--space-3);align-items:flex-start;">
         <svg data-lucide="alert-triangle" width="18" height="18" style="color:var(--color-warning);flex-shrink:0;margin-top:2px;"></svg>
-        <div style="font-size:var(--text-body-sm);color:var(--color-text-1);"><strong>Risk:</strong> At 98% work time, 1 team member going on leave would cause delivery delays. Recommend hiring 1 backend developer before committing to Contoso.</div>
+        <div style="font-size:var(--text-body-sm);color:var(--color-text-1);"><strong>Risk:</strong> At 98% work time, 1 team member going on leave would cause delivery delays. Recommend hiring 1 backend developer before committing to Umbrella Corp.</div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeScenarioCompare()">Close</button>
-      <button class="btn btn-primary" onclick="closeScenarioCompare();GHR&&GHR.showToast&&GHR.showToast('success','Scenario Saved','Contoso Deal scenario saved to planning.')">Accept Scenario</button>
+      <button class="btn btn-primary" onclick="closeScenarioCompare();GHR&&GHR.showToast&&GHR.showToast('success','Scenario Saved','Umbrella Corp Deal scenario saved to planning.')">Accept Scenario</button>
     </div>
   </div>
 </div>

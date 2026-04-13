@@ -641,7 +641,7 @@
             <div>
               <div class="stat-value font-mono">12</div>
               <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +3 this month</div>
-              <div style="font-size:var(--text-overline);color:var(--color-text-3);margin-top:var(--space-1);">7 active · 1 bench · 1 on leave</div>
+              <div style="font-size:var(--text-overline);color:var(--color-text-3);margin-top:var(--space-1);">10 active · 1 bench · 1 on leave</div>
             </div>
           </div>
           <div class="stat-sparkline">
@@ -706,10 +706,10 @@
 
         <!-- Billable Hours % -->
         <a href="insights.html" class="stat-card card-interactive card-3d" data-sensitive="financials" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
-          <div class="stat-label">Billable Hours %</div>
+          <div class="stat-label">Team Work Time</div>
           <div class="stat-row">
             <div>
-              <div class="stat-value font-mono">87%</div>
+              <div class="stat-value font-mono">82%</div>
               <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +3% vs last month</div>
             </div>
           </div>
@@ -768,6 +768,27 @@
                 <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"/>
               </linearGradient>
               <polygon points="0,12 20,14 40,10 60,18 80,20 100,22 120,24 120,32 0,32" fill="url(#sparkAccent)"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Monthly Capacity -->
+        <a href="insights.html" class="stat-card card-interactive card-3d" style="cursor:pointer;text-decoration:none;color:inherit;display:block;">
+          <div class="stat-label">Monthly Capacity</div>
+          <div class="stat-row">
+            <div>
+              <div class="stat-value font-mono">2,076h</div>
+              <div class="stat-trend up"><svg data-lucide="trending-up" width="14" height="14"></svg> +2% vs last month</div>
+            </div>
+          </div>
+          <div class="stat-sparkline">
+            <svg viewBox="0 0 120 32" fill="none">
+              <polyline data-animate points="0,24 20,22 40,20 60,18 80,16 100,14 120,12" stroke="var(--color-info)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <linearGradient id="sparkCapacity" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-info)" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="var(--color-info)" stop-opacity="0"/>
+              </linearGradient>
+              <polygon points="0,24 20,22 40,20 60,18 80,16 100,14 120,12 120,32 0,32" fill="url(#sparkCapacity)"/>
             </svg>
           </div>
         </a>
@@ -872,7 +893,7 @@
             <div class="ai-alert-body">
               <div class="ai-alert-text">
                 <span class="badge badge-error" style="margin-right: var(--space-1);"><svg data-lucide="alert-triangle" width="12" height="12"></svg> Overwork Alert</span>
-                <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#sarah-chen">Sarah Chen</a> has averaged 47h/week for 3 consecutive weeks — consider redistribution.
+                <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a> has averaged 47h/week for 3 consecutive weeks — consider redistribution.
               </div>
               <div class="ai-alert-actions">
                 <button class="btn btn-ghost btn-xs dismiss-alert-btn">Dismiss</button>
@@ -1243,7 +1264,7 @@
                   <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#sarah-chen" class="text-2" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="87" data-href="employees.html#sarah-chen">Sarah Chen</a></span>
+                  <span class="gantt-name"><a href="employees.html#sarah-chen" class="text-2" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-1); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">ACM</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1);"></div>
@@ -1253,7 +1274,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#john-smith" class="text-2" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a></span>
+                  <span class="gantt-name"><a href="employees.html#john-smith" class="text-2" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith">John Smith</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-2); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">GLX</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-2);"></div>
@@ -1273,7 +1294,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#carol-williams" class="text-2" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></span>
+                  <span class="gantt-name"><a href="employees.html#carol-williams" class="text-2" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams">Carol Williams</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background: var(--color-chart-3); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">UMB</span></div>
                     <div class="gantt-cell" style="background: var(--color-chart-3);"></div>
@@ -1283,7 +1304,7 @@
                   </div>
                 </div>
                 <div class="gantt-row">
-                  <span class="gantt-name"><a href="employees.html#marco-rossi" class="text-2" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a></span>
+                  <span class="gantt-name"><a href="employees.html#marco-rossi" class="text-2" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi">Marco Rossi</a></span>
                   <div class="gantt-track">
                     <div class="gantt-cell" style="background:var(--color-surface-2);"></div>
                     <div class="gantt-cell" style="background: var(--color-chart-1); display:flex;align-items:center;justify-content:center;"><span style="font-size:var(--text-overline);color:var(--color-white);opacity:0.9;white-space:nowrap;overflow:hidden;font-weight:var(--weight-semibold);">ACM</span></div>
@@ -1317,7 +1338,7 @@
                     <div class="text-sm text-1">
                       <a href="employees.html#emma-laurent" data-hovercard
                          data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR"
-                         data-project="Internal" data-worktime="78" data-href="employees.html#emma-laurent"
+                         data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent"
                          class="text-primary" onclick="event.stopPropagation()">Emma Laurent</a> submitted timesheet (<span class="font-mono">40h</span>)
                     </div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:2px;">10 min ago</div>
@@ -1332,7 +1353,7 @@
                     <div class="text-sm text-1">
                       <a href="employees.html#john-smith" data-hovercard
                          data-name="John Smith" data-role="Senior Developer" data-dept="Engineering"
-                         data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith"
+                         data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith"
                          class="text-primary" onclick="event.stopPropagation()">John Smith</a> approved <a href="employees.html#alice-wang" data-hovercard
                          data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering"
                          data-project="" data-worktime="45" data-href="employees.html#alice-wang"
@@ -1377,7 +1398,7 @@
                     <div class="text-sm text-1">
                       <a href="employees.html#marco-rossi" data-hovercard
                          data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations"
-                         data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#marco-rossi"
+                         data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi"
                          class="text-primary" onclick="event.stopPropagation()">Marco Rossi</a> assigned to <a href="projects.html#initech-api" class="text-primary" onclick="event.stopPropagation()">Initech API</a>
                     </div>
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:2px;">Yesterday</div>

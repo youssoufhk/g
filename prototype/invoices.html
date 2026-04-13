@@ -333,7 +333,7 @@
               <div class="notif-item unread">
                 <div class="notif-icon"><svg data-lucide="alert-triangle" width="16" height="16" style="color: var(--color-error);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">INV-2026-046 is overdue (Contoso Inc — Deal Platform)</div>
+                  <div class="notif-title">INV-2026-046 is overdue (Umbrella Corp — Portal)</div>
                   <div class="notif-time">1 hour ago</div>
                 </div>
               </div>
@@ -474,7 +474,7 @@
               <option>Acme Corp</option>
               <option>Globex Corp</option>
               <option>Initech</option>
-              <option>Contoso Inc</option>
+              <option>Umbrella Corp</option>
               <option>Umbrella Corp</option>
             </select>
             <input type="date" class="form-input form-input-sm" id="filterDateFrom" style="min-width:120px;max-width:160px;" onchange="filterInvoices()">
@@ -543,8 +543,8 @@
                 <tr class="invoice-row" data-invoice="INV-2026-046">
                   <td class="cell-secondary" data-label="#">3</td>
                   <td data-label="Invoice"><a href="#detail" class="invoice-link">INV-2026-046</a></td>
-                  <td data-label="Client"><a href="clients.html#detail/contoso">Contoso Inc</a></td>
-                  <td data-label="Project"><a href="projects.html#detail/contoso-deal">Contoso Deal</a></td>
+                  <td data-label="Client"><a href="clients.html#detail/umbrella">Umbrella Corp</a></td>
+                  <td data-label="Project"><a href="projects.html#detail/umbrella-portal">Umbrella Corp Portal</a></td>
                   <td class="cell-mono" data-label="Amount" data-sensitive="financials">
                     &euro;7,800
                     <div style="font-size:var(--text-caption);color:var(--color-text-3);font-family:var(--font-sans);font-weight:var(--weight-regular);">Fixed price</div>
@@ -1077,7 +1077,7 @@
               <option value="acme" selected>Acme Corp</option>
               <option value="globex">Globex Corp</option>
               <option value="initech">Initech</option>
-              <option value="contoso">Contoso Inc</option>
+              <option value="umbrella">Umbrella Corp</option>
               <option value="umbrella">Umbrella Corp</option>
             </select>
           </div>
@@ -1405,8 +1405,18 @@
       menu.style.cssText = 'position:absolute;z-index:100;background:var(--color-surface-0);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-3);min-width:180px;padding:var(--space-1) 0;';
 
       var items = [
-        { icon: 'download', label: 'Download PDF', action: function() { showToast('info','Download Started', invoiceId + '.pdf is being prepared...'); } },
-        { icon: 'send', label: 'Send', action: function() { showToast('success','Invoice Sent', invoiceId + ' sent to ' + clientName + '.'); } },
+        { icon: 'eye', label: 'View', action: function() { showToast('info','Opening','Viewing invoice ' + invoiceId); window.location.hash = 'detail'; } },
+        { icon: 'send', label: 'Send to Client', action: function() {
+          var badge = row ? row.querySelector('.badge, [class*="status"]') : null;
+          if (badge) { badge.textContent = 'Sent'; badge.className = badge.className.replace(/badge-\w+/g, '') + ' badge-info'; }
+          showToast('success','Invoice Sent', invoiceId + ' has been sent to ' + clientName + '.');
+        } },
+        { icon: 'download', label: 'Download PDF', action: function() { showToast('info','Downloading','Invoice PDF downloading...'); } },
+        { icon: 'check-circle', label: 'Record Payment', action: function() {
+          var badge = row ? row.querySelector('.badge, [class*="status"]') : null;
+          if (badge) { badge.textContent = 'Paid'; badge.className = badge.className.replace(/badge-\w+/g, '') + ' badge-success'; }
+          showToast('success','Payment Recorded', invoiceId + ' marked as paid');
+        } },
         { icon: 'copy', label: 'Duplicate', action: function() { window.duplicateInvoice(invoiceId, clientName); } },
         { icon: 'ban', label: 'Void', action: function() { showToast('warning','Invoice Voided', invoiceId + ' has been voided.'); } }
       ];
@@ -1690,13 +1700,28 @@ window.clearInvoiceFilters = function() {
   showToast('info', 'Filters Cleared', 'Showing all invoices.');
 };
 
+window.sendInvoice = function(btn) {
+  var row = btn.closest('tr') || btn.closest('[class*="invoice-row"]') || btn.closest('[class*="invoice-card"]');
+  if (row) {
+    var badge = row.querySelector('.badge, [class*="status"]');
+    if (badge) { badge.textContent = 'Sent'; badge.className = badge.className.replace(/badge-\w+/g, '') + ' badge-info'; }
+  }
+  GHR && GHR.showToast ? GHR.showToast('success', 'Invoice Sent', 'Invoice has been sent to client') : showToast('success', 'Invoice Sent', 'Invoice has been sent to client');
+  var menu = btn.closest('[class*="menu"], .invoice-action-menu');
+  if (menu) menu.style.display = 'none';
+};
+
 window.recordPayment = function(btn) {
-  var row = btn.closest('tr, .invoice-row');
-  var invoiceNum = row ? (row.getAttribute('data-invoice') || row.querySelector('[data-label="Invoice"] a, td:first-child').textContent) : 'Invoice';
-  showToast('success', 'Payment Recorded', invoiceNum + ' marked as paid');
-  var badge = row ? row.querySelector('.badge') : null;
-  if (badge) { badge.className = 'badge badge-success'; badge.innerHTML = '<svg data-lucide="check-circle" width="12" height="12"></svg> Paid'; lucide.createIcons({ nodes: [badge] }); }
-  btn.disabled = true; btn.innerHTML = '<svg data-lucide="check" width="12" height="12"></svg> Paid'; lucide.createIcons({ nodes: [btn] });
+  var row = btn.closest('tr') || btn.closest('[class*="invoice-row"]') || btn.closest('[class*="invoice-card"]') || btn.closest('tr, .invoice-row');
+  var invoiceNum = row ? (row.getAttribute('data-invoice') || '') : 'Invoice';
+  if (row) {
+    var badge = row.querySelector('.badge, [class*="status"]');
+    if (badge) { badge.textContent = 'Paid'; badge.className = badge.className.replace(/badge-\w+/g, '') + ' badge-success'; }
+  }
+  showToast('success', 'Payment Recorded', (invoiceNum || 'Invoice') + ' marked as paid');
+  if (btn.tagName === 'BUTTON') { btn.disabled = true; btn.innerHTML = '<svg data-lucide="check" width="12" height="12"></svg> Paid'; if (window.lucide) lucide.createIcons({ nodes: [btn] }); }
+  var menu = btn.closest('[class*="menu"], .invoice-action-menu');
+  if (menu) menu.style.display = 'none';
 };
 
 window.toggleInvoiceEdit = function() {
@@ -1736,8 +1761,8 @@ window.toggleInvoiceEdit = function() {
     'initech': [
       { value: 'initech-api', label: 'Initech API Integration' }
     ],
-    'contoso': [
-      { value: 'contoso-deal', label: 'Contoso Deal' }
+    'umbrella': [
+      { value: 'umbrella-portal', label: 'Umbrella Corp Portal' }
     ]
   };
   if (genClient && genProject) {

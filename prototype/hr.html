@@ -709,7 +709,7 @@
                 <svg data-lucide="download" width="14" height="14"></svg>
                 Export
               </button>
-              <button class="btn btn-primary btn-sm" id="addCandidateBtn">
+              <button class="btn btn-primary btn-sm" id="addCandidateBtn" onclick="document.getElementById('addCandidateInlineModal').style.display='flex'">
                 <svg data-lucide="user-plus" width="14" height="14"></svg>
                 Add Candidate
               </button>
@@ -752,10 +752,10 @@
             <div class="kanban-column stage-applied">
               <div class="kanban-header">
                 <span class="col-title">Applied</span>
-                <span class="col-count">15</span>
+                <span class="col-count">3</span>
               </div>
               <div class="kanban-body" data-stage="Applied">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Maria Santos', 'Senior Frontend Developer', 91, ['React','TypeScript','CSS','Figma','Jest'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">MS</div>
                     <div>
@@ -769,13 +769,14 @@
                     <span class="source-tag linkedin"><svg data-lucide="linkedin" width="10" height="10"></svg> LinkedIn</span>
                   </div>
                   <div class="days-in-stage">In stage: 5 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Liam O\'Brien', 'DevOps Engineer', 78, ['CI/CD Pipelines','Docker','Kubernetes','AWS','Linux'])">
                   <div class="cand-top">
-                    <div class="avatar avatar-sm">JW</div>
+                    <div class="avatar avatar-sm">LO</div>
                     <div>
-                      <div class="cand-name">James Wilson</div>
+                      <div class="cand-name">Liam O'Brien</div>
                     </div>
                   </div>
                   <div class="cand-position">DevOps Engineer</div>
@@ -785,9 +786,10 @@
                     <span class="source-tag referral"><svg data-lucide="user-check" width="10" height="10"></svg> Referral: Sarah Chen</span>
                   </div>
                   <div class="days-in-stage">In stage: 9 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Aisha Patel', 'UX Designer', 84, ['Figma','User Research','Prototyping','Design Systems'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">AP</div>
                     <div>
@@ -801,6 +803,7 @@
                     <span class="source-tag website"><svg data-lucide="globe" width="10" height="10"></svg> Website</span>
                   </div>
                   <div class="days-in-stage">In stage: 12 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -809,10 +812,10 @@
             <div class="kanban-column stage-screening">
               <div class="kanban-header">
                 <span class="col-title">Screening</span>
-                <span class="col-count">8</span>
+                <span class="col-count">2</span>
               </div>
               <div class="kanban-body" data-stage="Screening">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Thomas Mueller', 'Backend Developer', 85, ['Node.js','PostgreSQL','REST APIs','Docker','Python'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">TM</div>
                     <div>
@@ -829,9 +832,10 @@
                     <span class="score-badge badge-success" title="AI-scored on skills, experience, and role fit"><svg data-lucide="star" width="10" height="10"></svg> 85/100</span>
                   </div>
                   <div class="days-in-stage">In stage: 15 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Lucia Sanchez', 'Marketing Manager', 72, ['Digital Marketing','SEO','Campaign Management','Salesforce'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">LS</div>
                     <div>
@@ -848,6 +852,7 @@
                     <span class="score-badge badge-warning" title="AI-scored on skills, experience, and role fit"><svg data-lucide="star" width="10" height="10"></svg> 72/100</span>
                   </div>
                   <div class="days-in-stage">In stage: 17 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -856,10 +861,10 @@
             <div class="kanban-column stage-interview">
               <div class="kanban-header">
                 <span class="col-title">Interview</span>
-                <span class="col-count">12</span>
+                <span class="col-count">3</span>
               </div>
               <div class="kanban-body" data-stage="Interview">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Elena Kowalski', 'Project Manager', 88, ['Agile','Scrum','JIRA','Stakeholder Management','PMP'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">EK</div>
                     <div>
@@ -875,9 +880,10 @@
                     <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: John Smith</div>
                   </div>
                   <div class="days-in-stage">In stage: 21 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Nina Karlsson', 'Senior Backend Developer', 93, ['Go','PostgreSQL','Microservices','Kafka','AWS'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">NK</div>
                     <div>
@@ -893,9 +899,10 @@
                     <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: David Park</div>
                   </div>
                   <div class="days-in-stage">In stage: 14 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Pierre Martin', 'Data Engineer', 87, ['Python','Spark','Airflow','BigQuery','dbt'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">PM</div>
                     <div>
@@ -911,6 +918,7 @@
                     <div class="info-row"><svg data-lucide="user" width="12" height="12"></svg> Interviewer: Sarah Chen</div>
                   </div>
                   <div class="days-in-stage">In stage: 8 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -919,10 +927,10 @@
             <div class="kanban-column stage-offer">
               <div class="kanban-header">
                 <span class="col-title">Offer</span>
-                <span class="col-count">4</span>
+                <span class="col-count">2</span>
               </div>
               <div class="kanban-body" data-stage="Offer">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Raj Krishnan', 'Data Analyst', 82, ['SQL','Python','Tableau','Power BI','Excel'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">RK</div>
                     <div>
@@ -935,9 +943,10 @@
                     <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span>
                   </div>
                   <div class="days-in-stage">In stage: 4 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Sofia Oliveira', 'Product Designer', 90, ['Figma','Sketch','Design Systems','User Testing','Prototyping'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">SO</div>
                     <div>
@@ -950,6 +959,7 @@
                     <span class="badge badge-success"><svg data-lucide="circle" width="12" height="12"></svg> Accepted</span>
                   </div>
                   <div class="days-in-stage">In stage: 7 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -958,10 +968,10 @@
             <div class="kanban-column stage-hired">
               <div class="kanban-header">
                 <span class="col-title">Hired</span>
-                <span class="col-count">8</span>
+                <span class="col-count">2</span>
               </div>
               <div class="kanban-body" data-stage="Hired">
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Yuki Tanaka', 'QA Engineer', 89, ['Selenium','Cypress','JIRA','Manual Testing','API Testing'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">YT</div>
                     <div>
@@ -975,9 +985,10 @@
                     <span>Engineering</span>
                   </div>
                   <div class="days-in-stage">In stage: 11 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
 
-                <div class="candidate-card card-interactive" draggable="true">
+                <div class="candidate-card card-interactive" draggable="true" onclick="openCandidateDrawer('Ahmed Hassan', 'Sales Executive', 86, ['B2B Sales','Salesforce','Negotiation','Account Management'])">
                   <div class="cand-top">
                     <div class="avatar avatar-sm">AH</div>
                     <div>
@@ -991,6 +1002,7 @@
                     <span>Sales</span>
                   </div>
                   <div class="days-in-stage">In stage: 18 days</div>
+                  <select onclick="event.stopPropagation()" onchange="moveKanbanCard(this)" style="font-size:var(--text-caption);padding:2px 4px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text-2);margin-top:var(--space-1);cursor:pointer;width:100%;"><option value="">Move to...</option><option value="Applied">Applied</option><option value="Screening">Screening</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Hired">Hired</option></select>
                 </div>
               </div>
             </div>
@@ -1004,7 +1016,7 @@
 
           <div class="section-heading mt-4">
             <h3>Active Onboardings</h3>
-            <button class="btn btn-secondary btn-sm" onclick="showToast('info','Start Onboarding','Onboarding wizard would open here — select a new hire to begin.')">
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('onboardingName').textContent='New Hire';document.getElementById('onboardingModal').style.display='flex'">
               <svg data-lucide="plus" width="14" height="14"></svg>
               Start Onboarding
             </button>
@@ -1171,13 +1183,13 @@
               </div>
               <div class="card-body" style="display:flex;flex-direction:column;gap:var(--space-4);">
 
-                <!-- James Wilson offboarding -->
+                <!-- Liam O'Brien offboarding (contractor) -->
                 <div class="offboarding-item" id="offboardJW" style="border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4)">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2);">
                     <div style="display:flex;align-items:center;gap:var(--space-3)">
-                      <div class="avatar" style="background:var(--color-chart-4)">JW</div>
+                      <div class="avatar" style="background:var(--color-chart-4)">LO</div>
                       <div>
-                        <div class="font-semibold">James Wilson</div>
+                        <div class="font-semibold">Liam O'Brien</div>
                         <div class="text-3">DevOps Engineer &mdash; Last day: Apr 30, 2026</div>
                       </div>
                     </div>
@@ -1736,13 +1748,7 @@
     }
   });
 
-  // ── Candidate Card Click ──
-  document.querySelectorAll('.candidate-card').forEach(function(card) {
-    card.addEventListener('click', function() {
-      var name = this.querySelector('.cand-name').textContent;
-      showToast('info', 'Candidate Profile', 'Opening ' + name + "'s full profile...");
-    });
-  });
+  // ── Candidate Card Click ── handled via onclick attributes on each card
 
   // ── Onboarding Checkbox interactivity ──
   document.querySelectorAll('.checklist-item input[type="checkbox"]:not([disabled])').forEach(function(cb) {
@@ -1847,14 +1853,8 @@
     });
   }
 
-  // ── Add Candidate Modal ──
-  var addCandidateBtn = document.getElementById('addCandidateBtn');
-  if (addCandidateBtn) {
-    addCandidateBtn.addEventListener('click', function() {
-      var modal = document.getElementById('addCandidateModal');
-      if (modal) modal.classList.add('active');
-    });
-  }
+  // ── Add Candidate Modal — handled via onclick on button ──
+  // addCandidateBtn onclick opens addCandidateInlineModal (inline style modal)
   var addCandidateModalClose = document.getElementById('addCandidateModalClose');
   var addCandidateModalCancel = document.getElementById('addCandidateModalCancel');
   var addCandidateForm = document.getElementById('addCandidateForm');
@@ -2159,5 +2159,119 @@ document.addEventListener('DOMContentLoaded', function() {
   <a href="leaves.html" class="bottom-nav-item"><svg data-lucide="palm-tree" width="22" height="22"></svg><span>Leaves</span></a>
   <a href="#" class="bottom-nav-item" onclick="document.getElementById('sidebar').classList.add('mobile-open');return false;"><svg data-lucide="menu" width="22" height="22"></svg><span>More</span></a>
 </nav>
+
+<!-- ── Candidate Slide-over Drawer ── -->
+<div id="candidateDrawer" style="position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--color-surface-0);border-left:1px solid var(--color-border);z-index:200;transform:translateX(100%);transition:transform 0.25s ease;overflow-y:auto;padding:var(--space-6);">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+    <h2 id="drawerName" style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);color:var(--color-text-1);"></h2>
+    <button onclick="document.getElementById('candidateDrawer').style.transform='translateX(100%)';document.getElementById('drawerOverlay').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--color-text-2);font-size:var(--text-body-lg);line-height:1;padding:var(--space-1);">&#x2715;</button>
+  </div>
+  <p id="drawerRole" style="color:var(--color-text-2);margin-bottom:var(--space-2);font-size:var(--text-body-sm);"></p>
+  <p id="drawerFit" style="color:var(--color-primary);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);font-size:var(--text-body-sm);"></p>
+  <div id="drawerSkills" style="margin-bottom:var(--space-4);"></div>
+  <a id="drawerResume" href="#" style="color:var(--color-primary);display:block;margin-bottom:var(--space-4);font-size:var(--text-body-sm);">&#128196; View Resume</a>
+  <textarea id="drawerNotes" placeholder="Add notes..." style="width:100%;min-height:80px;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);color:var(--color-text-1);margin-bottom:var(--space-4);resize:vertical;font-family:var(--font-sans);font-size:var(--text-body-sm);box-sizing:border-box;"></textarea>
+  <button onclick="GHR.showToast('success','Moved','Candidate moved to next stage');document.getElementById('candidateDrawer').style.transform='translateX(100%)';document.getElementById('drawerOverlay').style.display='none'" style="width:100%;padding:var(--space-3);background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-weight:var(--weight-semibold);font-family:var(--font-sans);font-size:var(--text-body-sm);">Move to Next Stage &#x2192;</button>
+</div>
+<div id="drawerOverlay" onclick="document.getElementById('candidateDrawer').style.transform='translateX(100%)';this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;"></div>
+
+<!-- ── Start Onboarding Modal ── -->
+<div id="onboardingModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--color-surface-0);border-radius:var(--radius-lg);padding:var(--space-6);max-width:400px;width:90%;box-shadow:var(--shadow-3);">
+    <h3 style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);color:var(--color-text-1);">Start Onboarding</h3>
+    <p style="margin-bottom:var(--space-4);color:var(--color-text-2);font-size:var(--text-body-sm);">Start onboarding for <strong id="onboardingName"></strong>?</p>
+    <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+      <button onclick="document.getElementById('onboardingModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);">Cancel</button>
+      <button onclick="GHR.showToast('success','Onboarding Started','Onboarding checklist created successfully');document.getElementById('onboardingModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-sans);font-size:var(--text-body-sm);">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Candidate Inline Modal ── -->
+<div id="addCandidateInlineModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--color-surface-0);border-radius:var(--radius-lg);padding:var(--space-6);max-width:420px;width:90%;box-shadow:var(--shadow-3);">
+    <h3 style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);margin-bottom:var(--space-4);color:var(--color-text-1);">Add Candidate</h3>
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-4);">
+      <input id="candNameNew" placeholder="Full name" style="padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);"/>
+      <input id="candRoleNew" placeholder="Role applied for" style="padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);"/>
+      <input id="candSourceNew" placeholder="Source (LinkedIn, Referral, etc.)" style="padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);"/>
+    </div>
+    <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+      <button onclick="document.getElementById('addCandidateInlineModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);">Cancel</button>
+      <button onclick="addCandidateNew()" style="padding:var(--space-2) var(--space-4);background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-sans);font-size:var(--text-body-sm);">Add Candidate</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Move Kanban Card ──
+function moveKanbanCard(sel) {
+  if (!sel.value) return;
+  var card = sel.closest('.candidate-card');
+  var targetStage = sel.value;
+  var target = document.querySelector('.kanban-body[data-stage="' + targetStage + '"]');
+  if (target && card) {
+    target.appendChild(card);
+    // Update column header counts
+    document.querySelectorAll('.kanban-column').forEach(function(col) {
+      var body = col.querySelector('.kanban-body');
+      var countEl = col.querySelector('.col-count');
+      if (body && countEl) {
+        countEl.textContent = body.querySelectorAll('.candidate-card').length;
+      }
+    });
+    GHR && GHR.showToast ? GHR.showToast('success', 'Moved', 'Candidate moved to ' + targetStage) : showToast('Moved to ' + targetStage);
+  }
+  sel.value = '';
+}
+window.moveKanbanCard = moveKanbanCard;
+
+// ── Candidate drawer ──
+function openCandidateDrawer(name, role, fit, skills) {
+  document.getElementById('drawerName').textContent = name;
+  document.getElementById('drawerRole').textContent = role;
+  document.getElementById('drawerFit').textContent = fit + '% AI Fit Score';
+  document.getElementById('drawerSkills').innerHTML =
+    '<p style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);margin-bottom:var(--space-2);color:var(--color-text-2);">Key Skills</p>' +
+    skills.map(function(s) { return '<span style="display:inline-block;background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px 10px;font-size:var(--text-body-sm);margin:2px;color:var(--color-text-1);">' + s + '</span>'; }).join('');
+  document.getElementById('drawerNotes').value = '';
+  document.getElementById('drawerOverlay').style.display = 'block';
+  document.getElementById('candidateDrawer').style.transform = 'translateX(0)';
+}
+window.openCandidateDrawer = openCandidateDrawer;
+
+// ── Add candidate (inline modal) ──
+function addCandidateNew() {
+  var name = document.getElementById('candNameNew').value.trim();
+  var role = document.getElementById('candRoleNew').value.trim();
+  var source = document.getElementById('candSourceNew').value.trim();
+  if (!name) { return; }
+  var firstCol = document.querySelector('.kanban-body[data-stage="Applied"]');
+  if (firstCol) {
+    var card = document.createElement('div');
+    card.className = 'candidate-card card-interactive';
+    card.setAttribute('draggable', 'true');
+    card.style.cssText = 'cursor:pointer;';
+    var initials = name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0,2);
+    card.innerHTML =
+      '<div class="cand-top"><div class="avatar avatar-sm">' + initials + '</div><div><div class="cand-name">' + name + '</div></div></div>' +
+      '<div class="cand-position">' + (role || 'Role TBD') + '</div>' +
+      '<div class="cand-meta"><span>' + (source || 'Direct') + '</span></div>' +
+      '<div class="days-in-stage">In stage: 0 days</div>';
+    card.onclick = function() { openCandidateDrawer(name, role || 'Role TBD', 75, ['TBD']); };
+    firstCol.prepend(card);
+    // Update Applied count
+    var appliedCount = firstCol.querySelectorAll('.candidate-card').length;
+    var appliedHeader = document.querySelector('.stage-applied .col-count');
+    if (appliedHeader) appliedHeader.textContent = appliedCount;
+  }
+  document.getElementById('addCandidateInlineModal').style.display = 'none';
+  GHR.showToast('success', 'Candidate Added', name + ' added to pipeline');
+  document.getElementById('candNameNew').value = '';
+  document.getElementById('candRoleNew').value = '';
+  document.getElementById('candSourceNew').value = '';
+}
+window.addCandidateNew = addCandidateNew;
+</script>
 </body>
 </html>

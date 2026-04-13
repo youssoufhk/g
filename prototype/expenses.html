@@ -695,7 +695,7 @@
                 <option value="Acme Web Redesign">Acme Web Redesign</option>
                 <option value="Globex Phase 2">Globex Phase 2</option>
                 <option value="Initech API">Initech API</option>
-                <option value="Contoso Deal">Contoso Deal</option>
+                <option value="Umbrella Corp">Umbrella Corp</option>
               </select>
               <div class="toggle-wrap">
                 <div class="toggle-switch" id="billableToggle" onclick="this.classList.toggle('active')"></div>
@@ -873,11 +873,12 @@
                     <div class="upload-text">Drop receipt here or click to upload</div>
                     <div class="upload-hint">Supports PDF, JPG, PNG up to 10MB</div>
                     <div class="upload-buttons">
-                      <button class="btn btn-secondary btn-sm">
+                      <input type="file" id="expenseFileInput" accept="image/*,application/pdf" style="display:none" />
+                      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('expenseFileInput').click()">
                         <svg data-lucide="camera" width="16" height="16"></svg>
                         Camera
                       </button>
-                      <button class="btn btn-secondary btn-sm">
+                      <button class="btn btn-secondary btn-sm" id="browseBtn" onclick="document.getElementById('expenseFileInput').click()">
                         <svg data-lucide="folder-open" width="16" height="16"></svg>
                         Browse
                       </button>
@@ -989,7 +990,7 @@
                       <option value="acme" selected>Acme Web Redesign</option>
                       <option value="globex">Globex Phase 2</option>
                       <option value="initech">Initech API</option>
-                      <option value="contoso">Contoso Deal</option>
+                      <option value="umbrella">Umbrella Corp</option>
                       <option value="internal">Internal</option>
                     </select>
                   </div>
@@ -1820,6 +1821,18 @@
       input.click();
     });
   }
+
+  // ── Expense file input change handler ──
+  (function() {
+    var expenseFileInput = document.getElementById('expenseFileInput');
+    if (expenseFileInput) {
+      expenseFileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          showToast('info', 'File Selected', this.files[0].name);
+        }
+      });
+    }
+  })();
 
   // ── Submit expense (ISSUE-16 + ISSUE-41) ──
   window.submitExpense = function() {

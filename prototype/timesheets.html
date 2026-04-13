@@ -103,7 +103,7 @@
       background: var(--color-surface-0);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
-      overflow: hidden;
+      overflow-x: auto;
       margin-bottom: var(--space-4);
     }
     .ts-grid {
@@ -1179,10 +1179,19 @@
             <svg data-lucide="save" width="16" height="16"></svg>
             Save Draft
           </button>
+          <button class="btn btn-secondary btn-md" id="generateInvoiceBtn" onclick="generateInvoiceFromTimesheets()">
+            <svg data-lucide="file-text" width="16" height="16"></svg>
+            Generate Invoice
+          </button>
           <button class="btn btn-primary btn-md" id="submitBtn">
             <svg data-lucide="send" width="16" height="16"></svg>
             Submit for Review
           </button>
+        </div>
+        <!-- Invoice confirmation area (shown after Generate Invoice) -->
+        <div id="invoiceConfirmArea" style="display:none;margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-success-muted);border:1px solid var(--color-success);border-radius:var(--radius-md);font-size:var(--text-body-sm);color:var(--color-success);">
+          <svg data-lucide="check-circle" width="14" height="14" style="display:inline;vertical-align:-2px;margin-right:var(--space-1);"></svg>
+          <strong>INV-2026-055</strong> draft created &mdash; Client: Acme Corp &mdash; Amount: &euro;4,200 &mdash; Status: <span class="badge badge-warning" style="font-size:var(--text-caption);">Draft</span>
         </div>
       </div>
 
@@ -1361,7 +1370,7 @@
         <!-- Approval Queue — compact action rows (UI15) -->
         <div class="action-table">
 
-          <!-- Row 1: John Smith — 32h billable + 10h internal = 80% + 25% = 105% total -->
+          <!-- Row 1: John Smith — 40h billable + 5h internal = 100% + 12.5% = 112.5% total -->
           <div class="action-row approval-card" id="aq-1">
             <div class="action-row-checkbox">
               <input type="checkbox" aria-label="Select John Smith">
@@ -1369,22 +1378,22 @@
             <div class="action-row-employee">
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;">JS</div>
               <div>
-                <div class="employee-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="82" data-href="employees.html#john-smith">John Smith</a></div>
+                <div class="employee-name"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith">John Smith</a></div>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering</div>
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">42h</strong> total &mdash; <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex Phase 2</a> (32h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (10h)
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">45h</strong> total &mdash; <a href="projects.html#globex-phase-2" style="font-size:var(--text-body-sm);">Globex Phase 2</a> (40h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (5h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
-              <div class="aq-worktime-bar" title="80% billable + 25% internal = 105% total work time">
-                <div class="aq-worktime-fill" style="width:80%;"></div>
-                <div class="aq-worktime-overflow" style="width:6px;" title="+2h overwork"></div>
+              <div class="aq-worktime-bar" title="100% billable + 12.5% internal = 112.5% total work time">
+                <div class="aq-worktime-fill worktime-fill overflow" style="width:100%;background:var(--color-warning);"></div>
+                <div class="aq-worktime-overflow" style="width:8px;" title="+5h overwork"></div>
               </div>
-              <span class="aq-worktime-pct overwork">105%</span>
+              <span class="aq-worktime-pct overwork">112.5%</span>
             </div>
             <div class="action-row-status">
-              <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> +2h overwork</span>
+              <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> +5h overwork</span>
             </div>
             <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-1">
@@ -1438,7 +1447,7 @@
             <div class="action-row-employee">
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-info),var(--color-primary));">CW</div>
               <div>
-                <div class="employee-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="90" data-href="employees.html#carol-williams">Carol Williams</a></div>
+                <div class="employee-name"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100" data-href="employees.html#carol-williams">Carol Williams</a></div>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Design</div>
               </div>
             </div>
@@ -1464,7 +1473,7 @@
             </div>
           </div>
 
-          <!-- Row 4: Marco Rossi — 40h billable + 4h internal = 100% + 10% = 110% total (overwork) -->
+          <!-- Row 4: Marco Rossi — 36h billable + 7h internal = 90% + 17.5% = 107.5% total (overwork) -->
           <div class="action-row approval-card" id="aq-4">
             <div class="action-row-checkbox">
               <input type="checkbox" aria-label="Select Marco Rossi">
@@ -1472,22 +1481,22 @@
             <div class="action-row-employee">
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-accent),var(--color-error));">MR</div>
               <div>
-                <div class="employee-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="88" data-href="employees.html#marco-rossi">Marco Rossi</a></div>
+                <div class="employee-name"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="108" data-href="employees.html#marco-rossi">Marco Rossi</a></div>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">Operations</div>
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">44h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (40h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (4h)
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">43h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (36h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (7h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
-              <div class="aq-worktime-bar" title="100% billable + 10% internal = 110% total work time">
-                <div class="aq-worktime-fill" style="width:100%;"></div>
-                <div class="aq-worktime-overflow" style="width:8px;" title="+4h overwork"></div>
+              <div class="aq-worktime-bar" title="90% billable + 17.5% internal = 107.5% total work time">
+                <div class="aq-worktime-fill worktime-fill overflow" style="width:100%;background:var(--color-warning);"></div>
+                <div class="aq-worktime-overflow" style="width:6px;" title="+3h overwork"></div>
               </div>
-              <span class="aq-worktime-pct overwork">110%</span>
+              <span class="aq-worktime-pct overwork">107.5%</span>
             </div>
             <div class="action-row-status">
-              <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> +4h overwork</span>
+              <span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> +3h overwork</span>
             </div>
             <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-4">
@@ -1507,7 +1516,7 @@
             <div class="action-row-employee">
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-info),var(--color-success));">EL</div>
               <div>
-                <div class="employee-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent">Emma Laurent</a></div>
+                <div class="employee-name"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="90" data-href="employees.html#emma-laurent">Emma Laurent</a></div>
                 <div style="font-size:var(--text-caption);color:var(--color-text-3);">HR</div>
               </div>
             </div>
@@ -1533,7 +1542,7 @@
             </div>
           </div>
 
-          <!-- Row 6: Alice Wang — 38h billable + 2h internal = 95% + 5% = 100% total -->
+          <!-- Row 6: Alice Wang — 16h billable + 2h internal = 40% + 5% = 45% total (On Leave Apr 14-18) -->
           <div class="action-row approval-card" id="aq-6">
             <div class="action-row-checkbox">
               <input type="checkbox" aria-label="Select Alice Wang">
@@ -1542,20 +1551,20 @@
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-accent),var(--color-info));">AW</div>
               <div>
                 <div class="employee-name"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14–18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a></div>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering</div>
+                <div style="font-size:var(--text-caption);color:var(--color-text-3);">Engineering &mdash; On Leave Apr 14&ndash;18</div>
               </div>
             </div>
             <div class="action-row-detail">
-              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">40h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (38h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (2h)
+              Week of Apr 7 &mdash; <strong style="font-family:var(--font-mono);">18h</strong> total &mdash; <a href="projects.html#acme-web-redesign" style="font-size:var(--text-body-sm);">Acme Web</a> (16h) + <a href="projects.html#internal" style="font-size:var(--text-body-sm);">Internal</a> (2h)
             </div>
             <div class="action-row-meta" style="display:flex;align-items:center;gap:var(--space-2);">
-              <div class="aq-worktime-bar" title="95% billable + 5% internal = 100% total work time">
-                <div class="aq-worktime-fill" style="width:95%;"></div>
+              <div class="aq-worktime-bar" title="40% billable + 5% internal = 45% total work time">
+                <div class="aq-worktime-fill" style="width:45%;"></div>
               </div>
-              <span class="aq-worktime-pct">100%</span>
+              <span class="aq-worktime-pct">45%</span>
             </div>
             <div class="action-row-status">
-              <span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> On target</span>
+              <span class="badge badge-info"><svg data-lucide="palm-tree" width="12" height="12"></svg> On Leave</span>
             </div>
             <div class="action-row-actions always-visible" style="gap:var(--space-1-5);">
               <button class="btn btn-primary btn-sm aq-approve-btn" data-id="aq-6">
@@ -1575,7 +1584,7 @@
             <div class="action-row-employee">
               <div class="avatar avatar-sm" style="margin-right:var(--space-2);flex-shrink:0;background:linear-gradient(135deg,var(--color-error),var(--color-accent));">DP</div>
               <div>
-                <div class="employee-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="45" data-href="employees.html#david-park">David Park</a></div>
+                <div class="employee-name"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="85" data-href="employees.html#david-park">David Park</a></div>
                 <div style="font-size:var(--text-caption);color:var(--color-error);">Finance &mdash; <strong>OVERDUE 3d</strong></div>
               </div>
             </div>
@@ -2846,6 +2855,32 @@
       rejectModal.classList.remove('active');
     }
   });
+
+  // ── Generate Invoice from Timesheets ──
+  window.generateInvoiceFromTimesheets = function() {
+    var btn = document.getElementById('generateInvoiceBtn');
+    if (btn) {
+      btn.classList.add('btn-loading');
+      btn.disabled = true;
+    }
+    setTimeout(function() {
+      if (btn) {
+        btn.classList.remove('btn-loading');
+        btn.disabled = false;
+      }
+      // Show toast
+      showToast('success', 'Invoice Created', 'INV-2026-055 draft created for \u20ac4,200');
+      // Show confirmation area
+      var area = document.getElementById('invoiceConfirmArea');
+      if (area) {
+        area.style.display = 'block';
+        if (window.lucide) lucide.createIcons({ nodes: [area] });
+        // Highlight briefly
+        area.style.transition = 'background 0.3s';
+        area.style.background = 'var(--color-success-muted)';
+      }
+    }, 800);
+  };
 
   // ── Initial recalculate ──
   recalculate();

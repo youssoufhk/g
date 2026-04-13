@@ -84,6 +84,11 @@
 .btn-icon.btn-sm { height: 32px; width: 32px; }
 .btn-icon.btn-lg { height: 44px; width: 44px; }
 
+/* Touch device: ensure .btn-xs meets 44px minimum tap target */
+@media (hover: none) and (pointer: coarse) {
+  .btn-xs { min-height: 44px; }
+}
+
 /* Button Variants */
 .btn-primary {
   background: var(--color-primary);
@@ -1167,9 +1172,9 @@
 .worktime-bar .worktime-fill.high { background: var(--color-success); }
 .worktime-bar .worktime-fill.mid { background: var(--color-warning); }
 .worktime-bar .worktime-fill.low { background: var(--color-error); }
-/* Overflow state for >100% (overwork) */
+/* Overflow state for >100% (overwork) — amber/warning color */
 .worktime-bar .worktime-fill.overflow {
-  background: linear-gradient(90deg, var(--color-success) 0%, var(--color-success) calc(100% / var(--worktime-pct, 1) * 100), var(--color-error) calc(100% / var(--worktime-pct, 1) * 100), var(--color-error) 100%);
+  background: var(--color-warning);
 }
 .worktime-bar .worktime-overflow {
   position: absolute;

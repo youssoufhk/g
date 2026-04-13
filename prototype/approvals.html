@@ -467,7 +467,7 @@
               <a href="employees.html#alice-wang" class="employee-name" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-status="on-leave" data-href="employees.html#alice-wang">Alice Wang</a>
             </div>
             <div class="action-row-detail card-details">
-              Annual Leave Apr 28–29 <span class="detail-sep">&middot;</span> 2 days <span class="detail-sep">&middot;</span> Balance after: 16 days
+              Annual Leave Apr 14–18 <span class="detail-sep">&middot;</span> 5 days <span class="detail-sep">&middot;</span> Balance after: 13 days
             </div>
             <div class="action-row-meta">Engineering <span style="color:var(--color-text-3);margin-left:var(--space-2);">Today</span></div>
             <div class="action-row-status">
@@ -665,7 +665,7 @@
               <a href="employees.html#sophie-dubois" class="employee-name" data-hovercard data-name="Sophie Dubois" data-role="Business Analyst" data-dept="Operations" data-worktime="82" data-href="employees.html#sophie-dubois">Sophie Dubois</a>
             </div>
             <div class="action-row-detail card-details">
-              Week Mar 30–Apr 5 <span class="detail-sep">&middot;</span> <span class="font-mono font-semibold" style="color:var(--color-success);">38h</span> <span class="detail-sep">&middot;</span> Contoso Inc (34h), Internal (4h)
+              Week Mar 30–Apr 5 <span class="detail-sep">&middot;</span> <span class="font-mono font-semibold" style="color:var(--color-success);">38h</span> <span class="detail-sep">&middot;</span> Umbrella Corp (34h), Internal (4h)
             </div>
             <div class="action-row-meta">Operations <span style="color:var(--color-text-3);margin-left:var(--space-2);">Today</span></div>
             <div class="action-row-status">
@@ -859,6 +859,19 @@
     <div class="modal-footer">
       <button class="btn btn-secondary btn-md" onclick="closeModal('rejectAllModal')">Cancel</button>
       <button class="btn btn-destructive btn-md" id="rejectAllConfirmBtn">Reject Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Reject Modal (from bulk action bar) -->
+<div id="bulkRejectModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:var(--bg-card, var(--color-surface-2));border-radius:var(--radius-lg);padding:var(--space-6);max-width:420px;width:90%;">
+    <h3 style="font-size:var(--text-lg, var(--text-body-lg));font-weight:var(--weight-semibold);margin-bottom:var(--space-4);color:var(--text-primary, var(--color-text-1));">Reject Selected</h3>
+    <p style="color:var(--text-secondary, var(--color-text-2));margin-bottom:var(--space-3);">Please provide a reason for rejection:</p>
+    <textarea id="bulkRejectReason" placeholder="Rejection reason..." style="width:100%;min-height:80px;background:var(--bg-secondary, var(--color-surface-1));border:1px solid var(--border-default, var(--color-border));border-radius:var(--radius-md);padding:var(--space-2);color:var(--text-primary, var(--color-text-1));margin-bottom:var(--space-4);resize:vertical;box-sizing:border-box;font-family:var(--font-sans);font-size:var(--text-body-sm);"></textarea>
+    <div style="display:flex;gap:var(--space-3);justify-content:flex-end;">
+      <button onclick="document.getElementById('bulkRejectModal').style.display='none'" style="padding:var(--space-2) var(--space-4);background:var(--bg-secondary, var(--color-surface-2));border:1px solid var(--border-default, var(--color-border));border-radius:var(--radius-md);cursor:pointer;color:var(--text-primary, var(--color-text-1));font-size:var(--text-body-sm);">Cancel</button>
+      <button onclick="completeBulkReject()" style="padding:var(--space-2) var(--space-4);background:var(--color-error, #e53e3e);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-size:var(--text-body-sm);">Reject</button>
     </div>
   </div>
 </div>
@@ -1316,20 +1329,32 @@
     });
   });
 
-  // Bulk reject
+  // Bulk reject — opens modal for rejection reason
   document.getElementById('bulkRejectBtn').addEventListener('click', function() {
+    var checked = document.querySelectorAll('.item-check:checked');
+    if (checked.length === 0) { showToast('warning', 'None Selected', 'Please select at least one item to reject.'); return; }
+    document.getElementById('bulkRejectReason').value = '';
+    document.getElementById('bulkRejectModal').style.display = 'flex';
+  });
+
+  // completeBulkReject — called by modal confirm button
+  window.completeBulkReject = function() {
+    var reason = document.getElementById('bulkRejectReason').value.trim();
+    if (!reason) { GHR.showToast('warning', 'Required', 'Please enter a rejection reason'); return; }
     var checked = document.querySelectorAll('.item-check:checked');
     var count = checked.length;
     checked.forEach(function(cb) {
       var card = cb.closest('.approval-card');
       if (card) {
         card.classList.add('removing-item');
-        setTimeout(function() { card.style.display = 'none'; }, 300);
+        setTimeout(function() { card.style.display = 'none'; checkFilterEmptyState(); }, 300);
       }
     });
-    showToast('error', 'Rejected', count + ' request(s) have been rejected.');
+    showToast('success', 'Rejected', count + ' request(s) have been rejected.');
+    document.getElementById('bulkRejectModal').style.display = 'none';
+    document.getElementById('bulkRejectReason').value = '';
     setTimeout(updateBulkBar, 350);
-  });
+  };
 
   // Approve all visible (no toast here — called by modal confirm which shows toast)
   window.approveAllVisible = function() {

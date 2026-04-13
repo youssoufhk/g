@@ -1196,7 +1196,7 @@
                 <td data-label="Project">CRM Integration</td>
                 <td data-label="Issue Date">Jan 15, 2026</td>
                 <td data-label="Due Date">Feb 14, 2026</td>
-                <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€8,200.00</td>
+                <td data-label="Amount" class="font-mono" style="font-weight: var(--weight-semibold);">€9,800.00</td>
                 <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Paid</span></td>
                 <td data-label="Actions" style="white-space:nowrap;">
                   <button class="btn btn-ghost btn-xs" onclick="showToast('info', 'Download', 'Downloading INV-2026-041.pdf...')" title="Download PDF"><svg data-lucide="download" width="14" height="14"></svg></button>
@@ -1209,7 +1209,7 @@
         <div style="margin-top: var(--space-6); display: flex; gap: var(--space-4); flex-wrap:wrap;">
           <div class="stat-card" style="flex:1; min-width:100px;">
             <div class="stat-label">Total Paid (YTD)</div>
-            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-success);">€19,400</div>
+            <div class="stat-value font-mono" style="font-size: var(--text-heading-2); color: var(--color-success);">€21,000</div>
           </div>
           <div class="stat-card" style="flex:1; min-width:100px;">
             <div class="stat-label">Outstanding</div>
@@ -1710,9 +1710,10 @@
         status: 'Paid',
         lines: [
           { desc: 'CRM Integration — Phase 1', hours: '64h', rate: '€85/h', amount: '€5,440' },
-          { desc: 'CRM Integration — Phase 2', hours: '32h', rate: '€85/h', amount: '€2,720' }
+          { desc: 'CRM Integration — Phase 2', hours: '32h', rate: '€85/h', amount: '€2,720' },
+          { desc: 'CRM Integration — Setup & Config', hours: '—', rate: '—', amount: '€7' }
         ],
-        subtotal: '€6,833', tax: '€1,367', total: '€8,200', paid: true, paymentDate: 'Feb 10, 2026', paymentRef: 'TXN-20260210-0017'
+        subtotal: '€8,167', tax: '€1,633', total: '€9,800', paid: true, paymentDate: 'Feb 10, 2026', paymentRef: 'TXN-20260210-0017'
       }
     };
 
@@ -1801,11 +1802,12 @@
       var panel = document.getElementById('aiResponsePanel');
       var textEl = document.getElementById('aiResponseText');
       var q = question.toLowerCase();
+      var todayStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short'});
       var answer;
       if (q.includes('latest') || q.includes('recent') || q.includes('last invoice')) {
-        answer = 'Your most recent invoice is <strong>INV-2026-048</strong> — <strong>€12,400</strong> for Website Redesign, sent Apr 1. As of today (Apr 10), it\'s due in <strong>20 days</strong> (Apr 30). You\'re on track — no action needed yet.<br><br>⚠️ Also: <strong>INV-2026-043</strong> (€5,000 · Mobile App) is 26 days overdue. That one needs attention first. <a href="#" onclick="switchTab(\'invoices\'); return false;" style="color:var(--color-accent);">View both in Invoices →</a>';
+        answer = 'Your most recent invoice is <strong>INV-2026-048</strong> — <strong>€12,400</strong> for Website Redesign, sent Apr 1. As of today (' + todayStr + '), it\'s due on <strong>Apr 30</strong>. You\'re on track — no action needed yet.<br><br>⚠️ Also: <strong>INV-2026-043</strong> (€5,000 · Mobile App) is overdue (was due Mar 15). That one needs attention first. <a href="#" onclick="switchTab(\'invoices\'); return false;" style="color:var(--color-accent);">View both in Invoices →</a>';
       } else if (q.includes('invoice') || q.includes('payment') || q.includes('overdue') || q.includes('owe') || q.includes('pay')) {
-        answer = 'As of today (Apr 10), here\'s your outstanding invoice summary:<br><br><strong>2 invoices totalling €17,400</strong>:<br>• <strong>INV-2026-048</strong> — €12,400 · Website Redesign · due Apr 30 · <span style="color:var(--color-info); font-weight:var(--weight-semibold);">20 days remaining</span><br>• <strong>INV-2026-043</strong> — €5,000 · Mobile App · was due Mar 15 · <span style="color:var(--color-error); font-weight:var(--weight-semibold);">26 days overdue</span><br><br>💡 <strong>Action needed:</strong> INV-2026-043 is past due. Settling it now avoids any service impact. INV-2026-048 is on track — you have 20 days.<br><br>Paid this year: €19,400 across 2 invoices · Avg payment cycle: 18 days. <a href="#" onclick="switchTab(\'invoices\'); return false;" style="color:var(--color-accent);">Pay now in Invoices →</a>';
+        answer = 'As of today (' + todayStr + '), here\'s your outstanding invoice summary:<br><br><strong>2 invoices totalling €17,400</strong>:<br>• <strong>INV-2026-048</strong> — €12,400 · Website Redesign · due Apr 30 · <span style="color:var(--color-info); font-weight:var(--weight-semibold);">on track</span><br>• <strong>INV-2026-043</strong> — €5,000 · Mobile App · was due Mar 15 · <span style="color:var(--color-error); font-weight:var(--weight-semibold);">overdue</span><br><br>💡 <strong>Action needed:</strong> INV-2026-043 is past due. Settling it now avoids any service impact. INV-2026-048 is on track — due Apr 30.<br><br>Paid this year: €21,000 across 2 invoices · Avg payment cycle: 18 days. <a href="#" onclick="switchTab(\'invoices\'); return false;" style="color:var(--color-accent);">Pay now in Invoices →</a>';
       } else if (q.includes('timesheet') || q.includes('hours') || q.includes('time') || q.includes('approve')) {
         answer = 'Your team logged <strong>342 hours</strong> this month — that\'s <strong>+8% vs last month</strong>, indicating steady velocity.<br><br><strong>4 timesheets pending your approval</strong> (week of Mar 30 – Apr 5):<br>• Sarah Chen — 31h (€2,635)<br>• Marco Rossi — 40h (€3,400)<br>• John Smith — 15h (€1,425)<br>• Liam O\'Brien — 32h (€2,080)<br><br>💡 All entries look consistent with prior weeks. You can <a href="#" onclick="switchTab(\'timesheets\'); return false;" style="color:var(--color-accent);">bulk-approve them in one click →</a>';
       } else if (q.includes('project') || q.includes('status') || q.includes('progress') || q.includes('track')) {

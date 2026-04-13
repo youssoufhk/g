@@ -191,7 +191,7 @@
 }
 
 .header-icon-btn {
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
   background: transparent;
   border: none;
@@ -614,6 +614,11 @@ body.dev-mode .state-toggle { display: flex; }
 .bottom-nav-item.active {
   color: var(--color-primary);
 }
+/* WCAG 1.4.1: non-color visual indicator for active nav item */
+.bottom-nav-item.active {
+  font-weight: var(--weight-semibold);
+  border-top: 2px solid var(--color-primary);
+}
 .bottom-nav-item .bnav-badge {
   position: absolute;
   top: 4px;
@@ -644,6 +649,7 @@ body.dev-mode .state-toggle { display: flex; }
   .mobile-menu-btn { min-width: 44px; min-height: 44px; }
   .modal-close { min-width: 44px; min-height: 44px; }
   .pagination-btn { min-width: 44px; min-height: 44px; }
+  .pagination-buttons button { min-width: 44px; min-height: 44px; }
   .tab { min-height: 44px; }
   .toggle { min-height: 44px; min-width: 52px; }
   .dropdown-item { min-height: 44px; }

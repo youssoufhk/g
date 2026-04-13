@@ -353,7 +353,7 @@
               <div class="notif-item unread">
                 <div class="notif-icon"><svg data-lucide="building-2" width="16" height="16" style="color: var(--color-info);"></svg></div>
                 <div class="notif-text">
-                  <div class="notif-title">New client onboarded: Contoso Inc added to your portfolio</div>
+                  <div class="notif-title">New client onboarded: Umbrella Corp added to your portfolio</div>
                   <div class="notif-time">30 minutes ago</div>
                 </div>
               </div>
@@ -480,7 +480,7 @@
               <div class="client-info">
                 <div class="client-name">Acme Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 5 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 3 projects</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 12 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Jane Doe (jane@acme.com)</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Jan 2024</span>
@@ -504,7 +504,7 @@
               <div class="client-info">
                 <div class="client-name">Globex Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 projects</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 6 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Bob Smith</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since May 2025</span>
@@ -528,7 +528,7 @@
               <div class="client-info">
                 <div class="client-name">Initech</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 active project</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 3 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Bill Lumbergh</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Sep 2025</span>
@@ -546,33 +546,13 @@
               </div>
             </div>
 
-            <!-- Contoso Inc -->
-            <div class="client-card card-interactive" data-client="contoso">
-              <div class="client-logo" style="background: var(--color-primary);">CO</div>
-              <div class="client-info">
-                <div class="client-name">Contoso Inc</div>
-                <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project (planning)</span>
-                  <span class="client-meta-item"><svg data-lucide="users"></svg> 2 team members</span>
-                  <span class="client-meta-item"><svg data-lucide="user"></svg> Michael Scott</span>
-                  <span class="badge badge-info"><svg data-lucide="sparkles" width="12" height="12"></svg> New</span>
-                  <a href="portal/index.html" target="_blank" class="badge badge-default" onclick="event.stopPropagation()" style="text-decoration:none;"><svg data-lucide="external-link" width="10" height="10"></svg> Portal</a>
-                </div>
-              </div>
-              <div class="client-revenue" data-sensitive="financials">
-                <span class="font-mono">&euro;0</span>
-                <div class="client-revenue-label">YTD Revenue</div>
-                <div style="font-size:var(--text-caption);color:var(--color-text-3);margin-top:var(--space-1);">Planning phase</div>
-              </div>
-            </div>
-
             <!-- Umbrella Corp -->
             <div class="client-card card-interactive" data-client="umbrella">
               <div class="client-logo" style="background: linear-gradient(135deg, hsl(0, 50%, 40%), hsl(15, 50%, 50%));">UC</div>
               <div class="client-info">
                 <div class="client-name">Umbrella Corp</div>
                 <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 2 active projects</span>
+                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 1 project</span>
                   <span class="client-meta-item"><svg data-lucide="users"></svg> 4 team members</span>
                   <span class="client-meta-item"><svg data-lucide="user"></svg> Albert Wesker</span>
                   <span class="client-meta-item"><svg data-lucide="calendar"></svg> Active since Mar 2026</span>
@@ -590,28 +570,6 @@
               </div>
             </div>
 
-            <!-- Stark Industries -->
-            <div class="client-card card-interactive" data-client="stark">
-              <div class="client-logo" style="background: var(--color-surface-3);">SI</div>
-              <div class="client-info">
-                <div class="client-name">Stark Industries</div>
-                <div class="client-meta">
-                  <span class="client-meta-item"><svg data-lucide="folder-kanban"></svg> 0 active projects</span>
-                  <span class="client-meta-item"><svg data-lucide="users"></svg> 0 team members</span>
-                  <span class="client-meta-item"><svg data-lucide="user"></svg> Pepper Potts</span>
-                  <span class="client-meta-item"><svg data-lucide="calendar"></svg> Last project: Dec 2025</span>
-                  <span class="badge badge-default"><svg data-lucide="archive" width="12" height="12"></svg> Inactive</span>
-                </div>
-              </div>
-              <div class="client-revenue" data-sensitive="financials">
-                <span class="font-mono">&euro;67,000</span>
-                <div class="client-revenue-label">YTD Revenue</div>
-                <svg viewBox="0 0 60 20" style="width:100%;height:16px;margin-top:var(--space-1);">
-                  <polyline points="0,4 10,6 20,8 30,10 40,14 50,16 60,18" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-                </svg>
-                <div style="font-size:var(--text-caption);color:var(--color-error);margin-top:2px;">&#9660; &minus;100% (inactive)</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -1892,6 +1850,18 @@ Budget discussions for Q3 expansion planned for May 2026.</textarea>
     // Reset all cards to visible
     document.querySelectorAll('#clientList .client-card').forEach(function(c) { c.style.display = ''; });
   };
+
+  // ── Triple-dot action menus on client cards ──
+  document.querySelectorAll('.project-actions-btn, [data-menu], .more-btn, button[aria-label*="more"], button[aria-label*="action"]').forEach(function(btn) {
+    if (!btn.onclick && !btn.dataset.bound) {
+      btn.dataset.bound = '1';
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        var menu = btn.nextElementSibling || btn.parentElement.querySelector('.dropdown-menu, .action-menu');
+        if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      };
+    }
+  });
 
 })();
 </script>
