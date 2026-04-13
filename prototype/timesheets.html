@@ -673,6 +673,9 @@
     margin-bottom: var(--space-4);
     flex-wrap: wrap;
   }
+  @media (min-width: 769px) {
+    .aq-filter-bar { flex-wrap: nowrap; }
+  }
   .aq-filter-bar .form-select, .aq-filter-bar .form-input {
     height: 32px;
     font-size: var(--text-body-sm);
@@ -993,7 +996,7 @@
         <!-- Auto-save indicator -->
         <div id="tsAutoSave" style="display:none;font-size:var(--text-caption);color:var(--color-text-3);text-align:right;margin-bottom:var(--space-1);transition:opacity 0.5s;">
           <svg data-lucide="check" width="12" height="12" style="display:inline;vertical-align:-1px;"></svg>
-          Draft saved
+          Last saved <span id="tsAutoSaveTime"></span>
         </div>
 
         <!-- Week Grid -->
@@ -2106,6 +2109,13 @@
 
   function showAutoSaveIndicator() {
     if (autoSaveEl && !isSubmitted) {
+      var timeEl = document.getElementById('tsAutoSaveTime');
+      if (timeEl) {
+        var now = new Date();
+        var h = now.getHours().toString().padStart(2, '0');
+        var m = now.getMinutes().toString().padStart(2, '0');
+        timeEl.textContent = h + ':' + m;
+      }
       autoSaveEl.style.display = 'block';
       autoSaveEl.classList.add('visible');
       setTimeout(function() {

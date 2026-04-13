@@ -820,8 +820,8 @@ GHR.notificationItems = [
   { icon: 'clock',       color: 'var(--color-primary)', title: 'Sarah Chen submitted 40h timesheet for review',             time: '10 min ago',  unread: true,  href: 'timesheets.html' },
   { icon: 'check-circle',color: 'var(--color-success)', title: 'Expense report #1847 approved by Finance',                  time: '25 min ago',  unread: true,  href: 'expenses.html' },
   { icon: 'calendar',    color: 'var(--color-info)',     title: 'Marco Rossi requested annual leave (Jun 15-22)',            time: '1 hour ago',  unread: true,  href: 'leaves.html' },
-  { icon: 'alert-circle',color: 'var(--color-warning)',  title: 'Invoice INV-2026-048 overdue — Acme Corp (EUR 12,400)',   time: '2 hours ago', unread: false, href: 'invoices.html', minRole: 'pm' },
-  { icon: 'users',       color: 'var(--color-primary)',  title: 'New hire onboarding: Emma Laurent starts Monday',          time: '3 hours ago', unread: false, href: 'hr.html', minRole: 'pm' },
+  { icon: 'alert-circle',color: 'var(--color-warning)',  title: 'Invoice INV-2026-046 overdue — Contoso (EUR 8,750)',     time: '2 hours ago', unread: false, href: 'invoices.html', minRole: 'pm' },
+  { icon: 'users',       color: 'var(--color-primary)',  title: 'New hire onboarding: Yuki Tanaka starts Monday',           time: '3 hours ago', unread: false, href: 'hr.html', minRole: 'pm' },
   { icon: 'trending-up', color: 'var(--color-success)',  title: 'Monthly Insights report is ready to view',                 time: '5 hours ago', unread: false, href: 'insights.html' }
 ];
 

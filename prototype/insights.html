@@ -287,6 +287,12 @@
     body.show-empty .populated-content { display: none; }
     body.show-empty .empty-content { display: flex; }
 
+    /* Tab-level empty/populated content toggles (for SR and Forecasting tabs) */
+    body.show-populated .tab-populated-content { display: block; }
+    body.show-populated .tab-empty-state { display: none !important; }
+    body.show-empty .tab-populated-content { display: none !important; }
+    body.show-empty .tab-empty-state { display: flex !important; }
+
     /* Mobile donut breakpoints */
     @media (max-width: 639px) {
       .donut-wrap { flex-direction: column; align-items: center; }
@@ -317,7 +323,10 @@
     .period-filters {
       display: flex;
       gap: var(--space-1-5);
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+    }
+    @media (max-width: 639px) {
+      .period-filters { flex-wrap: wrap; }
     }
     .period-btn {
       padding: var(--space-1) var(--space-3);
@@ -521,7 +530,7 @@
       </nav>
 
       <!-- Page toolbar: period filter -->
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-4);">
+      <div class="filter-bar-standard" style="justify-content:space-between;margin-bottom:var(--space-4);">
         <div class="period-filters" id="periodFilters">
           <button class="period-btn" data-period="7D">7D</button>
           <button class="period-btn active" data-period="30D">30D</button>
@@ -903,9 +912,15 @@
 
           <!-- Top by Work Time -->
           <div style="padding: 0 var(--space-4) var(--space-4);">
-            <div class="chart-title">Top 5 by Work Time</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">
+              <div class="chart-title" style="margin-bottom:0;">Top 5 by Work Time</div>
+              <div style="position:relative;">
+                <svg data-lucide="search" width="14" height="14" style="position:absolute;left:var(--space-2);top:50%;transform:translateY(-50%);color:var(--color-text-3);pointer-events:none;"></svg>
+                <input type="text" class="form-input form-input-sm" id="worktimeTableSearch" placeholder="Filter..." style="padding-left:var(--space-6);max-width:180px;" oninput="filterInsightTable('worktimeTable', this.value)">
+              </div>
+            </div>
             <div class="overflow-x-auto">
-              <table class="data-table mobile-cards">
+              <table class="data-table mobile-cards" id="worktimeTable">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -1630,9 +1645,15 @@
             </div>
 
             <!-- Performance Summary Table -->
-            <div class="chart-title">Performance Summary</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);">
+              <div class="chart-title" style="margin-bottom:0;">Performance Summary</div>
+              <div style="position:relative;">
+                <svg data-lucide="search" width="14" height="14" style="position:absolute;left:var(--space-2);top:50%;transform:translateY(-50%);color:var(--color-text-3);pointer-events:none;"></svg>
+                <input type="text" class="form-input form-input-sm" placeholder="Filter..." style="padding-left:var(--space-6);max-width:180px;" oninput="filterInsightTable('perfTable', this.value)">
+              </div>
+            </div>
             <div class="overflow-x-auto">
-              <table class="data-table mobile-cards">
+              <table class="data-table mobile-cards" id="perfTable">
                 <thead>
                   <tr><th>Employee</th><th>Work Time</th><th>Projects</th><th>Hours This Month</th><th>Trend</th></tr>
                 </thead>
@@ -1797,17 +1818,17 @@
 
         <!-- Scheduled Reports Tab -->
         <div class="tab-content" id="tab-scheduled-reports">
-          <!-- Empty state for no scheduled reports -->
-          <div class="scheduled-reports-empty" style="display:none;text-align:center;padding:var(--space-12) var(--space-8);">
-            <svg data-lucide="calendar-clock" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin:0 auto var(--space-4);display:block;"></svg>
-            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">No scheduled reports yet</div>
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:360px;margin:0 auto var(--space-4);" title="Reports include work time summaries, revenue snapshots, and AI-highlighted anomalies.">Automate report delivery to your inbox on a weekly or monthly schedule.</div>
-            <button class="btn btn-primary btn-md" onclick="openScheduleModal()">
+          <!-- Empty state for no scheduled reports (shown in show-empty mode) -->
+          <div class="tab-empty-state scheduled-reports-empty" style="display:none;">
+            <svg data-lucide="calendar-clock" width="48" height="48"></svg>
+            <div class="empty-title">No scheduled reports yet</div>
+            <div class="empty-desc">Automate report delivery to your inbox on a weekly or monthly schedule.</div>
+            <button class="btn btn-primary btn-md" style="margin-top:var(--space-4);" onclick="openScheduleModal()">
               <svg data-lucide="plus" width="16" height="16"></svg>
               Create Your First Schedule
             </button>
           </div>
-          <div class="scheduled-reports-section">
+          <div class="scheduled-reports-section tab-populated-content">
             <div style="display:flex;align-items:flex-start;gap:var(--space-3);margin-bottom:var(--space-6);">
               <svg data-lucide="calendar-clock" style="width:24px;height:24px;flex-shrink:0;color:var(--color-accent);margin-top:2px;"></svg>
               <div>
@@ -1855,17 +1876,17 @@
 
         <!-- Forecasting Tab -->
         <div class="tab-content" id="tab-forecasting">
-          <!-- Empty state for insufficient historical data -->
-          <div class="forecasting-empty" style="display:none;text-align:center;padding:var(--space-12) var(--space-8);">
-            <svg data-lucide="brain" width="48" height="48" style="color:var(--color-text-3);opacity:0.3;margin:0 auto var(--space-4);display:block;"></svg>
-            <div style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-2);margin-bottom:var(--space-2);">Not enough data for forecasting</div>
-            <div style="font-size:var(--text-body-sm);color:var(--color-text-3);max-width:400px;margin:0 auto var(--space-4);" title="Requires at least 3 months of timesheet and project data.">Keep logging to unlock AI-powered forecasting.</div>
-            <div style="display:flex;align-items:center;gap:var(--space-3);justify-content:center;">
+          <!-- Empty state for insufficient historical data (shown in show-empty mode) -->
+          <div class="tab-empty-state forecasting-empty" style="display:none;">
+            <svg data-lucide="brain" width="48" height="48"></svg>
+            <div class="empty-title">Not enough data for forecasting</div>
+            <div class="empty-desc">Keep logging timesheets and project data to unlock AI-powered forecasting. Requires at least 3 months of data.</div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);justify-content:center;margin-top:var(--space-4);">
               <div style="width:120px;height:6px;background:var(--color-surface-2);border-radius:var(--radius-full);overflow:hidden;"><div style="width:40%;height:100%;background:var(--color-accent);border-radius:var(--radius-full);"></div></div>
               <span style="font-size:var(--text-caption);color:var(--color-text-3);">40% of data needed</span>
             </div>
           </div>
-          <div style="padding:var(--space-4);">
+          <div style="padding:var(--space-4);" class="tab-populated-content">
             <div style="display:flex;align-items:flex-start;gap:var(--space-3);padding:var(--space-4);background:var(--color-accent-muted);border:1px solid var(--color-accent);border-radius:var(--radius-md);margin-bottom:var(--space-6);">
               <svg data-lucide="brain" style="width:24px;height:24px;flex-shrink:0;color:var(--color-accent);margin-top:2px;"></svg>
               <div>
@@ -2040,6 +2061,31 @@
     toast.classList.add('removing');
     setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
   }
+
+  // ── Table Filter: filters rows by text content across all <td> cells ──
+  window.filterInsightTable = function(tableId, query) {
+    var table = document.getElementById(tableId);
+    if (!table) return;
+    var q = query.trim().toLowerCase();
+    var rows = table.querySelectorAll('tbody tr');
+    var visibleCount = 0;
+    rows.forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      var match = !q || text.includes(q);
+      row.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+    // Show/hide no-results message
+    var noResults = table.parentElement.querySelector('.table-no-results');
+    if (!noResults) {
+      noResults = document.createElement('div');
+      noResults.className = 'table-no-results';
+      noResults.style.cssText = 'display:none;padding:var(--space-4);text-align:center;color:var(--color-text-3);font-size:var(--text-body-sm);';
+      noResults.textContent = 'No results match your filter.';
+      table.parentElement.appendChild(noResults);
+    }
+    noResults.style.display = (q && visibleCount === 0) ? 'block' : 'none';
+  };
 
   // ── Tabs (hash-based) ──
   var allTabs = document.querySelectorAll('.tab[data-tab]');

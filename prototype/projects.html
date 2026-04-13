@@ -2953,7 +2953,12 @@
     newProjectModal.classList.add('active');
   });
 
-  window.closeModal = function() {
+  window.closeModal = function(id) {
+    if (id) {
+      // Generic modal close by id
+      var el = document.getElementById(id);
+      if (el) { el.classList.remove('active'); return; }
+    }
     newProjectModal.classList.remove('active');
   };
 
