@@ -1,298 +1,176 @@
-# GammaHR v2 — Design System Specification
+# Design System
 
-> The visual soul of GammaHR Quantum.
-> Dark-mode-first. 3D depth. Premium feel. Easy on the eyes for 8+ hour workdays.
-
----
-
-## 1. Design Philosophy
-
-### Principles
-
-1. **Dark Mode is Home** — Light mode is the variant, not the default
-2. **Depth Creates Hierarchy** — Surfaces float at different elevations; z-axis communicates importance
-3. **3D Enriches, Never Distracts** — 3D elements add polish, not complexity
-4. **Density with Clarity** — Show maximum information without visual overload
-5. **Color Communicates** — Every color has a semantic purpose; decorative color is minimal
-6. **Motion is Meaningful** — Animations guide attention and confirm actions
-7. **Accessibility is Non-negotiable** — WCAG 2.2 AA minimum; color is never the sole indicator
-
-### Visual References
-
-| Inspiration | What to take |
-|------------|-------------|
-| **Linear** | Information density, keyboard-first, dark theme elegance |
-| **Vercel Dashboard** | Clean dark mode, neon accents, typography hierarchy |
-| **Notion** | Content-first, minimal chrome, smooth interactions |
-| **Apple visionOS** | 3D depth, glassmorphism, floating surfaces |
-| **Stripe Dashboard** | Data visualization quality, gradient subtlety |
-| **Bloomberg Terminal** | Information density, no wasted space |
+> Status: LOCKED. Do not modify values. Source of truth for visual design.
+> If it is not in this document, it does not exist in the app.
 
 ---
 
-## 1.5 Prototype as Source of Truth
+## 1. Foundation
 
-The design system described in this document has been fully implemented in the HTML prototype. When any specification here conflicts with what is in the prototype files, **the prototype wins** — it has been visually validated and approved.
+Consistency comes from atoms, not templates:
 
-| Spec concept | Live implementation |
-|---|---|
-| Color tokens | `prototype/_tokens.css` — all CSS custom properties |
-| Component library | `prototype/_components.css` — copy styles from here directly into Next.js components |
-| App shell / layout | `prototype/_layout.css` — sidebar, top bar, mobile nav, filter bars |
-| Shared JS behaviour | `prototype/_shared.js` — hover cards, presence, role switcher, keyboard shortcuts, skeleton loading, command palette, toasts |
-| Page designs | `prototype/*.html` — approved visual spec per page |
+1. Shell (sidebar, topbar, bottom nav) is pixel-identical on every page.
+2. Every atom has fixed dimensions. No "flexible" variants.
+3. Every page uses exactly one of 5 content patterns composed from existing atoms.
+4. No props like "change my height" or "move my search bar". No improvisation.
 
-When implementing the Next.js frontend, developers should open the corresponding prototype HTML file in a browser and replicate it exactly. The CSS tokens map directly to `tailwind.config.ts` custom properties.
+The user's brain stops reading the chrome and only reads the content.
 
 ---
 
-## 2. Color System — Earth & Sage (Locked)
+## 2. Design Tokens
 
-> **Live tokens:** `prototype/_tokens.css` §Colors — all values below are implemented as CSS custom properties in that file.
+**LOCKED. DO NOT MODIFY.** All tokens live in `prototype/_tokens.css` and are imported unchanged into `frontend/styles/tokens.css`. Tailwind references these CSS variables in `tailwind.config.ts`. Any agent that edits these values must stop immediately; the Earth & Sage palette is founder-approved and frozen.
 
-> **Palette locked. No alternatives.** Earth & Sage was selected after full visual validation.
-> Rationale: sage/green semantics align perfectly with approval flows, active states, and healthy utilization — the core HR interaction patterns. Terracotta + aged gold provide a full semantic color language, not just aesthetics.
+This section is a human-readable mirror of `prototype/_tokens.css`. If the two ever drift, the prototype file is the source of truth.
 
-### 2.1 Dark Mode (Primary — Default)
-
-```
-BACKGROUNDS & SURFACES
-  Background:      hsl(35, 16%, 5%)     — Warm charcoal base (page bg)
-  Surface-0:       hsl(35, 13%, 8%)     — Card base, sidebar
-  Surface-1:       hsl(35, 11%, 11%)    — Elevated card, table row hover
-  Surface-2:       hsl(35, 9%, 15%)     — Modal/dialog, sheet
-  Surface-3:       hsl(35, 7%, 19%)     — Popover, tooltip, dropdown
-
-PRIMARY — SOFT SAGE
-  Primary:         hsl(155, 26%, 46%)   — Soft sage (buttons, active nav, links)
-  Primary-hover:   hsl(155, 26%, 52%)   — Lighter sage on hover
-  Primary-active:  hsl(155, 26%, 40%)   — Pressed/active state
-  Primary-muted:   hsla(155, 26%, 46%, 0.14) — Ghost button bg, subtle highlight
-
-ACCENT — TERRACOTTA
-  Accent:          hsl(30, 58%, 50%)    — Terracotta (secondary CTAs, highlights)
-  Accent-hover:    hsl(30, 58%, 56%)    — Lighter terracotta on hover
-  Accent-muted:    hsla(30, 58%, 50%, 0.14) — Subtle terracotta bg
-
-SEMANTIC COLORS
-  Success:         hsl(152, 22%, 44%)   — Soft sage (approved, complete, healthy)
-  Warning:         hsl(38, 65%, 50%)    — Aged gold (pending, attention, deadline)
-  Error:           hsl(5, 65%, 52%)     — Muted brick red (rejected, critical, error)
-  Info:            hsl(200, 40%, 52%)   — Muted steel blue (informational)
-
-FINANCIAL / CHART ACCENT
-  Gold:            hsl(38, 60%, 48%)    — Aged gold (revenue, invoices, financial KPIs)
-  Gold-hover:      hsl(38, 60%, 54%)
-
-TEXT
-  Text-primary:    hsl(40, 28%, 90%)    — Parchment cream (headings, values, body)
-  Text-secondary:  hsl(35, 10%, 55%)    — Warm muted (labels, secondary info)
-  Text-tertiary:   hsl(35, 8%, 38%)     — Warm dimmed (placeholders, disabled)
-  Text-inverse:    hsl(35, 16%, 5%)     — Dark text on light/primary bg
-
-BORDERS
-  Border:          hsl(35, 10%, 14%)    — Standard divider, card border
-  Border-subtle:   hsl(35, 8%, 10%)     — Barely-there dividers, table rows
-  Border-strong:   hsl(35, 12%, 22%)    — Emphasis borders, focus rings
-```
-
-### 2.2 Light Mode (Variant)
-
-```
-  Background:      hsl(40, 20%, 97%)    — Warm cream page bg
-  Surface-0:       hsl(40, 15%, 100%)   — White card (warm-tinted)
-  Surface-1:       hsl(40, 12%, 97%)    — Elevated card
-  Surface-2:       hsl(40, 10%, 94%)    — Modal
-
-  Primary:         hsl(155, 30%, 34%)   — Deeper sage (legible on light bg)
-  Primary-hover:   hsl(155, 30%, 28%)
-  Primary-muted:   hsla(155, 30%, 34%, 0.10)
-
-  Accent:          hsl(30, 60%, 42%)    — Deeper terracotta
-  Gold:            hsl(38, 65%, 40%)    — Deeper aged gold
-
-  Success:         hsl(152, 28%, 36%)
-  Warning:         hsl(38, 70%, 42%)
-  Error:           hsl(5, 68%, 44%)
-
-  Text-primary:    hsl(35, 12%, 10%)    — Dark warm for readability
-  Text-secondary:  hsl(35, 8%, 38%)
-  Text-tertiary:   hsl(35, 5%, 55%)
-
-  Border:          hsl(35, 12%, 84%)
-  Border-subtle:   hsl(35, 10%, 90%)
-```
-
-### 2.3 CSS Custom Properties
+### 2.1 Color System - Earth & Sage (LOCKED)
 
 ```css
-/* Dark mode (default) */
-:root {
-  /* Backgrounds */
-  --color-bg:          hsl(35, 16%, 5%);
-  --color-surface-0:   hsl(35, 13%, 8%);
-  --color-surface-1:   hsl(35, 11%, 11%);
-  --color-surface-2:   hsl(35, 9%, 15%);
-  --color-surface-3:   hsl(35, 7%, 19%);
+/* Backgrounds & Surfaces (dark mode default) */
+--color-bg:             hsl(35, 16%, 5%);   /* Page background */
+--color-surface-0:      hsl(35, 13%, 8%);   /* Base surface */
+--color-surface-1:      hsl(35, 11%, 11%);  /* Card surface */
+--color-surface-2:      hsl(35, 9%, 15%);   /* Elevated surface */
+--color-surface-3:      hsl(35, 7%, 19%);   /* Hover / active surface */
 
-  /* Primary — Soft Sage */
-  --color-primary:        hsl(155, 26%, 46%);
-  --color-primary-hover:  hsl(155, 26%, 52%);
-  --color-primary-active: hsl(155, 26%, 40%);
-  --color-primary-muted:  hsla(155, 26%, 46%, 0.14);
+/* Primary - Soft Sage */
+--color-primary:        hsl(155, 26%, 46%);
+--color-primary-hover:  hsl(155, 26%, 52%);
+--color-primary-active: hsl(155, 26%, 40%);
+--color-primary-muted:  hsla(155, 26%, 46%, 0.14);
 
-  /* Accent — Terracotta */
-  --color-accent:         hsl(30, 58%, 50%);
-  --color-accent-hover:   hsl(30, 58%, 56%);
-  --color-accent-muted:   hsla(30, 58%, 50%, 0.14);
+/* Accent - Terracotta */
+--color-accent:         hsl(30, 58%, 50%);
+--color-accent-hover:   hsl(30, 58%, 56%);
+--color-accent-active:  hsl(30, 58%, 44%);
+--color-accent-muted:   hsla(30, 58%, 50%, 0.14);
 
-  /* Semantic */
-  --color-success:    hsl(152, 22%, 44%);
-  --color-warning:    hsl(38, 65%, 50%);
-  --color-error:      hsl(5, 65%, 52%);
-  --color-info:       hsl(200, 40%, 52%);
+/* Semantic */
+--color-success:        hsl(152, 22%, 44%);
+--color-success-muted:  hsla(152, 22%, 44%, 0.15);
+--color-warning:        hsl(38, 65%, 50%);
+--color-warning-muted:  hsla(38, 65%, 50%, 0.15);
+--color-error:          hsl(5, 65%, 52%);
+--color-error-muted:    hsla(5, 65%, 52%, 0.15);
+--color-error-hover:    hsl(5, 65%, 58%);
+--color-info:           hsl(200, 40%, 52%);
+--color-info-muted:     hsla(200, 40%, 52%, 0.15);
 
-  /* Financial */
-  --color-gold:       hsl(38, 60%, 48%);
-  --color-gold-hover: hsl(38, 60%, 54%);
+/* Financial - Gold */
+--color-gold:           hsl(38, 60%, 48%);
+--color-gold-hover:     hsl(38, 60%, 54%);
+--color-gold-muted:     hsla(38, 60%, 48%, 0.15);
 
-  /* Text */
-  --color-text-1:     hsl(40, 28%, 90%);   /* primary */
-  --color-text-2:     hsl(35, 10%, 55%);   /* secondary */
-  --color-text-3:     hsl(35, 8%, 38%);    /* tertiary */
-  --color-text-inv:   hsl(35, 16%, 5%);    /* on-color */
+/* Text */
+--color-text-1:         hsl(40, 28%, 90%);  /* Primary text - parchment cream */
+--color-text-2:         hsl(35, 10%, 55%);  /* Secondary text */
+--color-text-3:         hsl(35, 8%, 38%);   /* Tertiary / meta */
+--color-text-inv:       hsl(35, 16%, 5%);   /* Text on light surfaces */
 
-  /* Borders */
-  --color-border:         hsl(35, 10%, 14%);
-  --color-border-subtle:  hsl(35, 8%, 10%);
-  --color-border-strong:  hsl(35, 12%, 22%);
-}
+/* On-Color (text on filled backgrounds) */
+--color-white:              #fff;
+--color-text-on-primary:    #fff;
+--color-text-on-error:      #fff;
+--color-text-on-accent:     #fff;
 
-/* Light mode override */
-[data-theme="light"] {
-  --color-bg:          hsl(40, 20%, 97%);
-  --color-surface-0:   hsl(40, 15%, 100%);
-  --color-surface-1:   hsl(40, 12%, 97%);
-  --color-surface-2:   hsl(40, 10%, 94%);
-  --color-primary:     hsl(155, 30%, 34%);
-  --color-primary-hover: hsl(155, 30%, 28%);
-  --color-accent:      hsl(30, 60%, 42%);
-  --color-gold:        hsl(38, 65%, 40%);
-  --color-success:     hsl(152, 28%, 36%);
-  --color-warning:     hsl(38, 70%, 42%);
-  --color-error:       hsl(5, 68%, 44%);
-  --color-text-1:      hsl(35, 12%, 10%);
-  --color-text-2:      hsl(35, 8%, 38%);
-  --color-text-3:      hsl(35, 5%, 55%);
-  --color-border:      hsl(35, 12%, 84%);
-  --color-border-subtle: hsl(35, 10%, 90%);
-}
+/* Borders */
+--color-border:         hsl(35, 10%, 14%);
+--color-border-subtle:  hsl(35, 8%, 10%);
+--color-border-strong:  hsl(35, 12%, 22%);
+
+/* Chart Colors (6-series, colorblind-safe) */
+--color-chart-1:        hsl(155, 26%, 46%);
+--color-chart-2:        hsl(38, 60%, 48%);
+--color-chart-3:        hsl(30, 58%, 50%);
+--color-chart-4:        hsl(200, 40%, 52%);
+--color-chart-5:        hsl(270, 45%, 58%);
+--color-chart-6:        hsl(5, 65%, 52%);
+--color-chart-5-muted:  hsla(270, 45%, 58%, 0.15);
+
+/* Gantt / Planning Bar Colors */
+--color-bar-billable:   hsla(155, 26%, 46%, 0.3);
+--color-bar-nonbillable:hsla(200, 40%, 52%, 0.25);
+--color-bar-leave:      hsla(200, 40%, 52%, 0.08);
+--color-bar-bench:      hsla(38, 65%, 50%, 0.08);
+--color-surface-weekend:hsla(35, 10%, 8%, 0.6);
+--color-row-hover:      hsla(35, 10%, 11%, 0.4);
+--color-internal:       var(--color-bar-nonbillable);
+
+/* WFH / Remote */
+--color-wfh:            hsl(175, 35%, 45%);
+--color-wfh-muted:      hsla(175, 35%, 45%, 0.15);
 ```
 
-### 2.4 Semantic Color Usage Table
+**Light mode** overrides via `[data-theme="light"]`: surfaces flip to `hsl(40, 20%, 97%)` family, primary deepens to `hsl(155, 30%, 34%)`, accent deepens to `hsl(30, 60%, 42%)`, text flips to `hsl(35, 12%, 10%)`. Dark mode is default per core principle 9 in `MASTER_PLAN.md`. Full light-mode token set is in `prototype/_tokens.css` lines 177-256.
 
-| Context | Color token | Example |
-|---------|-------------|---------|
-| Primary action buttons | `--color-primary` | "Submit Timesheet", "Approve", "Save" |
-| Active nav item | `--color-primary` | Sidebar active link |
-| Links | `--color-primary` | EmployeeLink, entity links |
-| Success badge | `--color-success` | "Approved", "Active", "Submitted" |
-| Secondary CTA | `--color-accent` | "Add Expense", "New Request" |
-| Warning badge | `--color-warning` | "Pending", "Due Soon", "Nearing Limit" |
-| Error/rejection | `--color-error` | "Rejected", "Overdue", "Error" |
-| Revenue / financial | `--color-gold` | Revenue trend chart, invoice totals |
-| Warning amount | `--color-warning` | Expense over budget |
-| Utilization healthy | `--color-success` | 75–100% utilization on Gantt |
-| Utilization low | `--color-warning` | 50–75% utilization on Gantt |
-| Utilization critical | `--color-error` | <50% or >110% utilization |
-
----
-
-## 3. Typography
-
-> **Live tokens:** `prototype/_tokens.css` §Typography
-
-### Font Stack
+### 2.2 Typography
 
 ```css
---font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont,
-             'Segoe UI', Roboto, sans-serif;
---font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Fira Code',
-             'Cascadia Code', monospace;
+--font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--font-mono:  'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+/* Type Scale */
+--text-display-xl:  2.25rem;   /* 36px */
+--text-display-lg:  1.875rem;  /* 30px */
+--text-heading-1:   1.5rem;    /* 24px */
+--text-heading-2:   1.25rem;   /* 20px */
+--text-heading-3:   1rem;      /* 16px */
+--text-body-lg:     1rem;      /* 16px */
+--text-body:        0.875rem;  /* 14px - default */
+--text-body-sm:     0.8125rem; /* 13px */
+--text-caption:     0.75rem;   /* 12px */
+--text-overline:    0.75rem;   /* 12px */
+--text-mono:        0.8125rem; /* 13px */
+
+/* Font Weights */
+--weight-regular:   400;
+--weight-medium:    500;
+--weight-semibold:  600;
+--weight-bold:      700;
+
+--letter-spacing-caps: 0.05em;
 ```
 
-**Inter** — Best-in-class screen legibility, variable font for smooth weight transitions.
-**JetBrains Mono** — For code, numbers in tables, currency amounts.
+Body font-size base is 16px html root with default body text at 14px (`--text-body`). Line height is 1.5 for body, tighter for headings.
 
-### Type Scale
+### 2.3 Spacing Scale (4px base)
 
-| Token | Size | Weight | Line Height | Use |
-|-------|------|--------|-------------|-----|
-| `display-xl` | 36px / 2.25rem | 700 | 1.2 | Page hero titles (Dashboard greeting) |
-| `display-lg` | 30px / 1.875rem | 700 | 1.2 | Section heroes |
-| `heading-1` | 24px / 1.5rem | 600 | 1.3 | Page titles |
-| `heading-2` | 20px / 1.25rem | 600 | 1.35 | Section titles |
-| `heading-3` | 16px / 1rem | 600 | 1.4 | Card titles, widget headers |
-| `body-lg` | 16px / 1rem | 400 | 1.5 | Primary body text |
-| `body` | 14px / 0.875rem | 400 | 1.5 | Standard body text, table cells |
-| `body-sm` | 13px / 0.8125rem | 400 | 1.45 | Secondary text, descriptions |
-| `caption` | 12px / 0.75rem | 500 | 1.4 | Labels, badges, timestamps |
-| `overline` | 11px / 0.6875rem | 600 | 1.3 | Section overlines, uppercase labels |
-| `mono` | 13px / 0.8125rem | 400 | 1.5 | Numbers, currency, code |
+```css
+--space-0:   0px;
+--space-0-5: 2px;
+--space-1:   4px;
+--space-1-5: 6px;
+--space-2:   8px;
+--space-3:   12px;
+--space-4:   16px;
+--space-5:   20px;
+--space-6:   24px;
+--space-7:   28px;
+--space-8:   32px;
+--space-9:   36px;
+--space-10:  40px;
+--space-11:  44px;
+--space-12:  48px;
+--space-14:  56px;
+--space-16:  64px;
+--space-18:  72px;
+--space-20:  80px;
+```
 
-### Font Weight Usage
+### 2.4 Border Radius
 
-| Weight | Token | Use |
-|--------|-------|-----|
-| 400 | `regular` | Body text, descriptions |
-| 500 | `medium` | Labels, navigation items, captions |
-| 600 | `semibold` | Headings, button text, active states |
-| 700 | `bold` | Display titles, stat numbers, emphasis |
+```css
+--radius-none: 0px;
+--radius-sm:   4px;    /* Inputs, badges */
+--radius-md:   8px;    /* Buttons, tags */
+--radius-lg:   12px;   /* Cards */
+--radius-xl:   16px;   /* Modals, large containers */
+--radius-2xl:  24px;   /* Feature cards */
+--radius-full: 9999px; /* Pills, avatars */
+```
 
----
-
-## 4. Spacing System
-
-> **Live tokens:** `prototype/_tokens.css` §Spacing
-
-**Base unit: 4px**
-
-| Token | Value | Common use |
-|-------|-------|-----------|
-| `space-0` | 0px | — |
-| `space-0.5` | 2px | Tight inline spacing |
-| `space-1` | 4px | Icon-to-text gap, tight padding |
-| `space-1.5` | 6px | Badge padding, small gaps |
-| `space-2` | 8px | Compact padding, list item gap |
-| `space-3` | 12px | Standard input padding, small card padding |
-| `space-4` | 16px | Card padding, section gap |
-| `space-5` | 20px | Medium section gap |
-| `space-6` | 24px | Large card padding, major section gap |
-| `space-8` | 32px | Page section spacing |
-| `space-10` | 40px | Major layout gaps |
-| `space-12` | 48px | Page top/bottom padding |
-| `space-16` | 64px | Hero section padding |
-| `space-20` | 80px | Large hero padding |
-
----
-
-## 5. Border Radius
-
-| Token | Value | Use |
-|-------|-------|-----|
-| `radius-none` | 0px | Tables, dividers |
-| `radius-sm` | 4px | Tags, small badges |
-| `radius-md` | 8px | Buttons, inputs, small cards |
-| `radius-lg` | 12px | Cards, modals |
-| `radius-xl` | 16px | Large cards, containers |
-| `radius-2xl` | 24px | Hero elements, feature cards |
-| `radius-full` | 9999px | Avatars, pills, toggles |
-
----
-
-## 6. Elevation System (Shadows & Depth)
-
-### Shadow Scale (Dark Mode)
+### 2.5 Shadows (Dark Mode)
 
 ```css
 --shadow-0: none;
@@ -301,418 +179,316 @@ BORDERS
 --shadow-3: 0 4px 8px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
 --shadow-4: 0 8px 16px rgba(0,0,0,0.3), 0 16px 32px rgba(0,0,0,0.25);
 --shadow-5: 0 16px 32px rgba(0,0,0,0.35), 0 32px 64px rgba(0,0,0,0.3);
+--shadow-md: var(--shadow-3);
 ```
 
-### Elevation Layers
+Light mode shadows are lighter (`rgba(0,0,0,0.05-0.12)`).
 
-| Layer | Elevation | Shadow | Use |
-|-------|-----------|--------|-----|
-| **Base** | 0 | shadow-0 | Page background |
-| **Surface** | 1 | shadow-1 | Cards, panels, sidebar |
-| **Raised** | 2 | shadow-2 | Hovered cards, stat cards |
-| **Floating** | 3 | shadow-3 | Dropdowns, popovers, command palette |
-| **Modal** | 4 | shadow-4 | Modals, dialogs |
-| **Toast** | 5 | shadow-5 | Notifications, toasts, tooltips |
-
-### Glassmorphism (Selective)
-
-Used ONLY on:
-- App header/toolbar
-- Command palette overlay
-- Modal backdrops
-- Floating action panels
-- Notification center
+### 2.6 Overlay & Glassmorphism
 
 ```css
-.glass {
-  background: rgba(23, 21, 18, 0.75); /* hsl(35,13%,8%) @ 75% opacity */
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  border: 1px solid rgba(255, 248, 235, 0.06); /* warm white tint */
-}
+--overlay-bg:      rgba(0,0,0,0.6);
+--overlay-bg-soft: rgba(0,0,0,0.5);
+
+--glass-bg:     rgba(23, 21, 18, 0.75);
+--glass-border: rgba(255, 248, 235, 0.06);
+--glass-blur:   blur(20px) saturate(1.2);
 ```
 
----
-
-## 7. 3D Design Integration
-
-### What Gets 3D Treatment
-
-| Element | 3D Treatment | Technology |
-|---------|-------------|-----------|
-| **App Logo** | 3D animated logo (subtle float/rotation) | React Three Fiber |
-| **Empty States** | 3D illustrations (document, calendar, chart) | Pre-rendered 3D + CSS animation |
-| **Dashboard Hero** | 3D scene: floating metric orbs or data landscape | React Three Fiber (lazy loaded) |
-| **Stat Cards** | 3D depth on hover (translateZ + perspective) | CSS transforms |
-| **Charts** | 3D bar charts, globe visualization for multi-region | React Three Fiber |
-| **Onboarding** | 3D progress indicator (orbiting checkmarks) | React Three Fiber |
-| **Error Page** | 3D floating "404" or broken object | Pre-rendered 3D |
-| **Icons (select)** | 3D-rendered icons for sidebar navigation | Pre-rendered SVG with depth effects |
-
-### What Stays 2D
-
-- Tables, forms, inputs, buttons — 3D would hinder usability
-- Body text, labels, badges
-- Navigation items (sidebar, breadcrumbs)
-- Standard UI chrome
-
-### 3D Performance Budget
-
-- Initial load: NO Three.js on critical path
-- Lazy load: 3D canvas only when visible (IntersectionObserver)
-- Fallback: CSS depth effects if WebGL unavailable
-- Max canvas size: 800x600px (dashboard hero)
-- Target: 60fps on M1 MacBook Air
-- Reduce motion: CSS transforms only (no WebGL) when prefers-reduced-motion
-
-### Depth Effects (CSS-only, no WebGL)
+### 2.7 Motion
 
 ```css
-/* Card depth on hover */
-.card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-3);
-}
+--motion-instant: 0ms;
+--motion-fast:    100ms;
+--motion-normal:  200ms;
+--motion-slow:    300ms;
+--motion-gentle:  500ms;
 
-/* Perspective container for stat cards */
-.perspective-container {
-  perspective: 1000px;
-}
-.stat-card {
-  transition: transform 0.3s ease;
-}
-.stat-card:hover {
-  transform: rotateX(2deg) rotateY(-2deg) translateZ(10px);
-}
-
-/* Layered surfaces (parallax on scroll) */
-.parallax-surface {
-  will-change: transform;
-  transform: translateZ(0);
-}
+--ease-out:       ease-out;
+--ease-in-out:    ease-in-out;
+--ease-gentle:    cubic-bezier(0.4, 0, 0.2, 1);
 ```
 
----
+All animations respect `prefers-reduced-motion`. Functional transitions (modals, panels, dropdowns) remain active even under reduced motion; only decorative animation is suppressed.
 
-## 8. Motion & Animation
-
-> **Live implementation:** `prototype/_components.css` §Animations and `prototype/_shared.js` for JS-driven transitions.
-
-### Timing Tokens
-
-| Token | Duration | Easing | Use |
-|-------|---------|--------|-----|
-| `motion-instant` | 0ms | — | Immediate feedback (active states) |
-| `motion-fast` | 100ms | ease-out | Hover states, button press |
-| `motion-normal` | 200ms | ease-in-out | Card transitions, menu open |
-| `motion-slow` | 300ms | ease-in-out | Modal open/close, page transitions |
-| `motion-gentle` | 500ms | cubic-bezier(0.4, 0, 0.2, 1) | Complex transitions, 3D movements |
-
-### Spring Physics (for premium feel)
+### 2.8 Layout Tokens
 
 ```css
-/* Framer Motion spring presets */
---spring-snappy: { stiffness: 500, damping: 30 }
---spring-gentle: { stiffness: 200, damping: 20 }
---spring-bouncy: { stiffness: 400, damping: 15, mass: 0.5 }
+--sidebar-width:      224px;  /* Expanded sidebar */
+--sidebar-wide:       256px;  /* Wide variant (rare) */
+--sidebar-collapsed:  56px;   /* Collapsed icon rail */
+--header-height:      56px;   /* Topbar */
+--drawer-width:       480px;  /* Side drawer */
 ```
 
-### Animation Catalog
-
-| Animation | Trigger | Duration | Effect |
-|-----------|---------|----------|--------|
-| **Card hover lift** | Mouse enter | 200ms | translateY(-2px), shadow deepen |
-| **Button press** | Click | 100ms | Scale(0.97), shadow reduce |
-| **Button loading** | Submit | Loop | Shimmer gradient across button |
-| **Modal enter** | Open | 300ms | Fade in + scale from 0.95 |
-| **Modal exit** | Close | 200ms | Fade out + scale to 0.95 |
-| **Slide panel** | Open | 300ms | Slide from right + fade |
-| **Toast enter** | Trigger | 300ms | Slide down from top + fade |
-| **Toast exit** | Dismiss/auto | 200ms | Slide up + fade |
-| **Page transition** | Navigate | 200ms | Fade + subtle translateY |
-| **Sidebar expand** | Toggle | 200ms | Width transition + label fade |
-| **Notification badge** | New item | 400ms | Scale pulse (1 → 1.2 → 1) |
-| **Counter update** | Value change | 300ms | Number roll (digit by digit) |
-| **Chart draw** | Mount | 800ms | SVG path draw-in |
-| **Gantt bar** | Drag | 0ms (real-time) | Follow cursor with snap |
-| **List item enter** | New item | 200ms | Fade in + slide from top |
-| **List item exit** | Remove | 150ms | Fade out + slide to left |
-| **Skeleton shimmer** | Loading | Loop 2s | Gradient slide left to right |
-| **Status dot pulse** | Online | Loop 3s | Opacity 1 → 0.5 → 1 |
-| **3D logo rotate** | Idle | Loop 20s | Gentle Y-axis rotation |
-| **Command palette** | Cmd+K | 200ms | Fade + scale from center |
-
-### Reduced Motion
-
-When `prefers-reduced-motion: reduce`:
-- All transforms → instant (no animation)
-- Opacity transitions → 100ms max
-- No parallax, no 3D rotation
-- Shimmer → static placeholder
-- Spring animations → linear
+These are the exact dimensions in the prototype. Do not substitute rounded values.
 
 ---
 
-## 9. Component Specifications
+## 3. The Shell (Invariant)
 
-> **Live implementation:** `prototype/_components.css` — contains the complete component CSS. Copy from here, do not rewrite from scratch.
+Pixel-identical on every page. Three states by viewport width.
 
-### 9.1 Button
+### 3.1 Sidebar states
 
-**Variants:**
-| Variant | Background | Text | Border | Use |
-|---------|-----------|------|--------|-----|
-| `primary` | Primary color | White | None | Primary CTA |
-| `secondary` | Surface-1 | Text-primary | Border | Secondary actions |
-| `ghost` | Transparent | Primary | None | Tertiary, inline actions |
-| `destructive` | Error | White | None | Delete, remove |
-| `destructive-ghost` | Transparent | Error | None | Subtle destructive |
-| `link` | Transparent | Primary | None + underline | Inline links |
+| State | Trigger | Width | Contents |
+|-------|---------|-------|----------|
+| Expanded | >= 1280px OR user pinned | 224px | Icons + labels + section headers |
+| Collapsed | 1024-1279px OR user collapsed | 56px | Icons only, tooltip on hover |
+| Hidden | < 1024px | 0 | Replaced by bottom nav |
 
-**Sizes:**
-| Size | Height | Padding X | Font | Icon | Use |
-|------|--------|----------|------|------|-----|
-| `xs` | 28px | 8px | caption | 14px | Inline, table actions |
-| `sm` | 32px | 12px | body-sm | 16px | Compact UI |
-| `md` | 36px | 16px | body | 18px | Standard (default) |
-| `lg` | 44px | 20px | body-lg | 20px | Hero CTAs, forms |
-| `xl` | 52px | 24px | heading-3 | 22px | Landing page, onboarding |
-| `icon` | 36px | 0 | — | 18px | Icon-only buttons (square) |
+Nav item height 40px. Selected: background `--color-surface-2`, 3px left border `--color-primary`.
 
-**States:** Default → Hover (lighten 5%) → Active (darken 5%, scale 0.97) → Disabled (opacity 0.5) → Loading (shimmer + spinner)
+### 3.2 Sidebar sections
 
-### 9.2 Input
+| Section | Items |
+|---------|-------|
+| MAIN | Dashboard, Calendar, Timesheets, Leaves |
+| WORK | Expenses, Projects, Gantt, Planning, Clients, Invoices |
+| HR | Team Directory, Human Resources |
+| AI | Insights |
+| ADMIN (admin only) | Administration |
+| Footer | Approvals (badge), Account, Help & Shortcuts |
 
-```
-┌─────────────────────────────────────┐
-│ Label *                              │
-│ ┌─────────────────────────────────┐ │
-│ │ [icon] Placeholder text         │ │
-│ └─────────────────────────────────┘ │
-│ Helper text or error message        │
-└─────────────────────────────────────┘
-```
+Header row: 56px, logo + collapse toggle.
 
-**States:** Default → Focus (ring-2 primary) → Error (ring-2 error, red text) → Disabled → Read-only
+### 3.3 Topbar (56px, all breakpoints)
 
-**Sizes:** `sm` (32px), `md` (36px), `lg` (44px)
+| Position | Element | Notes |
+|----------|---------|-------|
+| Left | Breadcrumb (desktop) or Menu button + Page title (mobile) | - |
+| Right | `Ask` AI button | 88px desktop / 40px mobile. Opens command palette, Cmd+K |
+| Right | Notifications bell | 40px, opens drawer |
+| Right | User avatar + presence | 40px, opens account menu |
 
-### 9.3 Card
+### 3.4 Bottom nav (< 1024px only)
 
-**Variants:**
-| Variant | Style | Use |
-|---------|-------|-----|
-| `default` | Surface-0, shadow-1, radius-lg | Standard content card |
-| `stat` | Surface-0, gradient accent border-top, shadow-2 on hover | KPI stat display |
-| `glass` | Glassmorphism background | Overlays, hero elements |
-| `interactive` | Hover lift + shadow-2 transition | Clickable cards (project, client) |
-| `gradient` | Subtle primary gradient bg | Featured/highlighted content |
-| `outlined` | Transparent bg, border | Secondary content sections |
-
-### 9.4 Badge
-
-**Variants:**
-| Variant | Background | Text | Use |
-|---------|-----------|------|-----|
-| `default` | Surface-2 | Text-secondary | Neutral labels |
-| `primary` | Primary/15 | Primary | Active, selected |
-| `success` | Success/15 | Success | Approved, complete, active |
-| `warning` | Warning/15 | Warning | Pending, attention needed |
-| `error` | Error/15 | Error | Rejected, overdue, critical |
-| `info` | Info/15 | Info | Informational |
-
-All badges include semantic icons (not just color).
-
-### 9.5 Table
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│ [Checkbox] │ Name ▲         │ Department │ Status │ Actions  │
-├──────────────────────────────────────────────────────────────┤
-│ [☐] │ 🟢 Sarah Chen        │ Engineering│ Active │ [•••]    │
-│ [☐] │ 🟢 John Smith        │ Operations │ Active │ [•••]    │
-│ [☐] │ 🔴 Alice Wang        │ Design     │ Leave  │ [•••]    │
-├──────────────────────────────────────────────────────────────┤
-│                     1-10 of 48  │ ◀ 1 2 3 4 5 ▶            │
-└──────────────────────────────────────────────────────────────┘
-```
-
-**Features:**
-- Sticky header on scroll
-- Row hover highlight (Surface-1)
-- Row selection (checkbox, shift+click for range)
-- Column sorting (click header, shift+click for multi-sort)
-- Column resizing (drag handle)
-- Virtualized rows (1000+ rows smooth)
-- Expandable rows (click to reveal details)
-- Responsive: collapse to cards on mobile
-- Pagination or infinite scroll (configurable)
-
-### 9.6 Modal / Dialog
-
-**Sizes:**
-| Size | Width | Use |
-|------|-------|-----|
-| `sm` | 400px | Confirmations, simple forms |
-| `md` | 560px | Standard forms, details |
-| `lg` | 720px | Complex forms, previews |
-| `xl` | 960px | Data-heavy views, comparisons |
-| `full` | 100vw - 64px | Full-screen editors |
-
-**Animation:** Backdrop fade (300ms) + content scale-up from 0.95 (200ms)
-
-### 9.7 Avatar
-
-```
-Sizes: xs(24px) sm(32px) md(40px) lg(48px) xl(64px) 2xl(96px)
-
-Structure:
-  ┌─────┐
-  │ SC  │  ← Initials (first+last name)
-  │  🟢 │  ← Status dot (bottom-right)
-  └─────┘
-
-Features:
-- Image (if profile_photo_url exists)
-- Fallback: initials with generated gradient background
-- Status dot: green(online), yellow(away), gray(offline), red(on leave)
-- Group: overlapping stack with "+N" counter
-```
-
-### 9.8 Toast Notifications
-
-```
-┌──────────────────────────────────────┐
-│ ✅ Leave request approved            │ [✕]
-│    Apr 28-29 — by John Smith         │
-│    ─────────────────────────────────  │
-│    [View Details] [Dismiss]          │
-└──────────────────────────────────────┘
-```
-
-**Types:** success (green), error (red), warning (amber), info (blue)
-**Position:** Top-right, stacks vertically
-**Auto-dismiss:** 5s (info), 8s (success), persistent (error)
-
-### 9.9 Command Palette
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│ 🔍 Type to search...                               [Esc]    │
-├──────────────────────────────────────────────────────────────┤
-│ ▸ Sarah Chen — Employee, Engineering                         │
-│   Acme Corp — Client                                         │
-│   Acme Web Redesign — Project                                │
-│   ⚡ Submit timesheet                                        │
-│   ⚡ New expense                                             │
-├──────────────────────────────────────────────────────────────┤
-│ ↑↓ Navigate │ ↵ Select │ ⌘K Toggle │ Esc Close             │
-└──────────────────────────────────────────────────────────────┘
-```
-
-**Glass background, sharp shadow, 560px width, centered at 20% from top**
+Fixed 64px, safe-area-inset aware. Exactly 5 items: Dashboard, Timesheets, Leaves, Approvals (badge), More. Active: `--color-primary`. Inactive: `--color-text-3`.
 
 ---
 
-## 10. Iconography
+## 4. Content Patterns
 
-### Icon Library: Lucide React
+Every page uses exactly one of five patterns. Structure is fixed; content varies.
 
-- Consistent 24px grid, 2px stroke
-- Used for: navigation, buttons, status indicators, section headers
+| Pattern | Stacked components (top to bottom) | Used by |
+|---------|------------------------------------|---------|
+| **List** | PageHeader (64px) → FilterBar (52px) → StatStrip (96px, optional, 4 cards) → DataTable (desktop) / CardGrid (mobile) | Employees, Timesheets, Leaves, Expenses, Projects, Clients, Invoices |
+| **Detail** | BackBreadcrumb (40px) → EntityHeader (120px) → TabBar (48px) → Tab content | Employee, Project, Client, Invoice detail |
+| **Board** | PageHeader (64px) → Toolbar (52px) → VisualCanvas (full width, scrolls horizontally) | Gantt, Planning, Calendar, HR Kanban |
+| **Dashboard** | GreetingHeader (80px) → KPIStrip (exactly 4 cards, 96px) → DashboardSection x N | Dashboard, Insights, Approvals |
+| **Settings** | PageHeader (64px) → SectionNav (220px left) + FormContent (720px max) | Auth wizard, Onboarding, Account, Admin |
 
-### 3D Icon Treatment
-
-Selected icons get a 3D-rendered version for sidebar navigation:
-
-| Icon | Where | 3D Treatment |
-|------|-------|-------------|
-| Dashboard | Sidebar | 3D cube with gradient faces |
-| Timesheets | Sidebar | 3D clock with ticking hand |
-| Expenses | Sidebar | 3D receipt with curl |
-| Leaves | Sidebar | 3D calendar with leaf |
-| Projects | Sidebar | 3D folder with depth |
-| Team | Sidebar | 3D people silhouettes |
-| Insights | Sidebar | 3D brain/lightbulb |
-| Gantt | Sidebar | 3D timeline bars |
-
-All 3D icons: subtle idle animation (float/rotate), more pronounced hover animation.
-Fallback: standard 2D Lucide icons (for reduced motion, smaller viewports).
+Rules:
+- KPIStrip has exactly 4 cards. Extras go in an "Overview" section below.
+- Settings wizards replace SectionNav with a top StepIndicator.
+- Content max-width: 1400px (data pages), 720px (forms/settings).
 
 ---
 
-## 11. Responsive Breakpoints
+## 5. Atoms (Fixed Dimensions)
 
-| Token | Width | Layout | Sidebar |
-|-------|-------|--------|---------|
-| `mobile` | < 640px | Single column, cards | Hidden (hamburger) |
-| `tablet` | 640-1023px | 2 columns, compact | Icon-only (56px) |
-| `desktop` | 1024-1439px | Full layout | Expanded (224px) |
-| `wide` | 1440px+ | Full layout, extra columns | Expanded (256px) |
+One canonical size per atom. No growing, no shrinking. Overflow truncates with ellipsis. Mobile (< 1024px) has a minimum 44x44px touch target applied via invisible padding.
 
-### Mobile-Specific Patterns
+### 5.1 Buttons
 
-- Bottom navigation bar (5 items: Dashboard, Timesheets, Expenses, Leaves, More)
-- Cards instead of tables
-- Swipe gestures (swipe to approve/reject in lists)
-- Pull to refresh
-- Floating action button (FAB) for primary action
+| Variant | Height | Padding | Font | Border Radius |
+|---------|--------|---------|------|---------------|
+| `primary` | 40px | 16px horizontal | 14px/500 | 8px |
+| `secondary` | 40px | 16px horizontal | 14px/500 | 8px |
+| `ghost` | 40px | 12px horizontal | 14px/500 | 8px |
+| `small` | 32px | 12px horizontal | 13px/500 | 6px |
+| `icon` | 40px × 40px | - | - | 8px |
+| `icon-sm` | 32px × 32px | - | - | 6px |
+| `cta-large` | 48px | 20px horizontal | 15px/600 | 8px |
+
+### 5.2 Inputs
+
+| Variant | Height | Padding | Font |
+|---------|--------|---------|------|
+| `default` | 40px | 12px horizontal | 14px/400 |
+| `small` | 32px | 10px horizontal | 13px/400 |
+| `large` | 48px | 16px horizontal | 15px/400 |
+| `textarea` | auto (min 80px) | 12px all | 14px/400 |
+
+### 5.3 Cards
+
+| Variant | Min Height | Padding | Radius |
+|---------|-----------|---------|--------|
+| `stat-card` | **96px** (88px mobile) | 20px (16px mobile) | 12px |
+| `standard-card` | auto | 20px (16px mobile) | 12px |
+| `compact-card` | auto | 16px | 12px |
+| `mobile-row-card` | **80px min** | 16px | 12px |
+
+### 5.4 Tables
+
+| Element | Height |
+|---------|--------|
+| Table header | 44px |
+| Table row | **56px** |
+| Table footer (pagination) | 56px |
+
+### 5.5 Modals & Drawers
+
+| Element | Desktop | Mobile |
+|---------|---------|--------|
+| Modal width | 560px centered | Full-width bottom sheet |
+| Modal max-height | 80vh | 90vh |
+| Drawer width | 480px from right | Full-screen |
+| Modal header | 56px | 56px |
+| Modal footer (actions) | 64px | 64px |
+| Backdrop | `rgba(0,0,0,0.6)` | Same |
+| Animation | Fade + scale 200ms | Slide up 250ms |
+
+### 5.6 Other Atoms
+
+| Atom | Dimension |
+|------|-----------|
+| Badge | 22px height, 8px horizontal padding, 11px font |
+| Pill | 28px height, 12px horizontal padding, 12px font |
+| Tag (removable) | 28px height, 10px horizontal padding, 12px font |
+| Avatar sizes | 24px / 32px / 40px / 56px / 80px |
+| Tooltip | 32px height (single line), 10px horizontal padding |
+| Tab bar height | 48px |
+| Tab item height | 48px |
+| Breadcrumb height | 40px |
 
 ---
 
-## 12. Accessibility
+## 6. Component Library
 
-### WCAG 2.2 AA Requirements
+Exactly these components. No custom variants. Each one has a Storybook entry.
 
-- **Contrast ratios:** 4.5:1 for body text, 3:1 for large text (18px+) and UI components
-- **Focus indicators:** 2px ring in primary color, visible in both light and dark modes
-- **Touch targets:** Minimum 44x44px on mobile
-- **Color independence:** All status uses icon + color (never color alone)
-- **Keyboard navigation:** Every interactive element reachable via Tab; logical tab order
-- **Screen reader:** All images have alt text; decorative images have `aria-hidden="true"`
-- **Reduced motion:** All animations respect `prefers-reduced-motion`
-- **High contrast:** Support `prefers-contrast: more` with increased borders and text weight
-- **Zoom:** Layout works up to 200% zoom without horizontal scrolling
+| Group | Components |
+|-------|------------|
+| Shell | `AppShell`, `Sidebar`, `Topbar`, `BottomNav`, `CommandPalette`, `NotificationsDrawer` |
+| Layout | `PageHeader`, `FilterBar`, `StatStrip`, `StatCard`, `SectionHeader`, `EmptyState` |
+| Data display | `DataTable`, `CardGrid`, `MobileRowCard`, `Badge`, `Pill`, `Avatar`, `AvatarGroup`, `EmployeeLink`, `HoverCard` |
+| Inputs | `TextInput`, `Textarea`, `Select`, `Combobox`, `DatePicker`, `Checkbox`, `RadioGroup`, `Switch`, `FileUpload`, `Form`, `FormField` |
+| Feedback | `Button`, `IconButton`, `Modal`, `Drawer`, `BottomSheet`, `Toast`, `ConfirmDialog`, `Skeleton`, `Spinner`, `ProgressBar` |
+| Navigation | `Breadcrumb`, `TabBar`, `Pagination`, `BackLink` |
+| AI | `AICommandPalette`, `AISuggestionChip`, `AIConfidenceBadge`, `AIReviewRow`, `AIInsightCard` |
+| Charts | `BarChart`, `LineChart`, `DonutChart`, `HeatmapGrid`, `GanttCanvas`, `CalendarGrid` |
 
-### Focus Styles
-
-```css
-:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-md);
-}
-```
+Forms use React Hook Form + Zod. Charts use Visx.
 
 ---
 
-## 13. Data Visualization Style
+## 7. Responsive Behavior
 
-### Chart Design Principles
+### 7.1 Breakpoints (Tailwind)
 
-1. **Gridlines:** Subtle, dashed, low opacity (0.1)
-2. **Axis labels:** caption size, text-tertiary color
-3. **Tooltips:** Glass morphism, compact, with icon + label + value
-4. **Colors:** Use chart color scale (6 distinct, colorblind-safe)
-5. **Animation:** Draw-in on mount (800ms), smooth transitions on data change
-6. **Interaction:** Hover highlights data point + crosshair, click drills down
-7. **Responsive:** Auto-resize, simplified on mobile (fewer data points)
+| Token | Min width | Device |
+|-------|-----------|--------|
+| (none) | 0 | Small phone |
+| `sm` | 640px | Phone |
+| `md` | 768px | Tablet portrait |
+| `lg` | 1024px | Laptop / tablet landscape |
+| `xl` | 1280px | Desktop (primary target) |
+| `2xl` | 1440px | External monitor |
 
-### Chart Color Scale
+### 7.2 Shell per viewport
 
-Derived from the locked Earth & Sage palette. All 6 series are visually distinct and colorblind-safe.
+| Viewport | Sidebar | Nav |
+|----------|---------|-----|
+| < 1024px | Hidden | Bottom nav 64px |
+| 1024-1279px | Collapsed 56px | Sidebar icons |
+| >= 1280px | Expanded 224px | Full sidebar |
 
-```
-Chart-1: hsl(155, 26%, 46%)  — Soft sage     (primary series — matches --color-primary)
-Chart-2: hsl(38, 60%, 48%)   — Aged gold     (financial, revenue — matches --color-gold)
-Chart-3: hsl(30, 58%, 50%)   — Terracotta    (secondary series — matches --color-accent)
-Chart-4: hsl(200, 40%, 52%)  — Steel blue    (informational series — matches --color-info)
-Chart-5: hsl(270, 45%, 58%)  — Muted mauve   (quaternary — warm-toned, distinct)
-Chart-6: hsl(5, 65%, 52%)    — Brick red     (alert/overdue series — matches --color-error)
-```
+### 7.3 Content transformations (< 768px)
 
-All 6 tested for colorblind accessibility (protanopia, deuteranopia, tritanopia).
-Series 1–3 (sage, gold, terracotta) carry brand identity into data visualization.
+| Feature | Mobile behavior |
+|---------|-----------------|
+| DataTable | Replaced by CardGrid of MobileRowCards |
+| KPIStrip | 4 cols -> 2 cols |
+| Modal | Bottom sheet slides up (90vh max) |
+| Drawer | Full-screen overlay |
+| PageHeader actions | Primary only + kebab menu |
+| FilterBar | Search visible + `Filter` button opens drawer |
+| Gantt / Planning | Read-only week view with "use desktop" banner |
+| Hover cards | Open on tap; long-press preview |
+
+### 7.4 Zoom and units
+
+Zoom = viewport reduction. No special zoom code. Use `rem` for typography, `px` for structural dimensions and media queries. Test at 100/125/150% zoom on 1280 and 1440.
+
+---
+
+## 8. AI Integration Layers
+
+AI lives in the shell, not pages. Three layers:
+
+| Layer | Where | Trigger | Purpose |
+|-------|-------|---------|---------|
+| **1. Command palette** | Topbar `Ask` button, Cmd+K, mobile FAB | User-initiated | NL input with current page context. Returns answer, action, or navigation |
+| **2. Inline suggestions** | Inside page content, never modal | Proactive | Anomaly hints, OCR confidence, autofill preview. See `AI_FEATURES.md` |
+| **3. Insights page** | `/insights` (Dashboard pattern) | User-visited | Conversational analytics, anomalies, trend reports |
+
+---
+
+## 9. Iconography
+
+Lucide React, stroke 1.5. Default 20px. Navigation items filled when selected, outline when not. Actions always outline. Status icons filled + colored.
+
+| Token | Size |
+|-------|------|
+| `icon-xs` | 14px |
+| `icon-sm` | 16px |
+| `icon-md` | 20px (default) |
+| `icon-lg` | 24px |
+| `icon-xl` | 32px |
+
+---
+
+## 10. Accessibility
+
+WCAG 2.2 AA is the floor.
+
+- Semantic HTML (button, nav, main, article)
+- Full keyboard navigation
+- `:focus-visible` ring: 3px `--color-primary`, 2px offset
+- ARIA labels on icon-only buttons
+- Contrast >= 4.5:1 body, >= 3:1 large text
+- Screen reader verified (VoiceOver, NVDA)
+- `prefers-reduced-motion` respected (decorative motion only; functional transitions stay)
+- Dark mode default; `prefers-color-scheme` respected
+
+---
+
+## 11. Prototype Reference
+
+`prototype/*.html` is the approved visual spec. Every Next.js page must match its counterpart pixel-perfect at the `xl` breakpoint. Deviations require written justification.
+
+| Prototype file | Pattern |
+|----------------|---------|
+| `index.html` | Dashboard |
+| `employees.html` | List |
+| `timesheets.html` | List (custom TimesheetGrid) |
+| `leaves.html` | List |
+| `expenses.html` | List |
+| `projects.html` | List + Kanban |
+| `clients.html` | List |
+| `invoices.html` | List |
+| `calendar.html` | Board |
+| `gantt.html` | Board |
+| `planning.html` | Board |
+| `approvals.html` | Dashboard |
+| `insights.html` | Dashboard |
+| `hr.html` | Detail + Tabs |
+| `admin.html` | Settings |
+| `account.html` | Settings |
+| `auth.html` | Settings wizard |
+| `portal/index.html` | Dashboard (separate client-portal shell) |
+
+---
+
+## 12. Enforcement
+
+1. Component library is built before any page (Phase 2).
+2. Pages import from `@/components`. No custom layouts.
+3. Every page picks one pattern and uses its components as-is.
+4. Storybook is the canonical reference. Not in Storybook = does not exist.
+5. The flawless gate (`docs/FLAWLESS_GATE.md`) runs before any page is marked complete.
+6. PR review rejects any custom CSS overriding atom dimensions.
+
+If an agent needs something not in the system: **stop and ask the founder.** Never create a custom variant. The founder decides add-to-library (rare) vs. fit-the-content (usual).

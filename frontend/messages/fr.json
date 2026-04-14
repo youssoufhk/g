@@ -1,0 +1,25 @@
+{
+  "app": {
+    "name": "GammaHR",
+    "loading": "Chargement"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "calendar": "Calendrier",
+    "timesheets": "Feuilles de temps",
+    "leaves": "Congés",
+    "expenses": "Notes de frais",
+    "projects": "Projets",
+    "gantt": "Gantt",
+    "planning": "Planning",
+    "clients": "Clients",
+    "invoices": "Factures",
+    "team": "Annuaire équipe",
+    "hr": "Ressources humaines",
+    "insights": "Insights",
+    "admin": "Administration",
+    "approvals": "Approbations",
+    "account": "Compte",
+    "help": "Aide & Raccourcis"
+  }
+}

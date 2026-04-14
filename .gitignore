@@ -1,0 +1,50 @@
+# OS + editor
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.swp
+*.swo
+
+# Secrets + local env
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Build output
+dist
+build
+out
+coverage
+*.log
+
+# Node
+node_modules
+.next
+.turbo
+storybook-static
+playwright-report
+test-results
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.venv
+venv
+env
+.mypy_cache
+.ruff_cache
+.pytest_cache
+.coverage
+htmlcov
+
+# Databases
+*.db
+*.sqlite3
+*.dump

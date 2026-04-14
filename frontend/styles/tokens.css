@@ -1,0 +1,341 @@
+/* ============================================================
+   GammaHR v2 "Quantum" — Design Tokens
+   Earth & Sage palette — LOCKED. Do not modify colors.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ── Backgrounds & Surfaces ── */
+  --color-bg:             hsl(35, 16%, 5%);
+  --color-surface-0:      hsl(35, 13%, 8%);
+  --color-surface-1:      hsl(35, 11%, 11%);
+  --color-surface-2:      hsl(35, 9%, 15%);
+  --color-surface-3:      hsl(35, 7%, 19%);
+
+  /* ── Primary — Soft Sage ── */
+  --color-primary:        hsl(155, 26%, 46%);
+  --color-primary-hover:  hsl(155, 26%, 52%);
+  --color-primary-active: hsl(155, 26%, 40%);
+  --color-primary-muted:  hsla(155, 26%, 46%, 0.14);
+
+  /* ── Accent — Terracotta ── */
+  --color-accent:         hsl(30, 58%, 50%);
+  --color-accent-hover:   hsl(30, 58%, 56%);
+  --color-accent-active:  hsl(30, 58%, 44%);
+  --color-accent-muted:   hsla(30, 58%, 50%, 0.14);
+
+  /* ── Semantic ── */
+  --color-success:        hsl(152, 22%, 44%);
+  --color-success-muted:  hsla(152, 22%, 44%, 0.15);
+  --color-warning:        hsl(38, 65%, 50%);
+  --color-warning-muted:  hsla(38, 65%, 50%, 0.15);
+  --color-error:          hsl(5, 65%, 52%);
+  --color-error-muted:    hsla(5, 65%, 52%, 0.15);
+  --color-error-hover:    hsl(5, 65%, 58%);
+  --color-info:           hsl(200, 40%, 52%);
+  --color-info-muted:     hsla(200, 40%, 52%, 0.15);
+
+  /* ── Financial ── */
+  --color-gold:           hsl(38, 60%, 48%);
+  --color-gold-hover:     hsl(38, 60%, 54%);
+  --color-gold-muted:     hsla(38, 60%, 48%, 0.15);
+
+  /* ── Text ── */
+  --color-text-1:         hsl(40, 28%, 90%);
+  --color-text-2:         hsl(35, 10%, 55%);
+  --color-text-3:         hsl(35, 8%, 38%);
+  --color-text-inv:       hsl(35, 16%, 5%);
+
+  /* ── On-Color (for text on filled backgrounds) ── */
+  --color-white:              #fff;
+  --color-text-on-primary:    #fff;
+  --color-text-on-error:      #fff;
+  --color-text-on-accent:     #fff;
+
+  /* ── Borders ── */
+  --color-border:         hsl(35, 10%, 14%);
+  --color-border-subtle:  hsl(35, 8%, 10%);
+  --color-border-strong:  hsl(35, 12%, 22%);
+
+  /* ── Chart Colors (6-series, colorblind-safe) ── */
+  --color-chart-1:        hsl(155, 26%, 46%);
+  --color-chart-2:        hsl(38, 60%, 48%);
+  --color-chart-3:        hsl(30, 58%, 50%);
+  --color-chart-4:        hsl(200, 40%, 52%);
+  --color-chart-5:        hsl(270, 45%, 58%);
+  --color-chart-6:        hsl(5, 65%, 52%);
+  --color-chart-5-muted:  hsla(270, 45%, 58%, 0.15);
+
+  /* ── Gantt / Planning Bar Colors ── */
+  --color-bar-billable:   hsla(155, 26%, 46%, 0.3);
+  --color-bar-nonbillable:hsla(200, 40%, 52%, 0.25);
+  --color-bar-leave:      hsla(200, 40%, 52%, 0.08);
+  --color-bar-bench:      hsla(38, 65%, 50%, 0.08);
+  --color-surface-weekend:hsla(35, 10%, 8%, 0.6);
+  --color-row-hover:      hsla(35, 10%, 11%, 0.4);
+  --color-internal:       var(--color-bar-nonbillable); /* alias for non-billable/internal time bars */
+
+  /* ── WFH / Remote Color ── */
+  --color-wfh:            hsl(175, 35%, 45%);
+  --color-wfh-muted:      hsla(175, 35%, 45%, 0.15);
+
+  /* ── Typography ── */
+  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Type Scale */
+  --text-display-xl:  2.25rem;   /* 36px */
+  --text-display-lg:  1.875rem;  /* 30px */
+  --text-heading-1:   1.5rem;    /* 24px */
+  --text-heading-2:   1.25rem;   /* 20px */
+  --text-heading-3:   1rem;      /* 16px */
+  --text-body-lg:     1rem;      /* 16px */
+  --text-body:        0.875rem;  /* 14px */
+  --text-body-sm:     0.8125rem; /* 13px */
+  --text-caption:     0.75rem;   /* 12px */
+  --text-overline:    0.75rem;   /* 12px */
+  --text-mono:        0.8125rem; /* 13px */
+
+  /* Font Weights */
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+
+  /* ── Spacing (4px base) ── */
+  --space-0:   0px;
+  --space-0-5: 2px;
+  --space-1:   4px;
+  --space-1-5: 6px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   28px;
+  --space-8:   32px;
+  --space-9:   36px;
+  --space-10:  40px;
+  --space-11:  44px;
+  --space-12:  48px;
+  --space-14:  56px;
+  --space-16:  64px;
+  --space-18:  72px;
+  --space-20:  80px;
+
+  /* ── Typography Extras ── */
+  --letter-spacing-caps: 0.05em;
+
+  /* ── Border Radius ── */
+  --radius-none: 0px;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows (Dark Mode) ── */
+  --shadow-0: none;
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
+  --shadow-2: 0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2);
+  --shadow-3: 0 4px 8px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
+  --shadow-4: 0 8px 16px rgba(0,0,0,0.3), 0 16px 32px rgba(0,0,0,0.25);
+  --shadow-5: 0 16px 32px rgba(0,0,0,0.35), 0 32px 64px rgba(0,0,0,0.3);
+  --shadow-md: var(--shadow-3);
+
+  /* ── Overlay ── */
+  --overlay-bg:      rgba(0,0,0,0.6);
+  --overlay-bg-soft: rgba(0,0,0,0.5);
+
+  /* ── Glassmorphism ── */
+  --glass-bg:     rgba(23, 21, 18, 0.75);
+  --glass-border: rgba(255, 248, 235, 0.06);
+  --glass-blur:   blur(20px) saturate(1.2);
+
+  /* ── Motion ── */
+  --motion-instant: 0ms;
+  --motion-fast:    100ms;
+  --motion-normal:  200ms;
+  --motion-slow:    300ms;
+  --motion-gentle:  500ms;
+  --ease-out:       ease-out;
+  --ease-in-out:    ease-in-out;
+  --ease-gentle:    cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Layout ── */
+  --sidebar-width:      224px;
+  --sidebar-collapsed:  56px;
+  --header-height:      56px;
+  --sidebar-wide:       256px;
+  --drawer-width:       480px;
+}
+
+/* ── Light Mode Override ── */
+[data-theme="light"] {
+  /* Backgrounds & Surfaces */
+  --color-bg:             hsl(40, 20%, 97%);
+  --color-surface-0:      hsl(40, 15%, 100%);
+  --color-surface-1:      hsl(40, 12%, 97%);
+  --color-surface-2:      hsl(40, 10%, 94%);
+  --color-surface-3:      hsl(40, 8%, 90%);
+
+  /* Primary — Deeper Sage for light bg */
+  --color-primary:        hsl(155, 30%, 34%);
+  --color-primary-hover:  hsl(155, 30%, 28%);
+  --color-primary-active: hsl(155, 30%, 24%);
+  --color-primary-muted:  hsla(155, 30%, 34%, 0.10);
+
+  /* Accent — Deeper Terracotta */
+  --color-accent:         hsl(30, 60%, 42%);
+  --color-accent-hover:   hsl(30, 60%, 36%);
+  --color-accent-active:  hsl(30, 60%, 32%);
+  --color-accent-muted:   hsla(30, 60%, 42%, 0.10);
+
+  /* Semantic */
+  --color-success:        hsl(152, 28%, 36%);
+  --color-success-muted:  hsla(152, 28%, 36%, 0.12);
+  --color-warning:        hsl(38, 70%, 42%);
+  --color-warning-muted:  hsla(38, 70%, 42%, 0.12);
+  --color-error:          hsl(5, 68%, 44%);
+  --color-error-muted:    hsla(5, 68%, 44%, 0.12);
+  --color-error-hover:    hsl(5, 68%, 38%);
+  --color-info:           hsl(200, 45%, 40%);
+  --color-info-muted:     hsla(200, 45%, 40%, 0.12);
+
+  /* Financial */
+  --color-gold:           hsl(38, 65%, 40%);
+  --color-gold-hover:     hsl(38, 65%, 34%);
+  --color-gold-muted:     hsla(38, 65%, 40%, 0.12);
+
+  /* Text — dark on light */
+  --color-text-1:         hsl(35, 12%, 10%);
+  --color-text-2:         hsl(35, 8%, 38%);
+  --color-text-3:         hsl(35, 5%, 55%);
+  --color-text-inv:       hsl(40, 20%, 97%);
+
+  /* Borders */
+  --color-border:         hsl(35, 12%, 84%);
+  --color-border-subtle:  hsl(35, 10%, 90%);
+  --color-border-strong:  hsl(35, 14%, 72%);
+
+  /* Chart Colors (darker for light bg) */
+  --color-chart-1:        hsl(155, 30%, 34%);
+  --color-chart-2:        hsl(38, 65%, 40%);
+  --color-chart-3:        hsl(30, 60%, 42%);
+  --color-chart-4:        hsl(200, 45%, 40%);
+  --color-chart-5:        hsl(270, 45%, 46%);
+  --color-chart-6:        hsl(5, 68%, 44%);
+
+  /* Gantt / Planning */
+  --color-bar-billable:   hsla(155, 30%, 34%, 0.25);
+  --color-bar-nonbillable:hsla(200, 45%, 40%, 0.20);
+  --color-bar-leave:      hsla(200, 45%, 40%, 0.10);
+  --color-bar-bench:      hsla(38, 70%, 42%, 0.10);
+  --color-surface-weekend:hsla(35, 10%, 84%, 0.6);
+  --color-row-hover:      hsla(35, 10%, 88%, 0.6);
+
+  /* Shadows (lighter for light mode) */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-2: 0 2px 4px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-3: 0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.06);
+  --shadow-4: 0 8px 16px rgba(0,0,0,0.10), 0 16px 32px rgba(0,0,0,0.07);
+  --shadow-5: 0 16px 32px rgba(0,0,0,0.12), 0 32px 64px rgba(0,0,0,0.08);
+  --shadow-md: var(--shadow-3);
+
+  /* Overlay */
+  --overlay-bg:      rgba(0,0,0,0.4);
+  --overlay-bg-soft: rgba(0,0,0,0.3);
+
+  /* Glassmorphism */
+  --glass-bg:     rgba(255, 253, 248, 0.85);
+  --glass-border: rgba(35, 30, 20, 0.08);
+  --glass-blur:   blur(20px) saturate(1.2);
+}
+
+/* ── Global Reset & Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: 1.5;
+  color: var(--color-text-1);
+  background: var(--color-bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--motion-fast) var(--ease-out);
+}
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+::selection {
+  background: var(--color-primary-muted);
+  color: var(--color-text-1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-3);
+}
+
+/* ── Utility Classes ── */
+.font-mono { font-family: var(--font-mono); }
+.text-1 { color: var(--color-text-1); }
+.text-2 { color: var(--color-text-2); }
+.text-3 { color: var(--color-text-3); }
+.text-primary { color: var(--color-primary); }
+.text-accent { color: var(--color-accent); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-gold { color: var(--color-gold); }
+
+/* Reduced motion — broad base; decorative overrides are in _components.css */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    /* NOTE: transition-duration is intentionally NOT suppressed here so that
+       functional transitions (modals, panels, dropdowns) remain usable.
+       Selective overrides are applied in _components.css. */
+  }
+}
