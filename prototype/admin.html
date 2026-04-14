@@ -96,6 +96,28 @@
       display: inline-block;
     }
 
+    /* Unsaved changes sticky bar */
+    #unsavedBar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-surface-raised, #fff);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-3) var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      z-index: 200;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    }
+    #unsavedBar .unsaved-label {
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      margin-right: auto;
+    }
+
     /* Holiday year selector */
     .year-selector {
       display: flex;
@@ -425,7 +447,7 @@
                   </tr>
                   <tr>
                     <td class="row-check"><input type="checkbox" class="user-check"></td>
-                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100">Sarah Chen</a></div></td>
+                    <td><div class="flex items-center gap-2"><div class="avatar avatar-xs">SC</div><a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100">Sarah Chen</a></div></td>
                     <td data-label="Email" class="cell-secondary">sarah.chen@gammahr.io</td>
                     <td data-label="Role"><span class="badge badge-primary"><svg data-lucide="shield" width="12" height="12"></svg> Admin</span></td>
                     <td data-label="Department">Engineering</td>
@@ -1585,7 +1607,73 @@
     setTimeout(function() {
       btn.classList.remove('btn-loading');
       showToast('success', 'Settings Saved', 'Company settings have been updated successfully.');
+      hideUnsavedBar();
     }, 800);
+  });
+
+  // ── Unsaved Changes Bar (Company Settings) ──
+  var settingsForm = document.getElementById('tab-settings');
+  var unsavedBar = document.getElementById('unsavedBar');
+  var settingsChanged = false;
+
+  // Capture initial values for discard
+  function captureSettingsSnapshot() {
+    var snapshot = {};
+    settingsForm.querySelectorAll('input, select, textarea').forEach(function(el, i) {
+      if (el.type === 'checkbox') {
+        snapshot[i] = el.checked;
+      } else {
+        snapshot[i] = el.value;
+      }
+    });
+    return snapshot;
+  }
+  var settingsSnapshot = captureSettingsSnapshot();
+
+  function showUnsavedBar() {
+    unsavedBar.style.display = 'flex';
+    if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [unsavedBar] });
+  }
+  function hideUnsavedBar() {
+    unsavedBar.style.display = 'none';
+    settingsChanged = false;
+    settingsSnapshot = captureSettingsSnapshot();
+  }
+
+  settingsForm.addEventListener('input', function(e) {
+    if (!settingsChanged) {
+      settingsChanged = true;
+      showUnsavedBar();
+    }
+  });
+  settingsForm.addEventListener('change', function(e) {
+    if (!settingsChanged) {
+      settingsChanged = true;
+      showUnsavedBar();
+    }
+  });
+
+  document.getElementById('saveUnsavedBtn').addEventListener('click', function() {
+    this.classList.add('btn-loading');
+    var btn = this;
+    setTimeout(function() {
+      btn.classList.remove('btn-loading');
+      showToast('success', 'Settings Saved', 'Company settings have been updated successfully.');
+      hideUnsavedBar();
+    }, 800);
+  });
+
+  document.getElementById('discardSettingsBtn').addEventListener('click', function() {
+    // Restore snapshot values
+    settingsForm.querySelectorAll('input, select, textarea').forEach(function(el, i) {
+      if (el.type === 'checkbox') {
+        el.checked = settingsSnapshot[i];
+      } else {
+        el.value = settingsSnapshot[i];
+      }
+    });
+    hideUnsavedBar();
+    showToast('info', 'Changes Discarded', 'Your unsaved changes have been reverted.');
   });
 
   // ── Invite User ──
@@ -1994,6 +2082,16 @@
     if (e.target === this) this.classList.remove('active');
   });
 </script>
+
+<!-- Unsaved Changes Bar (Company Settings) -->
+<div id="unsavedBar" style="display:none;" role="status" aria-live="polite">
+  <span class="unsaved-label">You have unsaved changes</span>
+  <button class="btn btn-ghost btn-sm" id="discardSettingsBtn">Discard</button>
+  <button class="btn btn-primary btn-sm" id="saveUnsavedBtn">
+    <svg data-lucide="save" width="14" height="14"></svg>
+    Save Changes
+  </button>
+</div>
 
 <nav class="bottom-nav" aria-label="Mobile navigation">
   <a href="index.html" class="bottom-nav-item"><svg data-lucide="layout-dashboard" width="22" height="22"></svg><span>Home</span></a>

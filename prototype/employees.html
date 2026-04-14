@@ -88,6 +88,13 @@
     .employee-card-dept {
       font-size: var(--text-caption);
       color: var(--color-text-3);
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 2px;
+    }
+    .employee-card-dept:hover {
+      color: var(--color-primary);
+      text-decoration: underline;
     }
     .employee-card-projects {
       display: flex;
@@ -1012,6 +1019,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a>
                   <div class="employee-card-title">Project Manager</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Engineering" onclick="event.stopPropagation();">Engineering</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1029,6 +1037,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith">John Smith</a>
                   <div class="employee-card-title">Senior Developer</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Engineering" onclick="event.stopPropagation();">Engineering</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1049,6 +1058,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="45" data-status="on-leave" data-href="employees.html#alice-wang">Alice Wang</a>
                   <div class="employee-card-title">Software Engineer</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Engineering" onclick="event.stopPropagation();">Engineering</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1069,6 +1079,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
                   <div class="employee-card-title">Backend Developer</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Engineering" onclick="event.stopPropagation();">Engineering</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1089,6 +1100,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Acme Web Redesign" data-worktime="100" data-href="employees.html#carol-williams">Carol Williams</a>
                   <div class="employee-card-title">Design Lead</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Design" onclick="event.stopPropagation();">Design</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1106,6 +1118,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Globex Phase 2" data-worktime="85" data-href="employees.html#david-park">David Park</a>
                   <div class="employee-card-title">Finance Lead</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Finance" onclick="event.stopPropagation();">Finance</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1123,6 +1136,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent">Emma Laurent</a>
                   <div class="employee-card-title">HR Specialist</div>
+                  <a class="employee-card-dept" href="employees.html?dept=HR" onclick="event.stopPropagation();">HR</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1140,6 +1154,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi">Marco Rossi</a>
                   <div class="employee-card-title">Operations Lead</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Operations" onclick="event.stopPropagation();">Operations</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1160,6 +1175,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="sophie-dubois" data-hovercard data-name="Sophie Dubois" data-role="UX Designer" data-dept="Design" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#sophie-dubois">Sophie Dubois</a>
                   <div class="employee-card-title">UX Designer</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Design" onclick="event.stopPropagation();">Design</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1177,6 +1193,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="yuki-tanaka" data-hovercard data-name="Yuki Tanaka" data-role="QA Engineer" data-dept="Engineering" data-project="Initech API" data-worktime="70" data-href="employees.html#yuki-tanaka">Yuki Tanaka</a>
                   <div class="employee-card-title">QA Engineer</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Engineering" onclick="event.stopPropagation();">Engineering</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1194,6 +1211,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="marie-dupont" data-hovercard data-name="Marie Dupont" data-role="CEO" data-dept="Executive" data-worktime="100" data-href="employees.html#marie-dupont">Marie Dupont</a>
                   <div class="employee-card-title">CEO</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Executive" onclick="event.stopPropagation();">Executive</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1211,6 +1229,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-project="Acme Web Redesign" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a>
                   <div class="employee-card-title">Senior Developer</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Engineering" onclick="event.stopPropagation();">Engineering</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1228,6 +1247,7 @@
                 <div class="employee-card-info">
                   <a class="employee-card-name" data-employee="lisa-martinez" data-hovercard data-name="Lisa Martinez" data-role="Account Manager" data-dept="Operations" data-project="Initech Portal" data-worktime="88" data-href="employees.html#lisa-martinez">Lisa Martinez</a>
                   <div class="employee-card-title">Account Manager</div>
+                  <a class="employee-card-dept" href="employees.html?dept=Operations" onclick="event.stopPropagation();">Operations</a>
                 </div>
               </div>
               <div class="worktime-bar">
@@ -1659,17 +1679,6 @@
                 <svg data-lucide="trending-up" style="width:12px;height:12px;"></svg>
                 +5% vs last month
               </div>
-              <!-- 8-week work time sparkline (Sarah: trending ~85-90%) -->
-              <svg viewBox="0 0 160 36" preserveAspectRatio="none" style="width:100%;height:36px;margin-top:var(--space-2);" aria-label="Work time trend last 8 weeks">
-                <polyline points="0,22 20,18 40,20 60,14 80,16 100,12 120,10 140,8 160,7"
-                  fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-                <polyline points="0,22 20,18 40,20 60,14 80,16 100,12 120,10 140,8 160,7 160,36 0,36"
-                  fill="var(--color-primary-muted)" stroke="none" />
-                <circle cx="160" cy="7" r="3" fill="var(--color-primary)" />
-              </svg>
-              <div style="font-size:var(--text-caption);color:var(--color-text-3);display:flex;justify-content:space-between;margin-top:2px;">
-                <span>8 wks ago</span><span>Now</span>
-              </div>
             </div>
             <div class="stat-card card-3d">
               <div class="stat-label">Billable This Month</div>
@@ -1678,17 +1687,6 @@
                 <svg data-lucide="trending-up" style="width:12px;height:12px;"></svg>
                 On track for target
               </div>
-              <!-- Billable hours sparkline -->
-              <svg viewBox="0 0 160 36" preserveAspectRatio="none" style="width:100%;height:36px;margin-top:var(--space-2);" aria-label="Billable hours trend">
-                <polyline points="0,28 20,22 40,26 60,18 80,20 100,16 120,12 140,14 160,10"
-                  fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-                <polyline points="0,28 20,22 40,26 60,18 80,20 100,16 120,12 140,14 160,10 160,36 0,36"
-                  fill="var(--color-success-muted)" stroke="none" />
-                <circle cx="160" cy="10" r="3" fill="var(--color-success)" />
-              </svg>
-              <div style="font-size:var(--text-caption);color:var(--color-text-3);display:flex;justify-content:space-between;margin-top:2px;">
-                <span>8 wks ago</span><span>Now</span>
-              </div>
             </div>
             <div class="stat-card card-3d">
               <div class="stat-label">Leave Remaining</div>
@@ -1696,17 +1694,6 @@
               <div class="stat-trend" style="color:var(--color-text-2);">
                 <svg data-lucide="calendar" style="width:12px;height:12px;"></svg>
                 7 used this year
-              </div>
-              <!-- Leave usage sparkline (cumulative days used) -->
-              <svg viewBox="0 0 160 36" preserveAspectRatio="none" style="width:100%;height:36px;margin-top:var(--space-2);" aria-label="Leave usage trend">
-                <polyline points="0,32 20,32 40,28 60,28 80,22 100,22 120,22 140,20 160,20"
-                  fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-                <polyline points="0,32 20,32 40,28 60,28 80,22 100,22 120,22 140,20 160,20 160,36 0,36"
-                  fill="var(--color-warning-muted)" stroke="none" />
-                <circle cx="160" cy="20" r="3" fill="var(--color-warning)" />
-              </svg>
-              <div style="font-size:var(--text-caption);color:var(--color-text-3);display:flex;justify-content:space-between;margin-top:2px;">
-                <span>Jan 2026</span><span>Now</span>
               </div>
             </div>
           </div>

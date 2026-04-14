@@ -521,7 +521,7 @@
             <div style="display:flex;align-items:center;gap:var(--space-2);">
               <svg data-lucide="user-minus" width="16" height="16" style="color:var(--color-warning);"></svg>
               <span style="font-size:var(--text-body-sm);color:var(--color-text-2);">Bench</span>
-              <span style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);padding:var(--space-1) var(--space-2);background:var(--color-surface-1);border-radius:var(--radius-md);">3 people</span>
+              <span id="benchCountDisplay" style="font-family:var(--font-mono);font-size:var(--text-body);font-weight:var(--weight-bold);color:var(--color-text-1);padding:var(--space-1) var(--space-2);background:var(--color-surface-1);border-radius:var(--radius-md);">3 people</span>
             </div>
           </div>
         </div>
@@ -539,7 +539,7 @@
         <div class="card-body">
           <!-- Currently on bench -->
           <div style="font-size: var(--text-body-sm); font-weight: var(--weight-semibold); color: var(--color-text-2); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.5px; font-size: var(--text-caption);">Currently on Bench</div>
-          <div class="bench-item">
+          <div class="bench-item" data-employee="Bob Taylor">
             <div class="avatar avatar-sm">BT</div>
             <div class="bench-info">
               <div class="bench-name"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a></div>
@@ -548,19 +548,19 @@
             <div class="bench-days">21 days</div>
             <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject('Bob Taylor')">Assign</button>
           </div>
-          <div class="bench-item">
+          <div class="bench-item" data-employee="Liam O'Brien">
             <div class="avatar avatar-sm">LO</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-worktime="88" data-href="employees.html">Liam O'Brien</a></div>
+              <div class="bench-name"><a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Senior Developer" data-dept="Engineering" data-worktime="88" data-href="employees.html#liam-obrien">Liam O'Brien</a></div>
               <div class="bench-detail">Senior Developer &bull; TypeScript, React, Node.js</div>
             </div>
             <div class="bench-days">14 days</div>
             <button class="btn btn-primary btn-xs" data-min-role="pm" onclick="assignToProject(&quot;Liam O'Brien&quot;)">Assign</button>
           </div>
-          <div class="bench-item">
+          <div class="bench-item" data-employee="Lisa Martinez">
             <div class="avatar avatar-sm">LM</div>
             <div class="bench-info">
-              <div class="bench-name"><a href="employees.html" data-hovercard data-name="Lisa Martinez" data-role="Business Analyst" data-dept="Operations" data-worktime="15%" data-href="employees.html">Lisa Martinez</a> <span class="badge badge-default" style="font-size: var(--text-caption);">Contract</span></div>
+              <div class="bench-name"><a href="employees.html#lisa-martinez" data-hovercard data-name="Lisa Martinez" data-role="Business Analyst" data-dept="Operations" data-worktime="15" data-href="employees.html#lisa-martinez">Lisa Martinez</a> <span class="badge badge-default" style="font-size: var(--text-caption);">Contract</span></div>
               <div class="bench-detail">Business Analyst &bull; Data Analytics, SQL</div>
             </div>
             <div class="bench-days">7 days</div>
@@ -1387,6 +1387,19 @@
       if (!proj.value) { showToast('error', 'Required', 'Please select a project.'); return; }
       document.getElementById('assignProjectModal').classList.remove('active');
       showToast('success', 'Assigned', emp + ' has been assigned to ' + projLabel + '. PM will be notified.');
+      // Remove bench item from DOM
+      var benchItem = document.querySelector('.bench-item[data-employee="' + emp.replace(/"/g, '&quot;') + '"]');
+      if (benchItem) { benchItem.remove(); }
+      // Update bench count displays
+      var remaining = document.querySelectorAll('.bench-item').length;
+      document.querySelectorAll('.badge-warning').forEach(function(badge) {
+        if (badge.textContent.indexOf('on bench') !== -1) {
+          badge.innerHTML = '<svg data-lucide="alert-triangle" width="12" height="12"></svg> ' + remaining + ' on bench';
+          lucide.createIcons({ nodes: [badge] });
+        }
+      });
+      var benchCountDisplay = document.getElementById('benchCountDisplay');
+      if (benchCountDisplay) { benchCountDisplay.textContent = remaining + ' people'; }
     });
   }
 

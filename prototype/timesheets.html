@@ -590,6 +590,13 @@
   #tsAutoSave { opacity: 0; transition: opacity 0.5s; }
   #tsAutoSave.visible { opacity: 1; }
 
+  /* ── Flagged cell highlight (rejection callout) ── */
+  .ts-cell-flagged {
+    outline: 2px solid var(--color-error, #ef4444);
+    outline-offset: -2px;
+    background: rgba(239,68,68,0.05);
+  }
+
   /* ── Submitted completion card ── */
   .ts-completion-card {
     display: flex;
@@ -927,12 +934,6 @@
           </button>
         </div>
 
-        <!-- Submitted Banner (hidden by default) -->
-        <div class="ts-submitted-banner" id="tsSubmittedBanner" style="display:none;">
-          <svg data-lucide="check-circle" width="20" height="20"></svg>
-          <span>Submitted for Review -- Awaiting manager approval</span>
-        </div>
-
         <!-- Completion Card (shown after submit, hidden by default) -->
         <div class="ts-completion-card" id="tsCompletionCard" style="display:none;">
           <div class="completion-check">
@@ -953,9 +954,9 @@
           <div>
             <div style="font-weight:var(--weight-semibold);font-size:var(--text-body-sm);color:var(--color-error);margin-bottom:var(--space-1);">Timesheet Rejected - Action Required</div>
             <div style="font-size:var(--text-body-sm);color:var(--color-text-2);">
-              <strong>Friday Apr 3 - Acme Web Redesign:</strong> Expected 8h, logged 0h. Please correct Friday's entry for Acme Web Redesign to match your project schedule.
+              <strong>Wednesday Apr 1 - Acme Web Redesign:</strong> Expected 8h, logged 0h. Please correct Wednesday's entry for Acme Web Redesign to match your project schedule.
             </div>
-            <button class="btn btn-xs btn-secondary" style="margin-top:var(--space-2);" onclick="document.querySelector('.ts-cell[data-day=\\'4\\']').closest('td').style.outline='2px solid var(--color-error)'">Go to Friday</button>
+            <button class="btn btn-xs btn-secondary" style="margin-top:var(--space-2);" onclick="highlightRejectedCell()">Go to Wednesday</button>
           </div>
         </div>
 
@@ -1049,8 +1050,8 @@
                 <td class="col-total-day" data-day="6">0</td>
                 <td class="col-total-day" id="grandTotal">32</td>
               </tr>
-              <!-- Target row -->
-              <tr class="ts-target-row">
+              <!-- Target row (hidden - status shown via color-coding on Total row) -->
+              <tr class="ts-target-row" style="display:none;">
                 <td>Target</td>
                 <td>8</td>
                 <td>8</td>
@@ -1061,8 +1062,8 @@
                 <td>0</td>
                 <td>32</td>
               </tr>
-              <!-- Status row -->
-              <tr class="ts-status-row" id="statusRow">
+              <!-- Status row (hidden - status shown via color-coding on Total row) -->
+              <tr class="ts-status-row" id="statusRow" style="display:none;">
                 <td></td>
                 <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
                 <td><span class="ts-status-icon met"><svg data-lucide="check" width="14" height="14"></svg></span></td>
@@ -2085,7 +2086,36 @@
         td.style.color = dayTotals[i] < targets[i] ? 'var(--color-warning)' : '';
       }
     });
+
+    // Color-code the grand total cell: green if on target, amber if over, default if under
+    var grandTotalEl = document.getElementById('grandTotal');
+    if (grandTotalEl) {
+      if (grandTotal === weekTarget) {
+        grandTotalEl.style.color = 'var(--color-success)';
+      } else if (grandTotal > weekTarget) {
+        grandTotalEl.style.color = 'var(--color-warning)';
+      } else {
+        grandTotalEl.style.color = '';
+      }
+    }
   }
+
+  // ── Highlight rejected cell (Wednesday Acme Web Redesign row) ──
+  window.highlightRejectedCell = function() {
+    // Remove any existing flags
+    document.querySelectorAll('.ts-cell-flagged').forEach(function(c) {
+      c.classList.remove('ts-cell-flagged');
+    });
+    // Find the Acme row and highlight the Wednesday cell (data-day="2")
+    var acmeRow = document.querySelector('.ts-data-row[data-project="acme"]');
+    if (acmeRow) {
+      var wedCell = acmeRow.querySelector('.ts-cell[data-day="2"]');
+      if (wedCell) {
+        wedCell.classList.add('ts-cell-flagged');
+        wedCell.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      }
+    }
+  };
 
   // ── Auto-save: every 30 seconds + on edit (debounced) ──
   var autoSaveTimer = null;
@@ -2858,6 +2888,14 @@
 
   // ── Initial recalculate ──
   recalculate();
+
+  // ── If rejection callout is visible on load, highlight the flagged cell ──
+  (function() {
+    var callout = document.getElementById('tsRejectionCallout');
+    if (callout && callout.style.display !== 'none') {
+      highlightRejectedCell();
+    }
+  }());
 
 })();
 </script>

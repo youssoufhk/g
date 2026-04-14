@@ -548,6 +548,55 @@
     .confirm-body svg { color: var(--color-warning); margin-bottom: var(--space-3); }
     .confirm-body p { color: var(--color-text-2); margin-top: var(--space-2); }
 
+    /* ── My Leaves collapsed filter panel ── */
+    .my-leaves-filter-panel {
+      display: none;
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .my-leaves-filter-panel.open { display: flex; }
+
+    /* ── Conflict inline expansion ── */
+    .conflict-expand-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      z-index: 200;
+      background: var(--color-surface-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      min-width: 240px;
+      box-shadow: var(--shadow-2);
+      font-size: var(--text-body-sm);
+      color: var(--color-text-2);
+      white-space: nowrap;
+    }
+    .conflict-expand-panel.open { display: block; }
+    .conflict-warning { position: relative; cursor: pointer; }
+
+    /* ── Team Leave Detail Drawer ── */
+    .team-drawer-employee {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding-bottom: var(--space-4);
+      margin-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .team-drawer-note-field {
+      width: 100%;
+      min-height: 72px;
+      resize: vertical;
+    }
+
     /* ── Saved Views dropdown ── */
     .saved-views-menu.active { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; }
     .saved-view-item { padding: var(--space-2) var(--space-3); font-size: var(--text-body-sm); color: var(--color-text-1); cursor: pointer; }
@@ -836,29 +885,38 @@
             </button>
           </div>
 
-          <!-- Filters (issue 22: default to current year) -->
-          <div class="filter-bar-standard">
-            <div class="filter-search">
+          <!-- Filters - search + Filter button only -->
+          <div class="filter-bar-standard" style="border-radius: var(--radius-md) var(--radius-md) 0 0; border-bottom: none; flex-wrap: nowrap;">
+            <div class="filter-search" style="flex:1;">
               <svg data-lucide="search" width="16" height="16"></svg>
               <input type="text" placeholder="Search leaves..." id="myLeavesSearch" oninput="filterMyLeaves()">
             </div>
-            <select class="form-select form-input-sm" id="myLeavesStatus" onchange="filterMyLeaves()">
+            <button class="btn btn-secondary btn-sm" id="myLeavesFilterBtn" onclick="toggleMyLeavesFilterPanel(this)" style="flex-shrink:0;gap:var(--space-1-5);">
+              <svg data-lucide="sliders-horizontal" width="14" height="14"></svg>
+              Filter
+              <span id="myLeavesFilterCount" style="display:none;background:var(--color-primary);color:var(--color-text-inv);border-radius:var(--radius-full);font-size:10px;padding:0 5px;line-height:16px;font-weight:var(--weight-semibold);"></span>
+            </button>
+          </div>
+          <!-- Collapsed filter panel -->
+          <div class="my-leaves-filter-panel" id="myLeavesFilterPanel">
+            <select class="form-select form-input-sm" id="myLeavesStatus" onchange="filterMyLeaves();updateMyLeavesFilterCount()">
               <option value="">All Statuses</option>
               <option>Approved</option>
               <option>Pending</option>
               <option>Rejected</option>
               <option>Cancelled</option>
             </select>
-            <select class="form-select form-input-sm" id="myLeavesType" onchange="filterMyLeaves()">
+            <select class="form-select form-input-sm" id="myLeavesType" onchange="filterMyLeaves();updateMyLeavesFilterCount()">
               <option value="">All Types</option>
               <option>Annual Leave</option>
               <option>Sick Leave</option>
               <option>Personal</option>
               <option>Remote Work</option>
             </select>
-            <input type="date" class="form-input form-input-sm" id="myLeavesFrom" value="2026-01-01" title="From date" onchange="filterMyLeaves()">
-            <span style="color: var(--color-text-3); font-size: var(--text-body-sm);">to</span>
-            <input type="date" class="form-input form-input-sm" id="myLeavesTo" value="2026-12-31" title="To date" onchange="filterMyLeaves()">
+            <button class="btn btn-ghost btn-sm" onclick="clearMyLeavesFilters()" style="margin-left:auto;">
+              <svg data-lucide="x" width="14" height="14"></svg>
+              Clear
+            </button>
           </div>
 
           <!-- No-results state -->
@@ -1047,86 +1105,120 @@
                 </tr>
               </thead>
               <tbody>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="Alice Wang" data-initials="AW" data-dept="Engineering" data-role="On Leave"
+                  data-href="employees.html#alice-wang" data-hovercard-name="Alice Wang"
+                  data-type="Annual" data-type-key="annual" data-dates="Apr 14-18" data-days="5"
+                  data-status="Pending" data-approver="Sarah Chen" data-balance-annual="18" data-balance-remaining="18"
+                  data-reason="Family trip" data-conflicts="Emma Laurent - Sick Leave - Apr 7-8|Yuki Tanaka - Personal - Apr 10">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">AW</div>
-                      <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14-18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Alice Wang</a>
+                      <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="On Leave Apr 14-18" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">Alice Wang</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">Apr 14 - 18</td>
+                  <td data-label="Dates">Apr 14-18</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
-                  <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
+                  <td data-label="Impact">
+                    <span class="conflict-warning" onclick="event.stopPropagation();toggleConflictPanel(this)" title="Click to see who else is off">
+                      <svg data-lucide="alert-triangle"></svg> 2 others off that week
+                      <div class="conflict-expand-panel">
+                        <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">Also off this week:</div>
+                        <div>Emma Laurent - Sick Leave - Apr 7-8</div>
+                        <div>Yuki Tanaka - Personal - Apr 10</div>
+                      </div>
+                    </span>
+                  </td>
                   <td data-label="Actions">
-                    <div class="flex gap-1">
+                    <div class="flex gap-1" onclick="event.stopPropagation()">
                       <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
                       <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
                     </div>
                   </td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="Bob Taylor" data-initials="BT" data-dept="Engineering" data-role="Backend Developer"
+                  data-href="employees.html#bob-taylor"
+                  data-type="Personal" data-type-key="personal" data-dates="Apr 21-25" data-days="5"
+                  data-status="Approved" data-approver="Sarah Chen" data-balance-personal="2" data-balance-remaining="2"
+                  data-reason="" data-conflicts="">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">BT</div>
-                      <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Bob Taylor</a>
+                      <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">Bob Taylor</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
-                  <td data-label="Dates">Apr 21 - 25</td>
+                  <td data-label="Dates">Apr 21-25</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
                   <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
                   <td data-label="Actions"></td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="Emma Laurent" data-initials="EL" data-dept="HR" data-role="HR Specialist"
+                  data-href="employees.html#emma-laurent"
+                  data-type="Sick" data-type-key="sick" data-dates="Apr 7-8" data-days="2"
+                  data-status="Approved" data-approver="Sarah Chen" data-balance-sick="10" data-balance-remaining="10"
+                  data-reason="Flu" data-conflicts="">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">EL</div>
-                      <a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Emma Laurent</a>
+                      <a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="78" data-href="employees.html#emma-laurent" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">Emma Laurent</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge" style="background: var(--color-warning-muted); color: var(--color-warning);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
-                  <td data-label="Dates">Apr 7 - 8</td>
+                  <td data-label="Dates">Apr 7-8</td>
                   <td data-label="Days" class="cell-mono">2</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
                   <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
                   <td data-label="Actions"></td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="James Kim" data-initials="JK" data-dept="Engineering" data-role="Developer"
+                  data-href="employees.html#james-kim"
+                  data-type="Annual" data-type-key="annual" data-dates="Apr 21-25" data-days="5"
+                  data-status="Pending" data-approver="Sarah Chen" data-balance-annual="12" data-balance-remaining="12"
+                  data-reason="Holiday" data-conflicts="">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">JK</div>
-                      <a href="employees.html#james-kim" style="color: var(--color-text-1); font-weight: var(--weight-medium);">James Kim</a>
+                      <a href="employees.html#james-kim" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">James Kim</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">Apr 21 - 25</td>
+                  <td data-label="Dates">Apr 21-25</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
                   <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
                   <td data-label="Actions">
-                    <div class="flex gap-1">
+                    <div class="flex gap-1" onclick="event.stopPropagation()">
                       <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
                       <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
                     </div>
                   </td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="Yuki Tanaka" data-initials="YT" data-dept="Design" data-role="Designer"
+                  data-href="employees.html#yuki-tanaka"
+                  data-type="Personal" data-type-key="personal" data-dates="Apr 10" data-days="1"
+                  data-status="Approved" data-approver="John Smith" data-balance-personal="2" data-balance-remaining="2"
+                  data-reason="" data-conflicts="Alice Wang - Annual Leave - Apr 14-18|Emma Laurent - Sick Leave - Apr 7-8">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">YT</div>
-                      <a href="employees.html#yuki-tanaka" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Yuki Tanaka</a>
+                      <a href="employees.html#yuki-tanaka" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">Yuki Tanaka</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-accent"><svg data-lucide="user" width="12" height="12"></svg> Personal</span></td>
@@ -1134,15 +1226,29 @@
                   <td data-label="Days" class="cell-mono">1</td>
                   <td data-label="Status"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Approved</span></td>
                   <td data-label="Approver" class="text-2">John Smith</td>
-                  <td data-label="Impact"><span class="conflict-warning"><svg data-lucide="alert-triangle"></svg> 2 others off that week</span></td>
+                  <td data-label="Impact">
+                    <span class="conflict-warning" onclick="event.stopPropagation();toggleConflictPanel(this)" title="Click to see who else is off">
+                      <svg data-lucide="alert-triangle"></svg> 2 others off that week
+                      <div class="conflict-expand-panel">
+                        <div style="font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-1);">Also off this week:</div>
+                        <div>Alice Wang - Annual Leave - Apr 14-18</div>
+                        <div>Emma Laurent - Sick Leave - Apr 7-8</div>
+                      </div>
+                    </span>
+                  </td>
                   <td data-label="Actions"></td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="Maria Rodriguez" data-initials="MR" data-dept="Operations" data-role="Operations Lead"
+                  data-href="employees.html#maria-rodriguez"
+                  data-type="Remote Work" data-type-key="wfh" data-dates="Apr 15" data-days="1"
+                  data-status="Approved" data-approver="Sarah Chen" data-balance-wfh="4" data-balance-remaining="4"
+                  data-reason="" data-conflicts="">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">MR</div>
-                      <a href="employees.html#maria-rodriguez" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Maria Rodriguez</a>
+                      <a href="employees.html#maria-rodriguez" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">Maria Rodriguez</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge" style="background: var(--color-success-muted); color: var(--color-success);"><svg data-lucide="home" width="12" height="12"></svg> Remote Work</span></td>
@@ -1153,33 +1259,43 @@
                   <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
                   <td data-label="Actions"></td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="David Park" data-initials="DP" data-dept="Finance" data-role="Finance Lead"
+                  data-href="employees.html#david-park"
+                  data-type="Annual" data-type-key="annual" data-dates="May 5-9" data-days="5"
+                  data-status="Pending" data-approver="Sarah Chen" data-balance-annual="15" data-balance-remaining="15"
+                  data-reason="Holiday" data-conflicts="">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">DP</div>
-                      <a href="employees.html#david-park" style="color: var(--color-text-1); font-weight: var(--weight-medium);">David Park</a>
+                      <a href="employees.html#david-park" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">David Park</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge badge-info"><svg data-lucide="calendar" width="12" height="12"></svg> Annual</span></td>
-                  <td data-label="Dates">May 5 - 9</td>
+                  <td data-label="Dates">May 5-9</td>
                   <td data-label="Days" class="cell-mono">5</td>
                   <td data-label="Status"><span class="badge badge-warning"><svg data-lucide="clock" width="12" height="12"></svg> Pending</span></td>
                   <td data-label="Approver" class="text-2">Sarah Chen</td>
                   <td data-label="Impact" style="color: var(--color-text-3); font-size: var(--text-caption);">No conflicts</td>
                   <td data-label="Actions">
-                    <div class="flex gap-1">
+                    <div class="flex gap-1" onclick="event.stopPropagation()">
                       <button class="btn btn-primary btn-xs team-approve-btn">Approve</button>
                       <button class="btn btn-destructive-ghost btn-xs team-reject-btn">Reject</button>
                     </div>
                   </td>
                 </tr>
-                <tr class="team-leave-row">
-                  <td class="row-check"><input type="checkbox" class="team-check"></td>
+                <tr class="team-leave-row" style="cursor:pointer;" onclick="openTeamLeaveDrawer(this)"
+                  data-name="Lisa Nguyen" data-initials="LN" data-dept="Engineering" data-role="Developer"
+                  data-href="employees.html#lisa-nguyen"
+                  data-type="Sick" data-type-key="sick" data-dates="Apr 3" data-days="1"
+                  data-status="Approved" data-approver="John Smith" data-balance-sick="11" data-balance-remaining="11"
+                  data-reason="" data-conflicts="">
+                  <td class="row-check"><input type="checkbox" class="team-check" onclick="event.stopPropagation()"></td>
                   <td>
                     <div class="flex items-center gap-2">
                       <div class="avatar avatar-xs">LN</div>
-                      <a href="employees.html#lisa-nguyen" style="color: var(--color-text-1); font-weight: var(--weight-medium);">Lisa Nguyen</a>
+                      <a href="employees.html#lisa-nguyen" style="color: var(--color-text-1); font-weight: var(--weight-medium);" onclick="event.stopPropagation()">Lisa Nguyen</a>
                     </div>
                   </td>
                   <td data-label="Type"><span class="badge" style="background: var(--color-warning-muted); color: var(--color-warning);"><svg data-lucide="thermometer" width="12" height="12"></svg> Sick</span></td>
@@ -1595,6 +1711,25 @@
     </div>
     <div class="drawer-body" id="leaveDrawerBody">
       <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ TEAM LEAVE DETAIL DRAWER ════════════════════════════════════════ -->
+<div class="drawer drawer-right" id="teamLeaveDetailDrawer">
+  <div class="drawer-backdrop" onclick="closeTeamLeaveDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h2 class="drawer-title">Leave Request</h2>
+      <button class="drawer-close" onclick="closeTeamLeaveDrawer()" aria-label="Close">
+        <svg data-lucide="x" width="18" height="18"></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="teamLeaveDrawerBody">
+      <!-- Populated by openTeamLeaveDrawer() -->
+    </div>
+    <div class="drawer-footer" id="teamLeaveDrawerFooter">
+      <!-- Populated by openTeamLeaveDrawer() -->
     </div>
   </div>
 </div>
@@ -2552,6 +2687,218 @@
   };
   // Restore dismiss on load
   try { if (localStorage.getItem('leaveNudgeDismissed') === '1') { var nb = document.getElementById('leaveNudgeBanner'); if (nb) nb.style.display = 'none'; } } catch(e) {}
+
+  // ── My Leaves filter panel toggle ──
+  window.toggleMyLeavesFilterPanel = function(btn) {
+    var panel = document.getElementById('myLeavesFilterPanel');
+    if (!panel) return;
+    var isOpen = panel.classList.toggle('open');
+    if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  };
+
+  window.updateMyLeavesFilterCount = function() {
+    var statusEl = document.getElementById('myLeavesStatus');
+    var typeEl = document.getElementById('myLeavesType');
+    var count = 0;
+    if (statusEl && statusEl.value) count++;
+    if (typeEl && typeEl.value) count++;
+    var countEl = document.getElementById('myLeavesFilterCount');
+    if (countEl) {
+      if (count > 0) {
+        countEl.style.display = 'inline-block';
+        countEl.textContent = count;
+      } else {
+        countEl.style.display = 'none';
+      }
+    }
+  };
+
+  // Override clearMyLeavesFilters to also update count
+  var _origClearFilters = window.clearMyLeavesFilters;
+  window.clearMyLeavesFilters = function() {
+    var searchEl = document.getElementById('myLeavesSearch');
+    var statusEl = document.getElementById('myLeavesStatus');
+    var typeEl = document.getElementById('myLeavesType');
+    if (searchEl) searchEl.value = '';
+    if (statusEl) statusEl.value = '';
+    if (typeEl) typeEl.value = '';
+    updateMyLeavesFilterCount();
+    filterMyLeaves();
+  };
+
+  // ── Conflict panel toggle (inline expand) ──
+  window.toggleConflictPanel = function(el) {
+    var panel = el.querySelector('.conflict-expand-panel');
+    if (!panel) return;
+    // Close all other open panels first
+    document.querySelectorAll('.conflict-expand-panel.open').forEach(function(p) {
+      if (p !== panel) p.classList.remove('open');
+    });
+    panel.classList.toggle('open');
+  };
+
+  // Close conflict panels on outside click
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.conflict-warning')) {
+      document.querySelectorAll('.conflict-expand-panel.open').forEach(function(p) {
+        p.classList.remove('open');
+      });
+    }
+  });
+
+  // ── Team Leave Detail Drawer ──
+  var _teamLeaveDrawerRow = null;
+
+  window.openTeamLeaveDrawer = function(row) {
+    _teamLeaveDrawerRow = row;
+    var d = row.dataset;
+    var name = d.name || '';
+    var initials = d.initials || name.split(' ').map(function(w){return w[0];}).join('');
+    var dept = d.dept || '';
+    var role = d.role || '';
+    var href = d.href || '#';
+    var leaveType = d.type || '';
+    var typeKey = d.typeKey || 'annual';
+    var dates = d.dates || '';
+    var days = d.days || '0';
+    var status = d.status || '';
+    var approver = d.approver || '';
+    var reason = d.reason || '';
+    var conflictsRaw = d.conflicts || '';
+    var balanceKey = 'balance' + (typeKey.charAt(0).toUpperCase() + typeKey.slice(1));
+    var balanceRemaining = d[balanceKey] || d.balanceRemaining || '?';
+
+    // Build status badge
+    var statusClass = status === 'Approved' ? 'badge-success' : status === 'Pending' ? 'badge-warning' : 'badge-error';
+    var statusIcon = status === 'Approved' ? 'check-circle' : status === 'Pending' ? 'clock' : 'x-circle';
+
+    // Build leave type badge color
+    var typeColorMap = {
+      annual: 'badge-info',
+      sick: '',
+      personal: 'badge-accent',
+      wfh: ''
+    };
+    var typeStyleMap = {
+      annual: '',
+      sick: 'style="background:var(--color-warning-muted);color:var(--color-warning);"',
+      personal: '',
+      wfh: 'style="background:var(--color-success-muted);color:var(--color-success);"'
+    };
+    var typeBadgeClass = typeColorMap[typeKey] || '';
+    var typeBadgeStyle = typeStyleMap[typeKey] || '';
+    var typeIconMap = { annual: 'calendar', sick: 'thermometer', personal: 'user', wfh: 'home' };
+    var typeIcon = typeIconMap[typeKey] || 'calendar';
+
+    // Build conflicts section
+    var conflictsHtml = '';
+    if (conflictsRaw) {
+      var conflictItems = conflictsRaw.split('|').filter(Boolean);
+      conflictsHtml = '<div style="margin-top:var(--space-4);padding:var(--space-3);background:var(--color-warning-muted);border:1px solid var(--color-warning);border-radius:var(--radius-md);">' +
+        '<div style="font-size:var(--text-body-sm);font-weight:var(--weight-semibold);color:var(--color-warning);margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-1);">' +
+          '<svg data-lucide="alert-triangle" width="14" height="14"></svg> Team Conflicts' +
+        '</div>' +
+        conflictItems.map(function(c) {
+          return '<div style="font-size:var(--text-body-sm);color:var(--color-text-2);padding:var(--space-1) 0;">' + c + '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    // Build reason section
+    var reasonHtml = reason ? '<div class="form-group" style="margin-top:var(--space-4);"><label class="form-label">Reason</label><div style="background:var(--color-surface-1);border-radius:var(--radius-md);padding:var(--space-3);font-size:var(--text-body-sm);color:var(--color-text-2);">' + reason + '</div></div>' : '';
+
+    // Build body HTML
+    var body = document.getElementById('teamLeaveDrawerBody');
+    body.innerHTML =
+      '<div class="team-drawer-employee">' +
+        '<div class="avatar avatar-md">' + initials + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<a href="' + href + '" style="font-size:var(--text-heading-3);font-weight:var(--weight-semibold);color:var(--color-text-1);text-decoration:none;" data-hovercard data-name="' + name + '" data-role="' + role + '" data-dept="' + dept + '" data-href="' + href + '">' + name + '</a>' +
+          '<div style="font-size:var(--text-body-sm);color:var(--color-text-3);">' + role + ' - ' + dept + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Leave type</div>' +
+          '<span class="badge ' + typeBadgeClass + '" ' + typeBadgeStyle + '><svg data-lucide="' + typeIcon + '" width="12" height="12"></svg> ' + leaveType + '</span></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Status</div>' +
+          '<span class="badge ' + statusClass + '"><svg data-lucide="' + statusIcon + '" width="12" height="12"></svg> ' + status + '</span></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Date range</div>' +
+          '<div style="font-weight:var(--weight-semibold);color:var(--color-text-1);">' + dates + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Days</div>' +
+          '<div class="font-mono" style="font-weight:var(--weight-semibold);color:var(--color-text-1);">' + days + ' day' + (days !== '1' ? 's' : '') + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Approver</div>' +
+          '<div style="font-weight:var(--weight-medium);color:var(--color-text-1);">' + approver + '</div></div>' +
+        '<div><div style="font-size:var(--text-caption);color:var(--color-text-3);margin-bottom:2px;">Balance remaining</div>' +
+          '<div class="font-mono" style="font-weight:var(--weight-semibold);color:var(--color-text-1);">' + balanceRemaining + ' days</div></div>' +
+      '</div>' +
+      reasonHtml +
+      conflictsHtml +
+      (status === 'Pending' ? '<div class="form-group" style="margin-top:var(--space-4);"><label class="form-label">Note (optional)</label><textarea class="form-textarea team-drawer-note-field" id="teamDrawerNoteField" placeholder="Add a note to send to the employee..."></textarea></div>' : '');
+
+    lucide.createIcons({ nodes: [body] });
+
+    // Build footer
+    var footer = document.getElementById('teamLeaveDrawerFooter');
+    if (status === 'Pending') {
+      footer.innerHTML =
+        '<button class="btn btn-secondary btn-md" onclick="closeTeamLeaveDrawer()">Cancel</button>' +
+        '<button class="btn btn-destructive btn-md" id="teamDrawerRejectBtn" onclick="teamDrawerReject()"><svg data-lucide="x-circle" width="16" height="16"></svg> Reject</button>' +
+        '<button class="btn btn-primary btn-md" id="teamDrawerApproveBtn" onclick="teamDrawerApprove()"><svg data-lucide="check" width="16" height="16"></svg> Approve</button>';
+      lucide.createIcons({ nodes: [footer] });
+    } else {
+      footer.innerHTML = '<button class="btn btn-secondary btn-md" onclick="closeTeamLeaveDrawer()">Close</button>';
+    }
+
+    var drawer = document.getElementById('teamLeaveDetailDrawer');
+    drawer.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeTeamLeaveDrawer = function() {
+    var drawer = document.getElementById('teamLeaveDetailDrawer');
+    drawer.classList.remove('is-open');
+    document.body.style.overflow = '';
+    _teamLeaveDrawerRow = null;
+  };
+
+  window.teamDrawerApprove = function() {
+    if (!_teamLeaveDrawerRow) return;
+    var row = _teamLeaveDrawerRow;
+    var name = row.dataset.name || 'Employee';
+    var approveBtn = document.getElementById('teamDrawerApproveBtn');
+    if (approveBtn) approveBtn.classList.add('btn-loading');
+    setTimeout(function() {
+      // Update row status badge
+      var statusBadge = row.querySelector('.badge-warning');
+      if (statusBadge) {
+        statusBadge.className = 'badge badge-success';
+        statusBadge.innerHTML = '<svg data-lucide="check-circle" width="12" height="12"></svg> Approved';
+        lucide.createIcons({ nodes: [statusBadge] });
+      }
+      // Remove action buttons from row
+      var actTd = row.querySelector('td:last-child');
+      if (actTd && actTd.querySelector('.team-approve-btn')) actTd.innerHTML = '';
+      // Update row data attribute
+      row.dataset.status = 'Approved';
+      closeTeamLeaveDrawer();
+      showToast('success', 'Approved', name + "'s leave request has been approved.");
+    }, 800);
+  };
+
+  window.teamDrawerReject = function() {
+    if (!_teamLeaveDrawerRow) return;
+    var targetRow = _teamLeaveDrawerRow;
+    closeTeamLeaveDrawer();
+    openRejectReasonModal(targetRow);
+  };
+
+  // Close team leave drawer on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var drawer = document.getElementById('teamLeaveDetailDrawer');
+      if (drawer && drawer.classList.contains('is-open')) closeTeamLeaveDrawer();
+    }
+  });
 
   // ── Confirm cancel leave with modal ──
   window.confirmCancelLeave = function(btn) {

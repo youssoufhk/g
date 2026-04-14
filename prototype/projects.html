@@ -2890,13 +2890,11 @@
     if (tbody) {
       var tr = document.createElement('tr');
       tr.className = 'cursor-pointer';
-      tr.innerHTML = '<td><strong>' + name + '</strong></td>' +
+      tr.innerHTML = '<td><strong>' + name + '</strong><div style="font-size:var(--text-caption);color:var(--color-text-3);">' + clientName + '</div></td>' +
         '<td data-label="Client">' + clientName + '</td>' +
-        '<td data-label="Billing" class="cell-mono" data-sensitive="billing">-</td>' +
-        '<td data-label="Team Size">1</td>' +
-        '<td data-label="Budget %"><span style="color:var(--color-text-3);font-size:var(--text-caption);">0%</span></td>' +
+        '<td data-label="Team">1</td>' +
+        '<td data-label="Timeline" style="font-size:var(--text-caption);color:var(--color-text-2);">Apr 2026</td>' +
         '<td data-label="Health"><span class="badge badge-success"><svg data-lucide="check-circle" width="12" height="12"></svg> Active</span></td>' +
-        '<td data-label="Status"></td>' +
         '<td style="text-align:right;padding-right:var(--space-3);"><svg data-lucide="chevron-right" width="14" height="14" style="color:var(--color-text-3)"></svg></td>';
       tbody.appendChild(tr);
       if (window.lucide) lucide.createIcons({ nodes: [tr] });

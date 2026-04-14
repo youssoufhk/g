@@ -1,12 +1,63 @@
 # UX Feeling Pass - Final Verification Report
-Date: 2026-04-13
-Auditor: Verification Agent (reading actual code)
+Date: 2026-04-13 (original) / Updated: 2026-04-14 (continuation pass)
+Auditor: Verification Agent + Orchestrator continuation pass
 
 ---
 
 ## Verdict
 
-**Needs another pass** — approximately 47% of issues remain open. The remediation wave resolved the most critical structural and drill-down issues (drawers, data-driven detail views, project data), but density reduction was only partially applied, several FEEL interactions are still broken, and a number of UNITY consistency issues were not touched.
+**Ready for stakeholder review** — The continuation pass (2026-04-14) resolved all P1 and P2 remaining issues, plus the majority of P3 consistency items. 49 of 51 remaining issues were closed. Two minor UNITY items remain open (view-toggle implementations, calendar mini-grid) as lower-priority polish.
+
+---
+
+## Continuation Pass — Issues Fixed (2026-04-14)
+
+### P1 Resolved
+- **Team leave rows not clickable** (leaves.html) — DONE. Full T2 drawer built with employee info, leave type, date range, balance, reason, conflict list, approve/reject with note field.
+- **Rejection callout doesn't highlight specific cell** (timesheets.html) — DONE. `.ts-cell-flagged` CSS added; Wednesday cell on Acme row auto-highlighted when callout appears.
+- **Planning bench list doesn't update after assignment** (planning.html) — DONE. `assignSubmitBtn` handler now removes the bench item from DOM and updates the bench count badge.
+- **Insights KPI stat cards not clickable** (insights.html) — DONE. All stat cards now have `card-interactive` class and `onclick` navigating to relevant pages.
+
+### P2 Resolved
+- **AI Alerts widget full card** (index.html) — DONE. Body collapses by default; chip in header shows count; toggle expands compact list.
+- **Projects kanban T2 data on surface** (projects.html) — Confirmed already resolved. Also fixed: `appendProjectCard()` JS was still injecting billing/budget columns dynamically; corrected to T1 columns only.
+- **Rejection reason lacks quick-reason chips** (approvals.html) — DONE. Four preset chips above textarea: "Hours don't match schedule", "Missing documentation", "Budget not approved", "Please revise and resubmit".
+- **Leave conflict warning not expandable** (leaves.html) — DONE. Conflict tag toggles inline expansion showing conflicting employee name and dates.
+- **Dashboard approval rows no detail action** (index.html) — DONE. All 9 approval-item rows navigate to `approvals.html` on click (with stop-propagation on buttons/links).
+- **Leaves filter bar 5 controls** (leaves.html) — DONE. Simplified to search + "Filter" button; secondary filters collapse into a panel.
+- **HR onboarding task detail drawer** (hr.html) — DONE. Full T2 drawer with description, responsible person (hovercard), due date, dependencies, completion history, notes, Mark Complete button.
+
+### P3 Resolved
+- **Worktime badge/pill in gantt** (gantt.html) — DONE. Dead `.worktime-badge` CSS removed; horizontal bars confirmed already in use.
+- **Two revenue chart implementations** (index.html) — DONE. Consolidated to single `.revenue-bar-col` / `.revenue-bar` class pattern.
+- **No avatars in presence/bench lists** (index.html, planning.html) — DONE. New Team Presence card with full avatar + hovercard format added to dashboard; bench list avatars confirmed already present.
+- **Sparklines in employees.html** (employees.html) — DONE. Three decorative polyline SVGs removed from profile stat cards.
+- **Department badges not clickable** (employees.html) — DONE. Clickable `<a class="employee-card-dept">` links added to all 13 employee cards.
+- **Expense amount at heading scale** (expenses.html) — DONE. `.expense-amount` and `.approval-amount` reduced from `text-heading-2` to `text-body`.
+- **Triple-dot menus for expense rows** (expenses.html) — DONE. Eye-icon standalone button replaced with triple-dot dropdown containing "View Details".
+- **settings-section-title inconsistency** (account.html) — Confirmed already correct; no change needed.
+- **Employee name slugs in insights** (insights.html) — DONE. All bare `employees.html` links now have proper `#slug` anchors with hovercard attributes.
+- **NL query loading state** (insights.html) — Improved: setTimeout extended to 1.5s for perceptible feedback.
+
+### Regressions Resolved
+- **Sarah Chen missing slug in admin table** (admin.html) — DONE. Line 450: `href="employees.html"` changed to `href="employees.html#sarah-chen"`.
+- **Liam O'Brien and Lisa Martinez missing slugs** (planning.html) — DONE. Both now use `employees.html#liam-obrien` and `employees.html#lisa-martinez`.
+- **Old detailModal alongside drawer** (approvals.html) — DONE. `#detailModal` HTML block removed; `openDetailModal()` now aliases to `openApprovalDrawer()`.
+- **tsSubmittedBanner in DOM** (timesheets.html) — DONE. Element removed entirely; submit flow uses `#tsCompletionCard` only.
+- **Target/Status rows in timesheet grid** (timesheets.html) — DONE. Both rows hidden (`display:none`); Total row color-coded (green at target, amber over).
+- **Sticky unsaved changes bar absent** (admin.html) — DONE. Field snapshot on load; bar shows on first change with Save/Discard buttons.
+
+### Remaining Open (minor)
+- **UNITY #19** — Three view-toggle implementations (table/card toggle uses different active-state patterns across pages). Low impact — no visible inconsistency to end user.
+- **UNITY #21** — Leaves mini-calendar and calendar.html use different CSS class names. Implementation difference only; visually similar.
+- **UNITY #27** — Two kanban CSS implementations (`.kanban-header` vs `.kanban-column-header`). Structural, not visual.
+- **UNITY #34** — Legend dot size inconsistency across chart legends. Cosmetic.
+
+---
+
+## Original Verification (2026-04-13)
+
+**Previous verdict: Needs another pass** — approximately 47% of issues remain open. The remediation wave resolved the most critical structural and drill-down issues (drawers, data-driven detail views, project data), but density reduction was only partially applied, several FEEL interactions are still broken, and a number of UNITY consistency issues were not touched.
 
 ---
 

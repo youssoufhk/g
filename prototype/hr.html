@@ -2172,6 +2172,20 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- ── Onboarding Task Detail Drawer (T2) ── -->
+<div id="onboardingTaskBackdrop" onclick="closeOnboardingTaskDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:240;"></div>
+<div id="onboardingTaskDrawer" style="position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--color-surface-0);border-left:1px solid var(--color-border);z-index:250;transform:translateX(100%);transition:transform 0.25s ease;display:flex;flex-direction:column;">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-5) var(--space-6) var(--space-4);border-bottom:1px solid var(--color-border);flex-shrink:0;">
+    <h2 style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);color:var(--color-text-1);">Task Detail</h2>
+    <button onclick="closeOnboardingTaskDrawer()" aria-label="Close" style="background:none;border:none;cursor:pointer;color:var(--color-text-2);font-size:1.25rem;line-height:1;padding:var(--space-1);">&#x2715;</button>
+  </div>
+  <div id="onboardingTaskBody" style="flex:1;overflow-y:auto;padding:var(--space-5) var(--space-6);"></div>
+  <div style="padding:var(--space-4) var(--space-6);border-top:1px solid var(--color-border);display:flex;gap:var(--space-3);flex-shrink:0;">
+    <button class="btn btn-primary btn-md" id="onboardingTaskMarkBtn" onclick="markOnboardingTaskComplete()">Mark Complete</button>
+    <button class="btn btn-secondary btn-md" onclick="GHR&&GHR.showToast?GHR.showToast('info','Reassign','Reassign flow - coming soon'):null">Assign to Someone Else</button>
+  </div>
+</div>
+
 <!-- ── Start Onboarding Modal ── -->
 <div id="onboardingModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
   <div style="background:var(--color-surface-0);border-radius:var(--radius-lg);padding:var(--space-6);max-width:400px;width:90%;box-shadow:var(--shadow-3);">
@@ -2340,38 +2354,110 @@ window.openCandidateDrawer = openCandidateDrawer;
 var ONBOARD_DATA = {
   'yuki': {
     tasks: [
-      { label: 'Contract signed', done: true, tag: 'Auto-verified' },
-      { label: 'Equipment ordered', done: true, tag: 'Auto-tracked' },
-      { label: 'IT access created', done: true, tag: 'Auto-detected' },
-      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function(cb) { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Yuki Tanaka'):null; } },
-      { label: 'Buddy assigned: Sophie Dubois', done: true, tag: 'AI-suggested' },
-      { label: 'First day orientation scheduled', done: true, tag: 'Auto-scheduled' },
-      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; } },
-      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; } }
+      { label: 'Contract signed', done: true, tag: 'Auto-verified',
+        desc: 'Employment contract reviewed and signed by both parties via DocuSign.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 1, 2026', deps: null },
+      { label: 'Equipment ordered', done: true, tag: 'Auto-tracked',
+        desc: 'Standard QA engineer kit (laptop, monitor, peripherals) ordered via IT procurement.',
+        responsible: 'IT Team', responsibleRole: null, responsibleDept: 'IT',
+        due: 'Apr 2, 2026', deps: 'Requires: Contract signed' },
+      { label: 'IT access created', done: true, tag: 'Auto-detected',
+        desc: 'System accounts, VPN credentials, and role-based permissions provisioned from QA template.',
+        responsible: 'IT Team', responsibleRole: null, responsibleDept: 'IT',
+        due: 'Apr 3, 2026', deps: 'Requires: Equipment ordered' },
+      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function(cb) { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Yuki Tanaka'):null; },
+        desc: 'Personalised welcome email with first-day logistics, team intro, and handbook link.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 14, 2026', deps: null },
+      { label: 'Buddy assigned: Sophie Dubois', done: true, tag: 'AI-suggested',
+        desc: 'Onboarding buddy selected by AI based on team fit and schedule availability.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'Apr 4, 2026', deps: null },
+      { label: 'First day orientation scheduled', done: true, tag: 'Auto-scheduled',
+        desc: 'Full-day orientation session booked with HR, IT, and team lead.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 1, 2026', deps: null },
+      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; },
+        desc: 'End-of-week 1-on-1 to review first impressions and address any blockers.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'Apr 15, 2026', deps: 'Requires: First day orientation scheduled' },
+      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; },
+        desc: 'Formal 30-day performance and integration review with manager.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'May 1, 2026', deps: 'Requires: Week 1 check-in scheduled' }
     ]
   },
   'ahmed': {
     tasks: [
-      { label: 'Contract signed', done: true },
-      { label: 'Equipment ordered', done: true },
-      { label: 'IT access created', done: false, action: 'Provision from template', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Sales template'):null; } },
-      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Ahmed Hassan'):null; } },
-      { label: 'Buddy assigned', done: false, action: 'AI suggest', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests Marco Rossi (Operations, available)'):null; } },
-      { label: 'First day orientation scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 14 calendar'):null; } },
-      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; } },
-      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; } }
+      { label: 'Contract signed', done: true,
+        desc: 'Employment contract signed by Ahmed Hassan and HR representative.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 14, 2026', deps: null },
+      { label: 'Equipment ordered', done: true,
+        desc: 'Standard sales kit (laptop, headset, phone) ordered and scheduled for delivery.',
+        responsible: 'IT Team', responsibleRole: null, responsibleDept: 'IT',
+        due: 'Apr 14, 2026', deps: 'Requires: Contract signed' },
+      { label: 'IT access created', done: false, action: 'Provision from template', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Sales template'):null; },
+        desc: 'CRM, email, VPN, and sales tool accounts to be provisioned from the Sales role template.',
+        responsible: 'IT Team', responsibleRole: null, responsibleDept: 'IT',
+        due: 'Apr 15, 2026', deps: 'Requires: Equipment ordered' },
+      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Ahmed Hassan'):null; },
+        desc: 'Personalised welcome email with first-day info, team contact details, and handbook.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 15, 2026', deps: null },
+      { label: 'Buddy assigned', done: false, action: 'AI suggest', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests Marco Rossi (Operations, available)'):null; },
+        desc: 'Assign an experienced sales team member as onboarding buddy for Ahmed.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 15, 2026', deps: null },
+      { label: 'First day orientation scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 14 calendar'):null; },
+        desc: 'Full-day orientation covering company culture, tools, and team introductions.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 16, 2026', deps: 'Requires: IT access created' },
+      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; },
+        desc: 'First weekly 1-on-1 to review onboarding progress and answer questions.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'Apr 21, 2026', deps: 'Requires: First day orientation scheduled' },
+      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; },
+        desc: 'Formal integration review assessing onboarding completion and initial performance.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'May 14, 2026', deps: 'Requires: Week 1 check-in scheduled' }
     ]
   },
   'clara': {
     tasks: [
-      { label: 'Contract signed', done: false, action: 'Send DocuSign', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','DocuSign request sent to Clara Bergmann'):null; } },
-      { label: 'Equipment ordered', done: false, action: 'Order standard kit', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Ordered','Standard dev kit ordered via procurement'):null; } },
-      { label: 'IT access created', done: false, action: 'Provision from template', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Engineering template'):null; } },
-      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Clara Bergmann'):null; } },
-      { label: 'Buddy assigned', done: false, action: 'AI suggest', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests John Smith (Engineering, available)'):null; } },
-      { label: 'First day orientation scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 21 calendar'):null; } },
-      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; } },
-      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; } }
+      { label: 'Contract signed', done: false, action: 'Send DocuSign', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','DocuSign request sent to Clara Bergmann'):null; },
+        desc: 'Employment contract to be sent via DocuSign for Clara\'s review and signature.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 15, 2026', deps: null },
+      { label: 'Equipment ordered', done: false, action: 'Order standard kit', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Ordered','Standard dev kit ordered via procurement'):null; },
+        desc: 'Standard junior developer kit (laptop, monitor, keyboard) to be ordered via procurement.',
+        responsible: 'IT Team', responsibleRole: null, responsibleDept: 'IT',
+        due: 'Apr 16, 2026', deps: 'Requires: Contract signed' },
+      { label: 'IT access created', done: false, action: 'Provision from template', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Created','IT access provisioned from Engineering template'):null; },
+        desc: 'Dev tools, code repos, VPN, and system access to be provisioned from Engineering template.',
+        responsible: 'IT Team', responsibleRole: null, responsibleDept: 'IT',
+        due: 'Apr 18, 2026', deps: 'Requires: Equipment ordered' },
+      { label: 'Welcome email sent', done: false, action: 'Send now', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Sent','Welcome email sent to Clara Bergmann'):null; },
+        desc: 'Personalised welcome email with first-day schedule, buddy info, and onboarding guide.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 18, 2026', deps: null },
+      { label: 'Buddy assigned', done: false, action: 'AI suggest', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Assigned','AI suggests John Smith (Engineering, available)'):null; },
+        desc: 'Pair Clara with a senior Engineering team member as her onboarding buddy.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'Apr 18, 2026', deps: null },
+      { label: 'First day orientation scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Orientation added to Apr 21 calendar'):null; },
+        desc: 'Full-day onboarding orientation covering tools, team norms, and first-week goals.',
+        responsible: 'Emma Laurent', responsibleRole: 'HR Specialist', responsibleDept: 'HR',
+        due: 'Apr 21, 2026', deps: 'Requires: IT access created' },
+      { label: 'Week 1 check-in scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','Week 1 check-in added to calendar'):null; },
+        desc: 'End-of-week catch-up to check in on Clara\'s first impressions and blockers.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'Apr 28, 2026', deps: 'Requires: First day orientation scheduled' },
+      { label: '30-day review scheduled', done: false, action: 'Auto-schedule', actionFn: function() { GHR&&GHR.showToast?GHR.showToast('success','Scheduled','30-day review added to calendar'):null; },
+        desc: 'Structured 30-day review to assess integration progress and set next milestones.',
+        responsible: 'Sarah Chen', responsibleRole: 'Project Manager', responsibleDept: 'Engineering',
+        due: 'May 21, 2026', deps: 'Requires: Week 1 check-in scheduled' }
     ]
   }
 };
@@ -2396,8 +2482,10 @@ function openOnboardDrawer(name, role, dept, startDate, pct, key) {
 
   var checklistHtml = '<div class="checklist">';
   data.tasks.forEach(function(task, idx) {
-    checklistHtml += '<label class="checklist-item' + (task.done ? ' done' : '') + '" style="cursor:pointer;">' +
-      '<input type="checkbox"' + (task.done ? ' checked disabled' : '') + ' data-task-idx="' + idx + '" data-task-key="' + key + '"> ' +
+    checklistHtml += '<div class="checklist-item' + (task.done ? ' done' : '') + '" style="cursor:pointer;display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2);border-radius:var(--radius-sm);transition:background 0.15s;" ' +
+      'onclick="openOnboardingTaskDrawer(\'' + key + '\',' + idx + ',this)" ' +
+      'onmouseenter="this.style.background=\'var(--color-surface-1)\'" onmouseleave="this.style.background=\'\'"> ' +
+      '<input type="checkbox"' + (task.done ? ' checked disabled' : '') + ' data-task-idx="' + idx + '" data-task-key="' + key + '" onclick="event.stopPropagation()"> ' +
       '<span style="flex:1;">' + task.label + '</span>';
     if (task.tag) {
       checklistHtml += '<span style="font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);">' + task.tag + '</span>';
@@ -2405,7 +2493,8 @@ function openOnboardDrawer(name, role, dept, startDate, pct, key) {
     if (task.action && !task.done) {
       checklistHtml += '<button class="btn btn-ghost btn-xs" style="margin-left:var(--space-1);padding:1px var(--space-2);font-size:var(--text-caption);" data-action-idx="' + idx + '" data-action-key="' + key + '" onclick="event.preventDefault();event.stopPropagation();executeOnboardAction(\'' + key + '\',' + idx + ',this)">' + task.action + '</button>';
     }
-    checklistHtml += '</label>';
+    checklistHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-text-3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+    checklistHtml += '</div>';
   });
   checklistHtml += '</div>';
   document.getElementById('onboardDrawerChecklist').innerHTML = checklistHtml;
@@ -2429,6 +2518,152 @@ function executeOnboardAction(key, idx, btn) {
   }
 }
 window.executeOnboardAction = executeOnboardAction;
+
+// ── Onboarding Task Detail Drawer (T2) ──
+var _currentTaskKey = null;
+var _currentTaskIdx = null;
+var _currentTaskRow = null;
+
+function openOnboardingTaskDrawer(key, idx, row) {
+  var task = ONBOARD_DATA[key] && ONBOARD_DATA[key].tasks[idx];
+  if (!task) return;
+  _currentTaskKey = key;
+  _currentTaskIdx = idx;
+  _currentTaskRow = row;
+
+  var statusLabel = task.done ? 'Complete' : 'Pending';
+  var statusColor = task.done ? 'var(--color-success)' : 'var(--color-warning)';
+  var statusBg    = task.done ? 'var(--color-success-muted, rgba(34,197,94,0.1))' : 'var(--color-warning-muted, rgba(245,158,11,0.1))';
+
+  var responsibleHtml;
+  if (task.responsibleRole) {
+    responsibleHtml =
+      '<div style="display:flex;align-items:center;gap:var(--space-2);">' +
+      '<div class="avatar avatar-sm" style="width:28px;height:28px;font-size:var(--text-caption);flex-shrink:0;">' +
+        task.responsible.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2) +
+      '</div>' +
+      '<span data-hovercard data-name="' + task.responsible + '" data-role="' + task.responsibleRole + '" data-dept="' + task.responsibleDept + '" data-worktime="90" data-href="employees.html#' + task.responsible.toLowerCase().replace(' ','-') + '" ' +
+        'style="color:var(--color-primary);font-weight:var(--weight-medium);cursor:pointer;">' + task.responsible + '</span>' +
+      '</div>';
+  } else {
+    responsibleHtml =
+      '<div style="display:flex;align-items:center;gap:var(--space-2);">' +
+      '<div class="avatar avatar-sm" style="width:28px;height:28px;font-size:var(--text-caption);flex-shrink:0;background:var(--color-surface-2);">IT</div>' +
+      '<span>' + task.responsible + '</span>' +
+      '</div>';
+  }
+
+  var bodyHtml =
+    '<div style="margin-bottom:var(--space-5);">' +
+      '<h3 style="font-size:var(--text-body-lg);font-weight:var(--weight-semibold);color:var(--color-text-1);margin-bottom:var(--space-2);">' + task.label + '</h3>' +
+      '<p style="font-size:var(--text-body-sm);color:var(--color-text-2);line-height:1.55;">' + (task.desc || 'No description available.') + '</p>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-5);">' +
+      '<div>' +
+        '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-3);margin-bottom:var(--space-2);">Responsible</div>' +
+        responsibleHtml +
+      '</div>' +
+      '<div>' +
+        '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-3);margin-bottom:var(--space-2);">Due Date</div>' +
+        '<div style="font-size:var(--text-body-sm);color:var(--color-text-1);">' + (task.due || 'Not set') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="margin-bottom:var(--space-5);">' +
+      '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-3);margin-bottom:var(--space-2);">Status</div>' +
+      '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;background:' + statusBg + ';color:' + statusColor + ';border-radius:var(--radius-full);font-size:var(--text-caption);font-weight:var(--weight-semibold);">' + statusLabel + '</span>' +
+    '</div>' +
+    (task.deps
+      ? '<div style="margin-bottom:var(--space-5);">' +
+          '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-3);margin-bottom:var(--space-2);">Dependencies</div>' +
+          '<div style="font-size:var(--text-body-sm);color:var(--color-text-2);">' + task.deps + '</div>' +
+        '</div>'
+      : '') +
+    '<div style="margin-bottom:var(--space-5);">' +
+      '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-3);margin-bottom:var(--space-2);">Completion History</div>' +
+      (task.done
+        ? '<div style="font-size:var(--text-body-sm);color:var(--color-success);display:flex;align-items:center;gap:4px;"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'20 6 9 17 4 12\'></polyline></svg> Completed</div>'
+        : '<div style="font-size:var(--text-body-sm);color:var(--color-text-3);">Not yet completed</div>') +
+    '</div>' +
+    '<div>' +
+      '<div style="font-size:var(--text-caption);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-3);margin-bottom:var(--space-2);">Manager Notes</div>' +
+      '<textarea id="onboardingTaskNotes" placeholder="Add a note..." style="width:100%;min-height:80px;padding:var(--space-2) var(--space-3);background:var(--color-surface-1);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-1);font-family:var(--font-sans);font-size:var(--text-body-sm);resize:vertical;box-sizing:border-box;">' + (task.notes || '') + '</textarea>' +
+    '</div>';
+
+  document.getElementById('onboardingTaskBody').innerHTML = bodyHtml;
+
+  var markBtn = document.getElementById('onboardingTaskMarkBtn');
+  if (task.done) {
+    markBtn.disabled = true;
+    markBtn.textContent = 'Already Complete';
+    markBtn.style.opacity = '0.5';
+  } else {
+    markBtn.disabled = false;
+    markBtn.textContent = 'Mark Complete';
+    markBtn.style.opacity = '';
+  }
+
+  document.getElementById('onboardingTaskBackdrop').style.display = 'block';
+  document.getElementById('onboardingTaskDrawer').style.transform = 'translateX(0)';
+  if (window.lucide) lucide.createIcons({ nodes: [document.getElementById('onboardingTaskDrawer')] });
+}
+window.openOnboardingTaskDrawer = openOnboardingTaskDrawer;
+
+function closeOnboardingTaskDrawer() {
+  document.getElementById('onboardingTaskDrawer').style.transform = 'translateX(100%)';
+  document.getElementById('onboardingTaskBackdrop').style.display = 'none';
+  // Save notes if any
+  var notesEl = document.getElementById('onboardingTaskNotes');
+  if (notesEl && _currentTaskKey !== null && _currentTaskIdx !== null) {
+    var task = ONBOARD_DATA[_currentTaskKey] && ONBOARD_DATA[_currentTaskKey].tasks[_currentTaskIdx];
+    if (task) task.notes = notesEl.value;
+  }
+  _currentTaskKey = null;
+  _currentTaskIdx = null;
+  _currentTaskRow = null;
+}
+window.closeOnboardingTaskDrawer = closeOnboardingTaskDrawer;
+
+function markOnboardingTaskComplete() {
+  if (_currentTaskKey === null || _currentTaskIdx === null) return;
+  var task = ONBOARD_DATA[_currentTaskKey] && ONBOARD_DATA[_currentTaskKey].tasks[_currentTaskIdx];
+  if (!task || task.done) return;
+
+  task.done = true;
+
+  // Update the row in the parent drawer checklist
+  if (_currentTaskRow) {
+    _currentTaskRow.classList.add('done');
+    var cb = _currentTaskRow.querySelector('input[type="checkbox"]');
+    if (cb) { cb.checked = true; cb.disabled = true; }
+    // Remove action button if present
+    var actionBtn = _currentTaskRow.querySelector('.btn-ghost');
+    if (actionBtn) actionBtn.remove();
+    // Remove tag placeholder, add completed tag
+    var existingTag = _currentTaskRow.querySelector('span[style*="color:var(--color-success)"]');
+    if (!existingTag) {
+      var tagEl = document.createElement('span');
+      tagEl.style.cssText = 'font-size:var(--text-caption);color:var(--color-success);margin-left:var(--space-1);';
+      tagEl.textContent = 'Completed';
+      var chevron = _currentTaskRow.querySelector('svg:last-child');
+      if (chevron) _currentTaskRow.insertBefore(tagEl, chevron);
+      else _currentTaskRow.appendChild(tagEl);
+    }
+  }
+
+  GHR && GHR.showToast && GHR.showToast('success', 'Task Complete', (task.label || 'Task') + ' marked as complete.');
+  closeOnboardingTaskDrawer();
+}
+window.markOnboardingTaskComplete = markOnboardingTaskComplete;
+
+// Close T2 task drawer on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var td = document.getElementById('onboardingTaskDrawer');
+    if (td && td.style.transform === 'translateX(0px)' || (td && td.style.transform === 'translateX(0)')) {
+      closeOnboardingTaskDrawer();
+    }
+  }
+});
 
 // ── Add candidate (inline modal) ──
 function addCandidateNew() {

@@ -84,10 +84,10 @@
     .expense-icon svg { width: 20px; height: 20px; }
     .expense-amount {
       font-family: var(--font-mono);
-      font-size: var(--text-heading-2);
-      font-weight: var(--weight-bold);
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
       color: var(--color-text-1);
-      min-width: 100px;
+      min-width: 80px;
       flex-shrink: 0;
     }
     .expense-details {
@@ -334,8 +334,8 @@
     }
     .approval-amount {
       font-family: var(--font-mono);
-      font-size: var(--text-heading-2);
-      font-weight: var(--weight-bold);
+      font-size: var(--text-body);
+      font-weight: var(--weight-semibold);
       color: var(--color-text-1);
     }
     .approval-policy {
@@ -464,7 +464,7 @@
       }
       .expense-item .expense-amount {
         min-width: unset;
-        font-size: var(--text-heading-3);
+        font-size: var(--text-body-sm);
       }
       .expense-item .expense-right {
         width: 100%;
@@ -1097,7 +1097,12 @@
                 <div class="action-row-actions">
                   <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
                   <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
-                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <div class="dropdown" style="position:relative;display:inline-block;">
+                    <button class="btn btn-xs btn-ghost btn-icon" onclick="event.stopPropagation();var m=this.nextElementSibling;document.querySelectorAll('.row-more-menu.active').forEach(function(el){if(el!==m)el.classList.remove('active')});m.classList.toggle('active')" aria-label="More actions"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
+                    <div class="row-more-menu dropdown-menu right" style="min-width:140px;">
+                      <button class="dropdown-item" onclick="event.stopPropagation();this.closest('.row-more-menu').classList.remove('active');openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg> View Details</button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1141,7 +1146,12 @@
                 <div class="action-row-actions">
                   <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
                   <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
-                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <div class="dropdown" style="position:relative;display:inline-block;">
+                    <button class="btn btn-xs btn-ghost btn-icon" onclick="event.stopPropagation();var m=this.nextElementSibling;document.querySelectorAll('.row-more-menu.active').forEach(function(el){if(el!==m)el.classList.remove('active')});m.classList.toggle('active')" aria-label="More actions"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
+                    <div class="row-more-menu dropdown-menu right" style="min-width:140px;">
+                      <button class="dropdown-item" onclick="event.stopPropagation();this.closest('.row-more-menu').classList.remove('active');openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg> View Details</button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1185,7 +1195,12 @@
                 <div class="action-row-actions">
                   <button class="btn btn-xs btn-primary" onclick="approveItem(this)"><svg data-lucide="check" width="14" height="14"></svg> Approve</button>
                   <button class="btn btn-xs btn-destructive-ghost" onclick="openRejectModal(this)"><svg data-lucide="x" width="14" height="14"></svg> Reject</button>
-                  <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg></button>
+                  <div class="dropdown" style="position:relative;display:inline-block;">
+                    <button class="btn btn-xs btn-ghost btn-icon" onclick="event.stopPropagation();var m=this.nextElementSibling;document.querySelectorAll('.row-more-menu.active').forEach(function(el){if(el!==m)el.classList.remove('active')});m.classList.toggle('active')" aria-label="More actions"><svg data-lucide="more-horizontal" width="14" height="14"></svg></button>
+                    <div class="row-more-menu dropdown-menu right" style="min-width:140px;">
+                      <button class="dropdown-item" onclick="event.stopPropagation();this.closest('.row-more-menu').classList.remove('active');openExpenseDrawer(getRowExpenseData(this))"><svg data-lucide="eye" width="14" height="14"></svg> View Details</button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1698,6 +1713,13 @@
   document.addEventListener('click', (e) => {
     if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
       userDropdown.classList.remove('active');
+    }
+  });
+
+  // Close row more-menus when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.row-more-menu') && !e.target.closest('[aria-label="More actions"]')) {
+      document.querySelectorAll('.row-more-menu.active').forEach(m => m.classList.remove('active'));
     }
   });
 

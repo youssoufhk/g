@@ -368,24 +368,9 @@
       height: 120px;
       margin-top: var(--space-4);
     }
-    .rev-bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-1);
-      height: 100%;
-      justify-content: flex-end;
-    }
-    .rev-bar {
-      width: 100%;
-      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-      min-height: 4px;
-      transition: filter var(--motion-fast);
-    }
-    .rev-bar:hover { filter: brightness(1.15); }
-    .rev-bar.actual    { background: var(--color-gold); }
-    .rev-bar.projected { background: var(--color-gold); opacity: 0.4; border: 1px dashed var(--color-gold); }
+    /* Snapshot chart uses shared .revenue-bar-col / .revenue-bar classes.
+       Projected bar variant: */
+    .revenue-bar.projected { background: var(--color-gold); opacity: 0.4; border: 1px dashed var(--color-gold); }
     .rev-label {
       font-size: var(--text-overline);
       color: var(--color-text-3);
@@ -811,12 +796,12 @@
           </span>
           <div style="display:flex;align-items:center;gap:var(--space-2);">
             <span class="badge badge-accent" id="aiAlertCountBadge">3 alerts</span>
-            <button class="btn btn-ghost btn-xs" id="aiAlertsToggleBtn" onclick="toggleAIAlerts()" aria-expanded="true">
-              <svg data-lucide="chevron-up" width="14" height="14" id="aiAlertsChevron"></svg>
+            <button class="btn btn-ghost btn-xs" id="aiAlertsToggleBtn" onclick="toggleAIAlerts()" aria-expanded="false">
+              <svg data-lucide="chevron-down" width="14" height="14" id="aiAlertsChevron"></svg>
             </button>
           </div>
         </div>
-        <div id="aiAlertsBody">
+        <div id="aiAlertsBody" style="display:none;">
         <div class="card-body">
           <div class="ai-alert">
             <div class="ai-alert-icon"><svg data-lucide="alert-triangle" width="18" height="18" style="color: var(--color-error);"></svg></div>
@@ -902,48 +887,48 @@
 
             <!-- Timesheets Tab (capped at 4 items for readability) -->
             <div class="tab-content active" id="tab-timesheets" role="tabpanel">
-              <div class="approval-item">
-                <a href="employees.html#john-smith" class="avatar avatar-xs" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith" style="text-decoration:none;">JS</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#john-smith" class="avatar avatar-xs" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith" style="text-decoration:none;" onclick="event.stopPropagation()">JS</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith" style="color:inherit;text-decoration:none;">John Smith</a> - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-project="Globex Phase 2" data-worktime="113" data-href="employees.html#john-smith" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">John Smith</a> - Week 13</div>
                   <div class="approval-sub">40h logged - Globex Phase 2 - <span class="font-mono" data-sensitive="billing">&#8364;3,200</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for John Smith">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for John Smith">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for John Smith" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for John Smith" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
-              <div class="approval-item">
-                <a href="employees.html#carol-williams" class="avatar avatar-xs" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams" style="text-decoration:none;">CW</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#carol-williams" class="avatar avatar-xs" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams" style="text-decoration:none;" onclick="event.stopPropagation()">CW</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams" style="color:inherit;text-decoration:none;">Carol Williams</a> - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-project="Umbrella Corp Portal" data-worktime="100" data-href="employees.html#carol-williams" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Carol Williams</a> - Week 13</div>
                   <div class="approval-sub">38h logged - Umbrella Corp Portal - <span class="font-mono" data-sensitive="billing">&#8364;2,850</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for Carol Williams">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for Carol Williams">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for Carol Williams" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for Carol Williams" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
-              <div class="approval-item">
-                <a href="employees.html#marco-rossi" class="avatar avatar-xs" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi" style="text-decoration:none;">MR</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#marco-rossi" class="avatar avatar-xs" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi" style="text-decoration:none;" onclick="event.stopPropagation()">MR</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi" style="color:inherit;text-decoration:none;">Marco Rossi</a> - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-project="Acme Web Redesign" data-worktime="108" data-href="employees.html#marco-rossi" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Marco Rossi</a> - Week 13</div>
                   <div class="approval-sub">42h logged - Acme Web Redesign - <span class="font-mono" data-sensitive="billing">&#8364;3,360</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for Marco Rossi">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for Marco Rossi">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for Marco Rossi" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for Marco Rossi" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
-              <div class="approval-item">
-                <a href="employees.html#david-park" class="avatar avatar-xs" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Initech API" data-worktime="85" data-href="employees.html#david-park" style="text-decoration:none;">DP</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#david-park" class="avatar avatar-xs" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Initech API" data-worktime="85" data-href="employees.html#david-park" style="text-decoration:none;" onclick="event.stopPropagation()">DP</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Initech API" data-worktime="85" data-href="employees.html#david-park" style="color:inherit;text-decoration:none;">David Park</a> - Week 13</div>
+                  <div class="approval-title"><a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-project="Initech API" data-worktime="85" data-href="employees.html#david-park" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">David Park</a> - Week 13</div>
                   <div class="approval-sub">36h logged - Initech API - <span class="font-mono" data-sensitive="billing">&#8364;2,880</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for David Park">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for David Park">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve timesheet for David Park" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject timesheet for David Park" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
               <div style="padding: var(--space-2) var(--space-4);text-align:center;">
@@ -953,63 +938,63 @@
 
             <!-- Leaves Tab -->
             <div class="tab-content" id="tab-leaves" role="tabpanel">
-              <div class="approval-item">
-                <a href="employees.html#alice-wang" class="avatar avatar-xs" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang" style="text-decoration:none;">AW</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#alice-wang" class="avatar avatar-xs" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang" style="text-decoration:none;" onclick="event.stopPropagation()">AW</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang" style="color:inherit;text-decoration:none;">Alice Wang</a> - Annual Leave</div>
+                  <div class="approval-title"><a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-project="" data-worktime="45" data-href="employees.html#alice-wang" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Alice Wang</a> - Annual Leave</div>
                   <div class="approval-sub">Apr 14-18, 2026 (5 days)</div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Alice Wang">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Alice Wang">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Alice Wang" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Alice Wang" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
-              <div class="approval-item">
-                <a href="employees.html#bob-taylor" class="avatar avatar-xs" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="text-decoration:none;">BT</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#bob-taylor" class="avatar avatar-xs" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="text-decoration:none;" onclick="event.stopPropagation()">BT</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;">Bob Taylor</a> - Personal</div>
+                  <div class="approval-title"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Bob Taylor</a> - Personal</div>
                   <div class="approval-sub">Apr 10, 2026 (1 day)</div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Bob Taylor">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Bob Taylor">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Bob Taylor" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Bob Taylor" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
-              <div class="approval-item">
-                <a href="employees.html#liam-obrien" class="avatar avatar-xs" data-hovercard data-name="Liam O'Brien" data-role="Developer" data-dept="Engineering" data-project="" data-worktime="80" data-href="employees.html#liam-obrien" style="text-decoration:none;">LO</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#liam-obrien" class="avatar avatar-xs" data-hovercard data-name="Liam O'Brien" data-role="Developer" data-dept="Engineering" data-project="" data-worktime="80" data-href="employees.html#liam-obrien" style="text-decoration:none;" onclick="event.stopPropagation()">LO</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Developer" data-dept="Engineering" data-project="" data-worktime="80" data-href="employees.html#liam-obrien" style="color:inherit;text-decoration:none;">Liam O'Brien</a> - Sick Leave</div>
+                  <div class="approval-title"><a href="employees.html#liam-obrien" data-hovercard data-name="Liam O'Brien" data-role="Developer" data-dept="Engineering" data-project="" data-worktime="80" data-href="employees.html#liam-obrien" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Liam O'Brien</a> - Sick Leave</div>
                   <div class="approval-sub">Apr 6-7, 2026 (2 days)</div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Liam O'Brien">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Liam O'Brien">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve leave for Liam O'Brien" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject leave for Liam O'Brien" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
             </div>
 
             <!-- Expenses Tab -->
             <div class="tab-content" id="tab-expenses" role="tabpanel">
-              <div class="approval-item">
-                <a href="employees.html#bob-taylor" class="avatar avatar-xs" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="text-decoration:none;">BT</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#bob-taylor" class="avatar avatar-xs" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="text-decoration:none;" onclick="event.stopPropagation()">BT</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;">Bob Taylor</a> - Client Dinner</div>
+                  <div class="approval-title"><a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-project="" data-worktime="0" data-href="employees.html#bob-taylor" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Bob Taylor</a> - Client Dinner</div>
                   <div class="approval-sub">Mar 30 - Helix Corp - <span class="font-mono">&#8364;186.50</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve expense for Bob Taylor">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject expense for Bob Taylor">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve expense for Bob Taylor" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject expense for Bob Taylor" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
-              <div class="approval-item">
-                <a href="employees.html#emma-laurent" class="avatar avatar-xs" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent" style="text-decoration:none;">EL</a>
+              <div class="approval-item" style="cursor:pointer;" onclick="window.location.href='approvals.html'">
+                <a href="employees.html#emma-laurent" class="avatar avatar-xs" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent" style="text-decoration:none;" onclick="event.stopPropagation()">EL</a>
                 <div class="approval-info">
-                  <div class="approval-title"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent" style="color:inherit;text-decoration:none;">Emma Laurent</a> - Conference Fee</div>
+                  <div class="approval-title"><a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-project="Internal" data-worktime="90" data-href="employees.html#emma-laurent" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">Emma Laurent</a> - Conference Fee</div>
                   <div class="approval-sub">Apr 2 - QA Summit 2026 - <span class="font-mono">&#8364;450.00</span></div>
                 </div>
                 <div class="approval-actions">
-                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve expense for Emma Laurent">Approve</button>
-                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject expense for Emma Laurent">Reject</button>
+                  <button class="btn btn-primary btn-xs approve-btn" data-min-role="pm" aria-label="Approve expense for Emma Laurent" onclick="event.stopPropagation()">Approve</button>
+                  <button class="btn btn-destructive-ghost btn-xs reject-btn" data-min-role="pm" aria-label="Reject expense for Emma Laurent" onclick="event.stopPropagation()">Reject</button>
                 </div>
               </div>
             </div>
@@ -1355,6 +1340,96 @@
 
         <!-- ═══ RIGHT COLUMN (40%) ═══ -->
         <div class="flex flex-col gap-8">
+
+          <!-- Team Presence -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Team Presence</span>
+              <a href="employees.html" class="btn btn-ghost btn-xs">All</a>
+            </div>
+            <div class="card-body" style="padding-top:0;">
+              <div class="presence-item">
+                <span class="presence-status online" aria-label="Online" data-presence="sarah-chen"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">SC</div>
+                    <a href="employees.html#sarah-chen" data-hovercard data-name="Sarah Chen" data-role="Project Manager" data-dept="Engineering" data-worktime="100" data-href="employees.html#sarah-chen">Sarah Chen</a>
+                  </div>
+                  <div class="presence-detail">Project Manager - Engineering</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status online" aria-label="Online" data-presence="john-smith"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">JS</div>
+                    <a href="employees.html#john-smith" data-hovercard data-name="John Smith" data-role="Senior Developer" data-dept="Engineering" data-worktime="112" data-href="employees.html#john-smith">John Smith</a>
+                  </div>
+                  <div class="presence-detail">Senior Developer - Engineering</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status away" aria-label="Away" data-presence="marco-rossi"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">MR</div>
+                    <a href="employees.html#marco-rossi" data-hovercard data-name="Marco Rossi" data-role="Operations Lead" data-dept="Operations" data-worktime="108" data-href="employees.html#marco-rossi">Marco Rossi</a>
+                  </div>
+                  <div class="presence-detail">Operations Lead - Operations</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status online" aria-label="Online" data-presence="carol-williams"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">CW</div>
+                    <a href="employees.html#carol-williams" data-hovercard data-name="Carol Williams" data-role="Design Lead" data-dept="Design" data-worktime="100" data-href="employees.html#carol-williams">Carol Williams</a>
+                  </div>
+                  <div class="presence-detail">Design Lead - Design</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status on-leave" aria-label="On Leave" data-presence="alice-wang"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">AW</div>
+                    <a href="employees.html#alice-wang" data-hovercard data-name="Alice Wang" data-role="Software Engineer" data-dept="Engineering" data-worktime="45" data-href="employees.html#alice-wang">Alice Wang</a>
+                  </div>
+                  <div class="presence-detail">On Leave Apr 14-18</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status online" aria-label="Online" data-presence="emma-laurent"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">EL</div>
+                    <a href="employees.html#emma-laurent" data-hovercard data-name="Emma Laurent" data-role="HR Specialist" data-dept="HR" data-worktime="90" data-href="employees.html#emma-laurent">Emma Laurent</a>
+                  </div>
+                  <div class="presence-detail">HR Specialist - HR</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status offline" aria-label="Offline" data-presence="david-park"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">DP</div>
+                    <a href="employees.html#david-park" data-hovercard data-name="David Park" data-role="Finance Lead" data-dept="Finance" data-worktime="85" data-href="employees.html#david-park">David Park</a>
+                  </div>
+                  <div class="presence-detail">Finance Lead - Finance</div>
+                </div>
+              </div>
+              <div class="presence-item">
+                <span class="presence-status offline" aria-label="Offline" data-presence="bob-taylor"></span>
+                <div class="presence-info">
+                  <div class="presence-name" style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar avatar-xs">BT</div>
+                    <a href="employees.html#bob-taylor" data-hovercard data-name="Bob Taylor" data-role="Backend Developer" data-dept="Engineering" data-worktime="0" data-href="employees.html#bob-taylor">Bob Taylor</a>
+                  </div>
+                  <div class="presence-detail">Backend Developer - Bench</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Revenue Trend -->
           <div class="card">
@@ -1869,15 +1944,15 @@
     var maxVal = Math.max.apply(null, data.map(function(d) { return d.value; }));
     data.forEach(function(d) {
       var col = document.createElement('div');
-      col.className = 'rev-bar-col';
+      col.className = 'revenue-bar-col';
       col.style.cursor = 'pointer';
       col.title = d.label + ': \u20AC' + (d.value / 1000).toFixed(0) + 'k' + (d.projected ? ' (projected)' : '') + ' - click to view in Insights';
       col.addEventListener('click', function() { window.location.href = 'insights.html'; });
       var pct = Math.round((d.value / maxVal) * 100);
       col.innerHTML =
-        '<div style="font-family:var(--font-mono);font-size:var(--text-overline);color:var(--color-text-2);">\u20AC' + (d.value / 1000).toFixed(0) + 'k</div>' +
-        '<div class="rev-bar ' + (d.projected ? 'projected' : 'actual') + '" style="height:' + pct + '%;"></div>' +
-        '<div class="rev-label">' + d.label + '</div>';
+        '<div class="revenue-value">\u20AC' + (d.value / 1000).toFixed(0) + 'k</div>' +
+        '<div class="revenue-bar ' + (d.projected ? 'projected' : '') + '" style="height:' + pct + '%;"></div>' +
+        '<div class="revenue-label">' + d.label + '</div>';
       chart.appendChild(col);
     });
   })();
