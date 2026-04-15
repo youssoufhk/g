@@ -37,7 +37,11 @@ See `CLAUDE.md` section 2 for the full 11 hard rules. The commandments below are
 
 **Phase 1 (Foundation docs) is DONE** as of 2026-04-15. All specs, ADRs, and the deferred decisions registry are final. The data-architecture planning progress file has been deleted; its content migrated into the permanent files above.
 
-**Phase 2 (Foundation build) is NEXT.** Nothing is built yet. No GCP projects, no code, no database. You start from zero infrastructure.
+**Phase 2 (Foundation build track) is DONE** as of 2026-04-15. Local dev stack, backend skeleton, tenancy middleware, 9 vendor wrappers M1 with stubs, multi-country scaffolding (FR+UK), frontend shell (sidebar 224, topbar, bottom nav), 20 atoms + 3 patterns, testing infrastructure (45 backend tests pass, property + contract, AI eval harness skeleton, Playwright config, CI workflow), operator console minimum. Nine commits landed on `main`; see `git log --oneline -- backend/ frontend/ infra/docker/ Makefile`.
+
+**Phase 2 deploy track is deferred to post-MVP.** GCP provisioning, vendor-wrapper swap to real implementations, first staging deploy, and DR drill all moved to `EXECUTION_CHECKLIST.md` §16 Deploy Track, founder-triggered after Phase 5a MVP is demo-ready.
+
+**Phase 3a (MVP onboarding critical path) is NEXT for the agent.** JWT claim wiring into the tenancy middleware, onboarding wizard, CSV import module, AI column mapper, password + Google OIDC login, operator console live wiring. See `EXECUTION_CHECKLIST.md` §4.1.
 
 ---
 
