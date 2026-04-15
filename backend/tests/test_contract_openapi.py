@@ -17,6 +17,8 @@ def test_openapi_includes_health_and_auth(client: TestClient) -> None:
     assert "/api/v1/auth/login" in spec["paths"]
     assert "/api/v1/auth/register" in spec["paths"]
     assert "/api/v1/auth/me" in spec["paths"]
+    assert "/api/v1/imports/preview" in spec["paths"]
+    assert "/api/v1/imports/commit" in spec["paths"]
 
 
 def test_openapi_components_schemas_are_stable(client: TestClient) -> None:

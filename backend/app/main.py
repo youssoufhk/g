@@ -40,6 +40,7 @@ from app.features import (  # noqa: F401
 )
 from app.features.admin.routes import router as admin_router
 from app.features.auth.routes import router as auth_router
+from app.features.imports.routes import router as imports_router
 
 logger = get_logger(__name__)
 
@@ -86,3 +87,4 @@ async def health() -> dict[str, Any]:
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(admin_router, prefix="/api/v1/ops", tags=["ops"])
+app.include_router(imports_router, prefix="/api/v1/imports", tags=["imports"])
