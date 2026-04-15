@@ -80,5 +80,6 @@ repos:
             \.pre-commit-config\.yaml|
             scripts/hooks/no_utilisation\.py|
             scripts/setup/bootstrap-dev\.sh|
+            PROMPT\.md|
             \.claude/skills/.*
           )$

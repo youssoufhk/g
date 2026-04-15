@@ -34,20 +34,21 @@ Same rule as `EXECUTION_CHECKLIST.md` section 1.0, restated for you:
 
 ---
 
-## 2. Phase 0 prerequisites (non-negotiable BEFORE the first line of product code ships)
+## 2. Parallel admin track (NOT a build blocker)
 
-These three are the anti-wall fixes from the brutal final review. **Do NOT start Phase 2 §3.1 Docker Compose until all three boxes are checked.** If you start building code before these are done, the whole plan is on a handshake.
+The founder runs these in parallel with Phase 2 build. They are not prerequisites. The build agent is explicitly told in `PROMPT.md` NOT to block on them and NOT to ask about them. Do them in parallel to §3.1, §3.2, §3.3, etc. Do them on evenings, weekends, or between build sessions.
 
-### 2.1 Runway one-pager (today or tomorrow, 1 hour)
+**Zero-salary POC mode is locked.** Both founders work without salary until Gamma is profitable AND both founders agree to start paying themselves. This means the "runway" conversation is about company admin costs only, not personal income. See `docs/founder/runway.md`.
 
-- [ ] Write a one-page budget covering month 1 to month 18 at `docs/founder/runway.md` (new file, founder-only, add to gitignore if personal data)
-- [ ] Include: both founder salaries (net + gross), GCP infra costs (start at €50/month, grow to €500 by month 12), SaaS tools (GitHub, Linear, Notion, Sentry, Figma, etc., ~€200/month), legal + accounting (~€500/month), domain + hosting (~€50/month), one-time legal fees for co-founder agreement (~€2-5k)
-- [ ] Total monthly burn, runway in months, fundraise trigger at < 12 months remaining
-- [ ] Source of funds: personal savings / angel / friends-and-family / bank loan. Named source, not "we will figure it out"
-- [ ] If runway < 12 months: book the first 5 fundraise calls this month
-- [ ] If runway >= 12 months: sign the one-pager as "read and accepted" by both founders
+### 2.1 Company admin budget (whenever, 30 minutes)
 
-### 2.2 Co-founder paperwork (this week, 1-2 days)
+Template already exists at `docs/founder/runway.md`. Zero-salary POC mode is locked. Only COMPANY admin costs (GCP, SaaS tools, UK accountant, domain, insurance from customer 1 on) are tracked here. Personal finances are NOT in this file and NOT in this repo.
+
+- [ ] Copy `docs/founder/runway.md` to `docs/founder/runway.local.md` (gitignored) and fill in actual company cash balance
+- [ ] Sign off in section 8 of the template
+- [ ] Review monthly on the first Monday of each month
+
+### 2.2 Co-founder paperwork (when the founders decide to, not a build blocker)
 
 - [ ] Draft or commission a founder agreement. Options: SeedLegals UK (~£500), Stripe Atlas template (free, lower quality), local UK lawyer (~£1-3k)
 - [ ] Required clauses: equity split (e.g., 50/50 or 60/40 with reasoning), 4-year vesting with 1-year cliff, full IP assignment to Global Gamma Ltd, bad-leaver protection (forfeiture on material breach), exit clause (right of first refusal, tag-along, drag-along), minimum weekly hours commitment (32+ for "full-time"), confidentiality, non-compete (narrow, defensible)
@@ -55,7 +56,7 @@ These three are the anti-wall fixes from the brutal final review. **Do NOT start
 - [ ] If co-founder hesitates at any clause: **that is the answer.** Do not rationalize. Do not "sort it out later". Fix it now or reconsider the partnership
 - [ ] Record in a founder log: "co-founder agreement signed on YYYY-MM-DD, filed at <location>"
 
-### 2.3 First 10 customer discovery messages sent (this week, 2 hours)
+### 2.3 Customer discovery messages (parallel to build, founder-paced)
 
 - [ ] Identify 50 warm-intro targets on LinkedIn: COOs, finance leads, HR operations managers at 50-500 employee consulting firms in France and UK. Store the list at `docs/founder/pipeline.md` (new file, founder-only)
 - [ ] Draft ONE outreach message template. Not long. 3 sentences: who you are, what Gamma is, one-line ask for a 30-minute call. No product pitch, no feature list

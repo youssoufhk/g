@@ -197,7 +197,17 @@ logs/
 
 
 # ------------------------------------------------------------------------------
-# 8. Founder scratch files (local drafts, not for commit)
+# 8. Founder personal files (gitignored by convention)
+# ------------------------------------------------------------------------------
+# Any .local.md file under docs/founder/ contains real numbers, real names,
+# and confidential personal data. Committed templates live as plain .md.
+# See docs/founder/README.md for the naming convention.
+docs/founder/**/*.local.md
+docs/founder/discovery-notes/
+docs/founder/weekly/
+
+# ------------------------------------------------------------------------------
+# 9. Founder scratch files (local drafts, not for commit)
 # ------------------------------------------------------------------------------
 scratch/
 .scratch/
