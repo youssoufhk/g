@@ -10,6 +10,7 @@
 #   5. Runs the gamma-ops unit test suite (13 tests)
 #   6. Installs the Google Cloud SDK via Google's official apt repository
 #   7. Installs Docker Engine + compose plugin and adds the user to the docker group
+#   8. Installs Node 22 LTS via NodeSource for the Next.js frontend
 #
 # What you do after (interactive, manual):
 #   - gcloud auth login
@@ -100,9 +101,9 @@ SUDO_KEEPALIVE_PID=$!
 trap 'kill $SUDO_KEEPALIVE_PID 2>/dev/null || true' EXIT
 
 # ------------------------------------------------------------------------------
-# Step 1/7: System packages
+# Step 1/8: System packages
 # ------------------------------------------------------------------------------
-say "Step 1/7: System packages (apt)"
+say "Step 1/8: System packages (apt)"
 sudo apt-get update
 sudo apt-get install -y \
   python3 python3-venv python3-pip \
@@ -112,9 +113,9 @@ sudo apt-get install -y \
   apt-transport-https software-properties-common
 
 # ------------------------------------------------------------------------------
-# Step 2/7: Ensure Python 3.12+ (the infra/ops library requires it)
+# Step 2/8: Ensure Python 3.12+ (the infra/ops library requires it)
 # ------------------------------------------------------------------------------
-say "Step 2/7: Python ${REQUIRED_PY_MAJOR}.${REQUIRED_PY_MINOR}+ check"
+say "Step 2/8: Python ${REQUIRED_PY_MAJOR}.${REQUIRED_PY_MINOR}+ check"
 if python3 -c "import sys; sys.exit(0 if sys.version_info >= (${REQUIRED_PY_MAJOR}, ${REQUIRED_PY_MINOR}) else 1)" 2>/dev/null; then
   PY=python3
   echo "    $(python3 --version) is new enough, using it"
@@ -128,9 +129,9 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# Step 3/7: Pre-commit hooks (secrets + em dashes + utilisation)
+# Step 3/8: Pre-commit hooks (secrets + em dashes + utilisation)
 # ------------------------------------------------------------------------------
-say "Step 3/7: Pre-commit hooks"
+say "Step 3/8: Pre-commit hooks"
 if git config --get core.hooksPath >/dev/null 2>&1; then
   git config --unset core.hooksPath
   echo "    Unset redundant core.hooksPath (it was set to the default value)"
@@ -148,9 +149,9 @@ if ! pre-commit run --all-files; then
 fi
 
 # ------------------------------------------------------------------------------
-# Step 4/7: Install infra/ops library in its own venv
+# Step 4/8: Install infra/ops library in its own venv
 # ------------------------------------------------------------------------------
-say "Step 4/7: Install gamma-ops library"
+say "Step 4/8: Install gamma-ops library"
 cd "$REPO_ROOT/infra/ops"
 
 if [[ -d .venv ]]; then
@@ -172,15 +173,15 @@ INSTALLED_VERSION=$(.venv/bin/python -c "import gamma_ops; print(gamma_ops.__ver
 echo "    Installed gamma-ops $INSTALLED_VERSION"
 
 # ------------------------------------------------------------------------------
-# Step 5/7: Unit tests
+# Step 5/8: Unit tests
 # ------------------------------------------------------------------------------
-say "Step 5/7: gamma-ops unit tests"
+say "Step 5/8: gamma-ops unit tests"
 .venv/bin/pytest tests/ -v
 
 # ------------------------------------------------------------------------------
-# Step 6/7: Google Cloud SDK
+# Step 6/8: Google Cloud SDK
 # ------------------------------------------------------------------------------
-say "Step 6/7: Google Cloud SDK"
+say "Step 6/8: Google Cloud SDK"
 cd "$REPO_ROOT"
 
 if command -v gcloud >/dev/null 2>&1; then
@@ -196,9 +197,9 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# Step 7/7: Docker Engine + compose plugin (for local dev stack)
+# Step 7/8: Docker Engine + compose plugin (for local dev stack)
 # ------------------------------------------------------------------------------
-say "Step 7/7: Docker Engine + compose plugin"
+say "Step 7/8: Docker Engine + compose plugin"
 if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
   echo "    docker already installed: $(docker --version)"
   echo "    compose plugin already installed: $(docker compose version | head -1)"
@@ -234,6 +235,26 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Step 8/8: Node 22 LTS via NodeSource (for the Next.js frontend)
+# ------------------------------------------------------------------------------
+say "Step 8/8: Node 22 LTS"
+if command -v node >/dev/null 2>&1; then
+  NODE_MAJOR=$(node --version | sed -E 's/^v([0-9]+).*/\1/')
+  if [[ "$NODE_MAJOR" -ge 22 ]]; then
+    echo "    Node already installed: $(node --version)"
+  else
+    echo "    Node $NODE_MAJOR detected; upgrading to 22 LTS via NodeSource"
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    echo "    Installed $(node --version)"
+  fi
+else
+  curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  echo "    Installed $(node --version)"
+fi
+
+# ------------------------------------------------------------------------------
 # Done
 # ------------------------------------------------------------------------------
 echo ""
@@ -243,40 +264,29 @@ echo -e "${GREEN}============================================================${N
 
 cat <<EOF
 
-NEXT STEPS (interactive, run these manually in order):
+NEXT STEPS for the MVP build track (do these in order, all local, no GCP):
 
-  0. If the script just added you to the docker group, either log out and back
-     in OR run in the current shell:
+  1. If the script just added you to the docker group, either log out and back
+     in OR run:
        newgrp docker
      Then verify:
        docker ps
 
-  1. Authenticate with Google:
-       gcloud auth login
-       gcloud auth application-default login
+  2. Bring the local stack up and install backend + frontend + run Alembic:
+       cd $REPO_ROOT
+       make mvp-up
 
-  2. Find your GCP billing account ID:
-       gcloud billing accounts list
-     Copy the ID (format: ABCDEF-123456-GHIJKL).
+  3. In two separate terminals, start the services:
+       make backend-run      # FastAPI at http://localhost:8000
+       make frontend-dev     # Next.js at http://localhost:3000
 
-  3. Set up the local .env for the ops library:
-       cd $REPO_ROOT/infra/ops
-       cp .env.example .env
-       # Open .env in your editor and set:
-       #   GCP_PROJECT_ID=gamma-staging-001
-       #   GCP_BILLING_ACCOUNT_ID=<the ID from step 2>
-       #   GCP_REGION=europe-west9
+  4. Browse http://localhost:3000/en and start Phase 3a work from
+     EXECUTION_CHECKLIST.md section 4.1.
 
-  4. Activate the venv in your shell (add to .bashrc / .zshrc for convenience):
-       source $REPO_ROOT/infra/ops/.venv/bin/activate
+DEPLOY TRACK (GCP), deferred until after Phase 5a MVP is demo-ready:
 
-  5. Create the staging GCP project:
-       cd $REPO_ROOT/infra/ops
-       gamma-ops gcp projects create gamma-staging-001 \\
-         --display-name 'Gamma Staging'
-
-  6. Follow docs/runbooks/gcp-bootstrap.md for the full environment bootstrap
-     (enable APIs, link billing, create KMS keyring, create buckets, etc.).
+  * docs/runbooks/gcp-bootstrap.md when the founder explicitly calls for it
+  * EXECUTION_CHECKLIST.md section 16 Deploy Track
 
 When you hit any error, stop and check docs/runbooks/dev-machine-bootstrap.md
 troubleshooting section. Do not improvise.
