@@ -136,6 +136,65 @@ gamma-ops gcp projects create gamma-staging-001 \
 
 This is Phase 2 Task 1 from `EXECUTION_CHECKLIST.md` §3.1. After it succeeds, continue with the full environment bootstrap in `docs/runbooks/gcp-bootstrap.md` (enable APIs, link billing, create KMS keyring, create buckets with CMEK, create secrets, etc.).
 
+### 4.6 Start the local development stack
+
+The local dev stack runs Postgres 16, Redis 7, and Mailhog in Docker. You need it up before any backend or frontend feature work (`EXECUTION_CHECKLIST.md` §3.2 onward).
+
+**One-time: put your user in the docker group so `docker` runs without sudo.**
+
+```bash
+sudo usermod -aG docker $USER
+# Log out and back in, OR run `newgrp docker` in the current shell.
+docker ps    # should succeed without sudo
+```
+
+**Start the stack:**
+
+```bash
+cd ~/ai-workspace/claude-projects/gammahr_v2
+make dev-up
+```
+
+`make dev-up` starts all three services and waits for healthchecks. On a first run it will pull ~200 MB of images (30-90 seconds on a normal connection). On subsequent runs it takes 3-5 seconds.
+
+Expected final output:
+
+```
+Dev stack ready:
+  Postgres:  postgresql://gamma:gamma_dev_password@localhost:5432/gamma_dev
+  Redis:     redis://localhost:6379
+  Mailhog:   smtp://localhost:1025  ui http://localhost:8025
+```
+
+**Verify each service:**
+
+```bash
+# Postgres: connect and list extensions + dev bootstrap marker
+psql postgresql://gamma:gamma_dev_password@localhost:5432/gamma_dev \
+  -c "SELECT name FROM _dev_bootstrap; SELECT extname FROM pg_extension ORDER BY extname;"
+
+# Redis: ping
+redis-cli -h localhost ping    # PONG
+
+# Mailhog UI
+xdg-open http://localhost:8025 2>/dev/null || echo "Open http://localhost:8025 in a browser"
+```
+
+**Other make targets:**
+
+| Target | What it does |
+|---|---|
+| `make dev-up` | Start the stack, wait for healthchecks |
+| `make dev-down` | Stop the stack, preserve data volumes |
+| `make dev-reset` | Stop and destroy volumes, start fresh (use after a broken migration) |
+| `make dev-logs` | Tail logs from all services |
+| `make dev-ps` | Show running services |
+| `make dev-psql` | Open a psql shell inside the postgres container |
+
+**Data lives in named Docker volumes** (`gamma_dev_postgres_data`, `gamma_dev_redis_data`). `make dev-down` preserves them; only `make dev-reset` nukes them.
+
+**Port conflicts?** If 5432, 6379, 1025, or 8025 are already in use on your machine, `make dev-up` will fail with "port is already allocated". Stop the conflicting service or change the host-side ports in `infra/docker/docker-compose.dev.yml` (the container-side ports stay the same). Do not commit the port change; use `docker-compose.override.yml` instead.
+
 ## 5. Troubleshooting
 
 ### Script fails at Step 1 with "Unable to locate package"

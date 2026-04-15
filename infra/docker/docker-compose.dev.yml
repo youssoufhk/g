@@ -1,0 +1,61 @@
+# Gamma local dev stack
+#
+# Usage:
+#   make dev-up     # start the stack (waits for healthchecks)
+#   make dev-down   # stop the stack, keep volumes
+#   make dev-reset  # stop and destroy volumes (clean slate)
+#
+# Reference:
+#   docs/runbooks/dev-machine-bootstrap.md section 4.6
+#   EXECUTION_CHECKLIST.md section 3.1
+#   docs/decisions/ADR-001-tenancy.md (schema-per-tenant)
+
+name: gamma-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gamma-postgres
+    environment:
+      POSTGRES_USER: gamma
+      POSTGRES_PASSWORD: gamma_dev_password
+      POSTGRES_DB: gamma_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - gamma_postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gamma -d gamma_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: gamma-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - gamma_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: gamma-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+
+volumes:
+  gamma_postgres_data:
+    name: gamma_dev_postgres_data
+  gamma_redis_data:
+    name: gamma_dev_redis_data
