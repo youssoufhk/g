@@ -1,36 +1,49 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
     app_env: str = "dev"
-    app_secret_key: str = "change-me"
-
-    database_url: str = "postgresql+asyncpg://gammahr:gammahr@localhost:5432/gammahr"
-    redis_url: str = "redis://localhost:6379/0"
-
-    jwt_algorithm: str = "HS256"
-    jwt_access_ttl_minutes: int = 15
-    jwt_refresh_ttl_days: int = 7
-
-    anthropic_api_key: str = ""
-
-    s3_endpoint: str = ""
-    s3_bucket: str = "gammahr-dev"
-    s3_access_key: str = ""
-    s3_secret_key: str = ""
-    s3_region: str = "eu-west-3"
-
-    meili_url: str = "http://localhost:7700"
-    meili_master_key: str = ""
-
-    resend_api_key: str = ""
+    app_name: str = "gamma"
     log_level: str = "info"
 
-    cors_origins: list[str] = ["http://localhost:3000"]
+    database_url: str = (
+        "postgresql+asyncpg://gamma:gamma_dev_password@localhost:5432/gamma_dev"
+    )
+    redis_url: str = "redis://localhost:6379/0"
+
+    jwt_secret_key: str = "dev-only-not-a-real-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    jwt_access_ttl_seconds: int = 900
+    jwt_refresh_ttl_seconds: int = 2_592_000
+
+    cors_origins: list[str] = Field(
+        default_factory=lambda: [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ]
+    )
+
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    smtp_from: str = "noreply@gamma.local"
+
+    ai_backend: str = "mock"
+    blob_backend: str = "local"
+    email_backend: str = "mailhog"
+    ocr_backend: str = "mock"
+    telemetry_backend: str = "stdout"
+
+    local_blob_root: str = "./tmp/dev-blobs"
 
 
 @lru_cache
