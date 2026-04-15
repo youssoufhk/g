@@ -21,8 +21,9 @@ BACKEND_VENV := backend/.venv
         dev-up dev-down dev-reset dev-logs dev-ps dev-psql \
         dev-logs-backend dev-logs-frontend \
         dev-shell-backend dev-shell-frontend \
-        dev-migrate dev-test-backend dev-test-frontend \
+        dev-migrate dev-seed-demo dev-test-backend dev-test-frontend \
         backend-install-local backend-test-local backend-lint-local \
+        backend-seed-demo-local \
         mvp-up mvp-down mvp-reset \
         test lint
 
@@ -50,6 +51,7 @@ help:
 	@echo ""
 	@echo "  one-off backend ops (run inside backend container):"
 	@echo "    make dev-migrate        Run alembic upgrade head"
+	@echo "    make dev-seed-demo      Regenerate backend/fixtures/demo/*.csv (201 employees, 120 clients, 260 projects)"
 	@echo "    make dev-test-backend   Run pytest"
 	@echo "    make dev-test-frontend  Run vitest"
 	@echo ""
@@ -106,6 +108,9 @@ dev-shell-frontend:
 dev-migrate:
 	$(BACKEND_EXEC) alembic upgrade head
 
+dev-seed-demo:
+	$(BACKEND_EXEC) python -m scripts.generate_demo_seed
+
 dev-test-backend:
 	$(BACKEND_EXEC) pytest -q
 
@@ -124,6 +129,9 @@ backend-test-local:
 
 backend-lint-local:
 	$(BACKEND_VENV)/bin/ruff check backend/app backend/tests backend/migrations
+
+backend-seed-demo-local:
+	cd backend && ../$(BACKEND_VENV)/bin/python -m scripts.generate_demo_seed
 
 # ----- one-shot --------------------------------------------------------------
 mvp-up: dev-up dev-migrate

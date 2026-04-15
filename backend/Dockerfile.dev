@@ -12,12 +12,13 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    WATCHFILES_FORCE_POLLING=true
 
 # System deps:
-#   - build-essential, libpq-dev: native wheels for bcrypt, asyncpg
-#   - curl: healthcheck
-#   - libpango/cairo/gdk-pixbuf: WeasyPrint runtime deps (Phase 5a invoices)
+#   build-essential, libpq-dev -> native wheels for bcrypt, asyncpg
+#   curl                       -> healthcheck
+#   libpango/cairo/gdk-pixbuf  -> WeasyPrint runtime (Phase 5a invoices)
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
        build-essential \
@@ -32,9 +33,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Install deps in a layer that depends only on pyproject.toml. A minimal
-# app stub lets hatchling discover the package layout before the real
-# source is bind-mounted at runtime.
+# Install deps in a layer keyed on pyproject.toml. A minimal app stub lets
+# hatchling discover the package layout before real source bind-mounts at
+# runtime; the egg-info in site-packages then points at /app/app which is
+# replaced by host source.
 COPY pyproject.toml ./
 RUN mkdir -p app \
   && touch app/__init__.py \
@@ -43,7 +45,11 @@ RUN mkdir -p app \
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=5 \
-  CMD curl --fail --silent http://localhost:8000/health || exit 1
+# 120s start period accommodates slow WSL2 filesystem binds on first boot.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=120s --retries=6 \
+  CMD curl --fail --silent http://127.0.0.1:8000/health || exit 1
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app/app"]
+# --reload without --reload-dir lets uvicorn watch the default working
+# directory (/app). Watchfiles polls because the inotify events do not
+# cross the WSL2 bind-mount boundary reliably.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "info"]

@@ -12,6 +12,11 @@
 # port publishing is unreliable. Ports 8000 and 3000 are published for the
 # host browser to reach the backend API and Next.js dev server.
 #
+# Third-party note: every service here is self-hosted and free.
+#   postgres, redis       = official open-source
+#   mailpit               = MIT-licensed maintained Mailhog fork
+#   ollama (host-side)    = local LLM runtime, reached via host.docker.internal
+#
 # Reference:
 #   docs/runbooks/dev-machine-bootstrap.md section 4.6
 #   EXECUTION_CHECKLIST.md section 3.1
@@ -52,9 +57,15 @@ services:
       retries: 10
     restart: unless-stopped
 
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    container_name: gamma-mailhog
+  # Mailpit: maintained fork of Mailhog. Free, self-hosted, MIT license.
+  # Same ports (SMTP 1025, web UI 8025). Catches all outgoing mail from the
+  # backend for local inspection. Zero external traffic, zero cost.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: gamma-mailpit
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -71,13 +82,17 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    # host.docker.internal resolves to the host so the backend container
+    # can reach services running on the WSL/Linux host (Ollama at :11434).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       APP_ENV: dev
       APP_NAME: gamma
       LOG_LEVEL: info
       DATABASE_URL: postgresql+asyncpg://gamma:gamma_dev_password@postgres:5432/gamma_dev
       REDIS_URL: redis://redis:6379/0
-      SMTP_HOST: mailhog
+      SMTP_HOST: mailpit
       SMTP_PORT: "1025"
       SMTP_FROM: noreply@gamma.local
       JWT_SECRET_KEY: dev-only-not-a-real-secret-change-me
@@ -85,19 +100,24 @@ services:
       JWT_ACCESS_TTL_SECONDS: "900"
       JWT_REFRESH_TTL_SECONDS: "2592000"
       CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
-      AI_BACKEND: mock
+      AI_BACKEND: ollama
+      OLLAMA_HOST: http://host.docker.internal:11434
+      OLLAMA_MODEL: gemma3
       BLOB_BACKEND: local
-      EMAIL_BACKEND: mailhog
+      EMAIL_BACKEND: mailpit
       OCR_BACKEND: mock
       TELEMETRY_BACKEND: stdout
       LOCAL_BLOB_ROOT: /app/tmp/dev-blobs
+      # WSL2: uvicorn --reload uses watchfiles, which needs polling mode
+      # under Docker bind mounts because inotify events do not fire
+      # reliably across the WSL host boundary.
+      WATCHFILES_FORCE_POLLING: "true"
     ports:
       - "8000:8000"
     volumes:
-      # Hot-reload source from the host into /app. Anonymous volumes below
-      # shadow host files that should NOT be pulled into the container
-      # (Linux venv, Python caches).
       - ../../backend:/app
+      # Anonymous volumes shadow host state that would conflict with the
+      # container's own install (Linux venv, Python caches).
       - /app/.venv
       - /app/.mypy_cache
       - /app/.pytest_cache
@@ -111,16 +131,14 @@ services:
       dockerfile: Dockerfile.dev
     image: gamma-frontend-dev
     container_name: gamma-frontend
-    depends_on:
-      - backend
     environment:
       NEXT_PUBLIC_API_BASE: http://localhost:8000/api/v1
       NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "3000:3000"
     volumes:
-      # Hot-reload source from the host. Anonymous volumes shadow
-      # node_modules and .next so the container's install is authoritative.
       - ../../frontend:/app
       - /app/node_modules
       - /app/.next

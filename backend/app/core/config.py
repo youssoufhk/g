@@ -37,13 +37,23 @@ class Settings(BaseSettings):
     smtp_port: int = 1025
     smtp_from: str = "noreply@gamma.local"
 
-    ai_backend: str = "mock"
-    blob_backend: str = "local"
-    email_backend: str = "mailhog"
-    ocr_backend: str = "mock"
-    telemetry_backend: str = "stdout"
+    # Vendor wrapper selection. See backend/app/{ai,storage,email,...}/.
+    # Dev defaults use stubs or local-only backends; staging + prod flip via
+    # env vars at §16 Deploy Track.
+    ai_backend: str = "mock"          # mock | ollama | vertex
+    blob_backend: str = "local"       # local | gcs
+    email_backend: str = "mailpit"    # mailpit | workspace
+    ocr_backend: str = "mock"         # mock | gemini
+    telemetry_backend: str = "stdout" # stdout | cloudmonitoring
 
     local_blob_root: str = "./tmp/dev-blobs"
+
+    # Ollama (self-hosted LLM, default AI backend under dev).
+    # In Docker the backend container reaches the host's ollama via
+    # host.docker.internal. On the host directly, use localhost.
+    ollama_host: str = "http://host.docker.internal:11434"
+    ollama_model: str = "gemma3"
+    ollama_timeout_seconds: int = 120
 
 
 @lru_cache
