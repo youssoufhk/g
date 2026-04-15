@@ -11,16 +11,16 @@ Resolution order:
     3. no tenant (public endpoints: auth, health, meta)
 """
 
+import re
 from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
-import re
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.errors import TenantResolutionError
 
-_TENANT_SCHEMA_RE = re.compile(r"^t_[a-z0-9_]{1,48}$")
+_TENANT_SCHEMA_RE = re.compile(r"\At_[a-z0-9_]{1,48}\Z")
 _PUBLIC_PREFIXES: tuple[str, ...] = (
     "/health",
     "/api/v1/auth",

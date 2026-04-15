@@ -1,10 +1,10 @@
 """Blob storage wrapper (M1)."""
 
+import hashlib
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
-import hashlib
-import os
 
 
 @dataclass

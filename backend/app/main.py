@@ -24,7 +24,7 @@ from app.core.logging import configure_logging, get_logger
 from app.core.tenancy import TenancyMiddleware
 
 # Feature imports (side-effect: registers with feature_registry).
-from app.features.auth.routes import router as auth_router  # noqa: F401
+from app.features.auth.routes import router as auth_router
 
 logger = get_logger(__name__)
 

@@ -35,7 +35,7 @@ class UKTaxRule:
                     )
                 ],
             )
-        vat = int(round(subtotal_minor_units * 0.20))
+        vat = round(subtotal_minor_units * 0.20)
         return TaxComputation(
             subtotal_minor_units=subtotal_minor_units,
             lines=[TaxLine(name="VAT 20%", rate=Decimal("0.20"), amount_minor_units=vat)],
