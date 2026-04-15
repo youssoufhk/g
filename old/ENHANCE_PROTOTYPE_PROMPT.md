@@ -175,7 +175,7 @@ prototype/
 
 ## What Critics Must Focus On
 
-Critics must find things that are **BROKEN, WRONG, INCONSISTENT, or MISSING**. 
+Critics must find things that are **BROKEN, WRONG, INCONSISTENT, or MISSING**.
 
 ### What to flag
 - Dead buttons (no onclick handler)

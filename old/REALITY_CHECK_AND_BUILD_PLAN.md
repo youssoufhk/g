@@ -1,6 +1,6 @@
 # GammaHR v2 — Harsh Reality Check + Precise Build Plan
-**Assessment Date:** 2026-04-14  
-**Evaluator:** Claude Code (Senior Architect)  
+**Assessment Date:** 2026-04-14
+**Evaluator:** Claude Code (Senior Architect)
 **Context:** Solo founder, non-technical, 20h/week, using Claude Code as primary dev multiplier
 
 ---
@@ -22,7 +22,7 @@
 
 #### 1. **The Rust Learning Curve Is On Your Critical Path**
 
-**The Problem:**  
+**The Problem:**
 You've chosen Rust (Axum backend) as the production language. The agent can write correct Rust. The problem: when the agent produces a lifetime error, a trait bound mistake, a subtle async deadlock at scale, or a security vulnerability specific to memory safety, **can you review it?**
 
 Your answer today is "not deeply." This matters because:
@@ -30,7 +30,7 @@ Your answer today is "not deeply." This matters because:
 - You catch it in testing, but debugging it requires understanding Rust semantics deeply
 - You are now blocked for hours learning Rust internals to understand the agent's output
 
-**Reality:**  
+**Reality:**
 You cannot build a production Rust backend with a non-Rust founder reviewing every PR. You have three options:
 1. **Learn Rust deeply NOW** (costs 4-6 weeks of your 20h/week = 80-120 hours before you can review production code)
 2. **Switch to FastAPI/Python** (agent code is easier to review, ships 6-8 weeks faster, but you lose the "blazing fast" benefit and take on Python's runtime overhead)
@@ -44,7 +44,7 @@ You cannot build a production Rust backend with a non-Rust founder reviewing eve
 
 #### 2. **You Don't Have an ADR System**
 
-**The Problem:**  
+**The Problem:**
 Your AGENTIC_COMPANY_REALITY_CHECK.md correctly identifies "Context Collapse" as critical risk #1. The mitigation is ADRs (Architecture Decision Records). You don't have them.
 
 What will happen:
@@ -53,7 +53,7 @@ What will happen:
 - They conflict, you find out in integration testing, now you have to rework both
 - Or worse: they don't conflict, but the design is inconsistent and fragile
 
-**Reality:**  
+**Reality:**
 Without ADRs, your agents are amnesiac. Each one makes decisions in a vacuum. The codebase will accumulate contradictory patterns.
 
 **Action required:** Before Phase 2 begins, create `docs/decisions/` folder and write ADRs for:
@@ -70,7 +70,7 @@ Each ADR should be 1 page: Decision + Why + Trade-offs. Agents must read relevan
 
 #### 3. **The Spec Depth Is Insufficient for Agents**
 
-**The Problem:**  
+**The Problem:**
 Your APP_BLUEPRINT.md is 1,973 lines. It's good. But it's not enough for agents to implement without constant clarification. Sections like "Gantt Chart with advanced filtering" need 10x more detail:
 
 - What are the 10+ filter dimensions mentioned in MASTER_PLAN?
@@ -81,7 +81,7 @@ Your APP_BLUEPRINT.md is 1,973 lines. It's good. But it's not enough for agents 
 
 Right now, the agent implementing Gantt will guess. Some guesses will be wrong. You'll catch them in review, and the agent will have to rewrite it.
 
-**Reality:**  
+**Reality:**
 You need to expand APP_BLUEPRINT.md sections to 2-3x current length, OR be prepared for agents to ask clarification questions during implementation (which costs context window and time).
 
 **Action required:** Before assigning the Gantt chart agent, expand that section with:
@@ -97,7 +97,7 @@ This applies to every complex module.
 
 #### 4. **20h/Week Is Extremely Tight for Solo + Agents**
 
-**The Problem:**  
+**The Problem:**
 Your timeline estimate says 8-10 months to production. Let's be honest about what that means:
 
 **Week budget breakdown:**
@@ -116,10 +116,10 @@ Reality:
 
 You have zero hours of slack. One bad week and you're 2 weeks behind.
 
-**Assessment:**  
+**Assessment:**
 With perfect discipline and perfect agent output, 8-10 months is realistic. With one moderately bad incident or one major spec misunderstanding, you slip to 12+ months.
 
-**Action required:**  
+**Action required:**
 1. Build in 2-month buffer (aim for 6 months, accept 8 as success)
 2. Identify what you'll cut if you hit timeline pressure (3D visualizations? Advanced Gantt filters? Client portal in phase 1?)
 3. Plan for 1-2 weeks of "unplanned incident response" built into the timeline
@@ -128,7 +128,7 @@ With perfect discipline and perfect agent output, 8-10 months is realistic. With
 
 #### 5. **The Mobile Spec Exists But Implementation Will Be Hard**
 
-**The Problem:**  
+**The Problem:**
 Your memory says "Mobile-first is CRITICAL" and "use `md:hidden` cards + `hidden md:block` tables pattern." The prototype DOES this. But the implementation is not trivial:
 
 - Every table page (employees, timesheets, expenses, projects) needs dual implementations
@@ -138,17 +138,17 @@ Your memory says "Mobile-first is CRITICAL" and "use `md:hidden` cards + `hidden
 
 Your agents will likely build the desktop version first and retrofit mobile. This is backward. You need mobile-first implementation, which means building the card views first, then adding table views for larger screens.
 
-**Assessment:**  
+**Assessment:**
 Mobile will take 15-20% of frontend effort. Budget accordingly.
 
-**Action required:**  
+**Action required:**
 Explicit instruction to Frontend Developer: "Mobile-first means card views are primary implementation. Implement cards, test at 390px, then add table views for md+ screens. Use Tailwind's `md:` breakpoint consistently."
 
 ---
 
 #### 6. **AI Features Are Specced But Not Architected**
 
-**The Problem:**  
+**The Problem:**
 MASTER_PLAN mentions:
 - Expense categorization via Claude API
 - Smart insights (anomaly detection, etc.)
@@ -167,10 +167,10 @@ These are specced at a 2-sentence level. Implementing them requires:
 - What counts as an anomaly? (spending 2x usual? missing hours? overtime spike?)
 - False positive rate — if you flag 5 anomalies and 3 are irrelevant, users will ignore them
 
-**Assessment:**  
+**Assessment:**
 AI features require their own phase of spec-writing before implementation. You can't hand an agent a 3-sentence requirement and get a good feature.
 
-**Action required:**  
+**Action required:**
 Create `specs/AI_FEATURES.md` detailing:
 - Expense categorization flow (OCR → Claude → confidence → UI)
 - Insights algorithm (what metrics? what triggers an alert? how often?)
@@ -184,7 +184,7 @@ Without this, you'll ship something that feels half-baked.
 
 #### 7. **Security Auditing Is Your Job, Not the Agent's**
 
-**The Problem:**  
+**The Problem:**
 Multi-tenant SaaS with employee and financial data has a high security bar. The agent can implement RBAC. The agent can write auth endpoints. But the agent cannot:
 
 - Spot IDOR vulnerabilities (employee A requesting `/api/employees/{B_id}` and seeing B's data)
@@ -196,14 +196,14 @@ Multi-tenant SaaS with employee and financial data has a high security bar. The 
 
 Your AGENTIC_COMPANY_REALITY_CHECK.md says: "agents will confidently produce wrong answers without flagging uncertainty." This is true for security.
 
-**Assessment:**  
+**Assessment:**
 You need to schedule a mandatory security review phase before any production data touches the system. Budget 1-2 weeks of your time in the timeline for:
 - Manual code review of auth, RBAC, and data access layers
 - Threat modeling exercise (what if a malicious PM tries to assign all billing to themselves?)
 - Penetration testing (basic — IDOR, SQL injection, privilege escalation)
 - SSL/TLS, secret management, API rate limiting review
 
-**Action required:**  
+**Action required:**
 Add "Security Hardening Sprint" (week 20-22 in your timeline) with explicit checklist:
 - [ ] Tenant isolation confirmed (cross-tenant data leak impossible)
 - [ ] IDOR impossible (all resource access checks tenant + user permissions)
@@ -218,7 +218,7 @@ Add "Security Hardening Sprint" (week 20-22 in your timeline) with explicit chec
 
 #### 8. **The Prototype Sets a Very High Visual Bar**
 
-**The Problem:**  
+**The Problem:**
 Your prototype is GORGEOUS. The design is polished, the interactions are smooth, the color palette is carefully chosen. The CSS is intricate (glassmorphism, perspective depth, subtle shadows, careful spacing).
 
 When you ship the Next.js frontend with Tailwind CSS, **it MUST look exactly like the prototype**, or your non-technical founder brain will say "this doesn't feel right."
@@ -229,10 +229,10 @@ Reality: There is a 20% chance your agents build it exactly right on the first p
 - Build the responsive behavior differently than the prototype
 - Forget to implement a CSS detail (like the specific shadow on hover cards)
 
-**Assessment:**  
+**Assessment:**
 Design QA will be a significant time sink. You'll spot things that "feel off" and need to be fixed. Budget 15-20% of frontend time for visual polish.
 
-**Action required:**  
+**Action required:**
 Create a "Visual QA Checklist" that Frontend Developer runs through before marking a page complete:
 - [ ] Spacing matches prototype (use browser dev tools to measure)
 - [ ] Colors match `_tokens.css` values exactly
@@ -279,7 +279,7 @@ NO feature ships without security audit + visual QA.
 ---
 
 ### Pre-Phase 2: Foundation Work (Week 0-2)
-**Your effort:** 8-10 hours/week  
+**Your effort:** 8-10 hours/week
 **Agent effort:** 4-6 hours/week
 
 #### Week 0: Decisions & ADRs
@@ -288,7 +288,7 @@ NO feature ships without security audit + visual QA.
 1. **Decide on Rust vs. FastAPI** (1 hour)
    - If Rust: commit to 6 weeks of learning (8-10h/week)
    - If FastAPI: update MASTER_PLAN.md tech stack + timeline (-6 weeks)
-   
+
 2. **Write core ADRs** (3 hours with agent help)
    - ADR-001: Multi-tenancy (schema-per-tenant, why not row-level)
    - ADR-002: Auth (JWT + WebAuthn, why not sessions)
@@ -342,7 +342,7 @@ NO feature ships without security audit + visual QA.
 ---
 
 ### Phase 2a: Backend Foundation (Week 3-6, ~4 weeks)
-**Your effort:** 8-10 hours/week (learn Rust + review PRs)  
+**Your effort:** 8-10 hours/week (learn Rust + review PRs)
 **Agent effort:** 30-40 hours/week (backend + DB)
 
 #### Week 3: Scaffolding + Auth
@@ -455,7 +455,7 @@ NO feature ships without security audit + visual QA.
 ---
 
 ### Phase 2b: Core Frontend + API Integration (Week 7-12, ~6 weeks)
-**Your effort:** 8-10 hours/week (review + design QA)  
+**Your effort:** 8-10 hours/week (review + design QA)
 **Agent effort:** 40 hours/week (frontend + API integration)
 
 #### Week 7: Frontend Scaffolding + Design System
@@ -632,7 +632,7 @@ NO feature ships without security audit + visual QA.
 ---
 
 ### Phase 2c: Advanced Features + Polish (Week 13-18, ~6 weeks)
-**Your effort:** 8-10 hours/week (review + security audit)  
+**Your effort:** 8-10 hours/week (review + security audit)
 **Agent effort:** 40 hours/week
 
 #### Week 13: Gantt advanced + Planning page
@@ -721,7 +721,7 @@ NO feature ships without security audit + visual QA.
 **Backend Developer + Frontend Developer agents (coordinated):**
 
 1. **Week 16: Expense OCR + Insights**
-   
+
    **Backend:**
    - [ ] OCR pipeline (image → text extraction)
    - [ ] Claude API integration for expense categorization
@@ -730,7 +730,7 @@ NO feature ships without security audit + visual QA.
    - [ ] Insights endpoint (anomalies, trends, forecasts)
    - [ ] Tests for OCR flow, API error handling
    - **Deliverable:** OCR works end-to-end, confidence scoring visible, insights available via API
-   
+
    **Frontend:**
    - [ ] Upload to OCR trigger (user uploads image → backend processes → confidence displayed)
    - [ ] Accept/reject Claude suggestion
@@ -847,7 +847,7 @@ NO feature ships without security audit + visual QA.
 ---
 
 ### Phase 3: Launch Prep (Week 19-22, ~4 weeks)
-**Your effort:** 10-12 hours/week (customer comms, testing, bug fixes)  
+**Your effort:** 10-12 hours/week (customer comms, testing, bug fixes)
 **Agent effort:** 20-30 hours/week (final polish, docs)
 
 #### Week 19: Beta Testing + Documentation
@@ -1070,19 +1070,19 @@ Before starting Phase 2, lock down these mitigations:
 
 ## Summary: Build It This Way
 
-**Phase 0 (Done):** Prototype + specs complete  
-**Phase 1 (2 weeks):** Decisions + ADRs + expanded specs locked  
-**Phase 2a (4 weeks):** Rust backend (auth, CRUD, leaves, timesheets/expenses)  
-**Phase 2b (6 weeks):** React frontend (auth, dashboard, all pages, API integration)  
-**Phase 2c (6 weeks):** Advanced features (Gantt drag, planning, portal, admin, AI, real-time)  
-**Phase 3 (4 weeks):** Launch prep (beta testing, documentation, production hardening)  
+**Phase 0 (Done):** Prototype + specs complete
+**Phase 1 (2 weeks):** Decisions + ADRs + expanded specs locked
+**Phase 2a (4 weeks):** Rust backend (auth, CRUD, leaves, timesheets/expenses)
+**Phase 2b (6 weeks):** React frontend (auth, dashboard, all pages, API integration)
+**Phase 2c (6 weeks):** Advanced features (Gantt drag, planning, portal, admin, AI, real-time)
+**Phase 3 (4 weeks):** Launch prep (beta testing, documentation, production hardening)
 
-**Total:** 22 weeks = ~5.5 months if perfect  
+**Total:** 22 weeks = ~5.5 months if perfect
 **Realistic:** 26-28 weeks = 6-7 months with incident buffer
 
-**Your effort:** 20h/week consistently (learn, review, decide, unblock)  
-**Agent effort:** 30-40h/week (code, test, integrate)  
-**Cost:** $0 (agents are Claude) + infrastructure + Anthropic API  
+**Your effort:** 20h/week consistently (learn, review, decide, unblock)
+**Agent effort:** 30-40h/week (code, test, integrate)
+**Cost:** $0 (agents are Claude) + infrastructure + Anthropic API
 
 **Success criteria:**
 - ✓ Ship production-ready SaaS in 6-7 months as solo founder

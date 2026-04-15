@@ -124,7 +124,7 @@ The product owner explicitly hates stacked full-width cards for list items that 
 ## UI16 — Too much text on multiple pages causes anxiety
 **Systemic — affects index.html, approvals.html, admin.html, insights.html, hr.html, planning.html**
 
-Verbose multi-sentence descriptions, long tooltips, dense settings labels, and walls of explanatory text make pages feel overwhelming rather than calm. 
+Verbose multi-sentence descriptions, long tooltips, dense settings labels, and walls of explanatory text make pages feel overwhelming rather than calm.
 
 **Rule:** Maximum 1 sentence per item. If something needs explanation, it goes in a tooltip or collapsed detail, not on the page surface. The visible page surface must show only the minimum needed to act.
 
