@@ -18,7 +18,10 @@ RUN npm install --loglevel=error
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
-  CMD wget -q --spider http://localhost:3000 || exit 1
+# Node-based healthcheck: uses the built-in http module (always present)
+# instead of busybox wget. 180s start period accommodates Next.js's cold
+# compile on first boot under a WSL2 bind mount.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=180s --retries=10 \
+  CMD node -e "require('http').get('http://127.0.0.1:3000', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))" || exit 1
 
 CMD ["npm", "run", "dev"]

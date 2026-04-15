@@ -1,7 +1,28 @@
+import json
 from functools import lru_cache
+from typing import Annotated, Any
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BeforeValidator, Field
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+
+def _split_cors_origins(value: Any) -> Any:
+    """Accept CORS_ORIGINS as a comma-separated string, a JSON array, or a list.
+
+    Pydantic-settings v2 tries ``json.loads()`` on any env var destined for a
+    list field, which blows up on ``http://a,http://b``. Combining
+    ``NoDecode`` (skip the JSON parse) with this ``BeforeValidator`` lets us
+    accept any of: a bare URL, a comma-separated list, a JSON array, or a
+    Python list. Keeps compose files and .env files readable.
+    """
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return []
+        if stripped.startswith("["):
+            return json.loads(stripped)
+        return [item.strip() for item in stripped.split(",") if item.strip()]
+    return value
 
 
 class Settings(BaseSettings):
@@ -26,7 +47,7 @@ class Settings(BaseSettings):
     jwt_access_ttl_seconds: int = 900
     jwt_refresh_ttl_seconds: int = 2_592_000
 
-    cors_origins: list[str] = Field(
+    cors_origins: Annotated[list[str], NoDecode, BeforeValidator(_split_cors_origins)] = Field(
         default_factory=lambda: [
             "http://localhost:3000",
             "http://127.0.0.1:3000",
@@ -39,7 +60,7 @@ class Settings(BaseSettings):
 
     # Vendor wrapper selection. See backend/app/{ai,storage,email,...}/.
     # Dev defaults use stubs or local-only backends; staging + prod flip via
-    # env vars at §16 Deploy Track.
+    # env vars at section 16 Deploy Track.
     ai_backend: str = "mock"          # mock | ollama | vertex
     blob_backend: str = "local"       # local | gcs
     email_backend: str = "mailpit"    # mailpit | workspace
