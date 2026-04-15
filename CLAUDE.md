@@ -32,6 +32,7 @@ Break any of these and your work gets reverted.
 10. **Never skip CI, skip hooks, or pass `--no-verify`.** Fix the underlying issue.
 11. **Never invent API endpoints or data contracts.** If the spec is silent, ask.
 12. **Never batch more than 3 subagents at once.** Rate limits matter.
+13. **Never invoke these global skills in GammaHR work:** `frontend-design`, `brand-guidelines`, `theme-factory`, `canvas-design`, `algorithmic-art`. They promote creative, maximalist, novel aesthetics. GammaHR has a locked design system; these skills would actively break the brand. If one of them appears to match a task, prefer the project-scoped skills in `.claude/skills/` (e.g., `build-page`, `run-flawless-gate`) instead.
 
 ---
 
