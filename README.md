@@ -4,26 +4,29 @@ Premium operations platform for consulting firms with 50 to 500 employees. Categ
 
 **Stack:** Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Vertex AI Gemini (LLM-as-router pattern) for AI. Hosted on GCP `europe-west9` + Cloudflare + GitHub.
 
-**Status:** Phase 2 foundation build in progress. The backend skeleton, vendor wrappers (M1), multi-country scaffolding, frontend shell, 20 atoms, testing infrastructure, and operator console minimum are in. Next: Phase 3 auth and onboarding. Execution is tracked in [`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md).
+**Status:** Phase 2 foundation build is DONE (2026-04-15). Backend skeleton, vendor wrappers M1, multi-country scaffolding, frontend shell, 20 atoms, testing infrastructure, and operator console minimum are all shipped locally. Next: Phase 3a onboarding critical path (JWT tenancy wiring, CSV import + AI column mapper, password + Google OIDC login). Execution is tracked in [`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md). The agent path is Phase 3a -> Phase 4 -> Phase 5a then a hard stop at the MVP acceptance test (`EXECUTION_CHECKLIST.md` §6.2).
 
-### Quick dev loop
+### Quick dev loop (MVP track)
 
 ```bash
-# One-time: bootstrap the machine (installs Python 3.12, pre-commit, gamma-ops, gcloud, Docker)
+# 1. One-time: bootstrap the machine (Python 3.12, pre-commit, Docker, Node 22, gamma-ops)
 bash scripts/setup/bootstrap-dev.sh
-# If the script just added you to the docker group, run: newgrp docker
 
-# Start the local stack (Postgres 16, Redis 7, Mailhog)
-make dev-up
+# 2. Enable the docker group in the current shell
+newgrp docker        # or logout+login; verify with: docker ps
 
-# Run the backend tests (45 passing)
-cd backend && python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/pytest -q
+# 3. Bring the MVP stack up in one shot:
+#    dev-up + backend-install + alembic upgrade head + dev tenant seed + frontend-install
+make mvp-up
 
-# Run the frontend
-cd frontend && npm install && npm run dev
-# Browse http://localhost:3000/en/dashboard
+# 4. Run the services (two terminals)
+make backend-run     # FastAPI at http://localhost:8000
+make frontend-dev    # Next.js at http://localhost:3000
+
+# Open http://localhost:3000/en and start building.
 ```
+
+**GCP deployment is deferred.** The MVP runs entirely locally. Deployment lives in `EXECUTION_CHECKLIST.md` §16 Deploy Track and is founder-triggered after the MVP demo loop works.
 
 See `docs/runbooks/dev-machine-bootstrap.md` for the full walkthrough.
 

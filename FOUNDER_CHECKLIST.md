@@ -113,7 +113,23 @@ Template already exists at `docs/founder/runway.md`. Zero-salary POC mode is loc
 - [ ] What tool would they replace if Gamma did the job? (reveals competitive set and willingness to pay)
 - [ ] If Gamma saved them 4 hours per month, what would that be worth to them? (reveals pricing anchor)
 
-### 4.4 Friday log template (copy into each weekly file)
+### 4.4 Early GTM content (absorbed from the old §3.9)
+
+These are the low-cost, high-signal artifacts you should produce in parallel with the agent's MVP build. Each unblocks a conversation with a prospect. None of them is on the critical path for the agent.
+
+- [ ] Blog post #1: "The 10-hour month-end close problem in consulting firms" (1000 words, publish on your own domain or LinkedIn)
+- [ ] Blog post #2: "Why Kantata is still winning (and how we will change that)" (positioning piece)
+- [ ] Blog post #3: "Agentic AI for consulting ops: drafts, not decisions" (differentiation piece)
+- [ ] Landing page placeholder (Framer or Next.js) with an email-capture form + a 3-minute founder video. No pricing, no feature list, just the tagline and one call-to-action.
+- [ ] Record the 3-minute founder intro video: raw, authentic, shot in one take. No agency.
+- [ ] LinkedIn presence: 2 posts per week on consulting ops pain, starting from day 1. Build the audience before the product exists.
+- [ ] Set up `support@<domain>` and `hello@<domain>` inboxes once you have a domain
+- [ ] Email list on MailerLite or Buttondown free tier (newsletter sign-ups from the landing page)
+- [ ] Target 10 discovery calls completed by week 13 (Phase 3 exit, if you follow the plan), 30+ by week 20 (validated-lead gate)
+
+**Budget:** ~4 hours per week across all of §4. Less than half a day of founder time should produce the first blog post + landing page + video + 10 LinkedIn posts by end of week 8. The agent never touches any of this.
+
+### 4.5 Friday log template (copy into each weekly file)
 
 ```markdown
 # Weekly log YYYY-MM-DD
