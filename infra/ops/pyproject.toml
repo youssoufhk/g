@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gamma-ops"
+version = "0.1.0"
+description = "Gamma operations library: deterministic, idempotent wrappers around GCP, Cloudflare, and tenant operations."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+authors = [
+    { name = "Gamma Founders", email = "ops@gammahr.com" },
+]
+
+dependencies = [
+    "click>=8.1,<9",
+    "pydantic>=2.5,<3",
+    "pydantic-settings>=2.1,<3",
+    "structlog>=23.2,<25",
+    "httpx>=0.27,<1",
+    "google-cloud-resource-manager>=1.12,<2",
+    "google-cloud-storage>=2.14,<3",
+    "google-cloud-kms>=2.21,<3",
+    "google-cloud-secret-manager>=2.18,<3",
+    "google-cloud-billing>=1.12,<2",
+    "google-cloud-run>=0.10,<1",
+    "google-cloud-monitoring>=2.19,<3",
+    "google-cloud-scheduler>=2.13,<3",
+    "google-cloud-pubsub>=2.21,<3",
+    "google-cloud-iam>=2.14,<3",
+    "google-api-python-client>=2.120,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "pytest-mock>=3.12,<4",
+    "pytest-asyncio>=0.23,<1",
+    "mypy>=1.9,<2",
+    "ruff>=0.3,<1",
+]
+
+[project.scripts]
+gamma-ops = "gamma_ops.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["gamma_ops*"]
+exclude = ["tests*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+warn_unused_ignores = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]

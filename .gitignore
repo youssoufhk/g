@@ -1,50 +1,206 @@
-# OS + editor
-.DS_Store
-Thumbs.db
-.idea
-.vscode
-*.swp
-*.swo
+# ==============================================================================
+# Gamma .gitignore
+#
+# Hard rule from docs/runbooks/secrets-management.md §1: never commit anything
+# sensitive. This file is the last line of defense before the gitleaks
+# pre-commit hook in .pre-commit-config.yaml. Both must be working.
+#
+# If you need to commit a template, name it .env.example / .env.template /
+# .env.sample. Those are explicitly un-ignored below.
+# ==============================================================================
 
-# Secrets + local env
+
+# ------------------------------------------------------------------------------
+# 1. Secrets, credentials, keys (HARD RULE: never commit)
+# ------------------------------------------------------------------------------
+
+# Environment files (may contain DB passwords, API tokens, etc.)
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!.env.template
+!.env.sample
+
+# GCP credentials. NEVER commit service account JSON files.
+# The app uses Application Default Credentials locally and Workload Identity
+# Federation in CI. See docs/runbooks/secrets-management.md §2.
+service-account*.json
+service_account*.json
+gcp-credentials*.json
+gcp_credentials*.json
+gcp-*.json
+google-credentials*.json
+google_credentials*.json
+application_default_credentials.json
+adc.json
+gcloud-*.json
+
+# AWS credentials
+.aws/
+aws-credentials*
+credentials.csv
+
+# Azure credentials
+.azure/
+azure-credentials*
+
+# Kubernetes configs
+kubeconfig
+.kube/
+*.kubeconfig
+
+# Firebase
+firebase-debug.log
+firebase-adminsdk*.json
+
+# SSH keys (private and public)
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+id_ecdsa
+id_ecdsa.*
+id_dsa
+id_dsa.*
+*.pub
+known_hosts
+authorized_keys
+
+# TLS certificates and private keys
 *.pem
 *.key
+*.p12
+*.pfx
+*.keystore
+*.jks
 
-# Build output
-dist
-build
-out
-coverage
-*.log
+# Terraform and IaC state (contains secrets in plaintext)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.auto.tfvars
 
-# Node
-node_modules
-.next
-.turbo
-storybook-static
-playwright-report
-test-results
+# Pulumi state
+Pulumi.*.yaml
+!Pulumi.yaml
+
+# Claude Code local settings (may contain personal API keys, MCP tokens)
+.claude/settings.local.json
+.claude/.local/
+.claude/*.local.json
+
+
+# ------------------------------------------------------------------------------
+# 2. Sensitive data (customer PII, incident reports, real data)
+# ------------------------------------------------------------------------------
+
+# Incident reports commonly contain customer-identifiable information.
+# Commit only the README and the template; the dated reports stay local.
+docs/incidents/20*.md
+docs/incidents/churn/*.md
+docs/incidents/drills/*.md
+!docs/incidents/README.md
+!docs/incidents/TEMPLATE.md
+!docs/incidents/template.md
+
+# Customer data samples (never commit real customer data)
+customer-data/
+real-data/
+pii-samples/
+fixtures/real-*
+fixtures/production-*
+fixtures/prod-*
+
+# Database dumps and backups (may contain PII)
+*.dump
+*.bak
+*.backup
+*.old
+*.sql.gz
+db-dump-*
+backup-*.tar.gz
+
+
+# ------------------------------------------------------------------------------
+# 3. OS and editor
+# ------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*~
+.*.sw[a-p]
+
+
+# ------------------------------------------------------------------------------
+# 4. Python
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg
+*.egg-info/
+.venv/
+venv/
+env/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+pip-log.txt
+pip-delete-this-directory.txt
+
+
+# ------------------------------------------------------------------------------
+# 5. Node, Next.js, frontend tooling
+# ------------------------------------------------------------------------------
+node_modules/
+.next/
+.turbo/
+.pnp.*
+.yarn/install-state.gz
+storybook-static/
+playwright-report/
+test-results/
 *.tsbuildinfo
 next-env.d.ts
+.nyc_output/
 
-# Python
-__pycache__
-*.pyc
-*.pyo
-*.egg-info
-.venv
-venv
-env
-.mypy_cache
-.ruff_cache
-.pytest_cache
-.coverage
-htmlcov
 
-# Databases
+# ------------------------------------------------------------------------------
+# 6. Build output
+# ------------------------------------------------------------------------------
+dist/
+build/
+out/
+coverage/
+*.log
+logs/
+
+
+# ------------------------------------------------------------------------------
+# 7. Local databases (dev)
+# ------------------------------------------------------------------------------
 *.db
+*.sqlite
 *.sqlite3
-*.dump
+*.sqlite3-journal
+
+
+# ------------------------------------------------------------------------------
+# 8. Founder scratch files (local drafts, not for commit)
+# ------------------------------------------------------------------------------
+scratch/
+.scratch/
+TODO.local.md
+NOTES.local.md
+*.scratch.md

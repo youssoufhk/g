@@ -52,8 +52,11 @@ Every feature merge goes through these ten steps in order. Do not skip steps, do
 ### 1.3 Skills to use and skills to NEVER use
 
 **Project-scoped skills (use freely):**
-- `.claude/skills/build-page/SKILL.md` - building or scaffolding a page from `specs/APP_BLUEPRINT.md`
-- `.claude/skills/run-flawless-gate/SKILL.md` - verifying a page or feature against the 15-item quality gate
+- `/build-page` (`.claude/skills/build-page/SKILL.md`) - building or scaffolding a page from `specs/APP_BLUEPRINT.md`
+- `/run-flawless-gate` (`.claude/skills/run-flawless-gate/SKILL.md`) - verifying a page or feature against the 15-item quality gate
+- `/scaffold-atom` (`.claude/skills/scaffold-atom/SKILL.md`) - creating a new Gamma design-system atom with tokens, Storybook story, dark/light variants, WCAG checks. Used 20+ times in the Phase 2 atom layer.
+- `/scaffold-feature` (`.claude/skills/scaffold-feature/SKILL.md`) - scaffolding a new backend feature module (routes + schemas + service + models + tasks + ai_tools + tests + matching frontend folder) enforcing M1-M10. Used 11+ times in Phase 5.
+- `/scaffold-e2e-scenario` (`.claude/skills/scaffold-e2e-scenario/SKILL.md`) - creating a new Playwright end-to-end scenario from the `docs/TESTING_STRATEGY.md` inventory, with real database assertions. Target 45 scenarios by v1.0 launch.
 
 **Forbidden skills (from CLAUDE.md rule 13):** NEVER invoke these even if they appear to match the task.
 - `frontend-design` - promotes creative, maximalist aesthetics that break the locked design system
@@ -120,6 +123,7 @@ One day of founder alignment. Do this before touching the keyboard.
 - [ ] 🤝 Read CLAUDE.md together, line by line, confirm both founders understand all hard rules
 - [ ] 🤝 Read this checklist together, confirm division of labor (founder 🧑 = product + design + frontend; co-founder 👥 = backend + infra + AI; 🤝 = both join)
 - [ ] 🤝 Pin co-founder commitment in writing: minimum 32 hours per week each, 4-year vesting, 1-year cliff, IP assignment to Global Gamma Ltd, exit clause. Signed before first commit of code.
+- [ ] 🤝 Install pre-commit hooks: `pipx install pre-commit && cd <repo> && pre-commit install`. Required before any code commit. Blocks em dashes, "utilisation", committed secrets via gitleaks. See `docs/runbooks/secrets-management.md` §9.
 - [ ] 🤝 Set up weekly Monday 09:00 planning meeting (30 minutes) using this checklist as the agenda
 - [ ] 🤝 Set up weekly Friday 17:00 demo + retro meeting (45 minutes)
 - [ ] 🤝 Agree on emergency contact protocol: what to do if one founder is unavailable for >48 hours
@@ -140,23 +144,31 @@ The biggest phase. Lots of parallelizable work. Two full-time founders can finis
 
 ### 3.1 Environment and infrastructure
 
-- [ ] 👥 Create GCP project `gamma-prod` in org
-- [ ] 👥 Create GCP project `gamma-staging`
-- [ ] 👥 Configure billing alerts at 50%, 80%, 100% of monthly budget
-- [ ] 👥 Provision Cloud SQL Postgres 16 Regional HA in `europe-west9` (both environments)
-- [ ] 👥 Configure Cloud Run services: `gamma-ops`, `gamma-app`, `gamma-portal`, `gamma-worker` with `min_instances=1` in prod, `min_instances=0` in staging
-- [ ] 👥 Configure Cloud Storage buckets with per-tenant CMEK via KMS
-- [ ] 👥 Configure legal-hold bucket with retention policy lock (for future `docs/LEGAL_HOLD_RUNBOOK.md`)
-- [ ] 👥 Set up GCP Secret Manager + IAM for service accounts
-- [ ] 👥 Configure VPC + Cloud SQL private IP
-- [ ] 👥 Configure Cloudflare DNS for `*.gamma.[final-domain]`
-- [ ] 👥 Configure Cloudflare WAF + Access + DDoS
+> **Run via `docs/runbooks/gcp-bootstrap.md`.** Every step below has an exact command in the runbook, using the `gamma-ops` Python CLI from `infra/ops/` where the function is implemented, and a gcloud fallback marked [STUB] where it is not. Run the runbook once for staging, then once for prod. Install the ops library first per `infra/ops/README.md`.
+
+- [ ] 👥 Install `infra/ops/` library: `cd infra/ops && make install && source .venv/bin/activate`
+- [ ] 👥 Verify `gamma-ops --help` lists the command groups
+- [ ] 👥 Create GCP project `gamma-staging-001` via `gamma-ops gcp projects create`
+- [ ] 👥 Create GCP project `gamma-prod-001` via `gamma-ops gcp projects create`
+- [ ] 👥 Enable APIs via `gamma-ops gcp projects enable-apis` (sqladmin, run, storage, kms, secretmanager, aiplatform, pubsub, cloudscheduler, monitoring, logging, iamcredentials)
+- [ ] 👥 Link billing account via `gamma-ops gcp projects link-billing`
+- [ ] 👥 Configure Workload Identity Federation for GitHub Actions to GCP (no service account JSON files). See `docs/runbooks/secrets-management.md` §4.
+- [ ] 👥 Configure GCP billing alerts at 50%, 80%, 100% (console, one-time)
+- [ ] 👥 Create KMS keyring `gamma-tenant-keys` via `gamma-ops gcp kms create-keyring`
+- [ ] 👥 Create platform CryptoKey `gamma-platform-key` with 365-day rotation via `gamma-ops gcp kms create-key`
+- [ ] 👥 Create 4 GCS buckets (uploads, backups, legal-hold, static) with CMEK via `gamma-ops gcp storage create-bucket`
+- [ ] 👥 Apply retention policy LOCK to the legal-hold bucket (run once, cannot be undone)
+- [ ] 👥 Provision Cloud SQL Postgres 16 Regional HA (gcloud [STUB], tracked in `gamma_ops/gcp/cloudsql.py`)
+- [ ] 👥 Create DB password + JWT signing key + Vertex API key in Secret Manager via `gamma-ops gcp secrets create`
+- [ ] 👥 Configure Cloud Run services (ops, app, portal, worker) with `min_instances=1` prod, `0` staging (gcloud [STUB] until `gamma_ops/gcp/cloudrun.py` lands)
+- [ ] 👥 Configure VPC connector for Cloud Run to Cloud SQL private IP
+- [ ] 👥 Configure Cloudflare DNS + WAF + Access via `docs/runbooks/cloudflare-bootstrap.md`
 - [ ] 👥 Set up GitHub repo with branch protection on `main`
 - [ ] 👥 Set up GitHub Actions CI pipelines (stub, filled in as we add layers)
 - [ ] 👥 Set up Cloud Monitoring dashboards with multi-region labels (A9)
 - [ ] 👥 Set up Cloud Logging with per-service log routing
 
-**Reference:** `docs/decisions/ADR-001-tenancy.md`, `docs/decisions/ADR-008-deployment.md`, `THE_PLAN.md` Phase 2 task list
+**Reference:** `docs/runbooks/gcp-bootstrap.md` (the procedure), `docs/runbooks/cloudflare-bootstrap.md`, `infra/ops/README.md` (the operation catalog), `docs/decisions/ADR-001-tenancy.md`, `docs/decisions/ADR-008-deployment.md`
 
 ### 3.2 Backend skeleton
 
@@ -676,7 +688,77 @@ This checklist deliberately does NOT repeat content from the specs. When you nee
 
 ---
 
-## 16. Final word
+## 17. Operations automation (`infra/ops/`)
+
+Every manual vendor operation (GCP, Cloudflare, tenants, database, testing) lives as a deterministic idempotent Python function in `infra/ops/gamma_ops/`. Skills, agents, and humans all call these functions instead of re-typing SDK calls or gcloud commands. The founder never learns gcloud; the founder runs `gamma-ops <group> <command>` and the library handles idempotency, logging, and error mapping.
+
+### 17.1 Install once per machine
+
+```
+cd infra/ops
+make install
+source .venv/bin/activate
+gamma-ops --help
+```
+
+Auth via Google Application Default Credentials: `gcloud auth application-default login`. Config via `.env` at `infra/ops/.env` (template: `.env.example`).
+
+### 17.2 The operation catalog
+
+The full catalog of ~80 operations (implemented, stub, planned) lives in `infra/ops/README.md`. Read it end to end once. Status markers:
+- **Implemented:** working code, unit-tested, ready to run. Week 1 has: `gcp projects`, `gcp storage`, `gcp kms`, `gcp secrets`.
+- **Stub:** function signature, docstring, raises `NotImplementedError`. Agents and humans can read the docstring to know what the function will do; implementation lands in Phase 2 weeks 2-6.
+- **Planned:** listed in the README catalog but not yet scaffolded. Create as need arises.
+
+### 17.3 How agents and skills use the ops library
+
+When a Claude Code subagent needs to provision a GCP resource (create bucket, rotate key, provision tenant, run drift check), it does NOT write raw SDK code. It imports from `gamma_ops` and calls the function:
+
+```python
+from gamma_ops.gcp.storage import create_bucket
+from gamma_ops.errors import ResourceAlreadyExists
+
+bucket = create_bucket(
+    name="gamma-prod-uploads-001",
+    location="europe-west9",
+    cmek_key="projects/gamma-prod-001/locations/europe-west9/keyRings/gamma-tenant-keys/cryptoKeys/gamma-platform-key",
+    public_access_prevention="enforced",
+)
+```
+
+This is enforced by the M1 rule in `docs/MODULARITY.md`: no vendor SDK imports outside the dedicated wrapper modules. The ops library IS the wrapper.
+
+### 17.4 How to add a new operation
+
+1. Pick the right module (`gamma_ops/gcp/...`, `cloudflare/...`, `tenants/...`, etc.)
+2. Write the function with a full docstring (Purpose, Parameters, Returns, Raises, Idempotency, Example)
+3. Map any SDK errors to `OpsError` subclasses in `gamma_ops/errors.py`
+4. Write a unit test that mocks the vendor client
+5. Add the function to the operation catalog in `infra/ops/README.md` with status "Implemented"
+6. Wire a Click subcommand in `gamma_ops/cli.py` if humans should call it from the terminal
+7. Reference it from any relevant runbook in `docs/runbooks/`
+8. Ship
+
+### 17.5 How to add a new runbook
+
+Runbooks in `docs/runbooks/` are for one-off or rare operations with authorization implications. Runbooks reference ops library functions where available and fall back to raw gcloud or vendor CLI where not. See `docs/runbooks/README.md` for the index and the template.
+
+### 17.6 Implementation roadmap
+
+The co-founder backfills stubs as Phase 2 progresses:
+
+- [ ] Week 1: `gcp/projects`, `gcp/storage`, `gcp/kms`, `gcp/secrets` (already IMPLEMENTED)
+- [ ] Week 2: `gcp/cloudsql`, `gcp/iam`, `db/backup`
+- [ ] Week 2-3: `cloudflare/dns`, `cloudflare/waf`, `cloudflare/access`
+- [ ] Week 3: `gcp/cloudrun`
+- [ ] Week 4: `gcp/monitoring`, `gcp/scheduler`, `gcp/pubsub`
+- [ ] Week 5: `tenants/provision`, `tenants/delete`, `tenants/migrate`, `tenants/drift`, `db/fingerprint`
+- [ ] Week 6: `testing/seed`, `testing/flawless_gate`
+- [ ] Ongoing: new operations as they appear in a runbook or a checklist task
+
+---
+
+## 18. Final word
 
 You made a plan. The plan is closed.
 

@@ -1,0 +1,67 @@
+# Gamma pre-commit configuration.
+#
+# See https://pre-commit.com for documentation.
+# Install: pipx install pre-commit && pre-commit install
+# Reference: docs/runbooks/secrets-management.md section 9.
+#
+# The goal of these hooks is to catch, locally before any commit, the three
+# classes of mistakes that are expensive to fix after the fact:
+#   1. Committed secrets (API tokens, keys, passwords) via gitleaks.
+#   2. Style drift (trailing whitespace, missing final newline, large files,
+#      malformed YAML/JSON, unresolved merge conflicts).
+#   3. Banned vocabulary that the founder hates: em dashes and "utilisation"
+#      (CLAUDE.md rules 5 and 6).
+
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+        name: Scan staged diff for secrets (gitleaks)
+        entry: gitleaks protect --staged --verbose --redact
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+        exclude: '^prototype/'
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: no-em-dashes
+        name: Ban em dashes and en dashes
+        language: system
+        files: '\.(md|mdx|ts|tsx|js|jsx|py|txt|yaml|yml)$'
+        entry: >
+          python -c "import sys; bad = False;
+          [ (lambda p:
+              [ (lambda i, line:
+                  (print(f'{p}:{i+1}: contains em dash or en dash -> {line.rstrip()}') or (globals().__setitem__('bad', True)))
+                  if ('\u2014' in line or '\u2013' in line) else None
+                )(i, line)
+                for i, line in enumerate(open(p, encoding='utf-8', errors='replace').read().splitlines()) ]
+            )(p) for p in sys.argv[1:] ];
+          sys.exit(1 if bad else 0)"
+
+      - id: no-utilisation
+        name: Ban the word utilisation
+        language: system
+        files: '\.(md|mdx|ts|tsx|js|jsx|py|txt|yaml|yml)$'
+        exclude: '^(CLAUDE\.md|docs/SCOPE\.md|docs/FLAWLESS_GATE\.md|agents/AGENTS\.md|docs/runbooks/secrets-management\.md|\.pre-commit-config\.yaml)$'
+        entry: >
+          python -c "import sys, re; bad = False;
+          rx = re.compile(r'utilisation', re.IGNORECASE);
+          [ (lambda p:
+              [ (lambda i, line:
+                  (print(f'{p}:{i+1}: contains banned word utilisation -> {line.rstrip()}') or (globals().__setitem__('bad', True)))
+                  if rx.search(line) else None
+                )(i, line)
+                for i, line in enumerate(open(p, encoding='utf-8', errors='replace').read().splitlines()) ]
+            )(p) for p in sys.argv[1:] ];
+          sys.exit(1 if bad else 0)"
