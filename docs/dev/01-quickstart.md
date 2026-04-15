@@ -79,6 +79,25 @@ Open each of these in your browser:
 - **http://localhost:8000/health** - raw health check. Returns `{"status":"ok","env":"dev","name":"gamma"}`.
 - **http://localhost:8025** - Mailpit web UI. Empty until something sends email; Phase 3a onboarding will put things here.
 
+**Dev credentials** (shipped by the seed migration; never use outside dev):
+
+```
+email:    admin@gamma.local
+password: gamma_dev_password
+tenant:   t_dev
+role:     owner
+```
+
+Test the login with curl:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@gamma.local","password":"gamma_dev_password"}'
+```
+
+You should get a JSON response with `access_token`, `refresh_token`, and `expires_in_seconds`. Paste the access token into the Swagger UI's "Authorize" dialog to test any tenant-scoped endpoint.
+
 ## Step 4: See what is happening (optional)
 
 Open a second terminal and tail the logs:
