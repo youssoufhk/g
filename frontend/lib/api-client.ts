@@ -2,13 +2,15 @@
  * Typed HTTP client for /api/v1/*.
  *
  * Responsibilities:
- *   - attach the tenant header + auth bearer
+ *   - attach the tenant header + auth bearer from the auth store
  *   - surface 402 (entitlement locked) as a typed ApiClientError
  *   - surface 409 (conflict) with payload for the three-layer resolver
  *   - parse JSON or throw a typed error on non-2xx
  *
  * Optimistic mutations live in ./optimistic.ts and use this client.
  */
+
+import { currentAccessToken, currentTenantSchema } from "./auth-store";
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api/v1";
 
@@ -45,38 +47,51 @@ export class ApiClientError extends Error {
 type RequestOptions = RequestInit & {
   tenantSchema?: string | null;
   accessToken?: string | null;
+  /** Skip adding the auth header even if a token exists in the store. */
+  anonymous?: boolean;
 };
 
 export async function apiFetch<T>(path: string, opts: RequestOptions = {}): Promise<T> {
-  const { tenantSchema, accessToken, headers, ...rest } = opts;
+  const { tenantSchema, accessToken, anonymous, headers, body, ...rest } = opts;
 
   const mergedHeaders: HeadersInit = {
     Accept: "application/json",
-    "Content-Type": "application/json",
     ...(headers ?? {}),
   };
-  if (tenantSchema) {
-    (mergedHeaders as Record<string, string>)["X-Tenant-Schema"] = tenantSchema;
+
+  // Only set Content-Type for JSON bodies; let fetch pick the multipart
+  // boundary for FormData uploads.
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  if (!isFormData && body !== undefined && body !== null) {
+    (mergedHeaders as Record<string, string>)["Content-Type"] = "application/json";
   }
-  if (accessToken) {
-    (mergedHeaders as Record<string, string>).Authorization = `Bearer ${accessToken}`;
+
+  const effectiveTenant = tenantSchema ?? currentTenantSchema();
+  if (effectiveTenant) {
+    (mergedHeaders as Record<string, string>)["X-Tenant-Schema"] = effectiveTenant;
+  }
+
+  const effectiveToken = anonymous ? null : (accessToken ?? currentAccessToken());
+  if (effectiveToken) {
+    (mergedHeaders as Record<string, string>).Authorization = `Bearer ${effectiveToken}`;
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...rest,
     headers: mergedHeaders,
+    body,
     credentials: "include",
   });
 
   if (!response.ok) {
-    let body: ApiErrorBody | null = null;
+    let errorBody: ApiErrorBody | null = null;
     try {
-      body = (await response.json()) as ApiErrorBody;
+      errorBody = (await response.json()) as ApiErrorBody;
     } catch {
-      body = null;
+      errorBody = null;
     }
-    const message = body?.message ?? response.statusText;
-    throw new ApiClientError(response.status, body, message);
+    const message = errorBody?.message ?? response.statusText;
+    throw new ApiClientError(response.status, errorBody, message);
   }
 
   if (response.status === 204) return undefined as T;
