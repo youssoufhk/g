@@ -11,7 +11,7 @@ Python 3.12 + FastAPI + SQLAlchemy 2.0 async + Pydantic v2 + Alembic + pytest + 
 
 | Factor | Why Python |
 |--------|-----------|
-| Scale | 200 employees + 100 clients = well under 200k rows/year/tenant. FastAPI + asyncpg handles 10k+ req/s on modest hardware. Instagram, Dropbox, Reddit run Python at scale orders of magnitude larger. |
+| Scale | Canonical seed tenant: 201 employees + 120 clients + 260 projects + 52 weeks of timesheets + 700 leaves + ~8,400 expenses + 900 invoices/year. Well under 200k rows/year/tenant. FastAPI + asyncpg handles 10k+ req/s on modest hardware. Instagram, Dropbox, Reddit run Python at scale orders of magnitude larger. |
 | Agent productivity | Claude Code generates high-quality Python and FastAPI from training. Fastest time to working feature. |
 | AI ecosystem | Anthropic Python SDK is first-class. Tool-use, prompt caching, structured outputs all straightforward. |
 | Founder fit | C++ background transfers well; Python is simpler and iteration loop is faster than C++. |

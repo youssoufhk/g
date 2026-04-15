@@ -1,29 +1,56 @@
 # ADR-005: File storage
 
-**Status:** Accepted
+**Status:** Accepted (updated 2026-04-15 to Google Cloud Storage after the hosting anchor was locked to GCP)
 
 ## Decision
 
-S3-compatible object storage. MinIO in dev, Cloudflare R2 or AWS S3 in prod.
+**Google Cloud Storage (GCS)** in `europe-west9` for all prod and staging. MinIO in docker-compose for local dev parity.
 
 | Element | Detail |
-|---------|--------|
-| Bucket | One per environment |
-| Key | `{tenant_id}/{entity}/{uuid}` |
-| Encryption | AES-256 server-side, enforced by bucket policy |
-| Access | Pre-signed URLs, 15 min expiry |
+|---|---|
+| Bucket (prod) | `gammahr-prod-files` in `europe-west9` |
+| Bucket (staging) | `gammahr-staging-files` in `europe-west9` |
+| Legal-hold bucket | `gammahr-legal-archive` in `europe-west9`, Object Versioning + retention policy lock, no delete permission even for service accounts |
+| Key format | `{tenant_id}/{entity_type}/{yyyy}/{mm}/{uuid}` |
+| Encryption at rest | AES-256 server-side, enforced by bucket policy |
+| Per-tenant CMEK | Cloud KMS customer-managed encryption key for Confidential-tier data (employee compensation, banking, Art. 9 sensitive data): separate key per tenant in the tenant keyring |
+| Access | Signed URLs (V4 signatures) for uploads and downloads, 15-minute expiry |
+| Upload limit | 20 MB expense receipts, 10 MB avatars, 50 MB CSV imports |
 | Download | `Content-Disposition` with sanitized filename |
-| Virus scan | ClamAV in a Celery worker before object marked `ready` |
-| Lifecycle | CSV imports deleted after 30 days; other objects retained until explicit delete |
+| Virus scan | ClamAV in a Celery worker, sets `public.files.status = 'ready'` before the file is linked to a parent entity |
+| Dedup | Per-tenant SHA256 unique constraint on `public.files(tenant_id, sha256)`: two different tenants uploading the same file get two separate rows |
+| Orphan cleanup | Nightly Celery job hard-deletes files older than 24 hours with no linked parent entity |
+| Lifecycle | CSV imports deleted after 30 days; expense receipts retained 10 years per French fiscal law (art. L.102 B LPF); avatars retained until explicit delete |
+| Backup | Weekly logical dump per tenant schema exported to a separate GCS bucket with 30-day retention |
 
-## Rejected
+## Rationale
 
-- **Database BLOBs:** bloats Postgres, hurts backup speed.
-- **Local disk:** breaks horizontal scaling.
+- **Same cloud as the rest of the stack.** Using GCS keeps everything in one GCP project with one DPA, one IAM system, one audit log, one region lock. No cross-cloud data movement.
+- **Cloud KMS integration is native.** Per-tenant CMEK keys for Confidential-tier encryption work seamlessly with GCS object encryption. No separate encryption layer in application code.
+- **Signed URL performance is identical to S3.** GCS V4 signatures are the same pattern Cloudflare R2 and AWS S3 use.
+- **MinIO in dev** keeps local-vs-prod parity. Application code uses the `google-cloud-storage` Python SDK in prod and a MinIO S3-compatible endpoint in dev via a thin abstraction.
+
+## Rejected alternatives
+
+- **Cloudflare R2** (the original ADR-005 choice): perfectly fine as an S3-compatible store and meaningfully cheaper on egress, but it sits outside the GCP DPA and adds a second sub-processor entry. Kept GCS for the one-vendor simplification.
+- **AWS S3:** would require adding AWS as a sub-vendor. Not worth it when GCS is equivalent and already in the stack.
+- **Database BLOBs:** bloats Postgres, hurts backup speed, no CMEK per-column.
+- **Local disk:** breaks horizontal scaling, breaks Cloud Run's stateless container model.
 
 ## Consequences
 
-- Backend never streams files through itself except the OCR read path.
-- Pre-signed URL generation is a hot path; must be fast.
+- Backend never streams files through itself except the OCR read path (Gemini vision fetches from a signed URL).
+- Signed URL generation is a hot path; must be fast (p95 < 100ms).
 - MinIO in docker-compose for dev parity.
-- Prod bucket has versioning + daily metadata snapshots.
+- Prod bucket has versioning + weekly metadata snapshots.
+- Legal-hold archive bucket has retention policy lock and no service-account delete permission; break-glass access documented in the operator console runbook.
+- Per-tenant CMEK keys rotate annually on an automatic schedule.
+
+## Related decisions
+
+- **ADR-001** (schema-per-tenant) - file paths keyed by tenant_id
+- **ADR-008** (deployment) - GCP-anchored stack
+- `specs/DATA_ARCHITECTURE.md` section 8.1 (data classification: Confidential-tier data uses CMEK)
+- `specs/DATA_ARCHITECTURE.md` section 8.2 (retention: per-entity file lifecycle rules with legal citations)
+- `specs/DATA_ARCHITECTURE.md` section 2.5 (public.files table)
+- `docs/DATA_INGESTION.md` section 2 (upload pipeline) and section 5 (OCR)

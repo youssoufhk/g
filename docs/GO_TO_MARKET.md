@@ -1,7 +1,7 @@
 # GO TO MARKET
 
 > Commercial plan. Most numbers below are **targets / TBD** until we have real customer conversations. Do not treat as facts.
-> Timeline week numbers live only in `ROADMAP.md`.
+> Timeline week numbers live only in `THE_PLAN.md`.
 
 ---
 
@@ -15,18 +15,41 @@
 
 ---
 
-## 2. Pricing (targets, TBD)
+## 2. Pricing (per-seat with volume bands, locked)
 
-All prices below are **proposed**, subject to validation during discovery calls.
+**Per-seat volume-band pricing** (band pricing, not cliff pricing: a 75-seat tenant pays first 50 at rate A and next 25 at rate B). **Seat = active user in last 30 days.** Reference users who appear in data but never log in are NOT billable.
 
-| Tier | Target price | Audience | Features |
-|------|--------------|----------|----------|
-| Starter | €30/user/mo, annual | 50-150 employees | All Tier 1 |
-| Growth | €40/user/mo, annual | 150-350 employees | Starter + AI OCR + Insights + API |
-| Scale | €50-60/user/mo, annual | 350-500 employees | Growth + SSO + advanced audit + priority support |
+### Published list pricing
 
-Monthly billing available at 20% premium.
-First 3 paying customers get grandfathered pricing (Starter rate regardless of size) for 3 years.
+| Tier | 1-50 seats | 51-100 seats | 101-200 seats | >200 seats |
+|---|---|---|---|---|
+| **Starter** | €9/seat/mo | €8/seat/mo | €7/seat/mo | custom contract |
+| **Pro** | €15/seat/mo | €13/seat/mo | €11/seat/mo | custom contract |
+| **Enterprise** | custom contract |
+
+### What's in each tier
+
+| Tier | Includes |
+|---|---|
+| Starter | Core: time, clients, projects, invoices, expenses, leaves, basic dashboards, email support. All Tier 1 features. |
+| Pro | Starter + AI command palette + AI OCR + AI insight cards + resource planning + custom fields + advanced reports + priority support |
+| Enterprise | Pro + SSO/SAML/SCIM (post-deferral) + audit exports + negotiated DPA + dedicated support + uptime SLA |
+
+### Custom contracts (Enterprise and >200 seats)
+
+Above 200 seats OR for any deal the founder wants to negotiate specially, a custom contract in `public.tenant_custom_contracts` overrides the volume-band pricing with a negotiated annual lump sum, included seat cap, and overage rate. Founder-created in the operator console. Fully decoupled from feature entitlements: a custom-contract tenant can still be on list-price Pro features but pay a custom lump sum.
+
+### Monthly vs annual
+
+Monthly billing available. **Annual pays ~10 months for 12** (roughly 15% discount). No multi-year contracts in v1.0 (DEF-031). No refunds on annual contracts except within the first 14 days (same as trial period).
+
+### Currency and VAT
+
+All prices ex-VAT, EUR only. Multi-currency subscription billing (GBP, USD) deferred (DEF-030). EU intra-community B2B invoices emit zero-VAT lines with the reverse-charge legal mention (single VAT rate per tenant + reverse-charge boolean on client, multi-rate VAT deferred in DEF-007). Non-EU billing not in v1.0 scope.
+
+### Grandfathered pricing for pilots
+
+First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years, regardless of seat count growth. Written into their custom contract.
 
 ---
 
@@ -82,13 +105,29 @@ First 3 paying customers get grandfathered pricing (Starter rate regardless of s
 
 ## 7. Billing infrastructure
 
-- Stripe subscription billing, cards + SEPA
-- Annual invoices issued at signup, 60-day renewal notice
-- Upgrades/downgrades prorated
-- Failed payments: Stripe Smart Retries, 14-day dunning
-- Self-serve billing portal in Admin console
+**Two-phase approach:**
 
-Target go-live: per `ROADMAP.md` milestone "Stripe billing live" (week 35 target, TBD).
+**Phase 2 (customers 1-5):** manual PDF invoicing.
+- Founder creates `public.subscription_invoices` rows in the operator console
+- WeasyPrint renders the PDF
+- Workspace SMTP Relay sends the PDF to the customer's billing email
+- Customer pays via wire transfer or SEPA Direct Debit
+- Founder marks paid in the operator console
+- Zero Stripe integration, zero webhook handling, zero self-serve billing portal. Admin console has view-only billing status.
+- 1 hour per new invoice is an acceptable founder time cost at this stage.
+
+**Phase 5+ (customer #6+):** migrate to an automated payment processor.
+- Leading candidate: **Revolut Business Merchant Acquiring** (founder has existing banking relationship, lower fees on EU cards, BUT Revolut lacks a full subscription product so requires custom subscription logic or a thin wrapper)
+- Alternative: **Stripe Billing** (full subscription product, more expensive per-transaction fees, requires OSS VAT registration)
+- Alternative: **Paddle** (merchant-of-record, ~5% fees, eliminates EU VAT handling entirely, best for founder wanting zero accounting operations burden)
+- Final choice deferred to DEF-029 implementation time
+- Existing Phase 2 customers are grandfathered or migrated at that time
+
+**Dunning (at automation time):** Stripe/Revolut webhook `invoice.payment_failed` triggers GammaHR's own branded emails via Workspace SMTP Relay. Three-email escalation (day 1, 7, 14). Templates part of the Phase 2 email template set.
+
+**Self-serve billing portal** in Admin console is deferred (DEF-059) until after DEF-028 (self-serve signup) and DEF-029 (payment processor integration) ship.
+
+Target go-live for automated billing: per the target weeks in `THE_PLAN.md`, when customer #5-10 signs OR manual billing exceeds 2 hours/week.
 
 ---
 

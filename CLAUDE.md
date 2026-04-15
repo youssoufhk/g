@@ -11,8 +11,8 @@
 GammaHR is a premium B2B HR operations platform for consulting firms with 50 to 500 employees. It unifies time, projects, clients, expenses, invoices, leaves, and resource planning with AI assistance. The target feel is Revolut for HR: the app does the work, the user confirms.
 
 Founder: non-technical product owner, 20 hours a week, native C++ background, very demanding quality bar.
-Tech stack (locked): Python 3.12 + FastAPI + PostgreSQL 16 + Celery on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Claude API for AI.
-First customer target: 200 employees, 100 clients, EU-based.
+Tech stack (locked): Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) + Celery on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Vertex AI Gemini (EU-resident, LLM-as-router pattern with deterministic per-feature tools) for AI. Hosted on GCP `europe-west9` (Paris) with Cloudflare in front for DNS, WAF, CDN, and Access, and GitHub for repo and CI.
+First customer target: ~201 employees, ~120 clients, EU-based consulting firm. See `specs/DATA_ARCHITECTURE.md` section 12.10 for the canonical seed data breakdown (1 owner, 2 admins, 4 finance, 15 managers, 177 employees, 2 readonly; 260 projects, 52 weeks of timesheets, 700 leaves, ~8,400 expenses, 900 invoices/year; HSBC UK as a GBP-billing client).
 
 ---
 
@@ -35,9 +35,11 @@ Break any of these and your work gets reverted.
 
 ---
 
-## 3. The feel (what to aim for)
+## 3. The feel and the core principles
 
 Agents tend to ship "correct but dead" work. Do not.
+
+### 3.1 The five feel qualities
 
 - **Calm.** No clutter, no noise, no unnecessary chrome. White space is a feature.
 - **Ease.** Every screen says "here is what you need, here is what to do next." Zero dead ends. Every employee, client, project is a clickable link from anywhere.
@@ -47,30 +49,45 @@ Agents tend to ship "correct but dead" work. Do not.
 
 If in doubt, open `prototype/dashboard.html` and ask: does my work feel like it belongs on the same page as that?
 
+### 3.2 The ten core principles (time-less design rules)
+
+1. **Design first, code never**, until the blueprint is perfect.
+2. **The app does the work. The user confirms.**
+3. **Zero dead ends.** Every entity reference is a link from anywhere.
+4. **One canonical way per pattern.** No variants per page.
+5. **Flawless before next.** No feature moves forward until the current one passes the gate.
+6. **Mobile is first-class.** PWA-ready, bottom nav, quick actions.
+7. **AI is a shell element, not a destination page.**
+8. **Speed is a feature** (perceived and actual).
+9. **Dark mode is home. Light mode is the variant.**
+10. **Security is invisible but robust.**
+
+These are non-negotiable. If a design or implementation violates one of these, stop and reconsider.
+
 ---
 
 ## 4. Repository layout
 
 ```
 gammahr_v2/
-  CLAUDE.md                  <- this file
-  README.md                  <- entry point for humans
-  MASTER_PLAN.md             <- vision + stack (time-less)
-  ROADMAP.md                 <- phases + dates (the only place time lives)
+  README.md                  <- entry point for humans, navigation hub
+  CLAUDE.md                  <- this file, the agent contract
+  THE_PLAN.md                <- week-by-week execution plan, phases 2-7, target weeks, success criteria
   specs/                     <- what we are building
     DESIGN_SYSTEM.md         <- tokens, atoms, patterns (LOCKED)
     APP_BLUEPRINT.md         <- every page, every flow
     DATA_ARCHITECTURE.md     <- entities, tenancy, API contracts
-    AI_FEATURES.md           <- Claude integrations
+    AI_FEATURES.md           <- Vertex AI Gemini integration, tool registry
     MOBILE_STRATEGY.md       <- PWA + responsive rules
   docs/                      <- how we are building it
+    DATA_INGESTION.md        <- CSV imports, OCR pipeline, payroll export
+    DEFERRED_DECISIONS.md    <- DEF-NNN registry, check before adding any feature
     SCOPE.md                 <- Tier 1 vs Tier 2
     FLAWLESS_GATE.md         <- the quality gate
     GO_TO_MARKET.md          <- commercial plan
-    decisions/               <- ADRs
+    decisions/               <- ADRs 001-010
   agents/                    <- how agents collaborate
     AGENTS.md                <- roles + pipeline
-    COMPONENT_LIBRARY_AGENT.md
   prototype/                 <- locked visual reference, 19 HTML pages
   frontend/                  <- Next.js 15 app (see section 5)
   backend/                   <- FastAPI app (see section 6)
@@ -88,24 +105,28 @@ Every feature owns its own folder. The `app/` tree contains only page shells.
 frontend/
   app/
     [locale]/
-      (auth)/login, register, mfa, password/reset
-      (app)/
+      (ops)/                          <- operator console, ops.gammahr.com
+        layout.tsx, login, dashboard, tenants, billing, flags, kill-switches, migrations, legal
+      (app)/                          <- main tenant app, app.gammahr.com
         layout.tsx                    <- shell (sidebar + topbar + bottom nav)
         dashboard/
         employees/, employees/[id]/
         clients/, clients/[id]/
         projects/, projects/[id]/
-        timesheets/, timesheets/[week]/
+        timesheets/, timesheets/[week_id]/
         leaves/
         expenses/
         approvals/
         invoices/, invoices/[id]/
         admin/
         account/
-      (tier2)/calendar, gantt, planning, hr, insights
+        calendar, gantt, planning, hr, insights  <- Tier 2 pages within (app)
+      (portal)/                       <- client portal, portal.gammahr.com (Phase 6)
+        layout.tsx, login, invoices
       layout.tsx                      <- providers, theme, i18n
   components/
     ui/                               <- design system atoms (one file per atom)
+    patterns/                         <- EmptyState, FilterBar, StatPill, ListPage, ConflictResolver, JobProgress
     shell/                            <- sidebar, topbar, bottom-nav, command-palette
     charts/                           <- Visx wrappers
   features/                           <- one folder per business domain
@@ -115,6 +136,7 @@ frontend/
       use-employees.ts                <- TanStack Query hooks
       schemas.ts                      <- Zod forms
       types.ts
+      ai_tools.py                     <- per-feature AI tool definitions for the LLM-as-router pattern (backend side)
     timesheets/...
     expenses/...
     leaves/...
@@ -122,8 +144,12 @@ frontend/
     clients/...
     projects/...
     approvals/...
-    ai/                               <- command palette, insight cards
-  lib/                                <- api-client, auth, i18n, utils
+    imports/...                       <- CSV onboarding + ongoing imports + AI column mapper
+  lib/
+    api-client.ts                     <- TanStack Query setup, 402/409 error handling
+    optimistic.ts                     <- useOptimisticMutation wrapper, three-layer 409 resolution
+    offline.ts                        <- tenant-scoped IndexedDB queue for timesheet entries
+    realtime.ts                       <- WebSocket singleton + reconnect logic
   hooks/
   stores/                             <- Zustand
   styles/
@@ -175,10 +201,10 @@ backend/
         routes.py, service.py, tasks.py, validators.py
       dashboard/..., admin/...
     ai/
-      client.py                       <- Anthropic SDK wrapper
-      prompts/*.jinja
-      schemas.py                      <- tool-use schemas
-      cost.py                         <- tracks ai_events
+      client.py                       <- Vertex AI Gemini wrapper, budget enforcement, kill-switch gate
+      prompts/*.jinja                 <- Jinja2 templates with versioned filenames
+      evals/                          <- golden-example eval suite, blocks merge on regression
+      models.py                       <- model ID constants (MODELS.DEFAULT, MODELS.VISION)
     tasks/
       celery_app.py, schedules.py
     events/
@@ -236,25 +262,28 @@ When unsure: **stop and ask the founder.** Do not guess. Do not invent. Do not s
 
 | If you need... | Read... |
 |----------------|---------|
-| Vision, principles, tech stack | `MASTER_PLAN.md` |
-| Dates, phases, milestones | `ROADMAP.md` |
+| What to do this week, phases, target weeks, success criteria, emergency manual | `THE_PLAN.md` |
+| The project entry point and navigation hub | `README.md` |
 | Colors, spacing, atoms, shell | `specs/DESIGN_SYSTEM.md` (+ `prototype/_tokens.css`) |
 | What a page does | `specs/APP_BLUEPRINT.md` |
-| Entities, tenancy, APIs | `specs/DATA_ARCHITECTURE.md` |
-| Where AI lives | `specs/AI_FEATURES.md` |
-| Responsive rules, PWA | `specs/MOBILE_STRATEGY.md` |
-| What is in v1.0 vs v1.1 | `docs/SCOPE.md` |
-| Quality checklist | `docs/FLAWLESS_GATE.md` |
+| Entities, tenancy, APIs, migrations, GDPR, feature gating | `specs/DATA_ARCHITECTURE.md` |
+| Where AI lives, tool registry, budget, evals | `specs/AI_FEATURES.md` |
+| Responsive rules, PWA, offline scope | `specs/MOBILE_STRATEGY.md` |
+| How customer data gets INTO the app (CSV imports, OCR, payroll export) | `docs/DATA_INGESTION.md` |
+| What we consciously chose NOT to do in v1.0, with triggers to revisit | `docs/DEFERRED_DECISIONS.md` |
+| What is in v1.0 vs v1.1, first-customer must-haves | `docs/SCOPE.md` |
+| Quality checklist (15 items per Tier 1 feature) | `docs/FLAWLESS_GATE.md` |
+| Commercial plan, pricing, pilot program | `docs/GO_TO_MARKET.md` |
 | Why a decision was made | `docs/decisions/ADR-*.md` |
 | Agent roles and workflow | `agents/AGENTS.md` |
-| The visual spec | `prototype/*.html` |
+| The visual spec (frozen) | `prototype/*.html` |
 
 ---
 
 ## 10. Honest caveats
 
-- Timelines in `ROADMAP.md` are optimistic. Solo founders miss by 2x. Do not pretend otherwise.
-- Performance targets ("p95 <100ms", "OCR <8s") are goals, not measured baselines.
+- Target weeks in `THE_PLAN.md` are optimistic. Solo founders miss by 2x. Do not pretend otherwise.
+- Performance targets ("p95 <100ms", "OCR <15s") are goals, not measured baselines.
 - Cost targets in `specs/AI_FEATURES.md` are estimates until we measure real usage.
 - `docs/FLAWLESS_GATE.md` is pruned to 15 items. Section 7 of this file mirrors it. If the two ever drift, the gate doc wins.
 - The agent roster in `agents/AGENTS.md` is aspirational. In practice one general-purpose agent does most tasks; the roster is a mental model, not a real org chart.

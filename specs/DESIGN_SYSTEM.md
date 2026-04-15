@@ -102,7 +102,7 @@ This section is a human-readable mirror of `prototype/_tokens.css`. If the two e
 --color-wfh-muted:      hsla(175, 35%, 45%, 0.15);
 ```
 
-**Light mode** overrides via `[data-theme="light"]`: surfaces flip to `hsl(40, 20%, 97%)` family, primary deepens to `hsl(155, 30%, 34%)`, accent deepens to `hsl(30, 60%, 42%)`, text flips to `hsl(35, 12%, 10%)`. Dark mode is default per core principle 9 in `MASTER_PLAN.md`. Full light-mode token set is in `prototype/_tokens.css` lines 177-256.
+**Light mode** overrides via `[data-theme="light"]`: surfaces flip to `hsl(40, 20%, 97%)` family, primary deepens to `hsl(155, 30%, 34%)`, accent deepens to `hsl(30, 60%, 42%)`, text flips to `hsl(35, 12%, 10%)`. Dark mode is default per core principle 9 in `CLAUDE.md` section 3.2. Full light-mode token set is in `prototype/_tokens.css` lines 177-256.
 
 ### 2.2 Typography
 

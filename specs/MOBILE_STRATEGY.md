@@ -73,27 +73,37 @@ Bottom nav items: Home, Time, Approvals, Insights, More. Active state uses `--co
 
 ---
 
-## 7. Offline (v1.0 = read-only)
+## 7. Offline (v1.0 = narrow: timesheet entry only)
+
+Offline scope is deliberately narrow. **Only timesheet entry works offline.** Everything else (approvals, dashboards, invoices, expenses, clients, projects) requires network. Rationale: consultants at client sites with bad wifi need to log hours without the app crashing, but full offline support for every feature is a 2-3 month product feature of its own with its own bug class (see DEF-047 + DEF-050 in `docs/DEFERRED_DECISIONS.md`).
 
 | Component | Behavior |
 |-----------|----------|
 | Service worker | Caches shell (HTML/CSS/JS/fonts) after first load |
-| TanStack Query | Persists cache in IndexedDB, 7-day TTL |
-| Offline banner | Shown on connection drop |
-| Read offline | Dashboard, employees, clients, projects, recent timesheets, recent expenses |
-| Mutations offline | Disabled with "will retry when online" message |
-| Timesheet drafts | Saved locally, background sync on reconnect |
+| TanStack Query | Persists cache in IndexedDB, 7-day TTL, read-only fallback when offline |
+| Offline banner | Shown on connection drop, explains which features are unavailable |
+| Read offline (fallback) | Last-cached version of any page the user previously viewed, but with a "stale, reconnecting..." badge |
+| **Timesheet entry offline** | IndexedDB queue scoped by `tenant_id` in `lib/offline.ts`. User taps to add a timesheet entry, entry is written to the local queue, green "Saved locally" badge appears. Service Worker Background Sync API flushes the queue when online. |
+| All other mutations offline | Disabled with "you are offline, this action will be available when you reconnect" message |
 
-v1.1 adds optimistic offline mutations with conflict resolution.
+**Conflict resolution on sync:** offline timesheet entries sync using the same three-layer optimistic lock mechanism as every other mutation (version column + field-level diff modal + revision history). If a 409 fires (unlikely for new entries, more likely for edits), the shared `<ConflictResolver>` modal handles the resolution. Most offline writes are creates, not edits, so conflicts are rare.
+
+**Tenant isolation:** if a user switches tenants offline, the local queue must NOT leak across tenants. IndexedDB keys are scoped by `tenant_id`.
+
+**Full offline support** for approvals, dashboards, invoices, expense drafts, and other features is deferred (DEF-047). Native mobile wrapper beyond PWA is deferred (DEF-051). Offline-first full state sync with conflict resolution (Linear/Notion style) is deferred (DEF-050).
 
 ---
 
 ## 8. Push notifications
 
+**In-app notifications + PWA Web Push are the primary channels.** Email is the fallback ONLY for specific kinds (auth flows, invoice delivery to clients, opt-in daily digest, legal notices). Not a general fallback.
+
 - Web Push via service worker, `pywebpush` on the backend
-- User opts in from account settings
-- Categories: Approvals, Mentions, System
-- Fallback to email if push unavailable
+- Subscriptions stored in `public.push_subscriptions(user_id, endpoint, p256dh_key, auth_key, created_at, last_seen_at)`
+- User opts in from account settings; browser-native permission prompt
+- Per-kind preferences in `public.notification_preferences` (user can mute specific kinds)
+- Notification kinds (Phase 2 locked): `approval_requested`, `approval_decided`, `import_finished`, `invoice_sent`, `mention`, `payment_failed`, `payment_succeeded`, `trial_ending`, `tenant_suspended`, `security_alert`, `digest_daily`
+- iOS 16.4+ supports Web Push in PWAs. Phase 2 ships with Chrome/Edge/Firefox/Android; iOS Safari tested before launch.
 
 ---
 

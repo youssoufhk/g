@@ -12,7 +12,7 @@
 | **Design System Guardian** | `specs/DESIGN_SYSTEM.md`, `frontend/components/ui/`, Storybook | Adding atoms without founder approval; modifying tokens | Prototype parity at all breakpoints |
 | **Page Builder** | `frontend/app/`, `frontend/features/<domain>/` | Creating new atoms; skipping responsive rules | Flawless gate |
 | **API Engineer** | `backend/app/features/<domain>/`, `backend/migrations/` | Touching frontend; adding columns without a migration; raw SQL in business logic | Pytest coverage + RBAC + audit log |
-| **AI Integration Engineer** | `backend/app/ai/`, per-feature AI hooks | Adding AI where not in `AI_FEATURES.md`; sending PII; skipping structured output validation | Cost + latency + fallback |
+| **AI Integration Engineer** | `backend/app/ai/` (Vertex AI client, prompts, evals), plus per-feature tool definitions in `backend/app/features/*/ai_tools.py` | Adding AI where not in `specs/AI_FEATURES.md`; sending Confidential-tier PII (compensation, banking, Art. 9); hardcoding model IDs; bypassing the `ai/client.py` abstraction; skipping structured output validation | Cost + latency + fallback + eval pass rate + kill switch |
 | **QA Scout** | `docs/FLAWLESS_GATE.md` runs | Fixing issues directly (files reports only) | 15/15 gate items |
 | **Security Reviewer** | Auth, session, RBAC, input validation, secrets | Touching product code | Cross-tenant test + rate limit test |
 

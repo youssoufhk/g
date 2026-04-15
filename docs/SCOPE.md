@@ -80,7 +80,7 @@ Never ship silently. Ask first.
 
 The 200-employee / 100-client EU customer blocks launch unless these are Tier 1 flawless:
 
-1. Bulk CSV onboarding for 200 employees in under 60 s
+1. Bulk CSV onboarding for the canonical seed dataset (201 employees + 120 clients + 260 projects + 52 weeks of timesheets + 700 leaves + ~8,400 expenses + 900 invoices) in under 60 s
 2. Weekly timesheet submission + manager approval
 3. Leave request + approval with balance enforcement
 4. Expense submission with OCR + approval
