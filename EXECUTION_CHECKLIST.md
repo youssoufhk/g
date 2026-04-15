@@ -1,8 +1,12 @@
-# Gamma Execution Checklist
+# Gamma Execution Checklist (AGENT-FACING)
 
-> **Read this file every Monday morning. This is the single source of truth for "what do I work on next".**
+> **This file is the agent's checklist, not the founder's.** Claude Code reads this file when it needs to know what to build next. The founder has a separate list at `FOUNDER_CHECKLIST.md` for non-delegable work (runway, paperwork, pipeline, customer calls, founder review, strategic decisions, health).
 >
-> Strategy, architecture, data model, and spec details are answered in the files linked at the bottom of each section. This file does NOT repeat spec content. It linearizes execution into checkboxes and points at the reference.
+> **Why the split:** the founder checklist and the agent checklist are now two separate files. This file contains Phase 2 through Phase 7 technical tasks (Docker Compose, backend, frontend, tests, deploys). The founder checklist contains everything that cannot be delegated to code: discovery calls, co-founder paperwork, runway, pricing, founder review of every shipped feature. The two files cross-reference each other at section boundaries. Never mix them; keeping focus requires keeping the lists separate.
+>
+> **How agents use this file:** read it at the start of every Claude Code session, identify the next unchecked task in the current phase, build it following the ten-step quality chain in section 1.1, commit via `/commit`, stop and report to the founder. Agents never touch `FOUNDER_CHECKLIST.md`.
+>
+> **How the founder uses this file:** read section 1.0 (80/20 rule) every Monday morning to confirm the agent is working on the right priorities. Otherwise leave this file to the agent and focus on `FOUNDER_CHECKLIST.md`.
 >
 > **Rule:** you cannot start Phase N+1 until all Phase N exit criteria boxes are checked.
 
