@@ -75,8 +75,10 @@ repos:
             docs/FLAWLESS_GATE\.md|
             docs/COUNTRY_PLAYBOOKS\.md|
             docs/runbooks/secrets-management\.md|
+            docs/runbooks/dev-machine-bootstrap\.md|
             specs/AI_FEATURES\.md|
             \.pre-commit-config\.yaml|
             scripts/hooks/no_utilisation\.py|
+            scripts/setup/bootstrap-dev\.sh|
             \.claude/skills/.*
           )$

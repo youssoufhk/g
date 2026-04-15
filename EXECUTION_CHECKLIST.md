@@ -119,11 +119,13 @@ Do not retry the same prompt. Change the prompt: add more context, name more spe
 
 One day of founder alignment. Do this before touching the keyboard.
 
+**Fresh-machine setup for a new founder or hire:** run `bash scripts/setup/bootstrap-dev.sh` once from the repo root. It handles Python 3.12 + pre-commit + the `infra/ops` library + unit tests + `gcloud` in one idempotent pass (5-10 minutes on a clean WSL Ubuntu, ~30 seconds on re-runs). See `docs/runbooks/dev-machine-bootstrap.md` for the full runbook, troubleshooting, and the 5 interactive steps after the script finishes (gcloud auth, `.env` setup, first GCP project).
+
 - [ ] 🤝 Commit the final planning pass to `main` with the title `plan: v1.0 positioning lock - Gamma, €35/€26 pricing, month-end close agent, multi-country scaffolding`
 - [ ] 🤝 Read CLAUDE.md together, line by line, confirm both founders understand all hard rules
 - [ ] 🤝 Read this checklist together, confirm division of labor (founder 🧑 = product + design + frontend; co-founder 👥 = backend + infra + AI; 🤝 = both join)
 - [ ] 🤝 Pin co-founder commitment in writing: minimum 32 hours per week each, 4-year vesting, 1-year cliff, IP assignment to Global Gamma Ltd, exit clause. Signed before first commit of code.
-- [ ] 🤝 Install pre-commit hooks: `pipx install pre-commit && cd <repo> && pre-commit install`. Required before any code commit. Blocks em dashes, "utilisation", committed secrets via gitleaks. See `docs/runbooks/secrets-management.md` §9.
+- [ ] 🤝 Pre-commit hook activation is handled by the bootstrap script above. After running it, every code commit is automatically scanned for secrets, em dashes, and the word utilisation. See `docs/runbooks/secrets-management.md` section 9.
 - [ ] 🤝 Set up weekly Monday 09:00 planning meeting (30 minutes) using this checklist as the agenda
 - [ ] 🤝 Set up weekly Friday 17:00 demo + retro meeting (45 minutes)
 - [ ] 🤝 Agree on emergency contact protocol: what to do if one founder is unavailable for >48 hours

@@ -7,7 +7,9 @@
 
 | Runbook | When | Time | Rollback? |
 |---|---|---|---|
-| [GCP bootstrap](gcp-bootstrap.md) | Phase 2 week 1, once per environment (prod + staging) | 2-3 hours | Partial (delete project is soft, 30-day grace) |
+| [Dev machine bootstrap](dev-machine-bootstrap.md) | Once per laptop, for any new founder or hire (start here on a fresh machine) | 10-15 min first run, ~30s re-runs | Yes (remove venv and re-run) |
+| [GCP bootstrap](gcp-bootstrap.md) | Phase 2 week 1, once per environment (prod + staging) | 2-3 hours | Partial (delete project is soft, 30-day grace) |</new_string>
+</invoke>
 | [Cloudflare bootstrap](cloudflare-bootstrap.md) | Phase 2 week 1, after GCP bootstrap | 45-60 minutes | Yes (DNS changes are propagating, allow 24h) |
 | [Tenant provisioning](tenant-provisioning.md) | Every new customer tenant (test or real) | 15-20 minutes | Yes (delete tenant procedure in docs/ROLLBACK_RUNBOOK.md) |
 | [Rollback (schema migration failure)](../ROLLBACK_RUNBOOK.md) | When a migration fails mid-deploy | 30 minutes to 3 hours | N/A (the rollback IS the recovery) |
