@@ -1,0 +1,49 @@
+# Gamma backend dev image.
+#
+# Used only by infra/docker/docker-compose.dev.yml. Source is bind-mounted
+# at runtime so edits on the host hot-reload inside the container.
+#
+# Production images are built separately by the deploy track (section 16
+# of EXECUTION_CHECKLIST.md).
+
+# syntax=docker/dockerfile:1.7
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# System deps:
+#   - build-essential, libpq-dev: native wheels for bcrypt, asyncpg
+#   - curl: healthcheck
+#   - libpango/cairo/gdk-pixbuf: WeasyPrint runtime deps (Phase 5a invoices)
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+       build-essential \
+       curl \
+       libpq-dev \
+       libpango-1.0-0 \
+       libpangoft2-1.0-0 \
+       libcairo2 \
+       libgdk-pixbuf-2.0-0 \
+       shared-mime-info \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install deps in a layer that depends only on pyproject.toml. A minimal
+# app stub lets hatchling discover the package layout before the real
+# source is bind-mounted at runtime.
+COPY pyproject.toml ./
+RUN mkdir -p app \
+  && touch app/__init__.py \
+  && pip install --upgrade pip \
+  && pip install -e ".[dev]"
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=5 \
+  CMD curl --fail --silent http://localhost:8000/health || exit 1
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app/app"]

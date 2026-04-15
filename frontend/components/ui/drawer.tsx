@@ -46,7 +46,7 @@ export function Drawer({
     >
       <div
         className="absolute inset-0 bg-black/60"
-        aria-hidden
+        aria-hidden="true"
         onClick={onClose}
       />
       <aside

@@ -67,7 +67,7 @@ def upgrade() -> None:
             sa.text(
                 "INSERT INTO public.country_holidays (country_code, date, name, kind) "
                 "VALUES (:country, :date, :name, :kind) "
-                "ON CONFLICT DO NOTHING"
+                "ON CONFLICT (country_code, date) DO NOTHING"
             ),
             {"country": country, "date": holiday_date, "name": name, "kind": kind},
         )

@@ -31,20 +31,23 @@ export function useOptimisticMutation<TData, TVariables, TContext = unknown>(
   opts: OptimisticMutationOptions<TData, TVariables, TContext>,
 ) {
   const client = useQueryClient();
+  const { onError: userOnError, onSettled: userOnSettled, onConflict, ...rest } = opts;
+
   return useMutation<TData, ApiClientError, TVariables, TContext>({
-    ...opts,
-    onError: (error, variables, context) => {
-      if (error.isConflict && opts.onConflict && error.body) {
-        void opts.onConflict({
+    ...rest,
+    onError: ((...args: Parameters<NonNullable<typeof userOnError>>) => {
+      const [error, variables] = args;
+      if (error.isConflict && onConflict && error.body) {
+        void onConflict({
           variables,
           serverState: error.body as unknown as TData,
         });
       }
-      opts.onError?.(error, variables, context);
-    },
-    onSettled: async (...args) => {
-      await opts.onSettled?.(...args);
+      return userOnError?.(...args);
+    }) as NonNullable<typeof userOnError>,
+    onSettled: (async (...args: Parameters<NonNullable<typeof userOnSettled>>) => {
+      await userOnSettled?.(...args);
       await client.invalidateQueries();
-    },
+    }) as NonNullable<typeof userOnSettled>,
   });
 }

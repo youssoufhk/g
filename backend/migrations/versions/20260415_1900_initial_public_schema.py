@@ -41,7 +41,7 @@ def upgrade() -> None:
             "supported_locales",
             sa.ARRAY(sa.Text),
             nullable=False,
-            server_default="{en-GB}",
+            server_default=sa.text("ARRAY['en-GB']::text[]"),
         ),
         sa.Column(
             "created_at",

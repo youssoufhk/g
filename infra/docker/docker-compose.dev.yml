@@ -1,14 +1,20 @@
 # Gamma local dev stack
 #
 # Usage:
-#   make dev-up     # start the stack (waits for healthchecks)
-#   make dev-down   # stop the stack, keep volumes
-#   make dev-reset  # stop and destroy volumes (clean slate)
+#   make mvp-up     # build + start everything + run Alembic + seed dev tenant
+#   make dev-up     # build + start everything (no migrate, no seed)
+#   make dev-down   # stop, keep volumes
+#   make dev-reset  # stop + destroy volumes
+#
+# Architecture note: backend and frontend run as compose services so they
+# reach Postgres and Redis via Docker DNS (postgres:5432 / redis:6379)
+# instead of host localhost. This works under WSL2 where host<->container
+# port publishing is unreliable. Ports 8000 and 3000 are published for the
+# host browser to reach the backend API and Next.js dev server.
 #
 # Reference:
 #   docs/runbooks/dev-machine-bootstrap.md section 4.6
 #   EXECUTION_CHECKLIST.md section 3.1
-#   docs/decisions/ADR-001-tenancy.md (schema-per-tenant)
 
 name: gamma-dev
 
@@ -52,6 +58,72 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.dev
+    image: gamma-backend-dev
+    container_name: gamma-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: dev
+      APP_NAME: gamma
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql+asyncpg://gamma:gamma_dev_password@postgres:5432/gamma_dev
+      REDIS_URL: redis://redis:6379/0
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+      SMTP_FROM: noreply@gamma.local
+      JWT_SECRET_KEY: dev-only-not-a-real-secret-change-me
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TTL_SECONDS: "900"
+      JWT_REFRESH_TTL_SECONDS: "2592000"
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      AI_BACKEND: mock
+      BLOB_BACKEND: local
+      EMAIL_BACKEND: mailhog
+      OCR_BACKEND: mock
+      TELEMETRY_BACKEND: stdout
+      LOCAL_BLOB_ROOT: /app/tmp/dev-blobs
+    ports:
+      - "8000:8000"
+    volumes:
+      # Hot-reload source from the host into /app. Anonymous volumes below
+      # shadow host files that should NOT be pulled into the container
+      # (Linux venv, Python caches).
+      - ../../backend:/app
+      - /app/.venv
+      - /app/.mypy_cache
+      - /app/.pytest_cache
+      - /app/.ruff_cache
+      - /app/__pycache__
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile.dev
+    image: gamma-frontend-dev
+    container_name: gamma-frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000/api/v1
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "3000:3000"
+    volumes:
+      # Hot-reload source from the host. Anonymous volumes shadow
+      # node_modules and .next so the container's install is authoritative.
+      - ../../frontend:/app
+      - /app/node_modules
+      - /app/.next
     restart: unless-stopped
 
 volumes:

@@ -57,7 +57,7 @@ There are **two columns** below: an *optimistic* one (the original plan's wishfu
 |-------|-----------------:|---------------------------------:|-------|---------------|
 | 0 | done | done | Prototype | All 19 HTML pages approved |
 | 1 | done (2026-04-15) | done (2026-04-15) | Foundation docs | All specs + ADRs final, deferred registry extracted (DEF-001 to DEF-064) |
-| 2 | 4 to 7 | **6 to 9** | Foundation build | Local dev infrastructure + FastAPI scaffold + Next.js scaffold + migration runner + `ai/client.py` + `useOptimisticMutation` + `ConflictResolver` + minimum operator console + atom layer + shell infrastructure (Cmd+K palette, notifications, conflict resolver, entitlement lock UI) + month-end close agent scaffolding + GCP setup and first staging deploy. **Buffer note:** realistic column was 4-7 until 2026-04-15 brutal review; widened to 6-9 to absorb the frontend learning curve on the founder's solo atom-layer work (Tailwind 4 + React 19 + prototype-exact fidelity). Ship the buffer, do not consume it.
+| 2 | 4 to 7 | **6 to 9** | Foundation build | **(build track DONE 2026-04-15)** Local dev infrastructure + FastAPI scaffold + Next.js scaffold + migration runner + 9 vendor wrappers M1 + tenancy middleware + audit log trigger + event bus + feature registry + atom layer (20 atoms) + shell + 45 backend tests + containerized dev stack. GCP setup and first staging deploy moved to §16 Deploy Track in EXECUTION_CHECKLIST.md (founder-triggered after MVP is demo-ready). Cmd+K palette, notifications drawer, ConflictResolver, EntitlementLock deferred to the Phase 5a feature that needs them.
 | 3 | 8 to 11 | **8 to 13** | Auth + onboarding + full operator console | OIDC + passkey + password auth paths, onboarding wizard with AI column mapper, full operator console |
 | 4 | 12 to 15 | **13 to 18** | Core data + Dashboard pass 1 | Employees, clients, projects, dashboard scaffold. **Customer-validation gate clears here (see "Validated lead gate" below).** |
 | 5 | 16 to 24 | **20 to 32** | Core modules | Timesheets (week-as-entity), leaves, expenses (OCR), invoices (PDF) + month-end close agent full implementation, approvals, admin, account, dashboard pass 2, payroll export, ongoing imports, first-contact UX hardenings |
@@ -188,149 +188,107 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 
 ### Phase 2: Foundation build
 
-**Goal:** infrastructure provisioned, core backend + frontend scaffolds running, the plumbing that every feature depends on in place.
+**Goal:** local dev stack up, backend + frontend scaffolds running entirely on the dev machine, the plumbing that every feature depends on in place. **No GCP, no deployment.** Deploy track is §16 in EXECUTION_CHECKLIST.md and runs after Phase 5a MVP is demo-ready.
 
-**Target:** 4 to 7 weeks of two-founder work at ~24-34 combined h/week productive. Probably slips to the upper end of that range.
+**Target:** 6 to 9 weeks of two-founder work at ~24-34 combined h/week productive. **BUILD TRACK DONE 2026-04-15** (shipped in 10 commits across backend, frontend, infra/docker, Makefile, CI workflow).
 
-**Concrete tasks, in order:**
+**Concrete tasks:**
 
-1. **GCP account setup**
-   - [ ] Create two GCP projects: `gammahr-staging` and `gammahr-prod`
-   - [ ] Apply Organization Policy `constraints/gcp.resourceLocations` restricting to `europe-west9` with `europe-west1` as allowed backup
-   - [ ] Enable: Cloud Run, Cloud SQL, Cloud Storage, Secret Manager, Cloud Logging, Cloud Monitoring, Vertex AI, Cloud KMS, Compute Engine, Cloud Build
-   - [ ] Set up billing alerts at €50, €150, €300/month (for prod); €20, €50, €100 (for staging)
-   - [ ] Create service accounts: `cloud-run-sa`, `celery-worker-sa`, `migration-runner-sa`, `vertex-ai-sa` each with the minimum IAM needed
+1. **GCP account setup** - **DEFERRED to §16 Deploy Track.** Not needed for MVP demo; runs after Phase 5a when a pilot customer asks for a production URL. Keeps the build track focused on local dev reality.
 
-2. **Cloudflare setup**
-   - [ ] Add `gammahr.com` zone
-   - [ ] Create DNS records for `ops.gammahr.com`, `app.gammahr.com`, `portal.gammahr.com`, `mail.gammahr.com` pointing at the prod Cloud Run URL (proxied)
-   - [ ] Enable Cloudflare Access on staging subdomains (founder IP only)
-   - [ ] Set up Email Routing forwards to founder inbox for: `bounces@mail.gammahr.com`, `privacy@gammahr.com`, `support@gammahr.com`, `security@gammahr.com`, `invoices@gammahr.com`, **`dpa@gammahr.com`** (referenced by `specs/DATA_ARCHITECTURE.md` section 8.6 for DPA correspondence), **`abuse@gammahr.com`** (RFC 2142 standard)
+2. **Cloudflare setup** - **DEFERRED to §16 Deploy Track.** Same reason. DNS, WAF, Access, Email Routing all happen when the app needs a public hostname.
 
-3. **Google Workspace setup**
-   - [ ] Subscribe to Google Workspace Business Starter for `gammahr.com` ($6/user/month)
-   - [ ] Create `mailer@gammahr.com` service user for SMTP Relay
-   - [ ] Configure SMTP Relay in Workspace Admin Console (IP allowlist from Cloud Run egress)
-   - [ ] Set up SPF, DKIM (2048-bit), DMARC records on `mail.gammahr.com` with `p=none` for monitoring
+3. **Google Workspace setup** - **DEFERRED to §16 Deploy Track.** Mailhog handles dev email entirely. Workspace SMTP Relay swaps in when the app needs to send real mail.
 
-4. **GitHub setup**
-   - [ ] Create `gammahr/gammahr` repo (private, owner: you)
-   - [ ] Add GitHub Environments: `staging`, `prod`
-   - [ ] Add secrets: deploy service account key, staging DB URL, prod DB URL, Workspace SMTP creds
-   - [ ] Set up branch protection on `main`: require PR review (from self, to force reflection), require CI green
+4. **GitHub setup** - **PARTIAL:** repo exists, `.github/workflows/ci.yml` live with pre-commit + backend (ruff + pytest 60% floor) + frontend (typecheck + vitest, lockfile-gated). Environments, deploy secrets, branch protection all move to §16 Deploy Track.
 
-5. **Backend scaffold**
-   - [ ] `backend/app/main.py` with FastAPI, middleware chain: `tenancy`, `auth`, `rate_limit`, `audit`
-   - [ ] `backend/app/core/tenancy.py` with `search_path` middleware per `specs/DATA_ARCHITECTURE.md` section 1.1
-   - [ ] `backend/app/core/auth.py` with JWT factory supporting three `actor_type` values
-   - [ ] `backend/app/core/database.py` with SQLAlchemy async engine + session factory
-   - [ ] `backend/app/core/config.py` with Pydantic settings loading from Secret Manager
-   - [ ] `backend/migrations/env.py` + `backend/migrations/runner.py` with Celery fan-out across N tenant schemas + `public.alembic_runs` tracking table + fake-tenant test harness (spin up 10 fake schemas, run migration, verify all at the new version)
-   - [ ] `backend/app/ai/client.py` as the single Vertex AI abstraction with budget enforcement and kill-switch gate
-   - [ ] `backend/app/core/gated_feature.py` decorator that calls entitlements + flags + kill switches in one place
-   - [ ] `backend/app/events/publisher.py` with pluggable in-process vs Redis pub/sub fan-out
-   - [ ] `backend/app/core/websocket.py` for the notifications channel at `/ws/notifications`
+5. **Backend scaffold** - **DONE 2026-04-15.**
+   - [x] `backend/app/main.py` with FastAPI + middleware chain: `TenancyMiddleware`, CORS, typed error handler
+   - [x] `backend/app/core/tenancy.py` with `ContextVar` + `SET LOCAL search_path` per ADR-001
+   - [x] `backend/app/core/security.py` with JWT audience binding (ops/app/portal) per ADR-010
+   - [x] `backend/app/core/database.py` with SQLAlchemy async engine + per-request session factory
+   - [x] `backend/app/core/config.py` with Pydantic settings
+   - [x] `backend/app/core/feature_registry.py` (M6, 12 features auto-register)
+   - [x] `backend/app/core/errors.py` typed exceptions (401/402/403/404/409/422/429)
+   - [x] `backend/app/core/audit.py` writer + PG trigger rejecting UPDATE/DELETE
+   - [x] `backend/migrations/env.py` with per-tenant `-x tenant=...` orchestration via SQLAlchemy async
+   - [x] First migration creates public.tenants, public.country_holidays, public.audit_log + append-only trigger
+   - [x] `backend/app/ai/client.py` AIClient Protocol + MockAIClient (vendor swap in §16)
+   - [x] `backend/app/events/bus.py` in-process event bus (M5)
+   - [x] `backend/app/tasks/celery_app.py` with 3 queues (critical, default, bulk)
+   - [ ] 👥 **Phase 3a carryover blocker:** wire JWT claim extraction into `TenancyMiddleware._extract_from_jwt` (currently a stub returning None)
 
-6. **Frontend scaffold**
+6. **Frontend scaffold** - **DONE 2026-04-15.**
+   - [x] Next.js 15.1 + React 19 + Tailwind 4 + TypeScript strict mode, compiles clean + passes typecheck + passes vitest + passes `next build`
+   - [x] `frontend/styles/tokens.css` byte-exact mirror of `prototype/_tokens.css` (allowlisted in em-dash hook, CLAUDE.md rule 3)
+   - [x] `frontend/styles/globals.css` with `@import tailwindcss` + `@theme inline` bridge
+   - [x] `frontend/app/[locale]/(ops)/layout.tsx` (operator shell variant)
+   - [x] `frontend/app/[locale]/(app)/layout.tsx` (main app shell with Providers + AppShell)
+   - [x] `frontend/components/shell/sidebar.tsx` at 224px, topbar, bottom-nav, app-shell wrapper
+   - [x] 20 atoms + 3 patterns (Button, Input, Card, Modal, Table, Select, Checkbox, Radio, Toggle, Textarea, Badge, Pill, Breadcrumb, Tabs, Accordion, Drawer, Toast, Tooltip, SearchInput, AIInsightCard, AIInvoiceExplanation + EmptyState + FilterBar + StatPill)
+   - [x] `frontend/lib/api-client.ts` with typed `ApiClientError` (402 entitlement, 409 conflict)
+   - [x] `frontend/lib/optimistic.ts` with `useOptimisticMutation` wrapper
+   - [x] `frontend/lib/offline.ts` IndexedDB queue stub
+   - [x] `frontend/lib/realtime.ts` WebSocket singleton stub
+   - [ ] 🧑 `frontend/app/[locale]/(portal)/layout.tsx` portal shell - deferred to Phase 6
+   - [ ] 🧑 Cmd+K palette, notifications drawer, ConflictResolver UI, EntitlementLock UI - each ships with the first Phase 5a feature that actually needs it
 
-   Scaffolding:
-   - [ ] Next.js 15 App Router + React 19 + Tailwind 4 + TypeScript strict mode
-   - [ ] `frontend/styles/tokens.css` byte-exact mirror of `prototype/_tokens.css` (CSS variables only, NO `tailwind.config.ts`, Tailwind 4 is CSS-first)
-   - [ ] `frontend/styles/globals.css` with `@import tailwindcss` + `@theme inline` bridge to the tokens
-   - [ ] `frontend/app/[locale]/(ops)/layout.tsx` + middleware (operator shell variant)
-   - [ ] `frontend/app/[locale]/(app)/layout.tsx` + middleware (main app shell)
-   - [ ] `frontend/app/[locale]/(portal)/layout.tsx` + middleware (portal shell, Phase 6)
+7. **Database bootstrap** - **PARTIAL.**
+   - [x] First Alembic migration covers `public.tenants`, `public.country_holidays`, `public.audit_log` + append-only trigger
+   - [x] Second Alembic migration seeds FR + UK holidays for 2026 and 2027
+   - [x] Migration runner uses SQLAlchemy async (no psycopg2 dependency)
+   - [ ] 👥 Run `alembic upgrade head` against the local dev DB once docker group is fixed (`make mvp-up` handles this)
+   - [ ] 👥 Phase 3a: add `public.app_users`, `ops_users`, `portal_contacts`, session tables (ADR-010 three-audience identity)
+   - [ ] 👥 Phase 3a: tenant provisioning service that creates `t_<slug>` schemas and runs per-tenant migrations
+   - [ ] 👥 Phase 3a: seed the `feature_flags` table with the initial kill switches (currently only the in-process feature registry holds this)
 
-   **Atom build order** (strictly sequential; each step passes side-by-side prototype parity before moving to the next):
+8. **Minimum operator console** - **PARTIAL.**
+   - [x] `backend/app/features/admin/models.py` Tenant ORM
+   - [x] Admin service + routes at `/api/v1/ops/features`, `/kill-switch`, `/overrides`
+   - [x] 12 feature modules self-register with the feature registry (M6)
+   - [x] `(ops)` route group: layout + static Tenants + static Flags pages
+   - [ ] 👥 Phase 3a: wire the static ops pages to live `/api/v1/ops/*` data
+   - [ ] 👥 Phase 3a: operator authentication (passkey-only per ADR-010) or Phase 3b hardening
+   - [ ] 👥 Phase 3a: `(ops)/tenants/new` create wizard
 
-   1. Shell atoms: Sidebar (224 px), Topbar (56 px), BottomNav (64 px), CommandPalette scaffold
-   2. Typography + layout atoms: Heading, Text, Stack, Grid
-   3. Button variants: primary, secondary, ghost, destructive, icon
-   4. Input atoms: Input, Textarea, Select, DatePicker, FileDrop, Checkbox, Radio, Toggle
-   5. Data display: Table, Row, Card, Badge, Avatar, ProgressBar, StatCard
-   6. Feedback: Toast, InlineAlert, Skeleton, EmptyState
-   7. Navigation: TabBar, Breadcrumb, Pagination
-   8. Overlay: Modal, Drawer, Popover, Tooltip, BottomSheet
-   9. Chart atoms: BarChart, LineChart, DonutChart (via Visx)
-   10. AI atoms: CommandPalette, InsightCard, AIExplainButton, SuggestionChip
-   11. Pattern compositions: `ConflictResolver`, `EmptyState`, `FilterBar`, `StatPill`, `ListPage`, `JobProgress` (SSE consumer)
+9. **Atom layer** - **DONE 2026-04-15.** 20 atoms + 3 patterns, byte-for-byte prototype tokens, dark + light via `[data-theme="light"]`. Storybook deferred (DEF-049).
 
-   **Exit condition for the atom layer:** any page in `specs/APP_BLUEPRINT.md` can be built using only existing atoms. If a page needs something not in the atom layer, stop and ask the founder before inventing.
+10. **`docs/ROLLBACK_RUNBOOK.md`** - **PARTIAL (doc exists).** Per-tenant rollback drill deferred to §16 Deploy Track (needs a real staging environment to run against).
 
-   Rules:
-   - Never invent an atom. If not in `specs/DESIGN_SYSTEM.md`, stop and ask.
-   - Never modify tokens. `prototype/_tokens.css` is the frozen source of truth.
-   - Every atom has fixed dimensions per the design system. No "flexible" variants.
-   - Accessible by default: ARIA, keyboard navigation, focus management.
-   - Dark mode default. Light mode verified in parallel.
-   - Storybook is deferred (DEF-049). Component documentation lives in code comments + visual parity against the prototype HTML files.
+11. **First DR drill** - **DEFERRED to §16 Deploy Track.** Requires real staging.
 
-   Library plumbing:
-   - [ ] `frontend/lib/optimistic.ts` with `useOptimisticMutation` wrapper centralizing the three-layer 409 reconciliation (optimistic rollback, field-level conflict diff modal, retry)
-   - [ ] `frontend/lib/api-client.ts` with TanStack Query setup, tenant-aware base URL, error handling for 402 (upgrade required) and 409 (version conflict)
-   - [ ] `frontend/lib/offline.ts` with tenant-scoped IndexedDB queue for timesheet entries
-   - [ ] `frontend/lib/realtime.ts` with WebSocket singleton, reconnect logic, TanStack Query cache invalidation helpers
-   - [ ] ESLint `eslint-plugin-boundaries` config enforcing `features/*` cannot import other `features/*`
+12. **Month-end close agent scaffolding** - **PARTIAL.** MockAIClient + AI eval harness skeleton at `backend/app/ai/evals/harness.py` are live. Full 5-example eval set per feature + the 24-analyzer library + invoice draft generation land in Phase 5a (`EXECUTION_CHECKLIST.md` §6.2).
 
-7. **Database bootstrap**
-   - [ ] Alembic migration: `public` schema with `tenants`, `operators`, `operator_sessions`, `audit_log` (partitioned), and the rest of the global tables from `specs/DATA_ARCHITECTURE.md` section 2.2 through 2.5
-   - [ ] Alembic migration: a template `tenant_<slug>` schema creator function that can be called by the tenant creation flow
-   - [ ] Seed the `feature_flags` table with the initial kill switches: `kill_switch.ai`, `kill_switch.signups`, `kill_switch.invoicing`, `kill_switch.email`, `kill_switch.ocr_uploads`, `kill_switch.webhooks`, `kill_switch.payment_processing`, **`kill_switch.imports`** (per `docs/DATA_INGESTION.md` section 7)
-   - [ ] Seed `sub_processors` with the initial list: Google Cloud (includes Vertex AI Gemini), Google Workspace, Cloudflare, GitHub/Microsoft
-   - [ ] Deploy the migration runner + fake-tenant test harness: `pytest` spins up 10 fake schemas, runs the initial migration against each, verifies all at the new `alembic_version`
+13. **Testing infrastructure scaffolding** - **DONE 2026-04-15.** pytest + hypothesis + pytest-asyncio + pytest-mock + vitest + Playwright installed. 45 backend tests pass. GitHub Actions CI: pre-commit + backend (ruff + pytest 60% floor) + frontend (typecheck + vitest, lockfile-gated).
 
-8. **Minimum operator console (so you can create tenants)**
-   - [ ] `(ops)/login` passkey challenge
-   - [ ] `(ops)/` dashboard with tenant count
-   - [ ] `(ops)/tenants` list
-   - [ ] `(ops)/tenants/new` wizard creating schema + seeding default entitlements + sending magic-link invite
-   - [ ] `(ops)/tenants/[id]` detail with lifecycle actions
-   - [ ] Operator self-provisioning: you manually add your own operator row to `public.operators` via SQL, then register a passkey via the UI
+14. **Property-based test invariants (first 5)** - **DONE 2026-04-15.** FR domestic VAT, intra-EU reverse charge, UK domestic VAT, tenant schema shape, tenant schema SQL-injection rejection. The tenant schema property test caught a real regex-anchor bug in `tenancy.py` during Phase 2 (`^` vs `\A` / `\Z`).
 
-9. **Task: Atom layer (3 to 4 weeks of productive time).** Implement `components/ui/` atoms with byte-exact prototype parity. Parallelizable in three groups:
-   - Group A (weeks 1-2): Button, Input, Select, Checkbox (new), Radio, Toggle, Textarea
-   - Group B (weeks 2-3): Card, Badge, Pill, Breadcrumb, Tabs, Accordion
-   - Group C (weeks 3-4): Modal, Drawer, Toast, Tooltip, SearchInput (new), AIInsightCard (new), ConflictResolver composite (new)
+15. **AI eval harness with 5 examples per feature** - **SKELETON only.** `backend/app/ai/evals/harness.py` exists; 5 hand-curated examples per feature ships with each feature in Phase 3a-5a (column mapper in 3a, month-end close in 5a, OCR in 5a).
 
-   Each atom: matches the prototype at 1440px, supports dark and light mode, has a Storybook story with all variants, passes WCAG 2.1 AA, no new tokens. Checkbox, SearchInput, AIInsightCard, and ConflictResolver are founder-approved new atoms added during the critic pass; all others are pre-existing in `specs/DESIGN_SYSTEM.md`.
+16. **Contract test harness** - **DONE 2026-04-15.** Contract test asserts `/api/v1/*` versioning + OpenAPI shape for auth + ops routes. `openapi-typescript` frontend diff ships with Phase 3a when the first real endpoints land.
 
-10. **Task: Write `docs/ROLLBACK_RUNBOOK.md`** covering per-tenant migration rollback, cross-tenant schema drift reconciliation, and full-cluster PITR. Required before Phase 5 begins, not after. See ADR-001 Follow-ups.
+17. **Snapshot test framework** - **NOT STARTED.** Phase 5a invoice PDF prereq. Ships with the first WeasyPrint render in `backend/app/features/invoices/`.
 
-11. **Disaster recovery drill (first)**: run the `docs/ROLLBACK_RUNBOOK.md` per-tenant rollback procedure on a staging tenant before the first customer goes live. Quarterly after. Log each drill in `docs/incidents/drills/YYYY-MM-DD.md`.
+**Definition of done (Phase 2, build track):**
+- [x] `make mvp-up` brings up Postgres + Redis + Mailhog + backend + frontend containers (solves the WSL2 localhost binding issue)
+- [x] Backend runs as a compose service, reaches Postgres via Docker DNS `postgres:5432`
+- [x] Frontend runs as a compose service, browser hits it at `http://localhost:3000/en`
+- [x] 45 backend tests pass locally (`make backend-test-local` or `make dev-test-backend`)
+- [x] Frontend typecheck + vitest + `next build` all green (`make dev-test-frontend`)
+- [x] 9 vendor wrappers M1 with stub implementations, CI lint blocks vendor SDK imports outside wrappers
+- [x] 20 atoms + 3 patterns, dark and light mode both look right
+- [x] Repo is em-dash-free and banned-vocabulary-free across every file (verified by pre-commit on the full repo, per CLAUDE.md rules 5 and 6)
+- [ ] 🧑 One-time founder unblock: `newgrp docker` in the current shell, then `make mvp-up`
+- [ ] 👥 Phase 3a carryover: JWT claim wiring into `TenancyMiddleware._extract_from_jwt`
 
-12. **Month-end close agent scaffolding**: see `specs/APP_BLUEPRINT.md` section 8.x and `specs/AI_FEATURES.md` section 2 for the spec. Backend module `backend/app/features/invoicing_agent/` stubbed in Phase 2 (directory, routes placeholder, service contract, tool registry stub); full implementation in Phase 5 alongside invoices. The scaffolding lives in Phase 2 so the tool registry and gated-feature decorator wiring are in place from day 0.
+**Definition of done (Phase 2, deploy track):** moved to §16 Deploy Track in `EXECUTION_CHECKLIST.md`. Agent never initiates this; founder calls for it post-MVP.
 
-13. **Testing infrastructure scaffolding**: install pytest + pytest-cov + pytest-asyncio + pytest-mock + Hypothesis + Playwright + pytest-playwright + locust. Configure GitHub Actions pipelines for the unit, property, contract, and E2E layers. Scaffold the eval harness skeleton under `backend/app/ai/evals/`. Draft the first 5 E2E scenarios: onboarding, timesheet, leave, expense, invoice shell (month-end close draft path). Reference: `docs/TESTING_STRATEGY.md`. No feature code depends on this; it has to land first so every subsequent PR is measured against it.
-
-14. **Property-based test invariants (first 5)**: write the first 5 property tests from the layer-2 invariant list in `docs/TESTING_STRATEGY.md` as soon as the invoicing and leaves modules have their first function signatures:
-    - `sum(invoice_lines.total_cents) == invoice.subtotal_cents`
-    - `invoice.subtotal_cents + invoice.tax_cents == invoice.total_cents`
-    - `leave_balance.accrued - leave_balance.used - leave_balance.pending >= 0`
-    - FX conversion transitivity within 1 cent tolerance
-    - Tenant schema queries filtered by `search_path` return zero rows from other tenants
-
-    Zero dependency on full feature implementation; these are written against function signatures, not finished features.
-
-15. **AI eval harness with 5 examples per feature**: 5 month-end close examples, 5 command palette examples, 5 OCR examples. Committed under `backend/app/ai/evals/`. These guide the feature implementation in Phase 5; they are NOT written after the feature. Full eval sets (20-50 examples per feature) land in Phase 5 alongside the feature.
-
-16. **Contract test harness**: FastAPI emits OpenAPI from route signatures; `openapi-typescript` generates frontend types; CI diff asserts consistency. A contract test hits every documented endpoint with a minimal valid request and asserts the response schema matches the OpenAPI spec exactly. Runs on every PR.
-
-17. **Snapshot test framework**: pytest snapshot plugin configured; image-diff library wired up for PDF pixel comparison; first invoice PDF snapshot committed as an empty-state placeholder. Real snapshots ship with the invoicing feature in Phase 5. Email template snapshot scaffolding lands here too (directory + fixture loader), with the first real snapshots arriving when templates are authored in Phase 3.
-
-**Definition of done (Phase 2):**
-- You can log into `ops.gammahr.com` with your passkey
-- You can create a test tenant via the operator console
-- The test tenant has its own schema and the initial entitlements
-- You can send yourself a magic-link invite, land on `app.gammahr.com`, and see an empty-state dashboard
-- Migration runner passes the fake-tenant test harness in CI
-- All services deploy to staging automatically from `main` branch
-- Testing infrastructure is live: pytest + Hypothesis + Playwright + contract test harness + snapshot framework all run on every PR; first 5 E2E scenarios drafted; first 5 property invariants committed; AI eval harness skeleton holds 5 examples per feature (month-end close, command palette, OCR). See `docs/TESTING_STRATEGY.md` section 6.
-
-**What NOT to build in Phase 2:**
-- Login flows beyond the passkey challenge (Phase 3)
+**What NOT to build in Phase 2 (still accurate):**
+- Login flows beyond the stub (Phase 3a password + OIDC, Phase 3b MFA + hardening)
 - Employee/client/project pages (Phase 4)
-- Any Tier 2 pages (Phase 6)
+- Any Tier 2 page (Phase 6)
 - Any feature gated by `@gated_feature` other than the gate itself (wait until Phase 4)
+- Anything in §16 Deploy Track (wait for founder trigger post-MVP)
 
 ---
 

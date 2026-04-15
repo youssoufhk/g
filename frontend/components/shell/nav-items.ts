@@ -60,10 +60,16 @@ export const secondaryNav: NavItem[] = [
   { key: "help", href: "/help", icon: HelpCircle, messageKey: "help" },
 ];
 
+function pick(source: NavItem[], key: string): NavItem {
+  const item = source.find((entry) => entry.key === key);
+  if (!item) throw new Error(`nav-items: missing key ${key}`);
+  return item;
+}
+
 export const bottomNav: NavItem[] = [
-  primaryNav[0],
-  primaryNav[4],
-  primaryNav[6],
-  primaryNav[7],
-  secondaryNav[3],
+  pick(primaryNav, "dashboard"),
+  pick(primaryNav, "timesheets"),
+  pick(primaryNav, "expenses"),
+  pick(primaryNav, "approvals"),
+  pick(secondaryNav, "account"),
 ];

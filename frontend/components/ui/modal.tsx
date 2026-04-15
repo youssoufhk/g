@@ -51,7 +51,7 @@ export function Modal({
     >
       <div
         className="absolute inset-0 bg-black/60"
-        aria-hidden
+        aria-hidden="true"
         onClick={onClose}
       />
       <div

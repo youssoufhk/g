@@ -3,16 +3,14 @@ import clsx from "clsx";
 
 export type CardProps = HTMLAttributes<HTMLDivElement> & {
   padded?: boolean;
-  as?: "div" | "section" | "article";
 };
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
-  { className, padded = true, as = "div", ...rest },
+  { className, padded = true, ...rest },
   ref,
 ) {
-  const Tag = as as "div";
   return (
-    <Tag
+    <div
       ref={ref}
       className={clsx(
         "bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)]",

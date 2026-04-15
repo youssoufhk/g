@@ -1,0 +1,24 @@
+# Gamma frontend dev image.
+#
+# Used only by infra/docker/docker-compose.dev.yml. Source is bind-mounted
+# at runtime so file edits hot-reload via Next.js dev server.
+#
+# Production images are built separately by the deploy track (section 16
+# of EXECUTION_CHECKLIST.md).
+
+# syntax=docker/dockerfile:1.7
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Install deps in a layer that depends only on package.json. node_modules
+# is a named/anonymous volume in compose so it does not shadow host state.
+COPY package.json ./
+RUN npm install --loglevel=error
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
+  CMD wget -q --spider http://localhost:3000 || exit 1
+
+CMD ["npm", "run", "dev"]
