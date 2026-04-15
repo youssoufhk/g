@@ -27,6 +27,19 @@
 
 This is how founders and Claude Code subagents collaborate to ship flawless-gate quality. Every 🤖 task follows this workflow.
 
+> **The 80/20 rule for founder time (read this every Monday).**
+>
+> Within every phase, some tasks determine whether the phase succeeds and the rest are polish. Sort your week by leverage, not by the order of appearance in this checklist. The 20 percent of tasks that deliver 80 percent of the value per phase are:
+>
+> - **Phase 2:** local dev up, tenancy + auth middleware, vendor wrappers M1 (stub implementations), first 5 atoms (Button, Input, Card, Modal, Table), shell (sidebar + topbar + bottom-nav), testing harness skeleton. Everything else can wait a week if these 6 are not done.
+> - **Phase 3:** onboarding wizard UX, CSV import pipeline, AI column mapper, OIDC login. The first 5 minutes of a pilot customer experience.
+> - **Phase 4:** clients profile, projects profile, team allocation, dashboard KPI strip. What a prospect asks to see on day 1 of a pilot.
+> - **Phase 5:** timesheets (week-as-entity with offline queue), invoices generation, month-end close agent. These three are the entire product value story.
+> - **Phase 6:** calendar read-only and resource planning visual. Everything else in Tier 2 is fill.
+> - **Phase 7:** SOC 2 Type 1, first paying customer onboarding, public launch readiness.
+>
+> If you only have 20 productive hours this week, spend them all on the 20 percent list for the current phase. Defer everything else to next week. The 80/20 framing is not an excuse to cut corners on quality; it is an instruction to decide which tasks the quality bar applies to FIRST. Gate items still block the next feature, always.
+
 ### 1.1 The ten-step quality chain (non-negotiable)
 
 Every feature merge goes through these ten steps in order. Do not skip steps, do not reorder them.
@@ -143,92 +156,104 @@ One day of founder alignment. Do this before touching the keyboard.
 
 ## 3. Phase 2: Foundation build (target: weeks 1-7)
 
-The biggest phase. Lots of parallelizable work. Two full-time founders can finish in 4-7 weeks.
+**Build track first, deploy track last.** GCP does not need to exist until you have a working app to show a real customer. Subsections §3.1 through §3.9 run entirely against local Docker Postgres, local Redis, and stub vendor wrappers. They do not touch GCP. Only §3.10 through §3.13 touch GCP. Two full-time founders can complete §3.1 through §3.9 in ~4-6 weeks, then §3.10 through §3.13 in another ~1-2 weeks.
 
-### 3.1 Environment and infrastructure
+**The 20% of Phase 2 that matters most (sorted by leverage, do these first, always):**
+1. **Local dev infrastructure up** (§3.1) - Docker Postgres + Redis + .env. Unlocks every other task in this phase.
+2. **Tenancy middleware + auth skeleton** (§3.2) - every backend endpoint depends on these. If they are broken, every feature is broken.
+3. **Vendor wrappers M1 with stub implementations** (§3.3) - MockAIClient, LocalFilesystemBlobStorage, StdoutEmailSender, etc. Every feature imports through these. Real implementations swap in at §3.11 when GCP is live.
+4. **First 5 atoms: Button, Input, Card, Modal, Table** (§3.6 Group A subset) - every page in the product uses these.
+5. **Shell: sidebar + topbar + bottom-nav** (§3.5) - every page wraps around this.
+6. **Testing harness skeleton** (§3.7) - unlocks test-first discipline from feature 1 onward.
 
-> **Run via `docs/runbooks/gcp-bootstrap.md`.** Every step below has an exact command in the runbook, using the `gamma-ops` Python CLI from `infra/ops/` where the function is implemented, and a gcloud fallback marked [STUB] where it is not. Run the runbook once for staging, then once for prod. Install the ops library first per `infra/ops/README.md`.
+Everything else in Phase 2 sits on top of these 6 pillars. Aim for these first. Atom Groups B and C, multi-country scaffolding details, operator console polish, additional runbooks, GCP setup: all can slide a week without blocking downstream work.
 
-- [ ] 👥 Install `infra/ops/` library: `cd infra/ops && make install && source .venv/bin/activate`
-- [ ] 👥 Verify `gamma-ops --help` lists the command groups
-- [ ] 👥 Create GCP project `gamma-staging-001` via `gamma-ops gcp projects create`
-- [ ] 👥 Create GCP project `gamma-prod-001` via `gamma-ops gcp projects create`
-- [ ] 👥 Enable APIs via `gamma-ops gcp projects enable-apis` (sqladmin, run, storage, kms, secretmanager, aiplatform, pubsub, cloudscheduler, monitoring, logging, iamcredentials)
-- [ ] 👥 Link billing account via `gamma-ops gcp projects link-billing`
-- [ ] 👥 Configure Workload Identity Federation for GitHub Actions to GCP (no service account JSON files). See `docs/runbooks/secrets-management.md` §4.
-- [ ] 👥 Configure GCP billing alerts at 50%, 80%, 100% (console, one-time)
-- [ ] 👥 Create KMS keyring `gamma-tenant-keys` via `gamma-ops gcp kms create-keyring`
-- [ ] 👥 Create platform CryptoKey `gamma-platform-key` with 365-day rotation via `gamma-ops gcp kms create-key`
-- [ ] 👥 Create 4 GCS buckets (uploads, backups, legal-hold, static) with CMEK via `gamma-ops gcp storage create-bucket`
-- [ ] 👥 Apply retention policy LOCK to the legal-hold bucket (run once, cannot be undone)
-- [ ] 👥 Provision Cloud SQL Postgres 16 Regional HA (gcloud [STUB], tracked in `gamma_ops/gcp/cloudsql.py`)
-- [ ] 👥 Create DB password + JWT signing key + Vertex API key in Secret Manager via `gamma-ops gcp secrets create`
-- [ ] 👥 Configure Cloud Run services (ops, app, portal, worker) with `min_instances=1` prod, `0` staging (gcloud [STUB] until `gamma_ops/gcp/cloudrun.py` lands)
-- [ ] 👥 Configure VPC connector for Cloud Run to Cloud SQL private IP
-- [ ] 👥 Configure Cloudflare DNS + WAF + Access via `docs/runbooks/cloudflare-bootstrap.md`
-- [ ] 👥 Set up GitHub repo with branch protection on `main`
-- [ ] 👥 Set up GitHub Actions CI pipelines (stub, filled in as we add layers)
-- [ ] 👥 Set up Cloud Monitoring dashboards with multi-region labels (A9)
-- [ ] 👥 Set up Cloud Logging with per-service log routing
+### 3.1 Local dev infrastructure (runs first, unblocks everything else)
 
-**Reference:** `docs/runbooks/gcp-bootstrap.md` (the procedure), `docs/runbooks/cloudflare-bootstrap.md`, `infra/ops/README.md` (the operation catalog), `docs/decisions/ADR-001-tenancy.md`, `docs/decisions/ADR-008-deployment.md`
+> **No GCP needed.** This runs entirely on the dev machine. Create this before any backend or frontend code lands.
 
-### 3.2 Backend skeleton
+- [ ] 🤝 Create `infra/docker/docker-compose.dev.yml` with: Postgres 16 (port 5432), Redis 7 (port 6379), Mailhog (port 8025) for local email viewing
+- [ ] 🤝 Add a `make dev-up` target to spin it up, `make dev-down` to tear down, `make dev-reset` to nuke and recreate volumes
+- [ ] 🤝 Seed the local Postgres with one test tenant (use the canonical 201-employee fixture once it exists; stub seed for now)
+- [ ] 🤝 Document local dev in `docs/runbooks/dev-machine-bootstrap.md` §5 (add a new subsection)
+- [ ] 👥 Install Node 22 LTS (via nvm or apt) on both dev machines
+- [ ] 🧑 Install Docker Desktop or Docker Engine in WSL (`sudo apt-get install docker.io docker-compose-plugin`)
+- [ ] 🤝 Verify end-to-end: `make dev-up` succeeds, `psql postgresql://localhost:5432/gamma_dev` connects
 
+**Reference:** `docs/runbooks/dev-machine-bootstrap.md`, `docs/decisions/ADR-001-tenancy.md`
+
+### 3.2 Backend skeleton (highest-leverage backend work, do this second)
+
+> **No GCP needed.** Runs against local Postgres from §3.1. Vendor wrappers are stubs from §3.3.
+
+**Top priority (do these first within this subsection):**
 - [ ] 👥 🤖 FastAPI + Python 3.12 project skeleton in `backend/`
-- [ ] 👥 SQLAlchemy 2.0 async + asyncpg
-- [ ] 👥 Alembic migration runner
-- [ ] 👥 Tenant orchestration: `backend/app/core/tenancy.py` with `search_path` middleware
-- [ ] 👥 Provisioning service: create schema per tenant, run migrations, seed holidays
-- [ ] 👥 Authentication skeleton: passkey + password + OIDC stubs (full build in Phase 3)
-- [ ] 👥 RBAC middleware with audience-bound JWTs (M8 + ADR-010 + ADR-002)
-- [ ] 👥 Celery + Redis setup, one queue per priority level
-- [ ] 👥 WebSocket notification layer with `(user_id, tenant_id)` subscription scoping (B1, ADR-004)
+- [ ] 👥 SQLAlchemy 2.0 async + asyncpg, configured against local Postgres
+- [ ] 👥 Alembic migration runner with per-tenant `search_path` orchestration (M3.2 critical path)
+- [ ] 👥 Tenant provisioning service: create schema, run migrations, seed holidays
+- [ ] 👥 Authentication skeleton: password + OIDC stubs. Passkey wiring comes in Phase 3.
+- [ ] 👥 RBAC middleware with audience-bound JWTs (ADR-010 + ADR-002)
 - [ ] 👥 Audit log table + DB trigger forbidding UPDATE and DELETE
+
+**Secondary (do these once the top priority is green):**
+- [ ] 👥 Celery + Redis setup, one queue per priority level (runs against local Redis from §3.1)
+- [ ] 👥 WebSocket notification layer with `(user_id, tenant_id)` subscription scoping (B1, ADR-004)
 - [ ] 👥 Event bus: `backend/app/events/bus.py` with local in-process dispatcher (M5)
 - [ ] 👥 Feature flag registry: `backend/app/core/feature_registry.py` (M6)
 - [ ] 👥 Request-scoped feature flag evaluation (coalesced query per request)
 
 **Reference:** `specs/DATA_ARCHITECTURE.md` sections 2-3, ADRs 001-004, `docs/MODULARITY.md`
 
-### 3.3 Vendor wrappers (M1 - critical, do this before any feature)
+### 3.3 Vendor wrappers M1 with stub implementations (the modularity foundation)
 
-Every vendor sits behind an interface. No file outside these wrappers imports a vendor SDK.
+> **No GCP needed.** Every wrapper ships with a stub/mock implementation suitable for local dev. Real implementations swap in at §3.11.
 
-- [ ] 👥 `backend/app/ai/client.py` with `AIClient` interface + `VertexGeminiClient` implementation
-- [ ] 👥 `backend/app/pdf/renderer.py` with `PDFRenderer` interface + `WeasyPrintRenderer` implementation
-- [ ] 👥 `backend/app/storage/blob.py` with `BlobStorage` interface + `GCSBlobStorage` implementation
-- [ ] 👥 `backend/app/email/sender.py` with `EmailSender` interface + `WorkspaceSMTPRelaySender` implementation
-- [ ] 👥 `backend/app/billing/provider.py` with `PaymentProvider` interface (manual path for v1.0, Stripe stub registered)
-- [ ] 👥 `backend/app/tax/calculator.py` with `TaxCalculator` interface + strategy registry
-- [ ] 👥 `backend/app/ocr/vision.py` with `VisionOCR` interface + `GeminiVisionOCR` implementation
-- [ ] 👥 `backend/app/monitoring/telemetry.py` with `TelemetryClient` interface + `CloudMonitoringClient` implementation
+Every vendor sits behind an interface. No file outside these wrappers imports a vendor SDK. CI lint enforces this.
+
+**Top priority (every feature depends on these):**
+- [ ] 👥 `backend/app/ai/client.py` with `AIClient` interface + `MockAIClient` (returns deterministic fake responses from a fixture file for local dev)
+- [ ] 👥 `backend/app/storage/blob.py` with `BlobStorage` interface + `LocalFilesystemBlobStorage` (writes to `./tmp/dev-blobs/`)
+- [ ] 👥 `backend/app/email/sender.py` with `EmailSender` interface + `MailhogEmailSender` (sends to local Mailhog from §3.1, viewable at http://localhost:8025)
+- [ ] 👥 `backend/app/pdf/renderer.py` with `PDFRenderer` interface + `WeasyPrintRenderer` (runs fully locally, no GCP)
+- [ ] 👥 `backend/app/billing/provider.py` with `PaymentProvider` interface + `NullPaymentProvider` (logs and returns success for dev)
+- [ ] 👥 `backend/app/tax/calculator.py` with `TaxCalculator` interface + strategy registry (starts with FR + UK plugins)
+- [ ] 👥 `backend/app/ocr/vision.py` with `VisionOCR` interface + `MockVisionOCR` (returns fixture data for local dev)
+- [ ] 👥 `backend/app/monitoring/telemetry.py` with `TelemetryClient` interface + `StdoutTelemetryClient` (prints metrics to stdout for dev)
 - [ ] 👥 `backend/app/notifications/provider.py` with `NotificationProvider` interface + local in-process implementation
-- [ ] 👥 CI lint rule: forbid vendor SDK imports outside these wrappers (grep for `google.cloud`, `stripe.`, `anthropic.`, `weasyprint.`, etc.)
+- [ ] 🤝 CI lint rule: forbid vendor SDK imports outside these wrappers (grep for `google.cloud`, `stripe.`, `anthropic.`, `weasyprint.`, `sendgrid.` in any file outside the wrapper directories)
 
-**Reference:** `docs/MODULARITY.md` M1 table
+**The swap to real implementations happens at §3.11**, not here. Build the app against stubs. Prove it works locally. Then flip the wrappers to real.
+
+**Reference:** `docs/MODULARITY.md` M1 table, `infra/ops/README.md` Design discipline section
 
 ### 3.4 Multi-country scaffolding (C1-C7, FR + UK only in v1.0)
 
-- [ ] 👥 Add `tenants.residency_region`, `tenants.legal_jurisdiction`, `tenants.base_currency`, `tenants.primary_locale`, `tenants.supported_locales` columns (if not already in the initial migration)
+> **No GCP needed.** Pure schema + Python code.
+
+- [ ] 👥 Add `tenants.residency_region`, `tenants.legal_jurisdiction`, `tenants.base_currency`, `tenants.primary_locale`, `tenants.supported_locales` columns to the tenants migration
 - [ ] 👥 Create `public.country_holidays` table
-- [ ] 👥 Seed FR and UK public and bank holidays for 2026 and 2027
-- [ ] 👥 Scaffold `backend/app/features/tax/rules/` with empty `fr.py` and `uk.py` (full implementation in Phase 5 invoicing)
+- [ ] 👥 Seed FR and UK public and bank holidays for 2026 and 2027 as part of tenant provisioning
+- [ ] 👥 Scaffold `backend/app/features/tax/rules/` with empty `fr.py` and `uk.py` (full implementation in Phase 5 invoicing work)
 - [ ] 👥 Scaffold `backend/app/features/leaves/rules/` with empty `fr.py` and `uk.py`
 - [ ] 👥 Scaffold `backend/app/features/timesheets/rules/` with empty `fr.py` and `uk.py`
 - [ ] 🧑 Set up `next-intl` with `en-GB` and `fr-FR` locale files (per-feature folders, not monolithic)
 
 **Reference:** `specs/DATA_ARCHITECTURE.md` §14-§15, `docs/COUNTRY_PLAYBOOKS.md`
 
-### 3.5 Frontend skeleton
+### 3.5 Frontend skeleton (shell appears on every page, highest leverage on the frontend)
 
+> **No GCP needed.** Runs on `npm run dev` against the backend from §3.2.
+
+**Top priority (every page wraps around the shell):**
 - [ ] 🧑 🤖 Next.js 15 + React 19 + Tailwind 4 project in `frontend/`
 - [ ] 🧑 CSS-first theme: `styles/globals.css` with `@theme inline` bridge
 - [ ] 🧑 `styles/tokens.css` byte-exact mirror of `prototype/_tokens.css` (set up `npm run sync-tokens`)
 - [ ] 🧑 `components/shell/sidebar.tsx` at 224px width (NEVER 240)
 - [ ] 🧑 `components/shell/topbar.tsx` with SearchInput slot (280px desktop, icon-button mobile modal)
 - [ ] 🧑 `components/shell/bottom-nav.tsx` (mobile only)
-- [ ] 🧑 Command palette infrastructure (Cmd+K wiring, modal UI, read-only tool dispatch layer)
+
+**Secondary (build these once the shell renders correctly):**
+- [ ] 🧑 Command palette infrastructure (Cmd+K wiring, modal UI, read-only tool dispatch layer; hooks into `MockAIClient` initially)
 - [ ] 🧑 Notifications drawer (S2) with WebSocket connection + polling fallback
 - [ ] 🧑 ConflictResolver pattern (S3) in `components/patterns/`
 - [ ] 🧑 EntitlementLock UI (S4) in `components/ui/`
@@ -243,31 +268,36 @@ Every vendor sits behind an interface. No file outside these wrappers imports a 
 
 ### 3.6 Atom layer (3 to 4 weeks of one founder's time, parallelizable in three groups)
 
-**Group A (weeks 1-2):**
-- [ ] 🧑 🤖 Button (primary, secondary, tertiary, disabled, loading)
+> **No GCP needed.** Pure frontend work. Use the `/scaffold-atom` skill for each one.
+
+**Group A (do these FIRST; the 5 atoms that appear on every page):**
+- [ ] 🧑 🤖 Button (primary, secondary, tertiary, disabled, loading states)
 - [ ] 🧑 🤖 Input (text, number, email)
+- [ ] 🧑 🤖 Card
+- [ ] 🧑 🤖 Modal
+- [ ] 🧑 🤖 Table (list rows, selectable, sortable)
+
+**Group A continued (next 5, still high leverage):**
 - [ ] 🧑 🤖 Select
 - [ ] 🧑 🤖 Checkbox (new atom for bulk-select columns and forms)
 - [ ] 🧑 🤖 Radio
 - [ ] 🧑 🤖 Toggle
 - [ ] 🧑 🤖 Textarea
 
-**Group B (weeks 2-3):**
-- [ ] 🧑 🤖 Card
+**Group B (medium leverage, can slide a week if Group A is not done):**
 - [ ] 🧑 🤖 Badge
 - [ ] 🧑 🤖 Pill
 - [ ] 🧑 🤖 Breadcrumb
 - [ ] 🧑 🤖 Tabs
 - [ ] 🧑 🤖 Accordion
 
-**Group C (weeks 3-4):**
-- [ ] 🧑 🤖 Modal
+**Group C (lower leverage, last to build):**
 - [ ] 🧑 🤖 Drawer
 - [ ] 🧑 🤖 Toast
 - [ ] 🧑 🤖 Tooltip
 - [ ] 🧑 🤖 SearchInput (new atom for topbar global non-AI search)
-- [ ] 🧑 🤖 AIInsightCard (new atom, dashboard only)
-- [ ] 🧑 🤖 AIInvoiceExplanation (new atom, month-end close only)
+- [ ] 🧑 🤖 AIInsightCard (new atom, dashboard only, Phase 5 usage)
+- [ ] 🧑 🤖 AIInvoiceExplanation (new atom, month-end close only, Phase 5 usage)
 - [ ] 🧑 🤖 ConflictResolver composite pattern
 
 **Every atom must:**
@@ -277,21 +307,26 @@ Every vendor sits behind an interface. No file outside these wrappers imports a 
 - Pass WCAG 2.1 AA (contrast, focus ring, keyboard reachable)
 - Use existing design tokens only (no new tokens)
 
-**Reference:** `specs/DESIGN_SYSTEM.md`, `prototype/_tokens.css`
+**Reference:** `specs/DESIGN_SYSTEM.md`, `prototype/_tokens.css`, skill `/scaffold-atom`
 
-### 3.7 Testing infrastructure (do this before Phase 3 or the house of cards collapses)
+### 3.7 Testing infrastructure (unlocks test-first discipline; do this BEFORE feature code lands)
 
+> **No GCP needed.** Local CI + local Playwright against local dev server.
+
+**Top priority (the test-first foundation):**
 - [ ] 🤝 Install pytest + pytest-cov + pytest-asyncio + pytest-mock + hypothesis + playwright + pytest-playwright + locust
 - [ ] 🤝 Configure CI pipelines on GitHub Actions: unit, property, contract, E2E smoke, snapshot
 - [ ] 🤝 Set the coverage floor: 85% overall, 100% on financial math markers
-- [ ] 👥 Eval harness skeleton in `backend/app/ai/evals/` with folders for `month_end_close/`, `command_palette/`, `receipt_ocr/`, `insight_cards/`
-- [ ] 👥 Seed 5 hand-curated eval examples per feature (total 20 examples)
-- [ ] 🤝 First 5 property tests (invoice subtotal, invoice total, leave balance invariant, FX transitivity, tenant isolation)
 - [ ] 🤝 Contract test harness: FastAPI OpenAPI emission + `openapi-typescript` diff in CI
-- [ ] 🤝 Snapshot test framework + placeholder invoice PDF snapshot (real snapshots arrive with invoicing in Phase 5)
-- [ ] 🤝 First 5 E2E scenarios drafted (onboarding, timesheet submission, leave request, expense with OCR, month-end close draft path) - stubs are fine, they run against the real feature in Phase 5
-- [ ] 🤝 CI lint: em dash detection (U+2014, U+2013) across all `.md`, `.ts`, `.tsx`, `.py` files; blocks merge on match
-- [ ] 🤝 CI lint: "utilisation" detection (case-insensitive) across all code and docs; exception: the banned-word references in CLAUDE.md, SCOPE.md, FLAWLESS_GATE.md
+- [ ] 🤝 Snapshot test framework + placeholder invoice PDF snapshot
+
+**Secondary (expand the safety net as features land):**
+- [ ] 👥 Eval harness skeleton in `backend/app/ai/evals/` with folders for `month_end_close/`, `command_palette/`, `receipt_ocr/`, `insight_cards/`
+- [ ] 👥 Seed 5 hand-curated eval examples per feature (total 20 examples) - these guide feature implementation
+- [ ] 🤝 First 5 property tests (invoice subtotal, invoice total, leave balance invariant, FX transitivity, tenant isolation)
+- [ ] 🤝 First 5 E2E scenarios drafted (onboarding, timesheet submission, leave request, expense with OCR, month-end close draft path) - stubs are fine; they light up as features ship
+- [ ] 🤝 CI lint: em dash detection (U+2014, U+2013) across all `.md`, `.ts`, `.tsx`, `.py` files; blocks merge on match (already done at repo root via pre-commit, extend to CI)
+- [ ] 🤝 CI lint: "utilisation" detection (case-insensitive)
 - [ ] 🤝 CI lint: M1 vendor SDK imports outside wrappers
 - [ ] 🤝 CI lint: M3 cross-feature model imports
 - [ ] 🤝 CI check: M7 alembic `upgrade && downgrade -1 && upgrade` on every PR
@@ -299,37 +334,32 @@ Every vendor sits behind an interface. No file outside these wrappers imports a 
 
 **Reference:** `docs/TESTING_STRATEGY.md`, `docs/MODULARITY.md`
 
-### 3.8 Operator console minimum
+### 3.8 Operator console minimum (runs against local Postgres, built against stub wrappers)
 
-- [ ] 👥 Operator authentication (passkey-only, printed recovery codes, founder day-0 procedure)
+> **No GCP needed.** Local operator UI for creating test tenants during Phase 3+ development.
+
+- [ ] 👥 Operator authentication (passkey-only for real; use a local dev shortcut in §3.8 and enable real passkey in §3.11)
 - [ ] 👥 Tenant list + detail pages
 - [ ] 👥 Create tenant action (triggers provisioning)
 - [ ] 👥 Kill switch toggles (inventory from `docs/DEGRADED_MODE.md` §1)
 - [ ] 👥 Feature flag overrides per tenant
 - [ ] 👥 Migration status per tenant
 
-**Full operator console in Phase 3. This is the minimum to create a test tenant for Phase 3 work.**
+**Full operator console (billing, legal, audit exports) in Phase 3. This is the minimum to create a test tenant for Phase 3 work.**
 
 **Reference:** `specs/APP_BLUEPRINT.md` §9 (admin), ADR-010
 
-### 3.9 Runbooks and drills
+### 3.9 GTM seeds (parallel track, ~4 hours per week total, runs entirely in parallel with the build)
 
-- [ ] 🤝 First DR drill: run `docs/ROLLBACK_RUNBOOK.md` per-tenant rollback procedure on a staging tenant
-- [ ] 🤝 Document the result in `docs/incidents/drills/2026-MM-DD-first-drill.md`
-- [ ] 🤝 Schedule quarterly DR drills on the calendar
-- [ ] 🤝 Write `docs/LEGAL_HOLD_RUNBOOK.md` with break-glass procedure (per ADR-005 M26)
-
-### 3.10 GTM seeds (parallel to build, ~4 hours per week total)
-
-Two full-time founders means GTM starts now, not Phase 4.
+> **No GCP needed.** Marketing and customer discovery work.
 
 - [ ] 🧑 Write blog post #1: "The 10-hour month-end close problem in consulting firms"
-- [ ] 🧑 Write blog post #2: "Why Kantata is still winning (and how we'll change that)"
+- [ ] 🧑 Write blog post #2: "Why Kantata is still winning (and how we will change that)"
 - [ ] 🧑 Write blog post #3: "Agentic AI for consulting ops: drafts, not decisions"
 - [ ] 🧑 Set up landing page placeholder (Framer or Next.js) with email capture + 3-minute founder video
 - [ ] 🧑 Record the 3-minute founder intro video (raw, authentic, no agency)
 - [ ] 🧑 Start founder LinkedIn presence, 2 posts per week on consulting ops pain
-- [ ] 🧑 Set up `support@[domain]` and `hello@[domain]` inboxes
+- [ ] 🧑 Set up `support@[domain]` and `hello@[domain]` inboxes (can wait until domain is chosen)
 - [ ] 🧑 Start the email list (MailerLite or Buttondown, free tier)
 - [ ] 🤝 Identify 50 warm-intro targets (LinkedIn): COOs, HR directors, finance leads at EU consulting firms 50-500 employees, FR + UK
 - [ ] 🤝 Send 10 warm-intro requests per week
@@ -337,23 +367,108 @@ Two full-time founders means GTM starts now, not Phase 4.
 
 **Reference:** `docs/GO_TO_MARKET.md`
 
+---
+
+**Build track checkpoint.** At this point (§3.1 through §3.9 done), you have a working Gamma app running on your laptop. Backend + frontend + atoms + testing + shell + operator console + 10 discovery calls. No GCP involved. This is the right moment to set up GCP.
+
+---
+
+### 3.10 GCP environment provisioning (runs at Phase 2 end, when you have something to deploy)
+
+> **GCP required here.** Run `docs/runbooks/gcp-bootstrap.md` in order. Every step uses `gamma-ops` CLI commands from `infra/ops/` where implemented, and gcloud fallbacks marked [STUB] where not yet implemented.
+
+- [ ] 👥 Install `infra/ops/` library per `docs/runbooks/dev-machine-bootstrap.md` if not already done
+- [ ] 👥 `gcloud auth login` + `gcloud auth application-default login`
+- [ ] 👥 Find billing account ID: `gcloud billing accounts list`
+- [ ] 👥 Create GCP project `gamma-staging-001` via `gamma-ops gcp projects create`
+- [ ] 👥 Create GCP project `gamma-prod-001` via `gamma-ops gcp projects create`
+- [ ] 👥 Enable APIs: `gamma-ops gcp projects enable-apis` (sqladmin, run, storage, kms, secretmanager, aiplatform, pubsub, cloudscheduler, monitoring, logging, iamcredentials)
+- [ ] 👥 Link billing account: `gamma-ops gcp projects link-billing`
+- [ ] 👥 Configure Workload Identity Federation for GitHub Actions (no service account JSON files, see `docs/runbooks/secrets-management.md` §4)
+- [ ] 👥 Configure GCP billing alerts at 50%, 80%, 100% (console, one-time)
+- [ ] 👥 Create KMS keyring `gamma-tenant-keys` via `gamma-ops gcp kms create-keyring`
+- [ ] 👥 Create platform CryptoKey `gamma-platform-key` with 365-day rotation via `gamma-ops gcp kms create-key`
+- [ ] 👥 Create 4 GCS buckets (uploads, backups, legal-hold, static) with CMEK via `gamma-ops gcp storage create-bucket`
+- [ ] 👥 Apply retention policy LOCK to the legal-hold bucket (run once, cannot be undone)
+- [ ] 👥 Provision Cloud SQL Postgres 16 Regional HA (gcloud [STUB] until `gamma_ops/gcp/cloudsql.py` is implemented)
+- [ ] 👥 Create DB password + JWT signing key + Vertex API key in Secret Manager via `gamma-ops gcp secrets create`
+- [ ] 👥 Configure Cloud Run services (ops, app, portal, worker) with `min_instances=1` prod, `0` staging (gcloud [STUB] until `gamma_ops/gcp/cloudrun.py` lands)
+- [ ] 👥 Configure VPC connector for Cloud Run to Cloud SQL private IP
+- [ ] 👥 Configure Cloudflare DNS + WAF + Access via `docs/runbooks/cloudflare-bootstrap.md`
+- [ ] 👥 Set up GitHub repo branch protection on `main`
+- [ ] 👥 Set up Cloud Monitoring dashboards with multi-region labels
+- [ ] 👥 Set up Cloud Logging with per-service log routing
+
+**Reference:** `docs/runbooks/gcp-bootstrap.md`, `docs/runbooks/cloudflare-bootstrap.md`, `infra/ops/README.md`, ADR-001, ADR-008
+
+### 3.11 Swap vendor wrappers from stub to real implementations
+
+> **GCP required here.** With GCP provisioned at §3.10, swap the stub implementations from §3.3 to real ones. Each swap is a one-file change because the interface is stable.
+
+- [ ] 👥 `AIClient`: `MockAIClient` -> `VertexGeminiClient` (reads from Secret Manager via `gamma_ops.gcp.secrets.read_secret`)
+- [ ] 👥 `BlobStorage`: `LocalFilesystemBlobStorage` -> `GCSBlobStorage` (uses buckets from §3.10 with CMEK)
+- [ ] 👥 `EmailSender`: `MailhogEmailSender` -> `WorkspaceSMTPRelaySender` (Google Workspace SMTP relay, IP-allowlisted)
+- [ ] 👥 `PaymentProvider`: `NullPaymentProvider` stays for v1.0 (manual PDF invoicing path). Stripe wrapper registered but not yet active (DEF-029 trigger at customer 5-10).
+- [ ] 👥 `VisionOCR`: `MockVisionOCR` -> `GeminiVisionOCR`
+- [ ] 👥 `TelemetryClient`: `StdoutTelemetryClient` -> `CloudMonitoringClient`
+- [ ] 👥 Re-run every test suite (unit + property + contract + E2E) against the real implementations to catch integration gaps
+- [ ] 👥 Re-run the AI eval harness against real Gemini to validate evaluation thresholds still pass
+
+### 3.12 First real staging deploy
+
+> **GCP required here.** The moment of truth: does the app actually run outside your laptop?
+
+- [ ] 👥 Build backend Docker image, push to GCR / Artifact Registry
+- [ ] 👥 Build frontend Docker image, push to GCR / Artifact Registry
+- [ ] 👥 Deploy backend to `gamma-staging-001` Cloud Run via `gamma-ops gcp cloudrun deploy` (or gcloud fallback)
+- [ ] 👥 Deploy frontend to `gamma-staging-001` Cloud Run
+- [ ] 👥 Configure Cloudflare DNS CNAMEs to point at Cloud Run URLs for `ops.<domain>`, `app.<domain>`, `portal.<domain>`
+- [ ] 👥 Verify health checks green on all four services
+- [ ] 👥 Create a test tenant via the real operator console (runs on real Cloud SQL)
+- [ ] 👥 Smoke-test the onboarding wizard end-to-end with a tiny CSV
+- [ ] 🤝 Celebrate. This is the first time anything you built actually runs on the internet.
+
+### 3.13 DR drill and operational readiness
+
+> **GCP required here.** Prove the safety net works before Phase 3 begins.
+
+- [ ] 🤝 First DR drill: run `docs/ROLLBACK_RUNBOOK.md` per-tenant rollback procedure on the staging test tenant
+- [ ] 🤝 Document the result in `docs/incidents/drills/2026-MM-DD-first-drill.md`
+- [ ] 🤝 Schedule quarterly DR drills on the founder calendar
+- [ ] 🤝 Write `docs/LEGAL_HOLD_RUNBOOK.md` with break-glass procedure (per ADR-005 M26)
+- [ ] 🤝 Verify monitoring dashboards show real traffic from the smoke test
+
 ### Phase 2 exit criteria
 
 All of these must be true before starting Phase 3. Any red item blocks the transition.
 
-- [ ] GCP prod and staging provisioned, CI green on an empty PR
-- [ ] All M1 vendor wrappers in place, CI enforces no direct SDK imports
-- [ ] Atom layer complete (Groups A + B + C), all atoms pass contrast and focus-ring checks in both themes
-- [ ] Shell (sidebar + topbar + bottom-nav + command palette + notifications drawer + conflict resolver + entitlement lock) usable on an empty page
+**Build track (must be done):**
+- [ ] Local dev up (`make dev-up` works on both laptops)
+- [ ] All M1 vendor wrappers in place with stub implementations, CI enforces no direct SDK imports
+- [ ] Backend skeleton runs against local Postgres with tenancy middleware + auth + audit log
+- [ ] Frontend skeleton renders the shell on a blank page, dark mode and light mode both look right
+- [ ] Atom layer Group A complete (at least 10 atoms), all passing contrast and focus-ring checks
 - [ ] Testing infrastructure live: first 5 property tests passing, first 5 E2E scenarios stub running, contract test harness green
-- [ ] Operator console minimum shipped (create a test tenant end-to-end)
+- [ ] Operator console minimum shipped (create a test tenant end-to-end against local Postgres)
+
+**Deploy track (must be done):**
+- [ ] GCP prod and staging provisioned, Workload Identity Federation configured
+- [ ] Vendor wrappers swapped from stub to real implementations, all tests still green
+- [ ] First staging deploy successful, smoke test passes
 - [ ] First DR drill completed and documented
-- [ ] GTM: 10 discovery calls done, email list has >50 subscribers
+
+**GTM track (must be done):**
+- [ ] 10 discovery calls done, email list has >50 subscribers, 3 blog posts published
+
+**Quality gate:**
 - [ ] 0 em dashes, 0 "utilisation" (except banned-word references) across repo
 
----
-
 ## 4. Phase 3: Auth + onboarding + full operator console (target: weeks 8-13)
+
+**The 20% of Phase 3 that matters most (do these first):**
+1. **Onboarding wizard UX** (first 5 minutes of a pilot decide sign vs churn)
+2. **CSV import pipeline + AI column mapper** (the pilot cannot start without this)
+3. **OIDC login** (Google Workspace SSO covers 80% of EU consulting firm buyers)
 
 - [ ] 👥 🤖 Login page (passkey + password + OIDC)
 - [ ] 👥 🤖 Register page
@@ -387,6 +502,11 @@ All of these must be true before starting Phase 3. Any red item blocks the trans
 
 ## 5. Phase 4: Core data + dashboard pass 1 (target: weeks 13-18)
 
+**The 20% of Phase 4 that matters most (do these first):**
+1. **Clients profile + projects profile + team allocation** (what a prospect asks to see on day 1 of a pilot)
+2. **Dashboard KPI strip** (the single most-scrutinized page in every demo)
+3. **Validated lead gate cleared** (non-negotiable before Phase 5 heavy build begins)
+
 - [ ] 👥 🤖 Employees directory (list + filter + search + pagination)
 - [ ] 👥 🤖 Employee profile page (overview + team + allocations + contribution)
 - [ ] 👥 🤖 Clients directory
@@ -413,6 +533,13 @@ All of these must be true before starting Phase 3. Any red item blocks the trans
 ---
 
 ## 6. Phase 5: Core modules (target: weeks 18-32, the heaviest phase)
+
+**The 20% of Phase 5 that matters most (build in this order, everything else flows from them):**
+1. **Timesheets** (week-as-entity, offline queue, approval). Without time entry, there are no invoices and no revenue.
+2. **Invoices generation** (manual path, WeasyPrint PDF, rate precedence). The money-making mechanism of the whole product.
+3. **Month-end close agent**. The single feature that justifies €35 per seat over a commodity PSA.
+
+Everything else in Phase 5 (expenses, leaves, approvals, admin, account, dashboard pass 2, payroll export, ongoing imports) depends on these three or can slide a week without killing the pilot.
 
 Eleven features, each through the full 10-step quality chain. Each feature gets its own sub-checklist. The template is below; copy and expand as each feature starts.
 
@@ -472,6 +599,13 @@ For each feature, the standard checklist is:
 
 ## 7. Phase 6: Tier 2 + portal (target: weeks 32-42)
 
+**The 20% of Phase 6 that matters most (do these first):**
+1. **Calendar (month view, read-only)**. The one Tier 2 feature prospects ask about in every demo.
+2. **Resource planning page** (capacity heatmap). The differentiator versus Kantata and Personio.
+3. **Client portal login + invoices view**. Unlocks the "customers can see their own invoices" pitch.
+
+Gantt, HR module enhancements, and insights page polish are lower leverage and can slide if needed.
+
 - [ ] 🤝 🤖 Calendar (month view read-only, projects + leaves as colored blocks, no drag-edit)
 - [ ] 🤝 🤖 Gantt (read-only, project timelines)
 - [ ] 🤝 🤖 Resource planning page (capacity heatmap, read-only in v1.0)
@@ -493,6 +627,13 @@ For each feature, the standard checklist is:
 ---
 
 ## 8. Phase 7: Hardening + launch (target: weeks 42-54)
+
+**The 20% of Phase 7 that matters most (do these first):**
+1. **First paying customer onboarding + retention** (customer 1 is the reference case for every future deal)
+2. **SOC 2 Type 1 audit cleared** (enterprise buyers refuse to sign without this)
+3. **Public status page + incident response runbook drilled** (table stakes for enterprise trust)
+
+Security audit, load testing, docs site, Product Hunt launch are all important but depend on the three above.
 
 - [ ] 🤝 Third-party security audit + pen test
 - [ ] 🤝 Performance load test (customer 1 seed data, 50 concurrent synthetic users, 30 minutes)
