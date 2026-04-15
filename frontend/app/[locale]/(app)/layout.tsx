@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 
-export default function AppShellLayout({ children }: { children: ReactNode }) {
-  // TODO (Phase 2): replace with <AppShell><Sidebar/><Topbar/><BottomNav/>{children}</AppShell>
-  return <div className="min-h-screen">{children}</div>;
+import { AppShell } from "@/components/shell/app-shell";
+import { Providers } from "@/components/providers";
+
+export default function AppGroupLayout({ children }: { children: ReactNode }) {
+  return (
+    <Providers>
+      <AppShell>{children}</AppShell>
+    </Providers>
+  );
 }

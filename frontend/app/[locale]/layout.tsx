@@ -6,8 +6,8 @@ import { locales, type Locale } from "@/lib/i18n";
 import "@/styles/globals.css";
 
 export const metadata = {
-  title: "GammaHR",
-  description: "HR operations for consulting firms",
+  title: "Gamma",
+  description: "The operations OS for modern consulting firms",
 };
 
 export function generateStaticParams() {
