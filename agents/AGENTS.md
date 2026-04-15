@@ -1,7 +1,7 @@
 # AGENTS
 
 > Roles + pipeline + rules. Read `CLAUDE.md` first for the hard rules.
-> The roster is a mental model. In practice one general-purpose agent does most tasks; the founder is the foreman.
+> Gamma is built by two founders from day 0. The roster below is aspirational for a two-founder team: in practice one general-purpose agent does most day-to-day work. The roster defines the mental model for review gates (security reviewer, API engineer, QA scout), not separate hires.
 
 ---
 

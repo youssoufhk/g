@@ -1,6 +1,6 @@
 # AI FEATURES
 
-> Every place AI appears in GammaHR v1.0, how it is wired, and how it fails safely.
+> Every place AI appears in Gamma v1.0, how it is wired, and how it fails safely.
 > **Provider: Google Vertex AI Gemini 2.5 Flash** (EU region `europe-west9`), called via the Google Cloud AI Platform Python SDK. All code in `backend/app/ai/` plus per-feature tool definitions in `backend/app/features/*/ai_tools.py`.
 > Pattern: **LLM-as-router with deterministic tools**. The LLM's only job is to parse a user query or a prepared context and call a deterministic Python tool with the right arguments. All business logic lives in the tools.
 > Numbers marked "target" are goals, not measured baselines.
@@ -15,21 +15,22 @@
 4. **Structured outputs only.** Tool schemas are Pydantic models, JSON Schema generated, not hand-written.
 5. **Prompt injection defense.** User input is always a user turn, never concatenated into the system prompt. Tool outputs re-validated before execution.
 6. **PII rules are enforced via pytest metatest.** Confidential-tier columns (compensation, banking, Art. 9) never appear in any prompt. Metatest greps the tool definitions and blocks merge on violation.
-7. **Non-AI fallback on every flow.** OCR falls back to manual entry, command palette falls back to sidebar navigation, insight cards fall back to yesterday's cache.
+7. **Non-AI fallback on every flow.** OCR falls back to manual entry, command palette falls back to sidebar navigation, insight cards fall back to yesterday's cache. Month-end close falls back to analyzer-only chips with no paragraph explanation.
 8. **Zero-retention at Vertex AI layer.** Configured in Vertex AI settings. Prompts are transient: not logged to Cloud Logging, not included in error reports.
 9. **Reversibility:** `backend/app/ai/client.py` is a single abstraction. Swapping to Claude Haiku or any other vendor is a one-file change (see DEF-046).
 
 ---
 
-## 2. Three feature surfaces (the locked v1.0 scope)
+## 2. Four feature surfaces (the locked v1.0 scope)
 
-Exactly three AI-visible surfaces ship in v1.0. Everything else is deferred.
+Exactly four AI-visible surfaces ship in v1.0. Everything else is deferred.
 
 | Surface | Where | Feature |
 |---|---|---|
 | 1. Command palette | Cmd+K from every (app) page | Natural-language query → LLM picks tool → tool returns structured result → frontend renders |
 | 2. Receipt OCR | Expense submission form | Gemini vision reads receipt image, returns merchant/date/amount/tax/currency/category suggestion |
 | 3. Insight cards | Dashboard + nightly Celery job | LLM summarizes candidate signals produced by deterministic analyzers, writes 3-5 cards per tenant per day |
+| 4. Month-end close agent | /invoices/month-end | Gemini ranks and explains deterministic analyzer signals per draft invoice; the draft generation and line math are pure Python. User confirms each draft before send. See specs/APP_BLUEPRINT.md §8.3. |
 
 ---
 
@@ -59,8 +60,9 @@ Tools live in `backend/app/features/*/ai_tools.py` and are auto-discovered at st
 | `extract_receipt_data` | `features/expenses/ai_tools.py` | Call Gemini vision on a receipt image, return structured expense data |
 | `navigate_to` | `features/core/ai_tools.py` | Generate a URL to a specific entity for command palette UX |
 | `onboarding_column_mapper` | `features/imports/ai_tools.py` | Map CSV headers to target schema during onboarding (per `docs/DATA_INGESTION.md`) |
+| `explain_invoice_draft` | `features/invoicing_agent/ai_tools.py` | Given a draft invoice and its analyzer signals, return one short plain-text paragraph (2-3 sentences) and the top 3 ranked signals. Called in batches of up to 20 drafts per prompt. |
 
-15 tools total for v1.0. Expansion = one new file per tool, not a new prompt family.
+16 tools total for v1.0. Expansion = one new file per tool, not a new prompt family.
 
 ### 3.2 Tools that are NOT in v1.0
 
@@ -184,7 +186,7 @@ Manual expense form is always available. If `extract_receipt_data` fails or retu
 
 ### 6.1 Behavior
 
-- Scheduled nightly Celery beat job per tenant, running at 4am tenant local time (Celery beat respects per-tenant timezones so daylight-saving transitions are handled correctly)
+- Celery beat schedules the nightly insights job daily at 04:00 UTC. The job, when it fires, iterates tenants and converts 04:00 UTC to each tenant's `default_timezone`; it only generates for tenants where the local time is between 04:00 and 05:00 (quiet hours). Tenants outside that window skip this run and get picked up the next day.
 - **Deterministic analyzers** (pure Python, no AI) produce candidate signals: projects over budget, employees with overdue timesheets, clients with overdue invoices, teams near capacity, leaves unapproved more than 5 days, etc.
 - **Gemini's job** is to rank the signals by importance, write a one-paragraph explanation per card in the user's language, and return 3-5 top cards
 - Cards stored in `ai_insights` table, cached 24 hours, displayed on the dashboard and the Insights page
@@ -209,9 +211,81 @@ The analyzers do the math. Gemini only writes the human-readable explanation and
 
 ---
 
-## 7. Budget and cost guardrails
+## 7. Surface 4: Month-end close agent
 
-### 7.1 Per-tenant monthly budget
+### 7.1 Why it exists
+
+The month-end close is the single most painful manual process for a consulting finance team: 2-4 hours per month going through timesheets and expenses, matching them to clients, drafting invoices in a spreadsheet or stale tool, chasing a colleague to verify a rate, then copying into the billing system. Gamma collapses this to "review queue, confirm each". The agent is the one v1.0 AI surface where the savings are hours per month per user, directly demo-able, and directly revenue-measurable (speed of billing = speed of cash).
+
+### 7.2 Architecture (LLM-as-router applied)
+
+1. Celery job `tasks.invoicing_agent.generate_drafts(tenant_id, period_start, period_end)` fires deterministic analyzers against approved timesheets, approved expenses, and active rate periods.
+2. Deterministic Python generates draft invoices per client using the line generation algorithm in `specs/DATA_ARCHITECTURE.md` §4.4.1. No AI involvement in the math.
+3. For each draft, analyzers return a list of candidate signals (see `specs/APP_BLUEPRINT.md` §8.3).
+4. The tool `explain_invoice_draft` calls Gemini Flash in batches of up to 20 drafts per prompt. Input: the draft summary (client, total, line count, signals). Output: a Pydantic-validated `InvoiceExplanation` object per draft with fields `{paragraph: str, top_signals: list[str], severity: literal["info", "warning", "action_needed"]}`.
+5. Results are stored on the draft invoice row in `invoices.ai_explanation_json` and displayed via the `AIInvoiceExplanation` atom.
+
+### 7.3 Tool schemas
+
+```python
+class InvoiceDraftSummary(BaseModel):
+    invoice_id: UUID
+    client_name: str
+    total_cents: int
+    currency: str
+    line_count: int
+    period_start: date
+    period_end: date
+    signals: list[AnalyzerSignal]
+
+class AnalyzerSignal(BaseModel):
+    code: str  # e.g. "rate_change_mid_period"
+    severity: Literal["info", "warning", "action_needed"]
+    reason: str  # human-readable, in user's language
+    entity_refs: list[str]  # entity IDs for deep-linking
+
+class InvoiceExplanation(BaseModel):
+    invoice_id: UUID
+    paragraph: str  # 2-3 sentences, plain text, no markdown
+    top_signals: list[str]  # up to 3 signal codes, ranked
+    severity: Literal["info", "warning", "action_needed"]
+```
+
+### 7.4 Cost target
+
+- Input: ~4000 tokens per batch of 20 drafts (draft summaries + analyzer signals + system prompt)
+- Output: ~1500 tokens per batch (20 explanations × ~75 tokens each)
+- Gemini Flash pricing: ~€0.004 per batch
+- A 120-client tenant runs ~6 batches per month (120 / 20): ~€0.024/month per tenant
+
+The cost is negligible compared to the revenue impact. The v1.0 monthly Gemini budget is unchanged (~€5/month per 200-employee tenant).
+
+### 7.5 Accuracy targets (targets, not baselines)
+
+| Field | Target |
+|---|---|
+| Severity classification | 85% agreement with finance reviewer ground truth |
+| Top-signal ranking | 80% relevance (top 3 signals match what reviewer would flag) |
+| Paragraph fluency | 95% pass (no em dashes, no hallucinated entity names, no numbers that don't match signals) |
+
+Evaluated against a synthetic eval set of 30 draft invoices with hand-curated signals and expected outputs, stored in `backend/app/ai/evals/invoicing_agent/`.
+
+### 7.6 Fallback
+
+If `kill_switch.ai` is on OR the Gemini call fails OR the per-tenant hourly AI ceiling is hit, the page still renders the draft queue. The `AIInvoiceExplanation` atom falls back to a neutral state showing just the analyzer signals as chips with no paragraph. Finance review is slower but functional. This is defined in `docs/DEGRADED_MODE.md` §2.
+
+### 7.7 What's deferred
+
+- Auto-send without confirmation (never; user always confirms)
+- Machine learning from user edits (v1.1)
+- Cross-period retroactive corrections (v1.1)
+- Auto-dunning for unpaid (DEF-029 payment processor)
+
+---
+
+## 8. Budget and cost guardrails
+
+### 8.1 Per-tenant monthly budget
 
 Default per pricing tier, denominated in EUR, enforced inside `ai/client.py`:
 
@@ -224,13 +298,13 @@ Default per pricing tier, denominated in EUR, enforced inside `ai/client.py`:
 - **Warning at 80%:** banner to tenant admin, email notification
 - **Cutoff at 100%:** `tenants.ai_enabled = false` effective until next month OR admin raises the limit (up to 3x tier default auto, above that needs operator console approval)
 
-### 7.2 Per-user rate limits
+### 8.2 Per-user rate limits
 
 - Command palette: 20 queries per user per hour
 - OCR: 100 calls per user per hour
 - Insight cards: background-only, no per-user rate limit
 
-### 7.3 Degraded mode triggers
+### 8.3 Degraded mode triggers
 
 - Tenant budget hits 80%
 - OR hourly AI spend across all users exceeds 10x the 7-day moving average (runaway detection)
@@ -242,7 +316,27 @@ In degraded mode:
 - Banner in the app explains why
 - Operator console has an override to unpause a tenant manually
 
-### 7.4 Cost estimate, per 200-employee tenant, per month
+Degraded-mode behavior is defined per-feature in `docs/DEGRADED_MODE.md` (behavior matrix in section 2). Every Tier 1 feature's flawless-gate run must include one pass with `kill_switch.ai = on` to verify the row is true. Failure to handle degraded mode is a gate fail, not a polish item.
+
+### 8.3.1 Runaway cost hard ceiling
+
+**Primary defense: per-user rate limits** (20 palette queries/hour, 100 OCR calls/hour per tenant). These catch almost all abuse before cost spikes.
+
+**Secondary defense: hard per-hour ceiling.** Each tenant has a hard ceiling of 1 EUR/hour of total Vertex AI spend, enforced in `backend/app/ai/client.py` before any call. Spend exceeding the ceiling returns HTTP 429 with `error=ai_rate_limited` and the user sees the degraded-mode banner. The ceiling is configurable per tenant via `tenants.ai_hourly_ceiling_cents` (default 100 = 1 EUR).
+
+**Tertiary defense: weekly budget alert.** A nightly Celery job checks each tenant's rolling 7-day spend. If spend exceeds 200% of the prior 7-day moving average, an alert emails ops@gammahr.com; at 500%, `kill_switch.ai` is auto-flipped for that tenant (see `docs/DEGRADED_MODE.md`). A cold-start baseline of 0.01 EUR/hour is used for tenants with <7 days of history, avoiding division-by-zero.
+
+**Never relied-upon defense: spending caps in GCP billing.** GCP billing budgets with 50/80/100% alerts are a safety net, not a primary control.
+
+### 8.3.2 Prompt logging scope
+
+**Prompt logging scope:** the AI client logs `tenant_id, feature, prompt_version, input_token_count, output_token_count, latency_ms, cost_eur, status, error_class` for every call. It does NOT log the prompt text or the response text (avoid PII liability). This gives cost observability without retention exposure. Retention: 90 days. See `docs/COMPLIANCE.md` section 7.
+
+### 8.3.3 Closed tool registry
+
+The tool registry is closed: the router cannot call tools not pre-registered per-feature. If a user request does not match any tool, the router falls back to a canned "I can help with <list>" response and does not attempt free-form completion. This is enforced in `backend/app/ai/client.py` at the dispatch layer.
+
+### 8.4 Cost estimate, per 200-employee tenant, per month
 
 | Feature | Events/mo | €/event | Total |
 |---|---|---|---|
@@ -250,15 +344,16 @@ In degraded mode:
 | Expense OCR | 1500 | €0.003 | €4.50 |
 | Insight cards | 30 | €0.003 | €0.10 |
 | Onboarding column mapper | ~1 (per new CSV upload) | €0.001 | ~€0.01 |
+| Month-end close agent | 6 batches/mo | €0.004 | €0.024 |
 | **Total** | | | **~€5/month per tenant** |
 
 This is an order of magnitude lower than the original Claude-based estimate because Gemini Flash is 5-10x cheaper than Claude Haiku. The €10 Starter budget gives ~2x headroom.
 
 ---
 
-## 8. PII and compliance
+## 9. PII and compliance
 
-### 8.1 What is NEVER in any prompt
+### 9.1 What is NEVER in any prompt
 
 The following columns are Confidential-tier (see `specs/DATA_ARCHITECTURE.md` section 8.1) and MUST NEVER appear in any AI prompt, even indirectly:
 
@@ -269,7 +364,7 @@ The following columns are Confidential-tier (see `specs/DATA_ARCHITECTURE.md` se
 
 These columns are physically split into separate tables with finance/admin-only access, and CMEK-encrypted at rest via Cloud KMS with a per-tenant keyring. A pytest metatest greps all tool definitions and prompt templates for references to these table names and blocks merge on violation.
 
-### 8.2 What IS in prompts (classified Internal)
+### 9.2 What IS in prompts (classified Internal)
 
 - Employee names, emails, role titles
 - Client names, project names, project codes
@@ -278,20 +373,20 @@ These columns are physically split into separate tables with finance/admin-only 
 
 This data is routed to Vertex AI in `europe-west9` within the same GCP project, same DPA, EU-only. Zero-retention configured in Vertex AI settings. This is acceptable under the Internal-tier classification in the data classification scheme.
 
-### 8.3 Tenant and user opt-outs
+### 9.3 Tenant and user opt-outs
 
 - `tenants.ai_enabled` BOOL defaults TRUE. Admin can disable; UI hides AI surfaces when disabled; OCR falls back to manual entry.
 - `users.ai_enabled` BOOL defaults TRUE. User profile toggle. Disabled users' data never appears in any prompt, even when tenant has AI enabled. This is the GDPR Art. 21 "right to object" implementation.
 
-### 8.4 What is logged
+### 9.4 What is logged
 
 `public.ai_events` stores only meter data: tokens, cost, tool, latency, request_id. **Never logs prompt content.** Prompts are transient.
 
 ---
 
-## 9. Prompt versioning and evaluation
+## 10. Prompt versioning and evaluation
 
-### 9.1 Prompt templates
+### 10.1 Prompt templates
 
 - All Jinja2 templates live in `backend/app/ai/prompts/*.jinja`
 - Versioned filenames: `palette_router_v1.jinja`, `insight_card_v2.jinja`, etc.
@@ -299,14 +394,14 @@ This data is routed to Vertex AI in `europe-west9` within the same GCP project, 
 - Every template begins with tenant name, user role, current date, user language
 - Banned words enforced by linter: no em dashes, no "utilisation"
 
-### 9.2 Tool schemas
+### 10.2 Tool schemas
 
 - Every tool is a Pydantic model
 - JSON Schema generated automatically via `model.model_json_schema()`
 - Schemas serialized into the system prompt so Gemini knows the available tools
 - Output validated against the schema before execution
 
-### 9.3 Evaluation harness
+### 10.3 Evaluation harness
 
 - `backend/app/ai/evals/` directory contains 10-20 hand-curated synthetic examples per tool family
 - CI runs evals on every prompt or tool-schema change
@@ -316,13 +411,13 @@ This data is routed to Vertex AI in `europe-west9` within the same GCP project, 
   - Insight card coherence: 75%
 - Evals use **synthetic data only**, never real customer data
 
-### 9.4 Kill switch for evals
+### 10.4 Kill switch for evals
 
 If the eval suite itself is broken (CI dependency, infrastructure flake), the founder can skip it with a manual PR approval. This should be rare. Log every skip in the PR description so patterns become visible.
 
 ---
 
-## 10. Observability
+## 11. Observability
 
 - Every Gemini call logged to `public.ai_events`: tenant, user, feature, tool, model, input_tokens, output_tokens, cost_cents, latency_ms, request_id, created_at
 - `ai_events` partitioned monthly
@@ -331,7 +426,7 @@ If the eval suite itself is broken (CI dependency, infrastructure flake), the fo
 
 ---
 
-## 11. Reversibility
+## 12. Reversibility
 
 The entire AI stack sits behind `backend/app/ai/client.py`:
 
@@ -348,7 +443,7 @@ This is the DEF-046 escape hatch. It is not a planned migration; it is insurance
 
 ---
 
-## 12. Cross-references
+## 13. Cross-references
 
 - `specs/DATA_ARCHITECTURE.md` section 5 (AI layer data model), section 6 (feature gating via entitlements + flags + kill switches)
 - `docs/DATA_INGESTION.md` section 5 (OCR pipeline)

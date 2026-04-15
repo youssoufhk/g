@@ -1,18 +1,24 @@
 # CLAUDE.md
 
 > **Read this first. Every session. Before any tool call.**
-> This file is the contract between the founder and every Claude agent working on GammaHR.
+> This file is the contract between the founders and every Claude agent working on Gamma.
 > If something here conflicts with any other doc, this file wins. If this file is silent, consult the map in section 9.
 
 ---
 
-## 1. What GammaHR is (30 seconds)
+## 1. What Gamma is (30 seconds)
 
-GammaHR is a premium B2B HR operations platform for consulting firms with 50 to 500 employees. It unifies time, projects, clients, expenses, invoices, leaves, and resource planning with AI assistance. The target feel is Revolut for HR: the app does the work, the user confirms.
+Gamma is a premium operations platform for consulting firms with 50 to 500 employees. It unifies time, projects, clients, expenses, invoices, leaves, and resource planning, with agentic AI that drafts monthly invoices and the user confirms. The target feel is Revolut for a consulting firm: the app does the work, you confirm.
 
-Founder: non-technical product owner, 20 hours a week, native C++ background, very demanding quality bar.
+Category: operations platform for modern consulting firms. Tagline: "The operations OS for modern consulting firms." Not HR (crowded category). Not generic PSA (we own design and agentic AI).
+
+Team: two founders from day 0. Founder (non-technical product owner, native C++ background, very demanding quality bar, 20 h/week available) leads product + design + frontend. Co-founder leads backend + infra + AI. Both on customer calls.
+
 Tech stack (locked): Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) + Celery on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Vertex AI Gemini (EU-resident, LLM-as-router pattern with deterministic per-feature tools) for AI. Hosted on GCP `europe-west9` (Paris) with Cloudflare in front for DNS, WAF, CDN, and Access, and GitHub for repo and CI.
+
 First customer target: ~201 employees, ~120 clients, EU-based consulting firm. See `specs/DATA_ARCHITECTURE.md` section 12.10 for the canonical seed data breakdown (1 owner, 2 admins, 4 finance, 15 managers, 177 employees, 2 readonly; 260 projects, 52 weeks of timesheets, 700 leaves, ~8,400 expenses, 900 invoices/year; HSBC UK as a GBP-billing client).
+
+Legal entity: Global Gamma Ltd (UK).
 
 ---
 
@@ -24,15 +30,15 @@ Break any of these and your work gets reverted.
 2. **Never edit `prototype/` except visual bugs the founder flags.** The prototype is the approved visual spec. It is frozen.
 3. **Never modify design tokens.** `prototype/_tokens.css` is locked. Mirror it, never rewrite it. Sidebar is 224px, not 240. Primary is `hsl(155, 26%, 46%)`. Surfaces are `--color-surface-0..3`, not `--color-bg-0..3`.
 4. **Never invent atoms.** If it is not in `specs/DESIGN_SYSTEM.md`, stop and ask. New atoms go through the founder.
-5. **Never use em dashes.** Use hyphens or restructure the sentence. The founder hates them. Anywhere: code, docs, UI strings, commit messages.
+5. **Never use em dashes.** Use hyphens or restructure the sentence. The founder hates them. Anywhere: code, docs, UI strings, commit messages. (Em dashes render inconsistently across browsers and mobile narrow screens, and the founder dislikes them on sight. Use hyphens for ranges (Jan 1 - Dec 31), parentheses for asides, or a period + capital letter.)
 6. **Never use the word "utilisation".** Use "work time", "capacity", or "contribution".
 7. **Never hand-edit the sidebar in individual pages.** It lives in one shared component. If you need a change, change the shared component.
 8. **Never add animations, sparklines, 3D, or decorative flourishes.** Only fix what is broken, wrong, or missing. The founder will run dedicated polish passes separately.
 9. **Never commit without the founder asking.** No `git commit`, no `git push` unless explicitly told.
-10. **Never skip CI, skip hooks, or pass `--no-verify`.** Fix the underlying issue.
+10. **Never skip CI, skip hooks, or pass `--no-verify`.** Fix the underlying issue. (GitHub Actions workflows in `.github/workflows/` and local pre-commit hooks in `.pre-commit-config.yaml`.)
 11. **Never invent API endpoints or data contracts.** If the spec is silent, ask.
 12. **Never batch more than 3 subagents at once.** Rate limits matter.
-13. **Never invoke these global skills in GammaHR work:** `frontend-design`, `brand-guidelines`, `theme-factory`, `canvas-design`, `algorithmic-art`. They promote creative, maximalist, novel aesthetics. GammaHR has a locked design system; these skills would actively break the brand. If one of them appears to match a task, prefer the project-scoped skills in `.claude/skills/` (e.g., `build-page`, `run-flawless-gate`) instead.
+13. **Never invoke these global skills in Gamma work:** `frontend-design`, `brand-guidelines`, `theme-factory`, `canvas-design`, `algorithmic-art`. They promote creative, maximalist, novel aesthetics. Gamma has a locked design system; these skills would actively break the brand. If one of them appears to match a task, prefer the project-scoped skills in `.claude/skills/` (e.g., `build-page`, `run-flawless-gate`) instead.
 
 ---
 
@@ -218,6 +224,14 @@ backend/
 
 **Golden rule:** cross-feature calls go through another feature's `service.py`, never reach into its models. Schema changes only via migrations.
 
+### Modularity rules (locked)
+
+The backend follows ten structural rules (M1 to M10) that make the core drop-a-component-safe. Vendor SDKs sit behind wrappers (`ai/client.py`, `pdf/renderer.py`, `storage/blob.py`, `email/sender.py`, `billing/provider.py`, `tax/calculator.py`, `ocr/vision.py`). Feature modules are self-contained folders. Cross-feature calls go through service layers only. Foreign keys have explicit ON DELETE behavior. Cross-feature signaling uses an event bus. Feature flags are at the module level, not just per-user. Schema migrations are reversible in CI. API versioning is in place from day 1. One domain concept per file; no utils.py.
+
+Full list with CI enforcement matrix: `docs/MODULARITY.md`.
+
+**Golden rule:** if you are tempted to take a shortcut across these rules, refactor the change, not the rules.
+
 ---
 
 ## 7. Quality gate (the 15 that actually matter)
@@ -238,9 +252,11 @@ The full list is in `docs/FLAWLESS_GATE.md`. If you only have time for 15, run t
 12. Playwright E2E covers the golden path
 13. No new atoms introduced (use `components/ui/` as-is)
 14. No em dashes, no "utilisation", no decorative flourishes
-15. The founder can look at it and say "this feels like GammaHR"
+15. The founder can look at it and say "this feels like Gamma"
 
 If any of 1-14 fails, you stop and fix. If 15 fails, you go back and think about why.
+
+The quality gate is complemented by two structural documents: `docs/MODULARITY.md` (M1-M10 rules enforced in CI for architectural discipline) and `docs/TESTING_STRATEGY.md` (the six testing layers that make quality regressions visible on every commit). A feature can pass the 15-item gate only if it also passes the CI-enforced modularity and testing checks.
 
 ---
 
@@ -275,18 +291,33 @@ When unsure: **stop and ask the founder.** Do not guess. Do not invent. Do not s
 | What is in v1.0 vs v1.1, first-customer must-haves | `docs/SCOPE.md` |
 | Quality checklist (15 items per Tier 1 feature) | `docs/FLAWLESS_GATE.md` |
 | Commercial plan, pricing, pilot program | `docs/GO_TO_MARKET.md` |
-| Why a decision was made | `docs/decisions/ADR-*.md` |
-| Agent roles and workflow | `agents/AGENTS.md` |
+| Why a technical decision was made | `docs/decisions/ADR-*.md` |
+| Agent roster and collaboration model | `agents/AGENTS.md` |
+| Rollback, compliance, degraded-mode procedures | `docs/ROLLBACK_RUNBOOK.md`, `docs/COMPLIANCE.md`, `docs/DEGRADED_MODE.md` |
 | The visual spec (frozen) | `prototype/*.html` |
 
 ---
 
 ## 10. Honest caveats
 
-- Target weeks in `THE_PLAN.md` are optimistic. Solo founders miss by 2x. Do not pretend otherwise.
+- Target weeks in `THE_PLAN.md` are optimistic. Two-founder teams still miss on optimistic plans. Do not pretend otherwise.
 - Performance targets ("p95 <100ms", "OCR <15s") are goals, not measured baselines.
 - Cost targets in `specs/AI_FEATURES.md` are estimates until we measure real usage.
 - `docs/FLAWLESS_GATE.md` is pruned to 15 items. Section 7 of this file mirrors it. If the two ever drift, the gate doc wins.
 - The agent roster in `agents/AGENTS.md` is aspirational. In practice one general-purpose agent does most tasks; the roster is a mental model, not a real org chart.
 
 Everything else in the specs is the intent. Build toward it. When reality disagrees, update the specs, not your memory of them.
+
+---
+
+## 11. Glossary
+
+- **Kill switch** - an operator-toggled feature flag that disables a feature globally or per-tenant during an incident. Inventory in `docs/DEGRADED_MODE.md` section 1.
+- **Degraded mode** - the user-visible behavior of a feature when a kill switch or dependency is off. Specified per feature in `docs/DEGRADED_MODE.md` section 2.
+- **Tier 1 feature** - one of the 13 feature rows in `docs/SCOPE.md` that must pass the 15-item flawless gate before v1.0 ships.
+- **Shell infrastructure** - components (command palette, notifications, conflict resolver, entitlement lock) built in Phase 2 and used by every Tier 1 page. Not Tier 1 features themselves.
+- **LLM-as-router** - the AI architecture: the model classifies user intent and dispatches to pre-registered deterministic tools, never performs free-form completion. Enforced in `backend/app/ai/client.py`.
+- **Flawless gate** - the 15-item quality checklist every Tier 1 feature passes before the next is built. In `docs/FLAWLESS_GATE.md`, mirrored in CLAUDE.md section 7.
+- **Three-app model** - the separation of operator console (`ops.gammahr.com`), main app (`app.gammahr.com`), and client portal (`portal.gammahr.com`) with three identity tables and three JWT audiences. See ADR-010.
+- **Schema-per-tenant** - each tenant is a Postgres schema inside one DB; the request's `search_path` is set by middleware. See ADR-001.
+- **Deferred decision (DEF-NNN)** - a conscious cut from v1.0 scope with a documented trigger for when to reconsider. Registry in `docs/DEFERRED_DECISIONS.md`.

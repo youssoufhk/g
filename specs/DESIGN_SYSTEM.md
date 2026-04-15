@@ -257,9 +257,12 @@ Header row: 56px, logo + collapse toggle.
 | Position | Element | Notes |
 |----------|---------|-------|
 | Left | Breadcrumb (desktop) or Menu button + Page title (mobile) | - |
+| Right | `SearchInput` | 280px wide on desktop. Mobile shows a 40px search icon button that opens a full-screen search modal. Always available regardless of `kill_switch.ai`. Cmd+/ focuses. |
 | Right | `Ask` AI button | 88px desktop / 40px mobile. Opens command palette, Cmd+K |
 | Right | Notifications bell | 40px, opens drawer |
 | Right | User avatar + presence | 40px, opens account menu |
+
+Right-side order, left to right: `SearchInput`, `Ask`, Notifications bell, user avatar.
 
 ### 3.4 Bottom nav (< 1024px only)
 
@@ -352,6 +355,66 @@ One canonical size per atom. No growing, no shrinking. Overflow truncates with e
 | Tab bar height | 48px |
 | Tab item height | 48px |
 | Breadcrumb height | 40px |
+| Checkbox | 20x20 square, optional 12px-gap right-side label |
+| SearchInput (topbar) | 280px wide desktop / 100% mobile modal, 40px tall |
+| AIInsightCard | 320px wide mobile / flex-1 desktop grid, 16px padding |
+| AIInvoiceExplanation | 100% container width, auto height (3 lines max), 12px padding, 3px left severity border |
+
+### 5.7 Checkbox
+
+- 20x20 square, 2px border in `--color-border`.
+- Checked state: `--color-primary` fill with a 10x10 white check icon.
+- States: unchecked, checked, indeterminate, disabled, focus (2px ring in `--color-primary` at 0.35 alpha as `--color-primary-ring`).
+- Optional label on the right, 12px gap, uses `--text-body`.
+- Used in bulk-select row columns (see APP_BLUEPRINT section 13.8) and in form fields.
+
+### 5.8 SearchInput
+
+- 280px wide on desktop (topbar). 100% wide inside the mobile search modal. 40px tall.
+- Leading magnifier icon, trailing clear button (x) when value is non-empty.
+- Placeholder: "Search employees, clients, projects".
+- Background `--color-surface-1`. Focus ring: 2px `--color-primary-ring`.
+- Input is debounced 250 ms before firing the search API.
+- Dropdown appears directly below, grouped into 3 sections (Employees, Clients, Projects), up to 20 results total.
+- Used only in the topbar and mobile search modal. Not a form input.
+
+### 5.9 AIInsightCard
+
+- Width: 320px fixed on mobile (horizontal scroll). Flex-1 in the desktop dashboard 3-column grid.
+- 16px padding. 12px border radius. Left border 3px in `--color-primary-muted`.
+- Layout: icon (20x20) top-left, dismiss (x) top-right, title in `--text-heading-3` below the icon row, body in `--text-body-sm` (2 lines max with ellipsis), CTA `Button` (tertiary variant) at the bottom.
+- Used only on the dashboard (see APP_BLUEPRINT section 2.1).
+
+### 5.10 AIInvoiceExplanation
+
+**AIInvoiceExplanation** is a wide card atom used ONLY on the month-end close page (`/invoices/month-end`). Layout:
+
+- Width: 100% of the draft card container (no fixed width)
+- Height: auto, max 3 lines of body text before truncation
+- Padding: 12px
+- Left border: 3px solid, color depends on severity:
+  - `info`: `--color-primary-muted`
+  - `warning`: `--color-warning`
+  - `action_needed`: `--color-error-muted`
+- Body: plain text paragraph, `--text-body-sm`, 2-3 sentences from Gemini
+- Footer row: up to 3 signal chips (small pills from existing `Badge` atom) with the top-ranked analyzer reasons
+- Fallback: when `kill_switch.ai` is on, the body text is replaced with "AI explanation temporarily unavailable." and the severity border is replaced with `--color-surface-2`
+
+Used on: `/invoices/month-end` review queue ONLY. Not on regular invoice detail or dashboard.
+
+No animations. No hover state. No click handler (the parent card handles clicks).
+
+### 5.11 ConflictResolver (composite pattern)
+
+`ConflictResolver` is a composite modal pattern, not a primitive atom. It lives in `components/patterns/` and is triggered by HTTP 409 responses via the `useOptimisticMutation` wrapper.
+
+- Full-width modal on mobile, 640px centered on desktop.
+- Header: "Edits don't match. Pick what to keep."
+- Body: a 2-column field-by-field list. Each conflicting field shows the field name, your value (left), their value (right), and radio buttons to pick.
+- Array fields (like invoice lines) are treated as opaque: one choice for the whole array, no per-item merge.
+- Large text fields (> 200 chars) show the first 200 chars with a "Show full" toggle.
+- Footer actions: "Keep mine", "Take theirs", "Merge and continue".
+- Cancel closes without resolving and keeps the mutation pending.
 
 ---
 
@@ -361,13 +424,14 @@ Exactly these components. No custom variants. Each one has a Storybook entry.
 
 | Group | Components |
 |-------|------------|
-| Shell | `AppShell`, `Sidebar`, `Topbar`, `BottomNav`, `CommandPalette`, `NotificationsDrawer` |
+| Shell | `AppShell`, `Sidebar`, `Topbar`, `BottomNav`, `CommandPalette`, `SearchInput`, `NotificationsDrawer` |
 | Layout | `PageHeader`, `FilterBar`, `StatStrip`, `StatCard`, `SectionHeader`, `EmptyState` |
 | Data display | `DataTable`, `CardGrid`, `MobileRowCard`, `Badge`, `Pill`, `Avatar`, `AvatarGroup`, `EmployeeLink`, `HoverCard` |
 | Inputs | `TextInput`, `Textarea`, `Select`, `Combobox`, `DatePicker`, `Checkbox`, `RadioGroup`, `Switch`, `FileUpload`, `Form`, `FormField` |
 | Feedback | `Button`, `IconButton`, `Modal`, `Drawer`, `BottomSheet`, `Toast`, `ConfirmDialog`, `Skeleton`, `Spinner`, `ProgressBar` |
 | Navigation | `Breadcrumb`, `TabBar`, `Pagination`, `BackLink` |
-| AI | `AICommandPalette`, `AISuggestionChip`, `AIConfidenceBadge`, `AIReviewRow`, `AIInsightCard` |
+| AI | `AICommandPalette`, `AISuggestionChip`, `AIConfidenceBadge`, `AIReviewRow`, `AIInsightCard`, `AIInvoiceExplanation` |
+| Patterns (composite) | `ConflictResolver`, `BulkActionBar`, `NotificationRow` |
 | Charts | `BarChart`, `LineChart`, `DonutChart`, `HeatmapGrid`, `GanttCanvas`, `CalendarGrid` |
 
 Forms use React Hook Form + Zod. Charts use Visx.

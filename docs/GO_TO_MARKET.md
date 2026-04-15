@@ -2,46 +2,44 @@
 
 > Commercial plan. Most numbers below are **targets / TBD** until we have real customer conversations. Do not treat as facts.
 > Timeline week numbers live only in `THE_PLAN.md`.
+> **Last updated:** 2026-04-15 (worked pricing example added, Stripe-only language replaced with the DEF-029 candidate set, validated lead gate cross-referenced).
 
 ---
 
 ## 1. Positioning
 
-- **Category:** Premium HR operations platform for consulting firms and agencies.
+- **Category:** Operations platform for consulting firms and agencies.
 - **Sweet spot:** 50 to 500 employees, time-and-materials billing, multi-client.
-- **One-liner:** GammaHR runs HR operations the way Revolut runs your finances: the app does the work, you confirm.
-- **Differentiator:** Flagship-quality UX + AI throughout + one design language.
-- **Not for:** tiny teams (use Notion), payroll-first buyers (use Gusto), enterprises (use Workday).
+- **One-liner:** Gamma is the operations OS for modern consulting firms. It drafts, you confirm.
+- **Differentiator:** Flagship-quality UX + agentic AI that drafts month-end invoices + one design language. Two founders from day 0.
+- **Not for:** tiny teams (use Notion), payroll-first buyers (use Gusto), enterprises >500 seats (use Workday or Kantata).
 
 ---
 
-## 2. Pricing (per-seat with volume bands, locked)
+## 2. Pricing (per-seat with two volume bands, locked)
 
-**Per-seat volume-band pricing** (band pricing, not cliff pricing: a 75-seat tenant pays first 50 at rate A and next 25 at rate B). **Seat = active user in last 30 days.** Reference users who appear in data but never log in are NOT billable.
+**Per-seat volume-band pricing.** One plan, one product, two volume bands, one Enterprise tier. Seat = active user in last 30 days. Reference users who appear in data but never log in are NOT billable. Prices are ex-VAT, EUR only (multi-currency subscription billing deferred, DEF-030).
 
 ### Published list pricing
 
-| Tier | 1-50 seats | 51-100 seats | 101-200 seats | >200 seats |
-|---|---|---|---|---|
-| **Starter** | €9/seat/mo | €8/seat/mo | €7/seat/mo | custom contract |
-| **Pro** | €15/seat/mo | €13/seat/mo | €11/seat/mo | custom contract |
-| **Enterprise** | custom contract |
+| Plan | <200 seats | ≥200 seats | Enterprise |
+|---|---:|---:|---:|
+| **Gamma** | €35/seat/mo | €26/seat/mo | custom |
 
-### What's in each tier
+### Why these numbers
 
-| Tier | Includes |
+These are **charm prices** (digits sum to 8, a pattern the founder wanted). They also happen to land in the premium-B2B-SaaS sweet spot: numbers ending in 5 or 6 signal "serious tool", not "retail discount". €35 anchors sub-200 firms well above the "budget HR tool" ceiling (Factorial, BambooHR, Personio Starter all live below €20). €26 gives ≥200 firms a real volume win (~26% discount) without undercutting the anchor. Enterprise is custom because you negotiate down from "talk to us", never up from a published number.
+
+### What's in the plan
+
+| Plan | Includes |
 |---|---|
-| Starter | Core: time, clients, projects, invoices, expenses, leaves, basic dashboards, email support. All Tier 1 features. |
-| Pro | Starter + AI command palette + AI OCR + AI insight cards + resource planning + custom fields + advanced reports + priority support |
-| Enterprise | Pro + SSO/SAML/SCIM (post-deferral) + audit exports + negotiated DPA + dedicated support + uptime SLA |
-
-### Custom contracts (Enterprise and >200 seats)
-
-Above 200 seats OR for any deal the founder wants to negotiate specially, a custom contract in `public.tenant_custom_contracts` overrides the volume-band pricing with a negotiated annual lump sum, included seat cap, and overage rate. Founder-created in the operator console. Fully decoupled from feature entitlements: a custom-contract tenant can still be on list-price Pro features but pay a custom lump sum.
+| **Gamma** | All Tier 1 features: time, clients, projects, invoices, expenses, leaves, approvals, admin, account, dashboard. Shell infrastructure: Cmd+K AI palette, notifications, conflict resolver, entitlement lock. AI surfaces: palette + receipt OCR + insight cards + **month-end close agent** (drafts monthly invoices from approved timesheets and expenses, user confirms). Resource planning. Custom fields. Advanced reports. PWA with offline timesheets. Priority email support. |
+| **Enterprise** | Everything in Gamma + SSO/SAML/SCIM (post-DEF-024) + audit exports + negotiated DPA + dedicated support engineer + uptime SLA + early access to v1.1 agentic features (predictive staffing, auto-timesheet drafting). |
 
 ### Monthly vs annual
 
-Monthly billing available. **Annual pays ~10 months for 12** (roughly 15% discount). No multi-year contracts in v1.0 (DEF-031). No refunds on annual contracts except within the first 14 days (same as trial period).
+**Annual only in v1.0.** Pays ~10 months for 12 (~15% effective discount). Monthly billing is deferred (new DEF entry; ship when customer 6+ asks and the Stripe/Revolut integration lands). No multi-year contracts in v1.0 (DEF-031). No refunds on annual except within the first 14 days (trial window).
 
 ### Currency and VAT
 
@@ -51,6 +49,22 @@ All prices ex-VAT, EUR only. Multi-currency subscription billing (GBP, USD) defe
 
 First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years, regardless of seat count growth. Written into their custom contract.
 
+### Worked example: the canonical first customer
+
+The canonical first customer in `CLAUDE.md` and `specs/DATA_ARCHITECTURE.md` section 12.10 has 201 employees, all active in the canonical seed, so seat count for billing is **201**.
+
+| Volume bands | Monthly | Annual list (× 12) | **Annual at the 10/12 discount** |
+|---|---:|---:|---:|
+| 200 × €35 + 1 × €26 | €7,026 | €84,312 | **€70,260** |
+
+Grandfathered for 3 years = **~€210,780 of locked revenue** if they renew through year 3 with no seat changes.
+
+If they grow from 201 to 250 during the grandfathered window, the volume tier stays at ≥200 for all seats beyond 200 (charged at the ≥200 rate). Growth revenue: 49 × €26 × 12 × (10/12) = ~€12,740 additional annual.
+
+**This is the number to quote off in any sales call.** Do not re-derive it under pressure.
+
+Compared with the prior Pro-tier plan (~€25,110 ACV), this pricing is **2.8x the first-deal revenue**, which funds the co-founder equity story and the SOC 2 Type 1 audit window.
+
 ---
 
 ## 3. Target customer profile
@@ -58,7 +72,7 @@ First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years,
 - Consulting firm or agency
 - Based in FR / CH / BE / LU / DE (founder geography)
 - 50-300 employees currently
-- Using Excel + BambooHR, or Personio, or Tempo + Jira, or Harvest + something
+- Using Excel + BambooHR, or Personio, or Tempo + Jira, or Harvest + something, or Kantata/Mavenlink (too expensive, too ugly)
 - Pain point: 10+ hours per week of manager time on approvals and rebalancing
 
 ---
@@ -67,7 +81,7 @@ First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years,
 
 | Stage | Definition |
 |-------|------------|
-| Curious | Aware of GammaHR, saw a demo video |
+| Curious | Aware of Gamma, saw a demo video |
 | Interested | 30-min discovery call done, pain confirmed |
 | Evaluating | Pilot kicked off with real data |
 | Committed | Signed annual contract |
@@ -116,6 +130,8 @@ First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years,
 - Zero Stripe integration, zero webhook handling, zero self-serve billing portal. Admin console has view-only billing status.
 - 1 hour per new invoice is an acceptable founder time cost at this stage.
 
+**Note:** Phase 2 invoicing is manual but the **month-end close agent is v1.0 scope** (see `specs/AI_FEATURES.md` §2 and `specs/APP_BLUEPRINT.md` §8 month-end close). The agent drafts invoices and presents a review queue; the founder still manually confirms and sends for customers 1-5 via WeasyPrint + Workspace SMTP Relay until DEF-029 payment processor ships.
+
 **Phase 5+ (customer #6+):** migrate to an automated payment processor.
 - Leading candidate: **Revolut Business Merchant Acquiring** (founder has existing banking relationship, lower fees on EU cards, BUT Revolut lacks a full subscription product so requires custom subscription logic or a thin wrapper)
 - Alternative: **Stripe Billing** (full subscription product, more expensive per-transaction fees, requires OSS VAT registration)
@@ -123,7 +139,7 @@ First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years,
 - Final choice deferred to DEF-029 implementation time
 - Existing Phase 2 customers are grandfathered or migrated at that time
 
-**Dunning (at automation time):** Stripe/Revolut webhook `invoice.payment_failed` triggers GammaHR's own branded emails via Workspace SMTP Relay. Three-email escalation (day 1, 7, 14). Templates part of the Phase 2 email template set.
+**Dunning (at automation time):** Stripe/Revolut webhook `invoice.payment_failed` triggers Gamma's own branded emails via Workspace SMTP Relay. Three-email escalation (day 1, 7, 14). Templates part of the Phase 2 email template set.
 
 **Self-serve billing portal** in Admin console is deferred (DEF-059) until after DEF-028 (self-serve signup) and DEF-029 (payment processor integration) ship.
 
@@ -162,14 +178,22 @@ Built in Framer or Next.js. Same design tokens as the app.
 ## 10. Launch checklist
 
 - [ ] All Tier 1 features pass the flawless gate
+- [ ] First-contact UX hardenings live (bulk row actions, global non-AI search, in-app feedback button, notifications inbox page) per `docs/SCOPE.md`
 - [ ] Onboarding wizard tested with customer's real data
-- [ ] Stripe billing live
+- [ ] **Month-end close agent shipped and tested** end-to-end (drafts monthly invoices from approved timesheets and expenses, founder confirms in review queue)
+- [ ] **Manual invoicing path live** (Phase 2 path: founder confirms agent-drafted `subscription_invoices`, WeasyPrint renders, Workspace SMTP Relay sends, customer pays via wire/SEPA, founder marks paid in operator console). Automated payment processor is post-launch (DEF-029, evaluated at customer #5-10 trigger).
+- [ ] **Magic pricing set at €35 / €26 / custom** and published on the landing page pricing section
+- [ ] **Two founders in place day 0** with 4-year vesting + 1-year cliff documented in the Global Gamma Ltd (UK) cap table
+- [ ] **SOC 2 Type 1 audit window targeted at customer 3-4** (was customer 5); vendor selected and kickoff booked
 - [ ] ToS + Privacy + DPA published
 - [ ] Security whitepaper drafted
 - [ ] Support email + docs live
 - [ ] Backup + restore drilled
+- [ ] Audit log archival pipeline live (weekly Celery export of >90-day partitions to GCS Cold Line, per `THE_PLAN.md` Phase 7 task 9)
 - [ ] Monitoring + alerting live
-- [ ] Incident response runbook drafted
+- [ ] Public status page (`status.gammahr.com`) live (DEF-016 trigger fires here)
+- [ ] Incident response runbook drafted (`docs/ROLLBACK_RUNBOOK.md`)
+- [ ] Validated lead gate cleared (per `THE_PLAN.md` "Validated lead gate" section, before Phase 4 entry; this is a prerequisite, not a launch task)
 
 ---
 
@@ -177,12 +201,13 @@ Built in Framer or Next.js. Same design tokens as the app.
 
 | Risk | Mitigation |
 |------|-----------|
-| First customer churns after 30 days | 60-day pilot, weekly check-ins, founder onboarding |
+| First customer churns after 30 days | 60-day pilot, weekly check-ins, founder-led onboarding |
 | CSV imports fail on their data shape | AI mapper + manual mapper + test with real data before pilot |
 | AI feature failure embarrasses us | Kill switches, non-AI fallback, conservative thresholds |
 | GDPR gap | DPA ready, right-of-access endpoint, deletion tested |
-| Pricing too high | Grandfathered pricing for first 3, ongoing interviews |
+| Pricing too high | Grandfathered pricing for first 5, ongoing interviews |
 | Feature-request firehose | Hard scope doc, monthly review |
+| Co-founder departure | 4-year vesting with 1-year cliff; legal entity Global Gamma Ltd (UK) owns all IP; founder has admin lock-out for ops console. |
 
 ---
 

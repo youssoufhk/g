@@ -4,7 +4,7 @@
 
 ## Decision
 
-GammaHR serves three distinct audiences from one codebase, three subdomains, three Next.js route groups, three API surfaces, and three independent identity tables. There is **no crossover** between the three identity spaces.
+Gamma serves three distinct audiences from one codebase, three subdomains, three Next.js route groups, three API surfaces, and three independent identity tables. There is **no crossover** between the three identity spaces.
 
 | Audience | Subdomain | Purpose |
 |---|---|---|
@@ -66,6 +66,8 @@ Flow:
 5. Every mutation during the impersonated session is logged to `public.audit_log` with BOTH `actor_id = operator_id` and `on_behalf_of_id = impersonated_user_id`.
 6. Session auto-expires after 30 minutes. Operator must re-challenge to extend.
 
+**Per-tenant re-challenge.** When an operator starts impersonating a user in tenant T, the issued impersonation JWT carries `impersonated_user_id`, `impersonated_tenant_id=T`, and `expires_at = now + 30 minutes`. Switching to a different tenant T2 requires a fresh impersonation challenge (re-auth via passkey). This prevents a single impersonation session from leaking across tenant boundaries. Audit log entries during impersonation carry `actor_type=operator, on_behalf_of_user_id, on_behalf_of_tenant_id`.
+
 **Impersonation tooling itself is deferred (DEF-002).** The JWT shape, audit contract, and auth flow are defined now so that the feature addition later is purely additive, not a refactor.
 
 ## Rationale
@@ -95,9 +97,9 @@ Three fixed subdomains (`ops`, `app`, `portal`) cover the three audiences with o
 ## Alternatives considered and rejected
 
 - **Single `users` table with `user_type ∈ {operator, tenant_user, portal_user}`.** Rejected for the security-boundary and auth-stack reasons above.
-- **Three separate GammaHR deployments.** Rejected because it triples the hosting cost and ops burden for no product benefit. Three subdomains sharing one Cloud Run service solve the isolation problem at the routing layer, not the infrastructure layer.
+- **Three separate Gamma deployments.** Rejected because it triples the hosting cost and ops burden for no product benefit. Three subdomains sharing one Cloud Run service solve the isolation problem at the routing layer, not the infrastructure layer.
 - **Use a vendor IdP (Auth0, Clerk, WorkOS) to handle identity and skip the three-table split.** Rejected because it adds a hard external dependency for the most security-critical part of the stack, costs ongoing money, and locks us into their data model. The in-house implementation is 1-2 weeks of work with well-known libraries (`authlib`, `webauthn`, `argon2-cffi`) and gives full control.
-- **Merge operator and tenant-user into one table with a superuser role.** Rejected because a compromised founder account would automatically have tenant data access, violating the GDPR processor/controller boundary where GammaHR (processor) should never have direct access to customer data without an audited impersonation trail.
+- **Merge operator and tenant-user into one table with a superuser role.** Rejected because a compromised founder account would automatically have tenant data access, violating the GDPR processor/controller boundary where Gamma (processor) should never have direct access to customer data without an audited impersonation trail.
 
 ## Consequences
 
@@ -108,6 +110,14 @@ Three fixed subdomains (`ops`, `app`, `portal`) cover the three audiences with o
 - **Impersonation audit contract** must be defined and tested in Phase 2, even if the impersonation UI itself ships later (DEF-002).
 - **Wildcard cert management** via Cloudflare. Set once, forget. Certificate renewal is Cloudflare's problem.
 - **Per-app login pages cost more design time** than a single login page would. Acceptable tradeoff. Each login page matches its audience: ops is utilitarian and passkey-only, app is welcoming and offers SSO buttons, portal is minimal and friendly.
+- **Session invalidation on role change.** Role mutations: demotion (admin to employee, employee to read-only) triggers `sessions.invalidate_where(user_id=?, previous_role=<old>)` in the same transaction. The user's active sessions across all devices are killed; their next request returns 401 and UI redirects to login, where they re-authenticate with the new role. Promotions do not invalidate sessions (the new role is merged on next token refresh). Operator role changes follow the same pattern. All transitions audited.
+- **Cookie scoping and audience claim.** The access token cookie is set with `Domain=*.gammahr.com, Path=/, SameSite=Strict, Secure, HttpOnly`. Cookies are sent on any `*.gammahr.com` subdomain request, but each JWT carries an `audience` claim in `{ops, app, portal}`. Backend middleware enforces:
+  - `/api/v1/ops/*` requires `audience=ops`
+  - `/api/v1/*` (non-ops, non-portal) requires `audience=app`
+  - `/api/v1/portal/*` requires `audience=portal`
+
+  Any mismatch returns HTTP 403 Forbidden with `error=invalid_audience`. The middleware runs before routing. Refresh tokens are bound to the same audience at issue-time.
+- **RBAC return code on privilege violation.** RBAC enforcement returns HTTP 403 Forbidden (not 404) on privilege violations, both for clarity and to simplify debugging. Tenant-scoping violations (user in tenant A trying to access tenant B data) also return 403. The trade-off: 403 vs 404 leaks endpoint existence to attackers, but obscurity-by-404 is not worth the debugging cost given the app's small, documented API surface.
 
 ## Follow-ups (required in Phase 2)
 
@@ -124,11 +134,11 @@ Three fixed subdomains (`ops`, `app`, `portal`) cover the three audiences with o
 
 ## Related decisions
 
-- **ADR-001** (schema-per-tenant) — identity tables live in `public`, business data in `tenant_<slug>`.
-- **ADR-002** (authentication) — supersedes JWT + session + passkey base rules with the three-audience refinement.
-- **SSO-first auth for tenant users** — OIDC (Google Workspace, Microsoft Entra) is the primary path for `public.users`, with WebAuthn passkey as secondary and bcrypt password as fallback. Supersedes the passkey-first default from ADR-002 for this audience only.
-- **Tenant user role model** — `users.role ∈ {owner, admin, manager, finance, employee, readonly}`, exactly one owner per tenant (transferable), owner is a strict superset of admin. Operators have no equivalent role enum (operators are binary: they are or they are not).
-- **DSR fulfillment** — tenant admin handles most DSRs via self-service in the tenant admin console; operator has a manual escape hatch via `privacy@gammahr.com` for direct-to-GammaHR inquiries.
-- **DEF-002** — operator impersonation UI (JWT contract defined now, UI later).
-- **DEF-008** — portal SSO (portal_users uses local auth only in v1.0).
-- **DEF-024, DEF-025** — SCIM and SAML federation for tenant users.
+- **ADR-001** (schema-per-tenant): identity tables live in `public`, business data in `tenant_<slug>`.
+- **ADR-002** (authentication): supersedes JWT + session + passkey base rules with the three-audience refinement.
+- **SSO-first auth for tenant users**: OIDC (Google Workspace, Microsoft Entra) is the primary path for `public.users`, with WebAuthn passkey as secondary and bcrypt password as fallback. Supersedes the passkey-first default from ADR-002 for this audience only.
+- **Tenant user role model**: `users.role ∈ {owner, admin, manager, finance, employee, readonly}`, exactly one owner per tenant (transferable), owner is a strict superset of admin. Operators have no equivalent role enum (operators are binary: they are or they are not).
+- **DSR fulfillment**: tenant admin handles most DSRs via self-service in the tenant admin console; operator has a manual escape hatch via `privacy@gammahr.com` for direct-to-Gamma inquiries.
+- **DEF-002**: operator impersonation UI (JWT contract defined now, UI later).
+- **DEF-008**: portal SSO (portal_users uses local auth only in v1.0).
+- **DEF-024, DEF-025**: SCIM and SAML federation for tenant users.

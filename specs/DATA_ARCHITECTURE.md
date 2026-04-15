@@ -3,8 +3,9 @@
 > Entities, tenancy, API conventions, and operational contracts.
 > Source of truth for the data model.
 > Derived from the Q&A planning session that locked 102 decisions across 15 rounds.
-> If this file conflicts with any other doc, this file wins for data/schema questions.
+> If this file conflicts with any other doc, this file wins for data/schema questions. (For non-data conflicts, `CLAUDE.md` wins.)
 > If this file is silent, consult `docs/DEFERRED_DECISIONS.md` or ask.
+> **Last updated:** 2026-04-15 (performance risks section added, audit log archival gap noted, seed data math corrected, materialized view refresh requirement explicit).
 
 ---
 
@@ -22,6 +23,9 @@
 - Section 10: Migrations, backfills, operational plumbing
 - Section 11: Backup, DR, environments
 - Section 12: Known gaps and operational follow-ups
+- Section 13: Reference: full table list
+- Section 14: Recruitment domain (reserved for v1.1)
+- Section 15: Country holiday calendar (FR + UK seeded in v1.0)
 
 ---
 
@@ -40,7 +44,7 @@
 
 ### 1.2 The three-audience identity model
 
-GammaHR serves three distinct audiences from one codebase, three subdomains, three route groups, three API surfaces, and three identity tables. **There is no crossover between these identity spaces.** See `docs/decisions/ADR-010-three-app-model.md` for the full rationale.
+Gamma serves three distinct audiences from one codebase, three subdomains, three route groups, three API surfaces, and three identity tables. **There is no crossover between these identity spaces.** See `docs/decisions/ADR-010-three-app-model.md` for the full rationale.
 
 | Audience | Subdomain | Identity table | Session table | Auth strategy |
 |---|---|---|---|---|
@@ -52,7 +56,7 @@ GammaHR serves three distinct audiences from one codebase, three subdomains, thr
 
 ### 1.3 User-tenant binding
 
-Strict: one `public.users` row per (email, tenant_id). A real person who works for two GammaHR tenants has two rows. No cross-tenant user profile. This keeps `search_path` tenant isolation clean and avoids the entire class of "does this user have access to tenant X" bugs.
+Strict: one `public.users` row per (email, tenant_id). A real person who works for two Gamma tenants has two rows. No cross-tenant user profile. This keeps `search_path` tenant isolation clean and avoids the entire class of "does this user have access to tenant X" bugs.
 
 ---
 
@@ -96,7 +100,11 @@ public.portal_users
   id, tenant_id (FK), client_id (FK to tenant_<slug>.clients via recorded ref, not DB FK),
   email (unique per tenant), full_name,
   password_hash NULL, mfa_totp_enabled BOOL,
-  email_verified_at, last_login_at, status, created_at, updated_at
+  email_verified_at, last_login_at, status, created_at, updated_at,
+  deleted_at TIMESTAMPTZ NULL
+  -- Deleted portal users: deleted_at set, anonymized 30 days later
+  -- (email replaced with `deleted-{uuid}@gammahr.invalid`), purged 1 year after deletion.
+  -- Retention job runs in the weekly GDPR sweep.
 
 public.portal_sessions
   id, portal_user_id, refresh_token_hash, user_agent, ip,
@@ -128,8 +136,13 @@ public.invitations
 public.tenants
   id, slug (unique), name,
   country_code,                    -- ISO 3166-1 alpha-2, default for employees
+  residency_region TEXT NOT NULL DEFAULT 'europe-west9',   -- GCP region where the tenant's data physically lives. v1.0 supports only 'europe-west9' (Paris).
+  legal_jurisdiction TEXT NOT NULL DEFAULT 'FR',           -- ISO 3166-1 alpha-2 or sub-country code. v1.0 supports 'FR' and 'GB' only. Year 2: 'CA-QC', 'CA-ON', 'MA', 'NE', WAEMU peers.
+  base_currency TEXT NOT NULL DEFAULT 'EUR',               -- ISO 4217 currency code. Supersedes the legacy `currency` column below; both kept in v1.0 for compatibility, base_currency wins on conflict.
+  primary_locale TEXT NOT NULL DEFAULT 'fr-FR',            -- e.g. fr-FR, en-GB, fr-CA, ar-MA. Drives UI language and invoice rendering default.
+  supported_locales TEXT[] NOT NULL DEFAULT ARRAY['fr-FR','en-GB'],  -- locales the tenant admin can assign to users; year 2 expansions add more.
   default_timezone,                -- IANA zone. UTC storage everywhere; reports aggregate in tenant TZ.
-  currency,                        -- ISO 4217, tenant base currency
+  currency,                        -- ISO 4217, tenant base currency (legacy alias for base_currency, kept until cleanup migration)
   hours_per_day NUMERIC(3,1) DEFAULT 8.0,  -- for day-to-minute conversion; employees.hours_per_day overrides per-employee
   fiscal_year_start DATE,
   default_tax_rate NUMERIC(5,4),  -- decimal fraction 0.2000 = 20%
@@ -167,7 +180,7 @@ public.subscription_invoices
   pdf_url, sent_at, paid_at, payment_method ∈ {wire, sepa, card} NULL,
   payment_reference NULL, notes,
   created_at, updated_at
-  -- GammaHR's own invoices to tenants (Phase 2 manual, Phase 5+ automated via DEF-029).
+  -- Gamma's own invoices to tenants (Phase 2 manual, Phase 5+ automated via DEF-029).
   -- Separate from the `invoices` table in tenant schema (which is tenants invoicing their clients).
 
 public.tenant_custom_contracts
@@ -204,6 +217,27 @@ public.dpa_versions
   -- Data Processing Agreement versioning. Customers sign a specific version; rotation is rare.
   -- Hosted at gammahr.com/legal/dpa; based on EU SCC 2021 clauses and GDPR Art. 28.
 ```
+
+#### Residency and jurisdiction semantics
+
+Two independent axes:
+
+- `residency_region` is WHERE the data physically lives (a GCP region slug). Year 1 supports only `europe-west9` (Paris). Year 2 may add `northamerica-northeast1` (Montreal) for Canada and other regions as customers require.
+- `legal_jurisdiction` is WHICH LAWS apply. Year 1 supports `FR` and `GB` only. Year 2 may add `CA-QC`, `CA-ON`, `MA`, `NE`, and WAEMU countries sharing a pattern with NE.
+
+Cross-border routing: a UK tenant with `residency_region = 'europe-west9'` and `legal_jurisdiction = 'GB'` is GDPR-compliant because UK-GDPR adequacy with the EU was renewed in 2025. Morocco and Niger tenants (year 2) remain served from `europe-west9` under CNDP (Morocco) and CNPDCP (Niger) cross-border transfer safeguards; no GCP region exists in those countries.
+
+Migration path: changing `residency_region` for an existing tenant is a scheduled-maintenance operation documented in `docs/ROLLBACK_RUNBOOK.md` section TBD (added in year 2 when first re-residency happens). v1.0 does NOT implement re-residency.
+
+#### Per-country strategy modules (FR and UK in v1.0, pattern for year 2 expansion)
+
+Several feature modules dispatch to per-country Python files keyed by `tenants.legal_jurisdiction` or `clients.country_code`:
+
+- Tax rules: `backend/app/features/tax/rules/{fr,uk}.py` (v1.0). Each exports `compute_tax(invoice, client, tenant) -> TaxBreakdown`, `invoice_legal_mentions(tenant) -> list[LegalMention]`, `invoice_pdf_fragment(tenant) -> TemplateFragment`. Year 2 adds new files per country with zero core changes.
+- Labor law rules: `backend/app/features/leaves/rules/{fr,uk}.py` and `backend/app/features/timesheets/rules/{fr,uk}.py` (v1.0). Controls leave accruals, overtime multipliers, working-day calculations. France uses 35-hour week with RTT, UK uses 48-hour opt-out. Year 2 adds per-country files (Quebec provincial rules, Morocco CNSS, Niger WAEMU convention collective, etc.).
+- Holiday calendar: see §15 below.
+
+The dispatcher in each feature reads the relevant country code at runtime and routes to the matching file. Unknown codes raise a clear error rather than silently falling back; this prevents year-2 customers from accidentally getting French tax logic.
 
 ### 2.4 Audit and telemetry (public schema, partitioned)
 
@@ -320,7 +354,31 @@ public.files
   UNIQUE (tenant_id, sha256)        -- Per-tenant dedup, never cross-tenant. Same SHA256 from two different tenants = two rows.
   -- Presigned upload to GCS, ClamAV Celery scan sets status=ready before the file is linked to a parent entity.
   -- Orphaned files (no linked_entity after 24h) are hard-deleted by a nightly cleanup job.
+
+feedback   (tenant schema)
+  id UUID PK,
+  user_id UUID REFERENCES users(id) NOT NULL,
+  category TEXT CHECK (category IN ('bug', 'suggestion', 'question', 'other')),
+  body TEXT NOT NULL,
+  url TEXT,                         -- page the feedback was submitted from
+  user_agent TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  INDEX (tenant_id, created_at DESC) -- for operator digest queries
+  -- Rate limit: max 5 per user per day (service-layer check, not schema).
+  -- Audit: every insert writes to audit_log with event_type `feedback_submitted`.
+
+user_searches   (tenant schema, lightweight telemetry)
+  id UUID PK,
+  user_id UUID REFERENCES users(id) NOT NULL,
+  query TEXT NOT NULL,
+  entity_types TEXT[] NOT NULL,     -- e.g., {employees, clients, projects}
+  result_count INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  -- Retention: 30 days (Celery sweep).
+  -- Used for ranking recent queries in the search dropdown, not for analytics.
 ```
+
+The `/notifications` inbox page reads from `public.notifications` above; filterable by `kind`, paginated cursor by `created_at`.
 
 ### 2.6 People (tenant schema)
 
@@ -335,6 +393,13 @@ employees   [soft-delete, version]
   hours_per_day NUMERIC(3,1) NULL,  -- override for tenants.hours_per_day when present (e.g., France 7.0, Germany 8.0)
   is_billable BOOL DEFAULT TRUE,    -- derivable per project but tracked here for quick queries
   location, created_at, updated_at, deleted_at NULL, version
+  CHECK (
+    (end_date IS NULL AND status IN ('active', 'on_leave')) OR
+    (end_date IS NOT NULL AND status = 'terminated')
+  )
+  -- Setting end_date via the admin UI auto-transitions status to 'terminated'.
+  -- Terminated employees cannot log new timesheet entries, submit expenses, or request leaves,
+  -- but remain visible in reports for historical data.
 
 teams
   id, name, description, lead_id (FK employees), created_at, updated_at
@@ -367,15 +432,24 @@ employee_documents
 approval_delegations
   id, user_id, delegate_user_id, valid_from, valid_to,
   reason, created_at
+  CHECK (user_id != delegate_user_id)
+  EXCLUDE USING GIST (user_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&)
   -- Vacation cover for approvals. Full inheritance: the delegate acts as the delegator for all approvals during the window.
   -- Every action logged with actor_id=delegate, on_behalf_of_id=delegator.
+  -- Transitivity: if A delegates to B and B delegates to C during overlapping windows, A's approvals route to C.
+  -- A nightly Celery job detects cycles (A -> B -> C -> A) and alerts ops@gammahr.com; cycles are rejected at service-layer insert.
 
 employee_visibility   (MATERIALIZED VIEW)
   viewer_employee_id, visible_employee_id
   -- Precomputed transitive reports + managed teams for fast manager-scope queries.
   -- Refreshed on org-change events (writes to employees.manager_id or team_id) via a Celery task
   -- using REFRESH MATERIALIZED VIEW CONCURRENTLY so queries do not block.
+  -- REQUIREMENT: a UNIQUE INDEX on (viewer_employee_id, visible_employee_id) is mandatory.
+  -- REFRESH ... CONCURRENTLY refuses to run without one. The Phase 2 migration MUST create
+  -- this index alongside the matview definition or the first refresh in production blocks readers.
 ```
+
+> **Migration gate:** the matview and its unique index MUST be created in the same migration transaction. See §10.2 checklist item.
 
 ### 2.7 Clients and projects (tenant schema)
 
@@ -411,7 +485,12 @@ project_allocations   [time-varying]
   valid_from DATE, valid_to DATE NULL,
   allocation_pct INTEGER,            -- 0-100
   created_at
+  CHECK (allocation_pct BETWEEN 0 AND 100)
+  EXCLUDE USING GIST (employee_id WITH =, project_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&)
   -- Capacity views use JOIN LATERAL by date. UI can expand a team into individual rows.
+  -- Cross-project overallocation is a soft warning in UI, not a DB constraint. Sum of allocation_pct
+  -- across projects for a given employee-date can exceed 100; planning page shows a yellow
+  -- 'overallocated' pill. Allocations are capacity hints, not enforcement.
 
 project_milestones   [for billing_type='fixed']
   id, project_id, name, amount_cents, due_date,
@@ -482,6 +561,27 @@ leave_balances
 -- employee row has no override.
 ```
 
+#### 2.9.1 Balance formula and accrual rules
+
+**Formula:**
+
+```
+balance = accrued - used - SUM(pending)
+where pending counts leave_requests with status IN ('draft', 'submitted').
+```
+
+**Accrual job:** monthly Celery job `tasks.leaves.accrue_monthly`, fires at 00:15 local-to-tenant on the 1st of each month (`tenant_default_timezone`, fallback `Europe/Paris`). For each active employee, increments `leave_balances.accrued` by `leave_types.accrual_rate` for every type they are eligible for.
+
+**Proration:** first accrual after `employees.start_date` is prorated: `accrual_rate * (days_remaining_in_month / days_in_month)`, rounded to nearest 0.5.
+
+**Termination:** employees with `end_date <= month_start` are skipped.
+
+**Rounding:** all accrual math rounds to nearest 0.5 days.
+
+**Invariant (DB-enforced):** `CHECK (balance >= 0)`. UI blocks submission that would drive balance negative; this is a defense in depth against client-side bypass.
+
+**Retroactive edits:** if an approver edits an already-approved leave (changes its duration), the balance delta is applied through a balance-correction row and audited.
+
 ### 2.10 Expenses (tenant schema)
 
 ```
@@ -508,6 +608,17 @@ expense_receipts
   -- Soft-duplicate warning on the (merchant, date, amount) tuple shown as a banner at review time, user decides.
 ```
 
+**Reimbursement lifecycle.**
+
+`reimbursement_status` state machine:
+
+- `pending -> paid`: finance role via `POST /api/v1/expenses/{id}/reimburse {paid_date, payment_reference?}`. Audited.
+- `pending -> na`: auto-set when `expense.project_id` is non-null (billable to client, not reimbursed to employee).
+- `paid -> pending`: allowed only via audit-logged correction by finance role with reason.
+- `na -> pending`: allowed if `project_id` is cleared (expense reclassified as internal).
+
+**Bulk reimbursement:** `POST /api/v1/expenses/bulk-reimburse {ids: [], paid_date, payment_reference}`. One audit entry per expense, one service-layer transaction.
+
 ### 2.11 Invoices to clients (tenant schema)
 
 ```
@@ -520,7 +631,7 @@ invoices   [soft-delete, version]
   sent_at NULL, paid_at NULL,
   pdf_status ∈ {pending, ready, failed}, pdf_url NULL,
   version, created_at, updated_at, deleted_at
-  UNIQUE (number)                   -- number is already per-tenant via schema isolation
+  UNIQUE (tenant_id, number)        -- full formatted string, e.g., "ACME-2026-0001"; see rate precedence in §4.4.1
 
 invoice_lines   [version]
   id, invoice_id, description,
@@ -535,6 +646,8 @@ invoice_payments
   method ∈ {wire, sepa, card, cash, other},
   reference, paid_at, created_at
 ```
+
+**Invoice number format and uniqueness.** Invoices store the full formatted number (prefix-year-sequence padded, e.g., `ACME-2026-0001`). The sequence integer lives in `public.invoice_sequences(tenant_id, year, next_value)` and resets on January 1 in tenant timezone. Uniqueness is enforced at `(tenant_id, number)`. Voided invoices keep their number (no reuse, no gaps allowed for French DGFIP fiscal compliance). See §4.4.1 for the rate precedence chain used when generating lines.
 
 ### 2.12 AI layer (tenant schema)
 
@@ -654,12 +767,45 @@ Half-day = `hours_per_day * 30`. Sub-day entries must be at least 60 minutes (1-
 - Each tenant has a base currency (`tenants.currency`).
 - Invoices can be issued in any currency (`invoices.currency`).
 - `invoices.fx_rate_to_base` records the rate used for margin/budget reporting in base currency.
-- GammaHR's own subscription billing to tenants is EUR-only in v1.0 (DEF-030); the multi-currency story applies only to tenants billing their own clients.
+- Gamma's own subscription billing to tenants is EUR-only in v1.0 (DEF-030); the multi-currency story applies only to tenants billing their own clients.
 - FX rates live in `public.fx_rates`, populated daily from a free source (ECB or similar). The invoice generator looks up the rate by invoice issue_date.
+
+#### 4.3.1 FX rate locking
+
+`invoices.fx_rate_to_base` is populated from `public.fx_rates` at the moment `invoices.issue_date` is set (creation or edit pre-send).
+
+- If `issue_date` is edited BEFORE `invoices.status = 'sent'`: rate is recomputed.
+- Once `status = 'sent'`: `fx_rate_to_base` is immutable (no retroactive FX adjustment).
+
+**Weekend/holiday fallback:** if no rate exists for `issue_date`, use the most recent prior business-day rate and log a warning in `audit_log` (event_type: `fx_rate_fallback`).
+
+Subscription invoices (`public.subscription_invoices`) are EUR-only in v1.0; the `fx_rate` columns are not populated on that table.
 
 ### 4.4 Historical rates via effective-dated rate tables
 
 `employee_rates` and `project_rates` are effective-dated. When an invoice is generated from timesheet entries, the generator groups entries by the active rate period for that entry's work_date. A mid-month rate change produces two separate invoice lines for clarity ("Jan 1-14 at rate A", "Jan 15-31 at rate B"). Rates changes are logged to audit_log, not stored on the rate row itself.
+
+#### 4.4.1 Line generation algorithm
+
+Entries are grouped by `(employee_id, project_id, rate_period, unit_type)` where `rate_period` is the half-open interval `[rate.valid_from, rate.valid_to)` that contains the entry's `work_date`.
+
+Per group, quantity is computed:
+
+- For `unit_type` in `{day, half_day}`: `quantity = SUM(duration_minutes) / (8 * 60)` in day units, stored with 0.5 precision.
+- For `unit_type = hour`: `quantity = SUM(duration_minutes) / 60` in hour units, stored with 0.25 precision.
+
+Unit price comes from the rate row in the matching rate_period. **Rate precedence:** `project_employee_rate > project_rate > employee_default_rate > tenant_default_rate`. The first non-null in that chain wins.
+
+Fixed-price projects emit one line per billing period: `quantity = 1`, `unit = fixed`, `unit_price = project.fixed_amount_cents` (remaining budget if partial).
+
+Milestones are separate lines (one per milestone approved in the period).
+
+Description auto-generated: `"{quantity} {unit} @ {unit_price} - {employee_name} / {project_name} ({date_range})"`, user-editable up to 255 chars, plain text only.
+
+**Worked example:** Alice on Project X, EUR 500/day Jan 1-10, rate changes to EUR 550/day Jan 11-20.
+
+- Line 1: 10 days @ EUR 500 = EUR 5,000 (2026-01-01 to 2026-01-10)
+- Line 2: 10 days @ EUR 550 = EUR 5,500 (2026-01-11 to 2026-01-20)
 
 ---
 
@@ -798,6 +944,18 @@ Three feature tiers:
 - EU OSS VAT registration handled by accountant.
 - Existing manual customers grandfathered or migrated.
 
+**Subscription invoice lifecycle.** Allowed transitions on `public.subscription_invoices.status`:
+
+- `draft -> sent`: operator clicks "Send".
+- `draft -> discarded`: operator deletes; hard-delete allowed only in draft state.
+- `sent -> paid`: operator records payment.
+- `sent -> void`: operator voids with reason; number is not reused.
+- `paid -> void`: refund scenario, requires written reason, updates payment record.
+
+Only operators can transition. Every transition is audited. Paid/void are immutable for 30 days (dispute grace period); after 30 days only the founder can edit via the operator console with a break-glass audit trail.
+
+Subscription invoices are EUR-only in v1.0. Multi-currency subscription billing is deferred (DEF-030).
+
 ### 7.4 Tenant lifecycle state machine
 
 `tenants.lifecycle_state` enum:
@@ -821,7 +979,7 @@ Every backend write path checks `lifecycle_state` via middleware. Background job
 
 ### 7.5 Dunning (payment failure communication)
 
-Stripe/Revolut webhook `invoice.payment_failed` triggers GammaHR's own branded emails via Workspace SMTP Relay. Three templates escalating: day 1 ("we couldn't charge your card"), day 7 ("action needed"), day 14 ("read-only tomorrow"). Each links to update-payment-method. Full template list post-Round-10: auth invite, domain verification, invoice delivery, daily digest, security alert, dunning-1, dunning-2, dunning-3.
+Stripe/Revolut webhook `invoice.payment_failed` triggers Gamma's own branded emails via Workspace SMTP Relay. Three templates escalating: day 1 ("we couldn't charge your card"), day 7 ("action needed"), day 14 ("read-only tomorrow"). Each links to update-payment-method. Full template list post-Round-10: auth invite, domain verification, invoice delivery, daily digest, security alert, dunning-1, dunning-2, dunning-3.
 
 ---
 
@@ -862,7 +1020,7 @@ Retention job anomaly alarm: if a nightly run would delete more than 10x the 7-d
 - "Export Employee Data" button calls `export_employee_data(tenant_id, employee_id) -> bytes`. Each feature module contributes its personal data to the bundle via a registry pattern. Returns JSON + PDF bundle.
 - "Delete Employee" button triggers anonymize-in-place (email replaced with `deleted-{uuid}@gammahr.invalid`, name replaced with `Deleted User`, `deleted_at = now()`) with a 30-day admin-cancel grace. Cascades to hard-delete of expense receipts, notifications, and `ai_command_history`. Audit log entries are left intact on the lawful basis of legitimate interest under GDPR Art. 6(1)(f).
 
-Manual handling for direct-to-GammaHR DSR emails via `privacy@gammahr.com`. Self-service form `gammahr.com/privacy/dsr` deferred (DEF-034).
+Manual handling for direct-to-Gamma DSR emails via `privacy@gammahr.com`. Self-service form `gammahr.com/privacy/dsr` deferred (DEF-034).
 
 30-day fulfillment SLA, extendable to 60 with justification per GDPR Art. 12(3).
 
@@ -906,6 +1064,14 @@ Pre-drafted at `gammahr.com/legal/dpa`, based on EU SCC 2021 clauses and GDPR Ar
   ```
 - **Every mutation** returns the updated entity including the new `version`, so the client can immediately set up the next optimistic mutation.
 
+**First-contact UX endpoints (feedback, search, notifications):**
+
+- `POST /api/v1/feedback` body `{category, body, url?, user_agent?}` - rate-limited (5 per user per day), audited with event_type `feedback_submitted`.
+- `GET /api/v1/search?q=&types=employees,clients,projects&limit=20&cursor=` response `{results: [{entity_type, id, display_name, secondary_text, url}], next_cursor}`. Non-AI, always available regardless of `kill_switch.ai`. Writes one row to `user_searches` per call.
+- `GET /api/v1/notifications?kind=&limit=50&cursor=` reads from `public.notifications`.
+- `PATCH /api/v1/notifications/{id}/read` marks a single notification read.
+- `POST /api/v1/notifications/read-all` marks all notifications for the current user read.
+
 ### 9.1 Real-time transports (per-feature)
 
 | Feature | Transport | Notes |
@@ -937,6 +1103,11 @@ Migrations against N tenant schemas run via Celery fan-out, tracked in `public.a
 6. Per-tenant failure is isolated and retryable individually via the operator console.
 
 Designed to evolve into expand-migrate-contract (DEF-052) without rewriting the execution layer. Budget 2-3 days in Phase 2 for the runner + a fake-tenant test harness (spin up 10 fake schemas, run migration, verify all at new version).
+
+**Tenant-provisioning migration checklist (enforced by integration test):**
+
+- Create `employee_visibility` matview AND `CREATE UNIQUE INDEX employee_visibility_uq ON employee_visibility (viewer_employee_id, visible_employee_id)` in one transaction.
+- Provisioning integration test asserts `REFRESH MATERIALIZED VIEW CONCURRENTLY employee_visibility` succeeds before the test tenant is marked provisioned.
 
 ### 10.3 Online DDL patterns (Postgres-native)
 
@@ -1045,7 +1216,7 @@ These are work items that the locked plan depends on but that are not in the sch
 
     **Time:**
       - 52 weeks of timesheet data (1 full year)
-      - ~28,000 timesheet entries (150 billable employees x 5 days x 52 weeks, mix billable/non-billable)
+      - ~39,000 timesheet entries (150 billable employees x 5 days x 52 weeks, mix billable/non-billable). The earlier figure of "~28,000" was a math error: 150 x 5 x 52 = 39,000. The 60-second canonical-import target must be sized against 39,000 entries, not 28,000.
       - 700 leaves (450 approved, 150 pending, 100 rejected)
         Leave types: paid vacation, sick, personal, RTT (France), maternity/paternity
 
@@ -1072,6 +1243,70 @@ These are work items that the locked plan depends on but that are not in the sch
       - ~500 notifications (unread, across all users)
 
 All of these carry explicit references from sections above. None of them are blockers for starting Phase 2, but each one needs a dedicated half-day to full day of work.
+
+---
+
+## 12.11 Performance and operational risks to verify in Phase 2-3
+
+These are not bugs in the schema, they are bugs in what the schema does not say about its own runtime cost. Each one needs an explicit verification step before the corresponding feature ships.
+
+### 12.11.1 Three-gate feature gating cold-start cost
+
+Every gated endpoint touches three rows: `tenant_entitlements`, `feature_flags` (rollout), `feature_flags` (kill switch). With the 30-second Redis cache, this is one round-trip when warm. Cold (every Cloud Run instance after a scale-from-zero) is **three serial DB hits per first request**, which at the API p95 < 500 ms target consumes ~60 ms of the budget on Cloud SQL alone.
+
+**Mitigation (required in Phase 2):** the `@gated_feature(key)` decorator MUST coalesce the three lookups into one round-trip via a single SQL with three joined rows, or read a denormalized "feature state" snapshot per (tenant, key) cached in Redis with 30 s TTL and warmed on tenant-write. Pytest assertion: a unit test on the decorator asserts `query_count == 1` for the cold path.
+
+### 12.11.2 AI budget enforcement serializes per-tenant calls
+
+The current spec (section 5.3) uses `SELECT ... FOR UPDATE` on `ai_budgets(tenant_id, year, month)` to reserve estimated cost before each call. Two users on the same tenant firing the command palette concurrently → one waits for the other. At the OCR p95 < 8 s target, this is unbounded contention.
+
+**Mitigation (required in Phase 3):** replace the row lock with **optimistic reservation**:
+
+```sql
+UPDATE ai_budgets
+SET used_cents = used_cents + :estimated_cents
+WHERE tenant_id = :tid AND year = :y AND month = :m
+  AND used_cents + :estimated_cents <= limit_cents;
+```
+
+If `rowcount == 0`, return "budget exhausted" without serializing. Reconcile actual cost on the response path with another atomic UPDATE. The pytest evals run a 10-concurrent-call test against a single tenant and assert no serialization beyond the WAL fsync.
+
+### 12.11.3 Audit log retention vs Cloud SQL PITR
+
+`audit_log` is partitioned monthly and retained 7 years per French accounting law. Cloud SQL automated PITR is **7 days only**. Restoring a 4-year-old partition from PITR is impossible. The current spec (section 11.3) does not name an archive pipeline.
+
+**Mitigation (required in Phase 7, but the buckets must exist from Phase 2):**
+
+- New GCS bucket `gammahr-prod-audit-archive` in `europe-west9`, storage class `Coldline`, retention policy lock with 7-year minimum, no service-account delete permission (parallel to `gammahr-legal-archive` from ADR-005).
+- Weekly Celery beat job that picks the oldest detached `audit_log_YYYY_MM` partition older than 90 days, exports it via `pg_dump --table` to GCS as a compressed file, then drops the partition from the live cluster.
+- The operator console has a "Restore audit partition" action that downloads the file from GCS into a temporary schema for ad-hoc queries during a customer dispute.
+- Pytest test: a fake 90-day-old partition is detached, exported, dropped, and re-imported in a tenant DR drill scenario.
+
+### 12.11.4 `public.files` SHA256 dedup is per-tenant by design
+
+The unique constraint is `(tenant_id, sha256)`. The same receipt photo from two tenants creates two GCS objects, not one. This is a **deliberate cost** of tenant isolation: cross-tenant dedup would let one tenant's storage leak into another via stat queries, and the storage cost is small at the canonical scale (200 employees × 7 receipts/month × 500 KB = 7 GB/year/tenant, ~€0.03/month at GCS Coldline rates).
+
+No mitigation needed; this paragraph exists so the cost is documented.
+
+### 12.11.5 Invoice gap-detection job
+
+Section 3.3 describes a nightly `invoice_gap_check` Celery job for French legal compliance. **Schedule and alert path are not specified.** Required:
+
+- Celery beat: daily at 02:00 UTC per tenant timezone.
+- Alert: PagerDuty equivalent or just a high-priority email to founder via Workspace SMTP Relay.
+- Pytest test: insert two invoices with sequence numbers (5, 7), run the job, assert the alert fires and identifies number 6 as missing.
+
+### 12.11.6 WebSocket backpressure on slow clients
+
+A slow client (mobile on bad wifi) can cause the FastAPI WebSocket loop to block on send. Phase 2 mitigation:
+
+- Per-connection bounded queue (max 100 messages).
+- On overflow: drop oldest message, increment a counter on the connection, log a warning.
+- After 30 seconds of overflow: server closes the connection. Client reconnects per ADR-004 reconnect logic.
+
+### 12.11.7 Cloudflare WebSocket idle timeout
+
+Cloudflare's free tier closes idle WebSocket connections after **100 seconds**. ADR-004 says "heartbeat every 30 seconds; server closes idle connections after 90 s." The 30 s heartbeat keeps the connection alive under Cloudflare's policy; the 90 s server-side close should be raised to **>100 s** to avoid racing Cloudflare's close. **Recommended: 110 s server-side idle close.**
 
 ---
 
@@ -1104,6 +1339,55 @@ expense_categories, expenses, expense_receipts,
 invoices, invoice_lines, invoice_payments,
 ai_budgets, ai_command_history, ai_insights
 ```
+
+---
+
+## 14. Recruitment domain (reserved for v1.1)
+
+Recruitment is scoped for v1.1 (see `docs/SCOPE.md` Tier 1.1). v1.0 does NOT build these tables. The schema namespace is reserved here so v1.1 can ship without a migration rewrite of existing tables.
+
+Reserved tenant-schema tables (v1.1):
+
+- `job_openings` - title, description, department, hiring_manager_id, status (draft/open/closed/filled), created_at
+- `candidates` - first_name, last_name, email (unique per tenant), phone, source, status (new/screening/interview/offer/hired/rejected), created_at
+- `applications` - candidate_id, job_opening_id, stage, created_at, updated_at, status
+- `interview_stages` - job_opening_id, name, order_index, type (phone/tech/culture/final), description
+- `interviews` - application_id, stage_id, scheduled_at, interviewer_ids, outcome (pending/pass/fail/strong_pass/strong_fail), notes_encrypted
+- `offers` - application_id, salary_cents, currency, start_date, status (draft/sent/accepted/declined/withdrawn), expires_at
+- `candidates.hired_employee_id` - nullable FK into `employees` table, populated on hire
+
+Do NOT implement these tables in v1.0. Do NOT add routes or services. The placeholder ensures the v1.1 implementer can create tables without renaming existing columns or tables.
+
+v1.1 integration notes:
+- A hired candidate triggers `employees` row creation via a service-layer function in `features/recruitment/service.py`
+- Notes are GDPR Art. 9 sensitive (may contain protected characteristics); encrypted at rest via CMEK like `leave_requests.reason_encrypted`
+- Candidate email PII is treated as Internal-tier; candidates can exercise DSR per `docs/COMPLIANCE.md` section 3
+- Interview feedback flows through the existing `notifications` table kind `interview_feedback_requested`
+
+---
+
+## 15. Country holiday calendar (reserved data structure, FR + UK seeded in v1.0)
+
+Used by leave balance accrual, timesheet working-day math, invoice due-date calculation, and month-end close scheduling. Public schema (not tenant-scoped) because holidays are country-level reference data. Complements the existing `public.holidays` table (section 2.5), which stores tenant-custom overrides; `public.country_holidays` below is the shared reference feed.
+
+```
+public.country_holidays (
+  id                  UUID PRIMARY KEY,
+  country_code        TEXT NOT NULL,       -- ISO 3166-1 alpha-2 (FR, GB; year 2: CA, MA, NE, ...)
+  region_code         TEXT NULL,           -- optional sub-country (CA-QC, CA-ON, GB-SCT for Scottish-only bank holidays)
+  date                DATE NOT NULL,
+  observed_date       DATE NOT NULL,       -- actual non-working day if the holiday falls on a weekend
+  name                TEXT NOT NULL,
+  type                TEXT NOT NULL CHECK (type IN ('public', 'religious', 'bank', 'optional')),
+  UNIQUE (country_code, region_code, date, name)
+)
+```
+
+**v1.0 seed data:** FR + UK public and bank holidays for 2026 and 2027 (two years forward). A Celery job `tasks.holidays.refresh_calendar` runs annually on December 1 to load the next year, with manual override via the operator console.
+
+**Year 2 expansion:** adding a country means (1) loading its holidays into this table, (2) creating the per-country rules files in the tax and leaves modules (see section 2.3 "Per-country strategy modules"). No schema change.
+
+**Islamic holiday dates:** when Morocco, Niger, or any Muslim-majority country is added in year 2, the `refresh_calendar` job must handle lunar-calendar holidays (Eid, Ramadan) whose Gregorian dates shift yearly. A reference data source (Hijri calendar library or a commercial feed) is selected at that time.
 
 ---
 

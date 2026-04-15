@@ -1,6 +1,6 @@
 # APP BLUEPRINT
 
-> Every page in GammaHR v1.0. One table row per page.
+> Every page in Gamma v1.0. One table row per page.
 > `specs/DESIGN_SYSTEM.md` defines the atoms. `prototype/*.html` is the visual spec. This file is the feature index.
 > Three audiences, three route groups: `(ops)` for ops.gammahr.com, `(app)` for app.gammahr.com, `(portal)` for portal.gammahr.com. See `docs/decisions/ADR-010-three-app-model.md`.
 
@@ -44,9 +44,9 @@
 - 1.8: bulk import target 201 employees + 120 clients + 260 projects + 1 year of timesheets (52 weeks) in < 60 s. Matches the canonical seed data in `specs/DATA_ARCHITECTURE.md` section 12.10. Resumable wizard. Idempotent imports.
 
 ### Deferred from the (app) auth flow
-- Self-serve public signup form at `gammahr.com/register` — DEF-028, not in v1.0. Tenants are created by the founder in the operator console; new employees receive magic-link invites.
-- SCIM provisioning from Google Workspace / Microsoft Entra directories — DEF-024.
-- SAML federation — DEF-025.
+- Self-serve public signup form at `gammahr.com/register` (DEF-028, not in v1.0). Tenants are created by the founder in the operator console; new employees receive magic-link invites.
+- SCIM provisioning from Google Workspace / Microsoft Entra directories (DEF-024).
+- SAML federation (DEF-025).
 
 ---
 
@@ -57,6 +57,13 @@
 | 2.1 | Dashboard | `/dashboard` | `prototype/index.html` | Dashboard | AI greeting, ranked insights card, anomaly badges on KPIs |
 
 Two build passes: Pass 1 after employees/clients/projects (Phase 4). Pass 2 after all modules wired (Phase 5).
+
+### 2.1 Layout
+
+1. **KPI strip (top).** Exactly 4 KPI cards: Revenue YTD, Billable days this week, Approvals pending, Team capacity this week. Each card uses the existing `StatPill` atom. Data from `GET /api/v1/dashboard?metrics=revenue,billable,approvals,capacity`. Refreshes on window focus via TanStack Query.
+2. **AI insights row (below KPIs).** Up to 5 ranked `<AIInsightCard>` atoms. Horizontally scrollable on mobile, 3-column grid on desktop. Each card is dismissible per-user (persists in `user_preferences.dismissed_insights`). Each card contains a title, a 1-2 sentence body, and an "Act on this" CTA that links to the relevant entity. Data from `GET /api/v1/insights?limit=5`, cached 24 h by the nightly insights Celery job.
+3. **Build phasing.** Pass 1 ships the KPI strip only (Phase 4 exit). Pass 2 adds the insight cards (Phase 5 exit, depends on the insights pipeline being live).
+4. **Degraded mode.** When `kill_switch.ai` is on, the insights row is hidden entirely and a one-line dismissible yellow banner says "Smart insights are temporarily paused."
 
 ---
 
@@ -98,9 +105,10 @@ draft ──[submit]──> submitted ──[approve]──> approved
 
 ### Constraints
 - 4.2: autosave every 5 s. Keyboard-navigable grid. Max `hours_per_day * 60` minutes per day validation. Projects with `allow_hourly_entry = false` accept only full-day and half-day entries; projects with the flag true accept sub-day entries at 1-hour minimum.
+- 4.2: autosave fires every 5 seconds on desktop, every 10 seconds on mobile, or on field blur. If autosave encounters an HTTP 409 conflict, the affected row locks (grayed out) and an inline conflict chip appears: "Conflict. [Resolve]". Clicking Resolve opens the `<ConflictResolver>` modal for that row only; other rows remain editable. Manual save (Ctrl+S) also triggers any pending autosaves.
 - 4.2: entries are immutable once parent week `status = 'submitted'`. The grid shows a clear "week is submitted, recall to edit" banner if an employee tries to type into a submitted week.
 - 4.2: version lock is on BOTH `timesheet_weeks` (parent) and `timesheet_entries` (children during draft). Conflict resolution uses the shared `<ConflictResolver>` pattern component.
-- 4.3: approvals operate on whole weeks for timesheets, whole requests for leaves, whole expenses for expenses. Undo window 5 s after approve/reject. Decisions idempotent.
+- 4.3: approvals operate on whole weeks for timesheets, whole requests for leaves, whole expenses for expenses. Undo window: the approver sees a toast with a 5-second countdown and an Undo button after every approve or reject. Undo is permitted only to the actor, only within 5 seconds, and rolls back `approvals.status` to `submitted` plus clears `approved_by` and `approved_at`. After 5 seconds, undo is no longer available via UI; an admin may still correct via audit-trail reversal (rare). Approvals are idempotent: replaying the same approval returns 200 with the current state; the approve endpoint honors an `Idempotency-Key` header with a 5-second replay window.
 - 4.3: approval routing is single-hop. Direct manager for timesheets and leaves; direct manager + finance co-approval for expenses above `tenants.expense_approval_threshold_cents`. The `approval_delegations` table handles vacation cover via full inheritance.
 
 ---
@@ -150,6 +158,86 @@ Project tabs: Overview, Team, Tasks, Time, Invoices, Files, Activity.
 
 Auto-generate from approved timesheets + expenses. PDF via WeasyPrint matching HTML preview at print DPI.
 
+### 8.3 Month-end close (the v1.0 agentic feature)
+
+**Route:** `/invoices/month-end`
+**Owner:** the finance role (per DATA_ARCHITECTURE roles)
+**Purpose:** on the first business day of each month, Gamma drafts one invoice per client for the prior month from approved timesheets, approved expenses, and active rate periods, then presents a review queue. The user clicks through, confirms each, Gamma sends via the existing WeasyPrint + Workspace SMTP Relay path.
+
+#### User flow
+
+1. User lands on `/invoices/month-end` on the 1st (or anytime manually).
+2. The page shows "X drafts ready for <previous month>" with a KPI strip: total draft value, count of clients, count of flagged drafts, count of drafts auto-generated without any warnings.
+3. A review queue list below: one card per client invoice draft. Each card shows client name, draft total in tenant currency, line count, a one-sentence AI-written explanation ("This draft is EUR 5,020 across 14 line items. All rates match the current rate card. No warnings."), and an inline status chip (`ready` / `warning` / `action needed`).
+4. User clicks a card, which opens the invoice draft detail view (same view as the existing invoice detail page) with a banner at the top showing the AI explanation and any warnings.
+5. User can edit any line, then clicks **Confirm and queue** to mark the draft ready-to-send. Batched send happens on a separate click of **Send all ready** (existing Phase 2 manual WeasyPrint flow, not automated email).
+6. Undo window: 5 seconds after Confirm, same pattern as approvals.
+7. Success state: when all drafts are confirmed, the page shows a full-bleed success panel "Month-end close complete. X invoices ready to send, EUR Y total billed."
+
+#### Deterministic analyzers (pure Python, no AI)
+
+Before any Gemini call, Python analyzers produce **candidate signals** for each draft. Analyzers live in `backend/app/features/invoicing_agent/analyzers.py`:
+
+- `rate_change_mid_period`: a rate row changed `valid_from` or `valid_to` within the invoice period
+- `line_count_anomaly`: line count is >2σ above the trailing 6-month average for this client
+- `total_value_anomaly`: total value is >2σ above the trailing 6-month average
+- `new_employee_on_project`: at least one line has an employee who never billed this project before
+- `fx_rate_fallback_used`: at least one line uses an FX rate from a prior business day (fallback)
+- `client_on_hold`: client has `payment_hold = true`
+- `expense_not_matched`: at least one expense in the period has no project_id but should (flagged for reimbursement-vs-bill review)
+- `unmatched_approved_entries`: the client has approved timesheet entries in the period that did NOT make it into any invoice line (bug indicator)
+- `milestone_due`: a fixed-price milestone on this client's project is marked due in this period
+
+Each analyzer returns `{code, severity, human_readable_reason, entity_refs}`. Severity: `info` / `warning` / `action_needed`.
+
+#### Gemini's role (LLM-as-router, not free-form generation)
+
+Gemini's ONLY job in this surface is:
+
+1. **Ranking**: given the list of candidate signals per draft, rank them by importance for a finance reviewer and pick the top 3 to surface on the card.
+2. **Explanation**: write ONE short paragraph (2-3 sentences max, plain text, no markdown, no em dashes) per draft that explains why this draft looks normal (`ready`), suspicious (`warning`), or requires manual action (`action needed`). The explanation cites the analyzer signals by human-readable reason.
+
+Gemini does NOT:
+- Decide which invoices to create (deterministic)
+- Compute line quantities or totals (deterministic, see DATA_ARCHITECTURE §4.4.1 algorithm)
+- Modify any line or field
+- Send any email
+- Learn from user edits (no training loop in v1.0; deferred)
+
+#### API contracts
+
+- `POST /api/v1/invoices/month-end/start` - body `{period_start, period_end}`. Kicks off a Celery job that generates all draft invoices for the period. Returns a job_id for SSE polling.
+- `GET /api/v1/invoices/month-end/drafts?period=2026-04` - returns the draft queue with AI explanations and analyzer signals.
+- `PATCH /api/v1/invoices/{id}/confirm-draft` - marks a draft as `ready_to_send`. Idempotency-Key honored with a 5-second replay window.
+- `POST /api/v1/invoices/month-end/send-batch` - body `{invoice_ids: [...]}`. Sends all ready invoices via WeasyPrint + SMTP Relay. One audit row per invoice.
+
+#### Guardrails and degraded mode
+
+- **Kill switch**: if `kill_switch.ai` is on, the page still renders the draft queue. Analyzer signals still show. The AI explanation paragraph is hidden and replaced with "AI explanation temporarily unavailable. Please review the draft details manually." Everything else works. The queue is functional without AI; the AI is additive explanation, not load-bearing logic.
+- **Audit**: every Confirm, Send, Edit writes one `audit_log` row. Analyzer signals are logged per draft in `public.ai_events` (no PII, metadata only).
+- **RBAC**: finance role only. Viewers and regular employees do not see the page.
+- **Idempotency**: generating drafts for the same period twice produces the same result byte-for-byte (pytest snapshot test).
+
+#### Performance
+
+- Draft generation for 120 clients: target under 30 seconds end-to-end (Celery fan-out, one task per client).
+- AI explanation generation: target under 200ms per draft via batched prompts (up to 20 drafts per prompt call).
+- Page first paint: <500ms warm, <2s cold.
+
+#### Success metric (v1.0)
+
+- 80% of pilot customers use month-end close in their 2nd month.
+- Average confirm-and-send time per invoice: under 45 seconds (vs 10+ minutes manual today).
+- Pilot interview quote: "I used to lose a day to this. Now it's 20 minutes."
+
+#### Deferred (NOT in v1.0)
+
+- Automatic sending without confirmation (NEVER; user always confirms)
+- Automatic dunning for unpaid (DEF-029 payment processor)
+- Cross-period corrections (e.g., retroactive rate changes) - v1.1
+- Recurring manual invoice templates (v1.1)
+- Machine learning from user edits to rank future drafts - v1.1
+
 ---
 
 ## 9. Admin + account (Tier 1)
@@ -187,7 +275,7 @@ Account sections: Profile, Security (MFA + passkeys + sessions), Notifications, 
 | 11.3 | Tenants list | `/tenants` | List | All tenants with lifecycle_state, list_tier or pricing_model, seat count, created_at, last_activity |
 | 11.4 | Tenant detail | `/tenants/[id]` | Detail + tabs | Overview, Users, Subscription, Entitlements, Custom Contract, Lifecycle actions |
 | 11.5 | Create tenant | `/tenants/new` | Wizard | Name, slug, country, timezone, currency, hours_per_day, starting tier. Creates schema via `CREATE SCHEMA`, seeds default entitlements, sends magic-link invite to owner email |
-| 11.6 | Subscription invoices | `/billing/invoices` | List | GammaHR's own invoices to tenants (Phase 2 manual) |
+| 11.6 | Subscription invoices | `/billing/invoices` | List | Gamma's own invoices to tenants (Phase 2 manual) |
 | 11.7 | Invoice detail | `/billing/invoices/[id]` | Detail + document | Line items, status, payment method, PDF download, mark-paid action |
 | 11.8 | Custom contracts | `/billing/contracts` | List | tenant_custom_contracts rows with tenant name, annual fee, period |
 | 11.9 | Contract detail + edit | `/billing/contracts/[id]` | Detail + form | Fields per DATA_ARCHITECTURE.md section 2.3, signed PDF upload, audit trail |
@@ -202,10 +290,10 @@ Account sections: Profile, Security (MFA + passkeys + sessions), Notifications, 
 | 11.18 | Health | `/health` | Dashboard | SLO dashboards, Cloud Monitoring embeds, incident history |
 
 ### Deferred from operator console v1.0
-- **Impersonation UI** to "log in as tenant admin" — DEF-002. The JWT shape and audit contract are defined now (ADR-010), the UI ships later.
-- **Integrated billing UI** for Stripe/Revolut webhook handling — DEF-003. Phase 2 is manual PDF invoicing.
-- **Broadcast banners, per-tenant feature flag toggles from a richer UI, maintenance drain orchestration** — DEF-004.
-- **Drift auto-reconciliation** in 11.12 Migrations — DEF-054.
+- **Impersonation UI** to "log in as tenant admin" (DEF-002). The JWT shape and audit contract are defined now (ADR-010), the UI ships later.
+- **Integrated billing UI** for Stripe/Revolut webhook handling (DEF-003). Phase 2 is manual PDF invoicing.
+- **Broadcast banners, per-tenant feature flag toggles from a richer UI, maintenance drain orchestration** (DEF-004).
+- **Drift auto-reconciliation** in 11.12 Migrations (DEF-054).
 
 ---
 
@@ -221,21 +309,64 @@ Account sections: Profile, Security (MFA + passkeys + sessions), Notifications, 
 | 12.4 | Portal invoice detail | `/invoices/[id]` | `prototype/portal/` | Detail + document | PDF view, payment status |
 
 ### Deferred from portal v1.0
-- **Portal SSO** (clients logging in via their corporate SSO) — DEF-008.
-- **Write operations** (portal users submitting anything) — not in v1.0. Read-only only.
+- **Portal SSO** (clients logging in via their corporate SSO): DEF-008.
+- **Write operations** (portal users submitting anything): not in v1.0. Read-only only.
 
 ---
 
 ## 13. Cross-cutting (all route groups)
 
+> Sections 13.1 to 13.6 describe shell infrastructure that lives always-on across every (app) page. They are built in Phase 2 as part of the foundation, not as discrete Tier 1 features. See `docs/SCOPE.md` Shell infrastructure table for ownership mapping.
+
 | # | Feature | Notes |
 |---|---------|-------|
-| 13.1 | Command palette | Cmd+K, global, (app) only. Maps natural-language queries to `ai_tools.py` tool calls via Vertex AI Gemini LLM-as-router. |
+| 13.1 | Command palette | Cmd+K, global, (app) only. Maps natural-language queries to `ai_tools.py` tool calls via Vertex AI Gemini LLM-as-router. In v1.0 the palette is read-only (15 filter and summary tools). Writes require explicit confirmation UI, which month-end close (§8.3) demonstrates. |
 | 13.2 | Notifications | Bell in topbar, WebSocket push on `/ws/notifications`, in-app + PWA Web Push as primary channels, email as fallback for auth flows + invoice delivery + opt-in daily digest. |
 | 13.3 | Audit log viewer | Tenant admins see their own tenant's audit log in (app) under `/admin/audit`. Operators see cross-tenant audit log in (ops) under `/audit`. |
 | 13.4 | Conflict resolver | `<ConflictResolver>` in `components/patterns/`, triggered by HTTP 409 responses on any optimistic mutation via the `useOptimisticMutation` wrapper. |
 | 13.5 | Entitlement lock UI | Locked features show a gray lock icon and "Upgrade to Pro" CTA instead of the action. Feature gating via `@gated_feature(key)` on the backend. |
 | 13.6 | Degraded mode banners | When AI kill switch is active or tenant hit 80% AI budget, a yellow banner appears at the top of (app) explaining which features are temporarily unavailable. |
+
+### 13.7 Notifications inbox page
+
+Route `/notifications` in the (app) route group. Pattern: List.
+
+Atoms used: `NotificationRow` (custom), `FilterBar`, `Pagination`, `EmptyState`.
+
+API: `GET /api/v1/notifications?kind=&limit=50&cursor=`. Filters: by kind (`approval_requested`, `timesheet_due`, `expense_submitted`, `invoice_overdue`, `mention`). Sorts: newest first. Row click navigates to the source entity. "Mark all read" button in the page header.
+
+Performance target: first paint < 500 ms warm, < 2 s cold. Supports 10k+ rows via cursor pagination.
+
+### 13.8 Bulk row actions pattern
+
+Multi-select pattern used across approvals, expenses, leaves, invoices, and timesheet lists.
+
+- Left-column checkbox on every row.
+- Header checkbox for select-all-on-page (not select-across-pages).
+- Floating action bar appears at the bottom of the viewport when 1+ rows are selected.
+- Actions are context-dependent: approve, reject, mark-paid, archive.
+- Confirm modal before destructive actions (reject, archive).
+- Every bulk action writes a per-row audit entry.
+
+API: `POST /api/v1/{resource}/bulk-action` with body `{ids: [], action: '', reason?: ''}`. Response returns per-id success or failure so the UI can highlight partial results.
+
+### 13.9 Global non-AI search
+
+Topbar search, always available regardless of `kill_switch.ai`. This is the fallback path when the AI command palette is degraded.
+
+Atom: `SearchInput` (see `specs/DESIGN_SYSTEM.md` section 5).
+
+API: `GET /api/v1/search?q=&types=employees,clients,projects&limit=20`.
+
+Keyboard: Cmd+/ focuses the input. Dropdown shows up to 20 results grouped by entity type (Employees, Clients, Projects). Mobile: icon button in topbar opens a full-screen search modal.
+
+### 13.10 In-app feedback
+
+Modal accessible from the topbar overflow menu and from a footer link on every page.
+
+Modal fields: category select (bug, suggestion, question, other), body textarea (max 2000 chars), auto-captured `url` and `user_agent`.
+
+API: `POST /api/v1/feedback`. Rate-limited to 5 per day per user. Success toast on submit.
 
 ---
 

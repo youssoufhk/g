@@ -1,9 +1,9 @@
 # THE PLAN
 
 > **Read this file before every work session. No exceptions.**
-> This is the founder's stick-to-it plan. The planning is done. No more "let me think about it." Execute in order.
+> This is the founders' stick-to-it plan. The planning is done. No more "let me think about it." Execute in order.
 > If reality disagrees with this plan, update this file explicitly, do not silently drift.
-> Last updated: 2026-04-15 (after the 15-round data architecture planning session locked 102 decisions + the spec rewrite).
+> Last updated: 2026-04-15 (after the 15-round data architecture planning session locked 102 decisions + the spec rewrite, then the harsh-review pass added the realistic schedule, the bandwidth math, the customer-validation gate, and the post-launch playbook; then the Gamma repositioning + co-founder pass recalibrated the team, the realistic column, SOC 2 timing, DR drill cadence, and the month-end close agent scaffolding).
 
 ---
 
@@ -24,13 +24,12 @@ You are **done planning**. This file tells you what to do each week to ship v1.0
 
 ## The five commandments (read before every work session)
 
-Break any of these and you are re-planning, which is the thing you promised yourself not to do.
+See `CLAUDE.md` section 2 for the full 11 hard rules. The commandments below are planning-specific additions, not duplicates. Break any of these and you are re-planning, which is the thing you promised yourself not to do.
 
 1. **Do not re-open locked decisions.** The 102 decisions in the spec files are closed. If you think one is wrong, open a PR that updates the spec file with explicit reasoning, then refer back to it. No silent drift.
 2. **Work one Tier 1 feature at a time.** Finish it to the flawless gate before starting the next. Parallel work on Tier 1 features is how quality slips.
 3. **Defer means defer.** Every item in `docs/DEFERRED_DECISIONS.md` has a trigger. Do not revisit it before the trigger fires. Write the DEF-NNN in code comments so future-you can find the context.
 4. **Match the prototype.** `prototype/*.html` is the visual spec. No inventing new atoms. If a new atom is needed, stop and ask before building it.
-5. **No em dashes, no "utilisation", no animations, no decorative flourishes.** The CLAUDE.md hard rules apply to this file too.
 
 ---
 
@@ -44,33 +43,87 @@ Break any of these and you are re-planning, which is the thing you promised your
 
 ## Target weeks per phase
 
-**Week 0 = production build kickoff** (not prototype start). All week numbers are **targets**, not guarantees. Solo founder at ~20 h/week historically misses by 1.5 to 2x.
+**Week 0 = production build kickoff** (not prototype start). All week numbers are **targets**, not guarantees.
 
-| Phase | Target weeks | Theme | Exit criteria |
-|-------|-------------|-------|---------------|
-| 0 | done | Prototype | All 19 HTML pages approved |
-| 1 | done (2026-04-15) | Foundation docs | All specs + ADRs final, deferred registry extracted (DEF-001 to DEF-064) |
-| 2 | 4 to 7 | Foundation build | GCP projects provisioned, FastAPI scaffold + Next.js scaffold + migration runner + ai/client.py + useOptimisticMutation + ConflictResolver + minimum operator console (tenant create/list/detail) |
-| 3 | 8 to 11 | Auth + onboarding + full operator console | OIDC + passkey + password auth paths, onboarding wizard with AI column mapper, full operator console |
-| 4 | 12 to 15 | Core data + Dashboard pass 1 | Employees, clients, projects, dashboard scaffold |
-| 5 | 16 to 24 | Core modules | Timesheets (week-as-entity), leaves, expenses (OCR), invoices (PDF), approvals, admin, account, dashboard pass 2 |
-| 6 | 25 to 34 | Tier 2 + portal | Calendar, Gantt, resource planning, HR module, insights page, client portal |
-| 7 | 35 to 42 | Hardening + launch | Security audit, perf pass, beta onboarding, docs, public launch |
+There are **two columns** below: an *optimistic* one (the original plan's wishful estimate) and a *realistic* one derived from the team bandwidth math in the next section. The realistic column is the one to plan against. The optimistic column stays in the table only because it is what every prior version of this file used; do not delete it, but do not believe it either.
 
-### Go-to-market milestones (target weeks, slide with phase slippage)
+**Realistic weeks assume two founders, ~12 h/week each productive after all-in overhead and coordination. Solo-founder ceilings (the original realistic column from the 2026-04-15 harsh review) are retained below the table so we remember the cost of losing a founder. Two founders do NOT halve the schedule; coordination and review overhead eat ~35-40% of the theoretical speedup.**
 
-| Target week | Milestone |
-|------------:|-----------|
-| 11 | Auth + onboarding + operator console flawless |
-| 15 | Dashboard pass 1 live with core data |
-| 24 | All Tier 1 features flawless |
-| 27 | First non-paying pilot kickoff (demo-to-contract motion, no self-serve signup) |
-| 34 | Tier 2 features + client portal functional |
-| 37 | Automated billing live (Stripe or Revolut, final choice at DEF-029 trigger time) |
-| 40 | First paying customer signs (may be earlier via the manual Phase 2 billing path) |
-| 42 | Public launch |
+| Phase | Optimistic weeks | **Realistic weeks (2 founders)** | Theme | Exit criteria |
+|-------|-----------------:|---------------------------------:|-------|---------------|
+| 0 | done | done | Prototype | All 19 HTML pages approved |
+| 1 | done (2026-04-15) | done (2026-04-15) | Foundation docs | All specs + ADRs final, deferred registry extracted (DEF-001 to DEF-064) |
+| 2 | 4 to 7 | **4 to 7** | Foundation build | GCP projects provisioned, FastAPI scaffold + Next.js scaffold + migration runner + `ai/client.py` + `useOptimisticMutation` + `ConflictResolver` + minimum operator console + atom layer + shell infrastructure (Cmd+K palette, notifications, conflict resolver, entitlement lock UI) + month-end close agent scaffolding |
+| 3 | 8 to 11 | **8 to 13** | Auth + onboarding + full operator console | OIDC + passkey + password auth paths, onboarding wizard with AI column mapper, full operator console |
+| 4 | 12 to 15 | **13 to 18** | Core data + Dashboard pass 1 | Employees, clients, projects, dashboard scaffold. **Customer-validation gate clears here (see "Validated lead gate" below).** |
+| 5 | 16 to 24 | **20 to 32** | Core modules | Timesheets (week-as-entity), leaves, expenses (OCR), invoices (PDF) + month-end close agent full implementation, approvals, admin, account, dashboard pass 2, payroll export, ongoing imports, first-contact UX hardenings |
+| 6 | 25 to 34 | **32 to 42** | Tier 2 + portal | Calendar, Gantt, resource planning, HR module, insights page, client portal. **SOC 2 Type 1 audit kickoff (parallel to Tier 2 build).** |
+| 7 | 35 to 42 | **42 to 54** | Hardening + launch | Security audit, perf pass, beta onboarding, docs, public launch, **SOC 2 Type 1 certification by customer 3-4** |
 
-**Note:** billing automation is NOT on the critical path for first revenue. Phase 2 manual PDF invoicing via Workspace SMTP Relay can handle the first 1-5 customers without any Stripe/Revolut integration. The "automated billing live" milestone is for customer #6+.
+**Read this twice:** the realistic total with two founders is **42 to 54 weeks** (10 to 13 calendar months from week 0 to public launch). The optimistic total of 35 to 42 weeks (8 to 10 months) is still too aggressive; the bottom-up math below shows why.
+
+**If solo-founder reality returns** (co-founder drops out, leaves, or cannot commit): fall back to the original realistic column from the 2026-04-15 harsh review: Phase 2 **6 to 10**, Phase 3 **12 to 18**, Phase 4 **20 to 26**, Phase 5 **30 to 46**, Phase 6 **48 to 60**, Phase 7 **62 to 72** (15 to 18 calendar months). The cost of losing one founder is roughly 20 extra calendar weeks and a forced Tier 2 scope cut. Keep this fallback visible so the team knows what is at stake.
+
+### Why the realistic column
+
+The realistic numbers come from these adjustments to the optimistic baseline:
+
+1. **Combined productive build time per week is 24 to 34 hours, not 40-60.** Two founders at "20-30 hours/week nominal" each still have to handle customer discovery (shared 50/50 from Phase 4), pilot management (shared in Phase 6+), weekly logs and cross-doc maintenance, founder review sessions for the flawless gate, learning curve, and ~10% lost to vacations, sickness, and life. Add ~15% coordination overhead (syncs, code review, decision alignment) between founders. Net combined productive build time = **24 to 34 hours/week**.
+2. **Phase 5 has 10 distinct features**, each at the flawless gate. Optimistic was "1 feature/week", which is still impossible at two-founder cadence because quality gates do not parallelize: one person builds, the other reviews. Bottom-up with two-founder parallelism: average 2 weeks/feature × 10 features = 20 weeks, with hard items (invoices + month-end close agent, approvals, week-as-entity timesheets) eating 3-4 weeks each. Realistic Phase 5 floor = 20 weeks, ceiling = 32.
+3. **Phase 2 includes the entire shell infrastructure** (atom layer + Cmd+K palette + notifications drawer + conflict resolver pattern + entitlement lock UI) plus the month-end close agent scaffolding. Two-founder split: founder runs the atom layer + shell in parallel to co-founder running the backend scaffold + `ai/client.py`. Realistic Phase 2 floor = 4 weeks, ceiling = 7.
+4. **Phase 4 has the customer-validation gate** before the heavy build of Phase 5 starts; this is a deliberate hold point. With two founders, discovery and demo outreach run on the co-founder's time without stealing Tier 1 build hours.
+5. **Phase 7 hardening + launch** is sized at 6-8 weeks of productive work plus the SOC 2 Type 1 audit window (see milestone below).
+
+### Team bandwidth math (the load-bearing assumption)
+
+Two founders in place from day 0. Division of labor:
+- **Founder** (non-technical product owner, ~20 h/week): product + design + frontend + founder review sessions + customer-facing demo calls.
+- **Co-founder** (~20 to 30 h/week, treat as a range): backend + infra + AI + technical discovery + code review + pilot technical enablement.
+- Both on customer calls when the firm is evaluating Gamma seriously.
+
+| Activity | Founder h/week | Co-founder h/week |
+|---|---|---|
+| Tier 1 build | 12 to 14 (Phase 2-5), 8 to 10 (Phase 6-7) | 14 to 20 (Phase 2-5), 10 to 14 (Phase 6-7) |
+| Customer discovery + demo calls | 0 (Phase 2-3), 1 to 2 (Phase 4+) | 0 (Phase 2-3), 1 to 2 (Phase 4+, technical deep-dives) |
+| Pilot management (per active pilot) | 0 (Phase 2-4), 1.5 to 2.5 h/pilot/week (Phase 5+) | 0 (Phase 2-4), 1.5 to 2.5 h/pilot/week (Phase 5+) |
+| Weekly logs, cross-doc maintenance, deferred-decision triage | 1 to 2 | 0 to 1 |
+| Founder review sessions (flawless gate item 15) | 1 to 2 | 0 to 1 (attending) |
+| Coordination overhead (syncs, PR review, decision alignment) | 1 to 2 | 1 to 2 |
+| Learning curve (front-loaded) | 2 to 4 (Phase 2), 1 to 2 (Phase 3-5), ~0 (Phase 6+) | 1 to 2 (Phase 2), ~1 (Phase 3-5), ~0 (Phase 6+) |
+| **Total nominal claim** | 17 to 30 h/week | 18 to 33 h/week |
+| **Combined productive build time** | **~24 to 34 h/week** (post-overhead) | |
+
+**Phase 6-7 with 3+ active pilots running concurrently is still tight even with two founders.** Pilot management alone consumes 9-15 h/week across the two of us at 3 pilots. Choose between dropping pilots, dropping Tier 2 scope, or extending the calendar. Do not try to run 5 pilots concurrently.
+
+### Validated lead gate (required to clear before Phase 4 starts)
+
+The original plan committed to **40 weeks of build before the first paying customer signs**. That is build-blind: betting a year of work on an avatar customer described in `CLAUDE.md` whose existence has not been verified. **Before Phase 4 (Core data + Dashboard pass 1) begins, this gate must be cleared:**
+
+- [ ] **At least one validated lead** in writing. Validation = a named decision-maker at a real consulting firm (50-500 employees, EU) who has done a 30-min discovery call AND has either (a) signed a non-binding pilot LOI, or (b) committed in writing to a paid pilot at first-customer pricing once Tier 1 is live, or (c) prepaid a deposit.
+- [ ] Two more leads at the "Interested" stage in the pipeline (per `docs/GO_TO_MARKET.md` section 4), even if not yet committed.
+- [ ] If neither (a), (b), nor (c) is achievable in 4 weeks of focused outreach: **STOP Phase 4** and reconsider whether to keep building. The architecture is good enough that the work to date is not wasted; you can resume later. But sinking another 30+ weeks into Phase 5 without a buyer is the failure mode this gate exists to prevent.
+
+With a co-founder in place, the outreach playbook splits: founder handles demo calls and design reviews, co-founder handles technical deep-dives during discovery. This doubles the weekly discovery bandwidth without stealing Tier 1 build hours from either of us.
+
+The customer-validation gate exists because the harshest bug in the original plan was not technical: it was the assumption that the avatar is a buyer. It is not. You need a buyer to validate that.
+
+### Go-to-market milestones
+
+Two columns again: optimistic and realistic (two-founder). Use the realistic column for any commitment to a customer or external party.
+
+| Optimistic week | **Realistic week (2 founders)** | Milestone |
+|----------------:|--------------------------------:|-----------|
+| 11 | **13** | Auth + onboarding + operator console flawless |
+| 15 | **18** | Dashboard pass 1 live with core data; **validated lead gate cleared** |
+| 24 | **32** | All Tier 1 features flawless |
+| 27 | **36** | First non-paying pilot kickoff (demo-to-contract motion, no self-serve signup) |
+| 34 | **42** | Tier 2 features + client portal functional; **SOC 2 Type 1 audit engaged** |
+| 40 | **48** | First paying customer signs (manual billing path) |
+| 42 | **54** | Public launch |
+| - | **56 to 60** | **SOC 2 Type 1 certification lands** (target: by customer 3-4) |
+| 50+ | **66+** | Automated billing live (Stripe / Revolut / Paddle, final choice at DEF-029 trigger time, **only after customer #5-10**) |
+
+**Note:** billing automation is NOT on the critical path for first revenue. Phase 2 manual PDF invoicing via Workspace SMTP Relay handles the first 1-5 customers without any Stripe/Revolut/Paddle integration. The "automated billing live" milestone is **post-launch**, on the Customer #6 trigger; it has been moved out of Phase 7 into the post-launch playbook (see end of this file).
 
 ### Slippage policy
 
@@ -81,9 +134,11 @@ Break any of these and you are re-planning, which is the thing you promised your
 
 ### Honest caveats
 
-- Total budget: ~720 to 880 hours at 20 h/week for 36 to 44 weeks. Realistic range is probably **14 to 18 months (1000+ hours)** for a solo founder building 14 Tier 1 features to a flawless bar.
-- "One Tier 1 feature per week in Phase 5" is an aspiration. Some features (invoices, approvals, timesheets grid) will take 2 to 3 weeks each.
-- Pilot and commercial milestones assume customer discovery is already in progress. If no warm leads exist by target week 20, the launch date slips.
+- Total budget at the realistic two-founder columns above: **42 to 54 productive weeks**, which at 24-34 combined productive hours/week is roughly **10 to 13 calendar months** from week 0 to public launch.
+- "One Tier 1 feature per week in Phase 5" was an aspiration in earlier versions of this file. The realistic two-founder column reflects the bottom-up estimate (10 features × 2 weeks average with parallelism = 20 weeks).
+- "13 Tier 1 features at flawless quality" (per the corrected `docs/SCOPE.md`, command palette is shell infrastructure not a Tier 1 feature) plus the month-end close agent and the first-contact UX hardenings (bulk row actions, global non-AI search, in-app feedback button, notifications inbox page) per `docs/SCOPE.md`.
+- Pilot and commercial milestones assume customer discovery is already in progress. **If no warm leads exist by Phase 4 entry**, the validated-lead gate halts the build instead of slipping the launch date.
+- **If the co-founder drops out**, fall back to the solo-founder realistic column (62 to 72 weeks; see the "If solo-founder reality returns" note under the table). Plan for this contingency, do not pretend it cannot happen.
 
 ### Success criteria for v1.0
 
@@ -121,7 +176,7 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 
 **Goal:** infrastructure provisioned, core backend + frontend scaffolds running, the plumbing that every feature depends on in place.
 
-**Target:** 4 weeks of founder work at 20 h/week (~80 hours). Probably slips to 5-6.
+**Target:** 4 to 7 weeks of two-founder work at ~24-34 combined h/week productive. Probably slips to the upper end of that range.
 
 **Concrete tasks, in order:**
 
@@ -136,7 +191,7 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
    - [ ] Add `gammahr.com` zone
    - [ ] Create DNS records for `ops.gammahr.com`, `app.gammahr.com`, `portal.gammahr.com`, `mail.gammahr.com` pointing at the prod Cloud Run URL (proxied)
    - [ ] Enable Cloudflare Access on staging subdomains (founder IP only)
-   - [ ] Set up Email Routing for `bounces@mail.gammahr.com` and `privacy@gammahr.com`, `support@gammahr.com`, `security@gammahr.com`, `invoices@gammahr.com` forwarding to founder inbox
+   - [ ] Set up Email Routing forwards to founder inbox for: `bounces@mail.gammahr.com`, `privacy@gammahr.com`, `support@gammahr.com`, `security@gammahr.com`, `invoices@gammahr.com`, **`dpa@gammahr.com`** (referenced by `specs/DATA_ARCHITECTURE.md` section 8.6 for DPA correspondence), **`abuse@gammahr.com`** (RFC 2142 standard)
 
 3. **Google Workspace setup**
    - [ ] Subscribe to Google Workspace Business Starter for `gammahr.com` ($6/user/month)
@@ -206,7 +261,7 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 7. **Database bootstrap**
    - [ ] Alembic migration: `public` schema with `tenants`, `operators`, `operator_sessions`, `audit_log` (partitioned), and the rest of the global tables from `specs/DATA_ARCHITECTURE.md` section 2.2 through 2.5
    - [ ] Alembic migration: a template `tenant_<slug>` schema creator function that can be called by the tenant creation flow
-   - [ ] Seed the `feature_flags` table with the initial kill switches: `kill_switch.ai`, `kill_switch.signups`, `kill_switch.invoicing`, `kill_switch.email`, `kill_switch.ocr_uploads`, `kill_switch.webhooks`, `kill_switch.payment_processing`
+   - [ ] Seed the `feature_flags` table with the initial kill switches: `kill_switch.ai`, `kill_switch.signups`, `kill_switch.invoicing`, `kill_switch.email`, `kill_switch.ocr_uploads`, `kill_switch.webhooks`, `kill_switch.payment_processing`, **`kill_switch.imports`** (per `docs/DATA_INGESTION.md` section 7)
    - [ ] Seed `sub_processors` with the initial list: Google Cloud (includes Vertex AI Gemini), Google Workspace, Cloudflare, GitHub/Microsoft
    - [ ] Deploy the migration runner + fake-tenant test harness: `pytest` spins up 10 fake schemas, runs the initial migration against each, verifies all at the new `alembic_version`
 
@@ -218,6 +273,36 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
    - [ ] `(ops)/tenants/[id]` detail with lifecycle actions
    - [ ] Operator self-provisioning: you manually add your own operator row to `public.operators` via SQL, then register a passkey via the UI
 
+9. **Task: Atom layer (3 to 4 weeks of productive time).** Implement `components/ui/` atoms with byte-exact prototype parity. Parallelizable in three groups:
+   - Group A (weeks 1-2): Button, Input, Select, Checkbox (new), Radio, Toggle, Textarea
+   - Group B (weeks 2-3): Card, Badge, Pill, Breadcrumb, Tabs, Accordion
+   - Group C (weeks 3-4): Modal, Drawer, Toast, Tooltip, SearchInput (new), AIInsightCard (new), ConflictResolver composite (new)
+
+   Each atom: matches the prototype at 1440px, supports dark and light mode, has a Storybook story with all variants, passes WCAG 2.1 AA, no new tokens. Checkbox, SearchInput, AIInsightCard, and ConflictResolver are founder-approved new atoms added during the critic pass; all others are pre-existing in `specs/DESIGN_SYSTEM.md`.
+
+10. **Task: Write `docs/ROLLBACK_RUNBOOK.md`** covering per-tenant migration rollback, cross-tenant schema drift reconciliation, and full-cluster PITR. Required before Phase 5 begins, not after. See ADR-001 Follow-ups.
+
+11. **Disaster recovery drill (first)**: run the `docs/ROLLBACK_RUNBOOK.md` per-tenant rollback procedure on a staging tenant before the first customer goes live. Quarterly after. Log each drill in `docs/incidents/drills/YYYY-MM-DD.md`.
+
+12. **Month-end close agent scaffolding**: see `specs/APP_BLUEPRINT.md` section 8.x and `specs/AI_FEATURES.md` section 2 for the spec. Backend module `backend/app/features/invoicing_agent/` stubbed in Phase 2 (directory, routes placeholder, service contract, tool registry stub); full implementation in Phase 5 alongside invoices. The scaffolding lives in Phase 2 so the tool registry and gated-feature decorator wiring are in place from day 0.
+
+13. **Testing infrastructure scaffolding**: install pytest + pytest-cov + pytest-asyncio + pytest-mock + Hypothesis + Playwright + pytest-playwright + locust. Configure GitHub Actions pipelines for the unit, property, contract, and E2E layers. Scaffold the eval harness skeleton under `backend/app/ai/evals/`. Draft the first 5 E2E scenarios: onboarding, timesheet, leave, expense, invoice shell (month-end close draft path). Reference: `docs/TESTING_STRATEGY.md`. No feature code depends on this; it has to land first so every subsequent PR is measured against it.
+
+14. **Property-based test invariants (first 5)**: write the first 5 property tests from the layer-2 invariant list in `docs/TESTING_STRATEGY.md` as soon as the invoicing and leaves modules have their first function signatures:
+    - `sum(invoice_lines.total_cents) == invoice.subtotal_cents`
+    - `invoice.subtotal_cents + invoice.tax_cents == invoice.total_cents`
+    - `leave_balance.accrued - leave_balance.used - leave_balance.pending >= 0`
+    - FX conversion transitivity within 1 cent tolerance
+    - Tenant schema queries filtered by `search_path` return zero rows from other tenants
+
+    Zero dependency on full feature implementation; these are written against function signatures, not finished features.
+
+15. **AI eval harness with 5 examples per feature**: 5 month-end close examples, 5 command palette examples, 5 OCR examples. Committed under `backend/app/ai/evals/`. These guide the feature implementation in Phase 5; they are NOT written after the feature. Full eval sets (20-50 examples per feature) land in Phase 5 alongside the feature.
+
+16. **Contract test harness**: FastAPI emits OpenAPI from route signatures; `openapi-typescript` generates frontend types; CI diff asserts consistency. A contract test hits every documented endpoint with a minimal valid request and asserts the response schema matches the OpenAPI spec exactly. Runs on every PR.
+
+17. **Snapshot test framework**: pytest snapshot plugin configured; image-diff library wired up for PDF pixel comparison; first invoice PDF snapshot committed as an empty-state placeholder. Real snapshots ship with the invoicing feature in Phase 5. Email template snapshot scaffolding lands here too (directory + fixture loader), with the first real snapshots arriving when templates are authored in Phase 3.
+
 **Definition of done (Phase 2):**
 - You can log into `ops.gammahr.com` with your passkey
 - You can create a test tenant via the operator console
@@ -225,6 +310,7 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 - You can send yourself a magic-link invite, land on `app.gammahr.com`, and see an empty-state dashboard
 - Migration runner passes the fake-tenant test harness in CI
 - All services deploy to staging automatically from `main` branch
+- Testing infrastructure is live: pytest + Hypothesis + Playwright + contract test harness + snapshot framework all run on every PR; first 5 E2E scenarios drafted; first 5 property invariants committed; AI eval harness skeleton holds 5 examples per feature (month-end close, command palette, OCR). See `docs/TESTING_STRATEGY.md` section 6.
 
 **What NOT to build in Phase 2:**
 - Login flows beyond the passkey challenge (Phase 3)
@@ -339,7 +425,7 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 
 ### Phase 6: Tier 2 features + client portal
 
-**Goal:** the features that differentiate GammaHR from boring HR tools, and the client portal.
+**Goal:** the features that differentiate Gamma from boring PSA tools, and the client portal.
 
 **Target:** 9 weeks. Tier 2 has a lower quality bar than Tier 1 (functional + polished, not flawless).
 
@@ -360,20 +446,38 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 
 **Goal:** production-ready, first paying customer, public launch.
 
-**Target:** 8 weeks.
+**Target:** 8 weeks optimistic, **12 weeks realistic** at two-founder cadence (realistic weeks 42 to 54 in the table above).
 
-1. **Security audit**: cross-tenant leak tests, auth flow attack surface, rate limit stress tests, SQL injection, XSS, CSRF
-2. **Performance pass**: p95 latency targets met, Lighthouse scores, bundle sizes, database query counts, N+1 elimination
-3. **Beta onboarding**: onboard 3 pilot customers manually (demo-to-contract motion)
-4. **Docs site**: public documentation using Mintlify or similar
-5. **Video tutorials**: onboarding, timesheet, expense, invoice (short recordings, not Hollywood)
-6. **Legal review**: DPA, TOS, privacy policy reviewed by French SaaS lawyer (€500-2000)
-7. **Public status page**: `status.gammahr.com` on Cloudflare Workers + R2
-8. **Incident response runbook**: documented in `docs/ROLLBACK_RUNBOOK.md` and `docs/BILLING_LIFECYCLE.md`
-9. **Customer #6 trigger check**: if customer #6 is coming, start DEF-028 (self-serve signup) + DEF-029 (payment processor)
-10. **Public launch**: announce, Product Hunt, LinkedIn
+1. **SOC 2 Type 1 audit window**: target certification by customer 3-4 (up from customer 5 in the solo plan). Work starts in Phase 6 parallel to Tier 2 features. Engage auditor by week 32 of the realistic column (post-Phase 4 customer-validation gate). Certification lands in the realistic week 56-60 window (see Go-to-market milestones).
+2. **Security audit**: cross-tenant leak tests, auth flow attack surface, rate limit stress tests, SQL injection, XSS, CSRF, three-gate feature gating boundary tests
+3. **Performance pass**: p95 latency targets met, Lighthouse scores, bundle sizes, database query counts, N+1 elimination, three-gate cold-start coalescing (see "Performance risks to verify" in `specs/DATA_ARCHITECTURE.md`)
+4. **Beta onboarding**: onboard 3 pilot customers manually (demo-to-contract motion)
+5. **Docs site**: public documentation using Mintlify or similar
+6. **Video tutorials**: onboarding, timesheet, expense, invoice (short recordings, not Hollywood)
+7. **Legal review**: DPA, TOS, privacy policy reviewed by French SaaS lawyer (€500-2000)
+8. **Public status page**: `status.gammahr.com` on Cloudflare Workers + R2 (DEF-016 trigger fires here: "before first paying customer signs")
+9. **Incident response runbook review**: `docs/ROLLBACK_RUNBOOK.md` is already delivered in Phase 2; Phase 7 reviews for drift and updates for any new failure modes discovered during Phase 5. Still to write here: `docs/BILLING_LIFECYCLE.md`, `docs/DATA_RETENTION.md`, `docs/MIGRATION_PATTERNS.md` (referenced from multiple specs but do not exist yet; must be written before launch).
+10. **Audit log archival pipeline live**: weekly Celery export of >90-day-old `audit_log` partitions to `gammahr-prod-audit-archive` GCS bucket (Cold Line storage class, lifecycle policy, retention policy lock). The 7-year retention requirement cannot be met by Cloud SQL PITR alone.
+11. **Public launch**: announce, Product Hunt, LinkedIn
 
 **Definition of done:** 1 paying customer, no P0 bugs for 30 consecutive days, founder can take a week off without everything breaking.
+
+---
+
+## Post-launch playbook (NOT in Phase 7)
+
+These triggers fire after launch, not during it. Putting them in Phase 7 was a category error in earlier versions of this file: Phase 7 ships v1.0 with one paying customer, and these items only become real on customer #2-#10.
+
+| Trigger | Action | DEF reference |
+|---|---|---|
+| Customer #2 signs | Confirm the demo-to-contract motion is repeatable, write the "first 30 days" playbook for new pilots into `docs/WEEKLY_LOG.md` | - |
+| Customer #5 signs OR manual billing exceeds 2 hours/week | Start payment processor integration (Stripe / Revolut / Paddle, evaluated at trigger time) | DEF-029 |
+| Sustained inbound requests for self-serve OR customer #6 signs | Build self-serve signup flow at `gammahr.com/register` | DEF-028 |
+| Customer #6 signs (after billing automation) | Self-serve volume band calculator in admin billing page | DEF-059 |
+| Customer #10 OR audit/compliance inquiry | DPA version management UI in operator console | DEF-037 |
+| Sustained >2 DSR emails/month | Self-service DSR form at `gammahr.com/privacy/dsr` | DEF-034 |
+| Tenant count exceeds 30 OR second drift incident | Cross-tenant schema drift auto-reconciliation UI | DEF-054 |
+| Year 2-3 OR Cloud SQL connection saturation | Self-hosted PgBouncer on Compute Engine | DEF-013 |
 
 ---
 
@@ -495,7 +599,7 @@ DO NOT THIS WEEK:
 
 ## Final word
 
-You spent serious effort locking this plan. The hardest part of solo-founder SaaS is not building; it is the constant reopening of decided questions. This file exists to stop that.
+We spent serious effort locking this plan. The hardest part of small-team SaaS is not building; it is the constant reopening of decided questions. This file exists to stop that.
 
 When you want to reopen something, open the relevant spec file instead. If the spec is wrong, fix the spec explicitly. If the spec is right, close the tab and build the next task.
 

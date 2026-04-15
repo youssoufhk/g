@@ -1,6 +1,6 @@
 # Data Ingestion
 
-> How customer data gets INTO GammaHR: bulk onboarding, ongoing imports, single-entity creation, and the reverse path (payroll export).
+> How customer data gets INTO Gamma: bulk onboarding, ongoing imports, single-entity creation, and the reverse path (payroll export).
 > Addresses a gap the founder identified after the data-architecture planning session: "I don't see anything on how the client's data is uploaded to the app."
 > Cross-references: `specs/DATA_ARCHITECTURE.md` section 2 and 10, `specs/APP_BLUEPRINT.md` section 1.8, `docs/DEFERRED_DECISIONS.md` DEF-010, DEF-011, DEF-024, DEF-060.
 
@@ -29,7 +29,7 @@ External HRIS sync (Workday, Personio, BambooHR, Rippling auto-sync) is **not** 
 
 ## 2. Bulk onboarding import (the first-day story)
 
-This is the single most important data-entry moment in GammaHR's life. The canonical first customer (per `specs/DATA_ARCHITECTURE.md` section 12.10) is a consulting firm with 201 employees, 120 clients, 260 projects, and one year of historical timesheets (52 weeks). They need to be up and running within an hour.
+This is the single most important data-entry moment in Gamma's life. The canonical first customer (per `specs/DATA_ARCHITECTURE.md` section 12.10) is a consulting firm with 201 employees, 120 clients, 260 projects, and one year of historical timesheets (52 weeks). They need to be up and running within an hour.
 
 ### 2.1 Pipeline overview
 
@@ -46,6 +46,8 @@ This is the single most important data-entry moment in GammaHR's life. The canon
 10. Progress streamed to the UI via WebSocket (on `/ws/notifications`) OR SSE job stream
 11. Final report: N imported, M failed, download links for (a) error CSV and (b) audit log of what was created
 ```
+
+This diagram is the golden path. Error branches: validation errors -> user downloads error CSV, fixes, re-uploads; Celery crash -> import resumes from the last committed batch; user cancellation mid-import -> in-flight batches complete, later batches skipped, report shows partial result.
 
 ### 2.2 Supported CSV entity types
 
@@ -94,9 +96,17 @@ Errors are collected into a per-row diagnostics list. The user sees:
 - `WARNING` rows: will import but something unusual (e.g., unknown manager_email, fallback to no manager)
 - `SKIP` rows: already exist, no action taken
 
+**Timesheet-specific validations.** For `historical_timesheets` imports:
+- `work_date` must be in the past and >= the employee's `start_date`
+- No duplicate `(employee_email, work_date, project_code)` rows within one import file
+- Daily total per employee: warning if > 8 h, error if > 12 h
+- Project code must match an existing project (or be mapped to 'unknown' with a warning)
+
 ### 2.5 Idempotency
 
 Every import session has an `import_id` UUID. The operation writes to `public.idempotency_keys` with TTL 24h. Re-uploading the same CSV with the same `import_id` is a no-op (replay returns the cached result). Different `import_id`, same content = the dedupe-against-existing logic skips existing rows transparently.
+
+**Duplicate-file detection.** On upload, the server computes SHA256 of the raw CSV bytes and checks `imports.file_hash` for any import from the same user in the last 24 hours. On match, the UI offers two paths: (a) replay the cached result (show the original validation report), or (b) start a fresh import (new `import_id`, dedup against existing data still applies row-wise). A banner tells the user "This file matches [import from 2 hours ago]."
 
 ### 2.6 Progress streaming
 
@@ -142,8 +152,8 @@ Admin console page `/admin/imports` (new page in the (app) route group, slot und
 ### 3.2 Differences from onboarding
 
 - **Scope:** one entity type per import (onboarding supports multi-file). Employees or clients or projects, not a bundle.
-- **No wizard chrome:** the onboarding wizard has a "welcome to GammaHR" framing; the ongoing import page is a utilitarian admin tool.
-- **Same pipeline:** same AI column mapper, same validation, same Celery runner, same progress UI. Code is 100% shared; the onboarding wizard and the admin imports page both invoke the same `imports.service.run_import(tenant_id, import_id, entity_type, file_id)` service method.
+- **No wizard chrome:** the onboarding wizard has a "welcome to Gamma" framing; the ongoing import page is a utilitarian admin tool.
+- **Same pipeline:** same AI column mapper, same validation, same Celery runner, same progress UI. Code is 100% shared; the onboarding wizard and the admin imports page both invoke the same `imports.service.run_import(tenant_id, import_id, entity_type, file_id)` service method. Note: "same backend pipeline" does NOT mean the same UI. Onboarding wizard has intro text, multi-file bundling, and walkthrough UX; admin imports page has a compact single-entity-type UI. Two frontend components, one shared `features/imports/service.py`.
 - **Rate limit:** one import running at a time per tenant, queued if a second is triggered.
 
 ### 3.3 Supported ongoing entity types
@@ -176,17 +186,28 @@ Pipeline:
 
 Entire pipeline runs in Celery; the HTTP request that triggered the upload returns immediately with a pending reference. The user sees the pre-fill appear in the form after 5-15 seconds (within the OCR p95 < 15s internal SLO target).
 
+### 5.1 Resilience and error handling
+
+OCR jobs run in Celery with exponential backoff: 3 retries at 30 s, 2 min, 5 min. If Vertex AI Gemini vision is still unavailable after 3 retries, the expense is created in `draft` status with empty pre-fill fields (amount, date, vendor, category blank), a yellow banner "Receipt scan is temporarily unavailable. Please enter details manually.", and the receipt image is still stored in GCS and attached. When the service recovers, a background sweep re-OCRs the draft expenses that are still missing fields and notifies the user; the user can accept the suggested values with one click.
+
+On sustained failure (>5 minutes p95 latency on the OCR tool), the operator may flip `kill_switch.ocr` (see `docs/DEGRADED_MODE.md`) to short-circuit retries and surface the manual-entry banner immediately.
+
 ---
 
 ## 6. Payroll CSV export (the one reverse-direction)
 
-GammaHR supports a one-way payroll export per month, generating a CSV in the format expected by the customer's payroll provider (Silae, Payfit, or a generic format). This is deliberately a file handoff, not a bidirectional sync.
+Gamma supports a one-way payroll export per month, generating a CSV in the format expected by the customer's payroll provider. This is deliberately a file handoff, not a bidirectional sync.
 
-### 6.1 Supported providers in v1.0
+### 6.1 Provider adapter scope
 
-- **Silae** (France)
-- **Payfit** (France)
-- **Generic** (CSV with standard column names the user can reformat into whatever their provider expects)
+**Provider adapter scope.** Phase 5 implements one adapter at launch: the provider used by the first pilot customer. The spec for each CSV shape must be confirmed with the provider documentation + a real sample file from the customer before the adapter is written. Do not implement on assumption. Candidates for Phase 5 (in priority order, pending first pilot choice):
+
+- **Silae (FR)**: columns TBD per their export template. Used by many French consulting firms.
+- **Payfit (FR/EU)**: columns TBD per Payfit documentation.
+- **SAP SuccessFactors Employee Central (EU multi-country)**: EC CSV interface.
+- **Generic CSV**: fallback shape for any provider, columns documented in 6.4 below.
+
+Each adapter has: (1) documentation of provider's expected columns, (2) a sample input file under `backend/tests/fixtures/payroll/<provider>.csv`, (3) a snapshot test asserting byte-stable output, (4) a smoke test with the customer before first real export. Adding a second adapter is a separate scoped work item, not a drive-by.
 
 More providers deferred (see DEF-062 section 8).
 
@@ -206,7 +227,7 @@ Admin → Integrations page → "Payroll Export" → pick provider + period → 
 
 ### 6.4 Not a sync
 
-This is a one-way file export. GammaHR does NOT push to the payroll provider's API. It does NOT receive data back from them. It is deliberately a file handoff so that the customer's finance/HR workflow stays in their payroll system, and GammaHR is just the time+expense source of truth.
+This is a one-way file export. Gamma does NOT push to the payroll provider's API. It does NOT receive data back from them. It is deliberately a file handoff so that the customer's finance/HR workflow stays in their payroll system, and Gamma is just the time+expense source of truth.
 
 Bidirectional payroll sync is deferred (DEF-062).
 
@@ -218,22 +239,14 @@ Bidirectional payroll sync is deferred (DEF-062).
 - **Every import** emits audit log entries: one for the import session itself (`action = 'import.started'` / `import.finished`), one per batch (`action = 'import.batch_committed'`), and optionally one per row for destructive operations.
 - **PII handling:** column mapping calls send headers and sample rows to Vertex AI Gemini in `europe-west9`. Sample rows may contain PII (names, emails). This data is Internal-tier in the data classification scheme and is acceptable because Vertex AI zero-retention is configured and the data never leaves EU. Confidential-tier columns (compensation, banking, Art. 9 medical) are never present in CSV imports.
 - **Idempotency keys** on every import session prevent duplicate commits under Celery retries. CSV imports are on the mandatory-idempotency endpoint list.
-- **Rate limiting:** one concurrent import per tenant. Additional imports queue until the previous one completes.
+- **Rate limiting:** one concurrent import per tenant. Additional imports queue until the previous one completes. Import queue is FIFO per tenant, max 1 concurrent import per tenant. Large imports (>10k rows) are split into Celery sub-tasks that run on separate workers, but a single tenant never runs >1 top-level import at a time. Operator can kill a stalled import from the operator console (Phase 2 deliverable); default hard timeout 30 minutes.
 - **Kill switch:** `kill_switch.imports` (to add to the initial kill switch set) lets the operator disable CSV imports tenant-wide during an incident. The founder should add this row to `public.feature_flags` in Phase 2.
 
 ---
 
-## 8. Deferrals (new items to add to DEFERRED_DECISIONS.md)
+## 8. Deferrals
 
-These items are implied by the ingestion story but not in v1.0 scope:
-
-- **DEF-060**: Automatic HRIS sync (Workday, Personio, BambooHR, Rippling, HiBob). Would require per-provider connector, mapping, and ongoing conflict resolution. Deferred indefinitely because tenant BYO-CSV is sufficient for the 50-500 employee market.
-- **DEF-061**: Historical leaves / expenses / invoices import. Only historical timesheets are importable in v1.0 onboarding. Historical leaves, expenses, and invoices remain in the customer's prior system. Deferred because the legal record-keeping responsibility stays with the prior system for those entities until the next fiscal year.
-- **DEF-062**: Bidirectional payroll sync (vs one-way CSV export). Deferred because file handoff is the industry norm and bidirectional sync per provider is multi-week work.
-- **DEF-063**: Excel (.xlsx) import beyond CSV. Tenant admins often have Excel exports; asking them to convert to CSV is a friction point. Deferred because `pandas.read_excel` adds an `openpyxl` dependency, and CSV covers the first-customer case.
-- **DEF-064**: Google Sheets direct import via OAuth. Would let admins paste a sheet URL instead of exporting to CSV. Deferred because it requires Google OAuth verification for the Sheets API read scope.
-
-These need to be appended to `docs/DEFERRED_DECISIONS.md` as new rows.
+Five deferrals are tracked in `docs/DEFERRED_DECISIONS.md` for data ingestion: DEF-060 HRIS sync, DEF-061 historical leaves/expenses/invoices imports, DEF-062 payroll provider sync (write path), DEF-063 Excel (.xlsx) import, DEF-064 Google Sheets import. See the registry for trigger conditions. Do not duplicate the list here.
 
 ---
 

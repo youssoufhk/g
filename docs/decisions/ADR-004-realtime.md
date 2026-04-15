@@ -19,7 +19,8 @@
 |---|---|
 | WebSocket endpoint | `/ws/notifications` on FastAPI, one persistent connection per user |
 | WS auth | Short-lived ticket issued by `/api/v1/auth/ws-ticket` after JWT validation, consumed on connect |
-| WS message schema | `{type, entity_type, entity_id, payload, ts}` validated with Pydantic on both ends |
+| WS message schema | `{type, entity_type, entity_id, payload, ts, tenant_id}` validated with Pydantic on both server and client |
+| WS subscription scoping | Subscriptions keyed by `(user_id, tenant_id)` tuple. The publisher filters by `tenant_id` before calling `send_to_user`. CI test: two users in two tenants, publish an event in tenant A, assert tenant B's user does NOT receive it. |
 | Reconnect | Exponential backoff with jitter on the client, starting at 1s, capping at 30s |
 | Heartbeat | Ping frames every 30 seconds; server closes idle connections after 90s |
 | Fan-out | In-process for Phase 2-3 (single backend instance). Redis pub/sub fan-out when a second backend instance is added (DEF-048). |
@@ -48,6 +49,10 @@
 
 - Backend must maintain a long-lived connection per authenticated user in the notifications channel. Cloud Run supports this with session affinity and WebSocket timeouts configured up to 60 minutes.
 - The notifications channel becomes a critical-path component. Outages require a graceful-degradation UX: when WS cannot reconnect after 30s, the UI falls back to a "Reconnecting..." badge and polls the notifications endpoint every 30s as a fallback.
+- **SSE stream lifecycle.** Each SSE stream for a long job has a 30-minute server-side timeout enforced by `asyncio.wait_for`. Server sends a `: keepalive\n\n` heartbeat every 15 seconds. If a client stops reading for 30 seconds the server closes the connection. Max 1 SSE stream per user per job type (duplicate starts kill the older stream). Browser 6-per-origin cap is the client-side ceiling. If a stream closes unexpectedly, the client re-connects with `Last-Event-ID` header to resume from the last seen event.
+- **Notification durability.** Each user has a Redis-backed notification queue with a 24-hour TTL, scoped by `(tenant_id, user_id)`. On WebSocket disconnect and reconnect, the client sends its last-seen timestamp; server calls `GET /api/v1/notifications/since?timestamp=` which returns up to 100 queued notifications (newest first). Older than 24 hours are lost (by design: offline-for-a-day users hit the full notifications inbox instead). The endpoint also serves the periodic polling fallback.
+- **Message ordering.** Messages are sent in strict `ts` order (server `now()`); client applies them in `ts` order. Ties resolved by `(entity_id ASC, type ASC)`. Duplicate messages (e.g., from Celery retries) are idempotent at the client: mutations that are already applied are no-ops. Notification kinds that cannot be naturally deduplicated include an explicit `event_id` that the client tracks in a short-lived set.
+- **Fallback polling path.** If WebSocket reconnect fails 3 consecutive times (30-second backoff between attempts), the client switches to `GET /api/v1/notifications/since?timestamp=` polling every 30 seconds. UI shows a small "Reconnecting..." badge in the topbar. Client continues trying WebSocket in the background; on successful WS reconnect, polling stops and badge clears.
 - Redis pub/sub is NOT required in Phase 2-3 (single instance) but will be required when a second backend instance is added. The in-process fan-out is a direct method call; the Redis fan-out is a publish. The interface is identical (DEF-048 covers the migration in ~1 week).
 - SSE job streams are 6-per-origin browser-capped; this is fine for one-at-a-time import/OCR/render jobs but a reason to never use SSE for long-lived feeds.
 - Playwright helpers written for both WS message waiting and SSE progress waiting; same test pattern everywhere.

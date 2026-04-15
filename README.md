@@ -1,20 +1,28 @@
-# GammaHR
+# Gamma
 
-B2B HR operations platform for consulting firms with 50 to 500 employees. Premium feel (target: Revolut for HR), AI assistance throughout, EU-hosted.
+Premium operations platform for consulting firms with 50 to 500 employees. Category: the operations OS for modern consulting firms. Target feel: Revolut for a consulting firm. Agentic AI that drafts monthly invoices (you confirm). EU-hosted.
 
 **Stack:** Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Vertex AI Gemini (LLM-as-router pattern) for AI. Hosted on GCP `europe-west9` + Cloudflare + GitHub.
 
-**Status:** prototype approved, data architecture locked across 102 decisions, Phase 2 foundation build is next.
+**Status:** planning phase closed. Phase 2 foundation build is next. Execution is tracked in [`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md).
 
 ---
 
-## Start here (the three files you read in order)
+## If you are a founder, start here
 
-If you are a new contributor, a returning founder, or an AI agent starting a fresh session, read these three files in order before anything else:
+Read **[`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md)** every Monday morning. It is the single source of truth for "what do I work on next". Every task is a checkbox, every phase has exit criteria, and §1 explains how founders and Claude Code subagents collaborate to hit flawless-gate quality.
 
-1. **[CLAUDE.md](CLAUDE.md)** — what GammaHR is, hard rules, the feel, the repository layout. This is the one-page contract. 5 minutes.
-2. **[THE_PLAN.md](THE_PLAN.md)** — what to do next, phase by phase, week by week. The founder's execution plan. 10 minutes.
-3. **[specs/DATA_ARCHITECTURE.md](specs/DATA_ARCHITECTURE.md) section 0 + 1** — the data model shape (schema-per-tenant + three-audience identity). 5 minutes.
+The checklist does NOT repeat spec content. It linearizes execution and points at the reference files when you need detail.
+
+---
+
+## If you are an agent starting a fresh session, start here
+
+Read these three files in order before any tool call:
+
+1. **[CLAUDE.md](CLAUDE.md)** - what Gamma is, hard rules, the feel, the repository layout. This is the one-page contract. 5 minutes.
+2. **[EXECUTION_CHECKLIST.md](EXECUTION_CHECKLIST.md) §1** - the ten-step quality chain and the agent prompt structure you must follow. 3 minutes.
+3. The specific spec files relevant to your task per the "What to give the AI when" table below.
 
 That is enough context to start working. Everything else is reference material you pull when you need it.
 
@@ -52,48 +60,49 @@ Do not dump the whole `specs/` folder into every AI session. The specs total ove
 
 ## File inventory (the full map, one line each)
 
-**Repo root — strategic + execution (3 files):**
+**Repo root - strategic + execution (4 files):**
 
-- [`README.md`](README.md) — you are here, the navigation hub
-- [`CLAUDE.md`](CLAUDE.md) — agent contract, hard rules, core principles, tech stack, feel, repository layout (read first, every session)
-- [`THE_PLAN.md`](THE_PLAN.md) — the founder's execution plan: phases 2 through 7, target weeks per phase, success criteria, slippage policy, weekly rhythm, emergency manual
+- [`README.md`](README.md) - you are here, the navigation hub
+- [`CLAUDE.md`](CLAUDE.md) - agent contract, hard rules, core principles, tech stack, feel, repository layout (read first, every session)
+- [`THE_PLAN.md`](THE_PLAN.md) - the strategic plan: phases 2 through 7, target weeks, success criteria, bandwidth math, emergency manual
+- [`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md) - **the weekly execution contract**: every task as a checkbox, owner markers, exit criteria per phase, agent quality-check workflow, weekly + monthly rituals. Read every Monday.
 
-**specs/ — what you are building (5 files):**
+**specs/ - what you are building (5 files):**
 
-- [`specs/DATA_ARCHITECTURE.md`](specs/DATA_ARCHITECTURE.md) — the data model: tables, schemas, API conventions, feature gating, GDPR, migrations. The biggest spec, 1000+ lines.
-- [`specs/APP_BLUEPRINT.md`](specs/APP_BLUEPRINT.md) — every page in the app, organized by route group (operator console, main app, portal)
-- [`specs/AI_FEATURES.md`](specs/AI_FEATURES.md) — how AI is wired (Vertex AI Gemini, LLM-as-router pattern, 15-tool registry, budget and eval rules)
-- [`specs/DESIGN_SYSTEM.md`](specs/DESIGN_SYSTEM.md) — design tokens, atoms, patterns (locked; never invent new atoms)
-- [`specs/MOBILE_STRATEGY.md`](specs/MOBILE_STRATEGY.md) — PWA rules, breakpoints, shell transformations, offline scope (timesheet entry only)
+- [`specs/DATA_ARCHITECTURE.md`](specs/DATA_ARCHITECTURE.md) - the data model: tables, schemas, API conventions, feature gating, GDPR, migrations. The biggest spec, 1000+ lines.
+- [`specs/APP_BLUEPRINT.md`](specs/APP_BLUEPRINT.md) - every page in the app, organized by route group (operator console, main app, portal)
+- [`specs/AI_FEATURES.md`](specs/AI_FEATURES.md) - how AI is wired (Vertex AI Gemini, LLM-as-router pattern, 15-tool registry, budget and eval rules)
+- [`specs/DESIGN_SYSTEM.md`](specs/DESIGN_SYSTEM.md) - design tokens, atoms, patterns (locked; never invent new atoms)
+- [`specs/MOBILE_STRATEGY.md`](specs/MOBILE_STRATEGY.md) - PWA rules, breakpoints, shell transformations, offline scope (timesheet entry only)
 
-**docs/ — how you are building it, scope, quality, legal (5 files + ADRs):**
+**docs/ - how you are building it, scope, quality, legal (5 files + ADRs):**
 
-- [`docs/DATA_INGESTION.md`](docs/DATA_INGESTION.md) — how customer data gets INTO the app: CSV imports, OCR pipeline, payroll export
-- [`docs/DEFERRED_DECISIONS.md`](docs/DEFERRED_DECISIONS.md) — registry of 64 items you consciously deferred, with triggers and costs. Check before adding any new feature.
-- [`docs/SCOPE.md`](docs/SCOPE.md) — Tier 1 vs Tier 2 feature lists, first-customer must-haves
-- [`docs/FLAWLESS_GATE.md`](docs/FLAWLESS_GATE.md) — the 15-item quality checklist every Tier 1 feature must pass
-- [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md) — commercial plan: pricing, pilot program, billing infrastructure, launch checklist
+- [`docs/DATA_INGESTION.md`](docs/DATA_INGESTION.md) - how customer data gets INTO the app: CSV imports, OCR pipeline, payroll export
+- [`docs/DEFERRED_DECISIONS.md`](docs/DEFERRED_DECISIONS.md) - registry of 64 items you consciously deferred, with triggers and costs. Check before adding any new feature.
+- [`docs/SCOPE.md`](docs/SCOPE.md) - Tier 1 vs Tier 2 feature lists, first-customer must-haves
+- [`docs/FLAWLESS_GATE.md`](docs/FLAWLESS_GATE.md) - the 15-item quality checklist every Tier 1 feature must pass
+- [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md) - commercial plan: pricing, pilot program, billing infrastructure, launch checklist
 
-**docs/decisions/ — architecture decision records (10 ADRs, each 1-10 KB):**
+**docs/decisions/ - architecture decision records (10 ADRs, each 1-10 KB):**
 
-- [`docs/decisions/ADR-001-tenancy.md`](docs/decisions/ADR-001-tenancy.md) — schema-per-tenant PostgreSQL (why, how, consequences)
-- [`docs/decisions/ADR-002-auth.md`](docs/decisions/ADR-002-auth.md) — JWT + passkey + MFA base auth (three-audience expansion in ADR-010)
-- [`docs/decisions/ADR-003-state.md`](docs/decisions/ADR-003-state.md) — TanStack Query + Zustand boundary
-- [`docs/decisions/ADR-004-realtime.md`](docs/decisions/ADR-004-realtime.md) — WebSocket + SSE + polling per-feature
-- [`docs/decisions/ADR-005-storage.md`](docs/decisions/ADR-005-storage.md) — Google Cloud Storage + CMEK encryption
-- [`docs/decisions/ADR-006-pdf.md`](docs/decisions/ADR-006-pdf.md) — WeasyPrint for invoice PDFs
-- [`docs/decisions/ADR-007-backend-language.md`](docs/decisions/ADR-007-backend-language.md) — Python 3.12 + FastAPI rationale
-- [`docs/decisions/ADR-008-deployment.md`](docs/decisions/ADR-008-deployment.md) — GCP + Cloudflare + GitHub hosting anchor
-- [`docs/decisions/ADR-009-mobile.md`](docs/decisions/ADR-009-mobile.md) — PWA (not React Native)
-- [`docs/decisions/ADR-010-three-app-model.md`](docs/decisions/ADR-010-three-app-model.md) — three subdomains, three identity tables, three auth stacks
+- [`docs/decisions/ADR-001-tenancy.md`](docs/decisions/ADR-001-tenancy.md) - schema-per-tenant PostgreSQL (why, how, consequences)
+- [`docs/decisions/ADR-002-auth.md`](docs/decisions/ADR-002-auth.md) - JWT + passkey + MFA base auth (three-audience expansion in ADR-010)
+- [`docs/decisions/ADR-003-state.md`](docs/decisions/ADR-003-state.md) - TanStack Query + Zustand boundary
+- [`docs/decisions/ADR-004-realtime.md`](docs/decisions/ADR-004-realtime.md) - WebSocket + SSE + polling per-feature
+- [`docs/decisions/ADR-005-storage.md`](docs/decisions/ADR-005-storage.md) - Google Cloud Storage + CMEK encryption
+- [`docs/decisions/ADR-006-pdf.md`](docs/decisions/ADR-006-pdf.md) - WeasyPrint for invoice PDFs
+- [`docs/decisions/ADR-007-backend-language.md`](docs/decisions/ADR-007-backend-language.md) - Python 3.12 + FastAPI rationale
+- [`docs/decisions/ADR-008-deployment.md`](docs/decisions/ADR-008-deployment.md) - GCP + Cloudflare + GitHub hosting anchor
+- [`docs/decisions/ADR-009-mobile.md`](docs/decisions/ADR-009-mobile.md) - PWA (not React Native)
+- [`docs/decisions/ADR-010-three-app-model.md`](docs/decisions/ADR-010-three-app-model.md) - three subdomains, three identity tables, three auth stacks
 
-**agents/ — how agents collaborate (1 file):**
+**agents/ - how agents collaborate (1 file):**
 
-- [`agents/AGENTS.md`](agents/AGENTS.md) — agent roles, pipeline, concurrency rules
+- [`agents/AGENTS.md`](agents/AGENTS.md) - agent roles, pipeline, concurrency rules
 
-**prototype/ — the frozen visual spec:**
+**prototype/ - the frozen visual spec:**
 
-- `prototype/*.html` — 19 HTML pages approved as the visual reference. Never edit except for visual bugs the founder flags.
+- `prototype/*.html` - 19 HTML pages approved as the visual reference. Never edit except for visual bugs the founder flags.
 
 ---
 
@@ -103,7 +112,8 @@ Do not dump the whole `specs/` folder into every AI session. The specs total ove
 gammahr_v2/
 ├── README.md                    ← you are here, the navigation hub
 ├── CLAUDE.md                    ← agent contract, hard rules, core principles, feel
-├── THE_PLAN.md                  ← what to do this week + phase tables + target weeks + success criteria
+├── THE_PLAN.md                  ← strategic plan + phase tables + target weeks + success criteria
+├── EXECUTION_CHECKLIST.md       ← the weekly execution contract (read every Monday)
 ├── specs/                       ← what you are building (5 files)
 │   ├── DATA_ARCHITECTURE.md     ← the data model (biggest file)
 │   ├── APP_BLUEPRINT.md         ← every page
@@ -131,13 +141,13 @@ gammahr_v2/
 
 If you ever want to fully load the project into your head, read in this order. Budget ~90 minutes.
 
-1. `CLAUDE.md` (full) — 10 min
-2. `THE_PLAN.md` (full, including the emergency manual) — 15 min
-3. `specs/DATA_ARCHITECTURE.md` (full) — 30 min
-4. `specs/APP_BLUEPRINT.md` (full) — 10 min
-5. `specs/AI_FEATURES.md` (full) — 10 min
-6. `docs/DEFERRED_DECISIONS.md` (skim for patterns, reference for specifics) — 10 min
-7. `docs/decisions/ADR-001-tenancy.md` and `ADR-010-three-app-model.md` — 5 min each (the two load-bearing ADRs)
+1. `CLAUDE.md` (full) - 10 min
+2. `THE_PLAN.md` (full, including the emergency manual) - 15 min
+3. `specs/DATA_ARCHITECTURE.md` (full) - 30 min
+4. `specs/APP_BLUEPRINT.md` (full) - 10 min
+5. `specs/AI_FEATURES.md` (full) - 10 min
+6. `docs/DEFERRED_DECISIONS.md` (skim for patterns, reference for specifics) - 10 min
+7. `docs/decisions/ADR-001-tenancy.md` and `ADR-010-three-app-model.md` - 5 min each (the two load-bearing ADRs)
 
 Skip on first pass: `docs/GO_TO_MARKET.md` (commercial, not technical), `specs/MOBILE_STRATEGY.md` (focused on responsive rules), ADR-002 through ADR-009 (shorter focused decisions, read when relevant), `docs/FLAWLESS_GATE.md` (reference when shipping), `docs/SCOPE.md` (reference when scoping), `specs/DESIGN_SYSTEM.md` (reference when building UI), `agents/AGENTS.md` (reference when running parallel agents).
 
@@ -145,6 +155,6 @@ Skip on first pass: `docs/GO_TO_MARKET.md` (commercial, not technical), `specs/M
 
 ## For agents
 
-**Read [`CLAUDE.md`](CLAUDE.md) first and every session.** It is the contract between the founder and every AI agent working on GammaHR. All hard rules, the feel guide, and the repository layout live there. Every other doc in this repo is referenced from CLAUDE.md section 9.
+**Read [`CLAUDE.md`](CLAUDE.md) first and every session.** It is the contract between the founders and every AI agent working on Gamma. All hard rules, the feel guide, and the repository layout live there. Every other doc in this repo is referenced from CLAUDE.md section 9.
 
 The task tracker for the founder is [`THE_PLAN.md`](THE_PLAN.md). The task tracker for YOU (the agent session) should be the `TaskCreate` tool, not a markdown file.

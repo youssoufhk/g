@@ -20,7 +20,7 @@
 | Virus scan | ClamAV in a Celery worker, sets `public.files.status = 'ready'` before the file is linked to a parent entity |
 | Dedup | Per-tenant SHA256 unique constraint on `public.files(tenant_id, sha256)`: two different tenants uploading the same file get two separate rows |
 | Orphan cleanup | Nightly Celery job hard-deletes files older than 24 hours with no linked parent entity |
-| Lifecycle | CSV imports deleted after 30 days; expense receipts retained 10 years per French fiscal law (art. L.102 B LPF); avatars retained until explicit delete |
+| Lifecycle | Retention policies are per-entity and per-customer-country, defined in `specs/DATA_ARCHITECTURE.md` §8.2 and centralized in `docs/COMPLIANCE.md` (Phase 2 deliverable). Defaults: expense receipts 10 years (French Code général des impôts, art. L.102 B LPF) for FR customers, 6 years (UK HMRC) for UK customers; CSV imports 30 days; avatars retained until user explicit delete. Per-country retention is enforced in the GDPR sweep Celery job by looking up `tenants.country_code`. Tenant-specific contractual overrides (e.g., 15-year retention requested by a financial-services customer) are stored in `public.custom_contracts` and win over defaults. |
 | Backup | Weekly logical dump per tenant schema exported to a separate GCS bucket with 30-day retention |
 
 ## Rationale
@@ -44,6 +44,13 @@
 - MinIO in docker-compose for dev parity.
 - Prod bucket has versioning + weekly metadata snapshots.
 - Legal-hold archive bucket has retention policy lock and no service-account delete permission; break-glass access documented in the operator console runbook.
+- **Legal-hold break-glass procedure.** The archive bucket has retention policy lock; no service account can delete objects. In the rare event of a justified legal-hold deletion (e.g., court order, GDPR erasure for a legal-hold file), the procedure is:
+  1. Founder files a break-glass request via operator console (to be built Phase 2). Request requires a reason and attaches the legal document.
+  2. Request triggers a 2-hour cool-off and a notification to a second-party approver (founder's designated backup: email alert + manual ack).
+  3. After both approve, founder uses a personal GCP account with temporary IAM override to delete the object. The override is time-bound (15 minutes) and auto-revoked.
+  4. All steps are logged to an append-only audit stream outside the tenant database.
+
+  The full runbook lives in `docs/LEGAL_HOLD_RUNBOOK.md` (Phase 2 deliverable). CI cannot test this path; it is a manual drill performed quarterly.
 - Per-tenant CMEK keys rotate annually on an automatic schedule.
 
 ## Related decisions
