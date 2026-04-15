@@ -9,26 +9,23 @@ Premium operations platform for consulting firms with 50 to 500 employees. Categ
 ### Quick dev loop (MVP track)
 
 ```bash
-# 1. One-time: bootstrap the machine (Python 3.12, pre-commit, Docker, Node 22, gamma-ops)
+# 1. One-time: bootstrap the machine (Python 3.12, pre-commit, Docker, Node 22)
 bash scripts/setup/bootstrap-dev.sh
 
 # 2. Enable the docker group in the current shell
-newgrp docker        # or logout+login; verify with: docker ps
+newgrp docker        # or 'wsl --shutdown' + reopen for permanent
 
-# 3. Bring the MVP stack up in one shot:
-#    dev-up + backend-install + alembic upgrade head + dev tenant seed + frontend-install
-make mvp-up
+# 3. Start the whole stack + run Alembic (one command)
+make mvp-up          # first run 2 to 5 min, later runs 30 sec
 
-# 4. Run the services (two terminals)
-make backend-run     # FastAPI at http://localhost:8000
-make frontend-dev    # Next.js at http://localhost:3000
-
-# Open http://localhost:3000/en and start building.
+# 4. Open http://localhost:3000/en in your browser
 ```
 
-**GCP deployment is deferred.** The MVP runs entirely locally. Deployment lives in `EXECUTION_CHECKLIST.md` §16 Deploy Track and is founder-triggered after the MVP demo loop works.
+**Stack anatomy**: `make mvp-up` starts 5 containers (postgres + redis + mailpit + backend + frontend), runs Alembic, and waits for every container to go healthy. `make dev-logs-backend` tails the backend. `make dev-down` stops. `make dev-reset` wipes volumes. Full command reference: `make help`.
 
-See `docs/runbooks/dev-machine-bootstrap.md` for the full walkthrough.
+**New to the repo?** The full junior-onboarding guide lives at **[`docs/dev/`](docs/dev/README.md)**. It explains what Docker is doing, the mental model, daily workflow, repo layout, common tasks, debugging, and a glossary. Start with [`docs/dev/01-quickstart.md`](docs/dev/01-quickstart.md).
+
+**GCP deployment is deferred.** The MVP runs entirely locally. Deployment lives in `EXECUTION_CHECKLIST.md` §16 Deploy Track and is founder-triggered after the MVP demo loop works.
 
 ---
 

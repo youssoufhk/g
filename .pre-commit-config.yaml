@@ -86,6 +86,8 @@ repos:
             docs/COUNTRY_PLAYBOOKS\.md|
             docs/runbooks/secrets-management\.md|
             docs/runbooks/dev-machine-bootstrap\.md|
+            docs/dev/06-debugging\.md|
+            docs/dev/07-glossary\.md|
             specs/AI_FEATURES\.md|
             \.pre-commit-config\.yaml|
             scripts/hooks/no_utilisation\.py|
