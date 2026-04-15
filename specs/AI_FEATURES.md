@@ -1,23 +1,25 @@
 # AI FEATURES
 
 > Every place AI appears in Gamma v1.0, how it is wired, and how it fails safely.
+> **Product framing: Gamma is an AI operations analyst.** The AI runs deterministic audits across every operational dimension (people, projects, clients, cash, invoices) on a continuous cycle (nightly, weekly, monthly) and surfaces the top findings with one-paragraph explanations. Deterministic Python is the eyes and hands; Gemini is the judgment about what matters and the language to explain it. From a customer perspective, Gamma does the job a junior operations analyst would do if the firm could afford one. It is not a SQL wrapper, not a chatbot, not a generic HR tool.
+> **Engineering pattern: LLM-as-router with deterministic tools** (see §1 principles). The LLM never computes, never writes to the database, never summarizes without structure. It picks tools and fills arguments; tools run pure Python business logic and return structured results. This architecture is what makes the analyst reliable, cheap, and auditable at scale.
 > **Provider: Google Vertex AI Gemini 2.5 Flash** (EU region `europe-west9`), called via the Google Cloud AI Platform Python SDK. All code in `backend/app/ai/` plus per-feature tool definitions in `backend/app/features/*/ai_tools.py`.
-> Pattern: **LLM-as-router with deterministic tools**. The LLM's only job is to parse a user query or a prepared context and call a deterministic Python tool with the right arguments. All business logic lives in the tools.
 > Numbers marked "target" are goals, not measured baselines.
 
 ---
 
 ## 1. Principles
 
-1. **LLM-as-router.** The model never computes, summarizes without structure, or writes to the database directly. It picks tools and fills arguments.
-2. **Deterministic tools, auditable calls.** Every AI-triggered action is a recorded tool call with structured arguments and a row in `public.ai_events`.
-3. **User confirms before write.** For any action with finance or approval consequences, AI proposes and the user confirms.
-4. **Structured outputs only.** Tool schemas are Pydantic models, JSON Schema generated, not hand-written.
-5. **Prompt injection defense.** User input is always a user turn, never concatenated into the system prompt. Tool outputs re-validated before execution.
-6. **PII rules are enforced via pytest metatest.** Confidential-tier columns (compensation, banking, Art. 9) never appear in any prompt. Metatest greps the tool definitions and blocks merge on violation.
-7. **Non-AI fallback on every flow.** OCR falls back to manual entry, command palette falls back to sidebar navigation, insight cards fall back to yesterday's cache. Month-end close falls back to analyzer-only chips with no paragraph explanation.
-8. **Zero-retention at Vertex AI layer.** Configured in Vertex AI settings. Prompts are transient: not logged to Cloud Logging, not included in error reports.
-9. **Reversibility:** `backend/app/ai/client.py` is a single abstraction. Swapping to Claude Haiku or any other vendor is a one-file change (see DEF-046).
+1. **AI analyst running deterministic audits.** Gamma AI is framed as a continuous operations analyst, not a chatbot. Every surface (command palette, OCR, insight cards, month-end close) is a cycle of the same analyst pattern: deterministic Python analyzers scan the tenant database, Gemini ranks and explains, the user confirms and acts. The value proposition is "the analyst your firm cannot afford to hire runs every night on autopilot", not "we have AI features".
+2. **LLM-as-router, engineering pattern.** The model never computes, summarizes without structure, or writes to the database directly. It picks tools and fills arguments. This is the implementation detail that makes principle 1 reliable, cheap, and auditable.
+3. **Deterministic tools, auditable calls.** Every AI-triggered action is a recorded tool call with structured arguments and a row in `public.ai_events`.
+4. **User confirms before write.** For any action with finance or approval consequences, AI proposes and the user confirms.
+5. **Structured outputs only.** Tool schemas are Pydantic models, JSON Schema generated, not hand-written.
+6. **Prompt injection defense.** User input is always a user turn, never concatenated into the system prompt. Tool outputs re-validated before execution.
+7. **PII rules are enforced via pytest metatest.** Confidential-tier columns (compensation, banking, Art. 9) never appear in any prompt. Metatest greps the tool definitions and blocks merge on violation.
+8. **Non-AI fallback on every flow.** OCR falls back to manual entry, command palette falls back to sidebar navigation, insight cards fall back to yesterday's cache. Month-end close falls back to analyzer-only chips with no paragraph explanation.
+9. **Zero-retention at Vertex AI layer.** Configured in Vertex AI settings. Prompts are transient: not logged to Cloud Logging, not included in error reports.
+10. **Reversibility:** `backend/app/ai/client.py` is a single abstraction. Swapping to Claude Haiku or any other vendor is a one-file change (see DEF-046).
 
 ---
 
@@ -186,10 +188,70 @@ Manual expense form is always available. If `extract_receipt_data` fails or retu
 
 ### 6.1 Behavior
 
+Insight cards are the **daily cycle of the AI analyst**. Every night, deterministic analyzers scan the full tenant database and produce a candidate list of findings; Gemini ranks the top 3-5 and writes one paragraph per card in the user's language; the cards appear on the dashboard and the Insights page the next morning. The user clicks "Act on this" and goes directly to the relevant entity. No human analyst does this proactively today because no consulting firm can afford one.
+
 - Celery beat schedules the nightly insights job daily at 04:00 UTC. The job, when it fires, iterates tenants and converts 04:00 UTC to each tenant's `default_timezone`; it only generates for tenants where the local time is between 04:00 and 05:00 (quiet hours). Tenants outside that window skip this run and get picked up the next day.
-- **Deterministic analyzers** (pure Python, no AI) produce candidate signals: projects over budget, employees with overdue timesheets, clients with overdue invoices, teams near capacity, leaves unapproved more than 5 days, etc.
-- **Gemini's job** is to rank the signals by importance, write a one-paragraph explanation per card in the user's language, and return 3-5 top cards
-- Cards stored in `ai_insights` table, cached 24 hours, displayed on the dashboard and the Insights page
+- **Deterministic analyzers** (pure Python, no AI) produce candidate signals across five operational categories (see §6.1a below).
+- **Gemini's job** is to rank the signals by importance for this specific tenant, write a one-paragraph explanation per card in the user's language, and return 3-5 top cards.
+- Cards stored in `ai_insights` table, cached 24 hours, displayed on the dashboard and the Insights page.
+
+### 6.1a Analyzer library (v1.0 scope)
+
+Every analyzer is a pure Python function in `backend/app/features/insights/analyzers/<category>.py`. Each returns a list of `{signal_code, severity, reason, entity_refs, metric_value, threshold}`. Unit tests cover happy path + edge cases. No Gemini call is made inside an analyzer; analyzers are deterministic and run on every tenant every night.
+
+**Category 1: People health (weekly cadence, surfaced daily if any signal fires)**
+
+| Signal | Trigger | Severity |
+|---|---|---|
+| `overwork_sustained` | employee logged >45h/week for 4 consecutive weeks | warning |
+| `overwork_acute` | employee logged >60h in a single week | action_needed |
+| `no_pto_taken` | employee has not taken any leave in >90 days AND has >10 days of accrued balance | warning |
+| `pto_balance_accruing` | employee's leave_balance.accrued > 2x monthly accrual rate (vacation debt) | info |
+| `overdue_timesheets` | employee has >2 weeks of unsubmitted timesheets | action_needed |
+| `approval_backlog` | manager has >5 pending approvals older than 5 days | warning |
+
+**Category 2: Project margin and delivery**
+
+| Signal | Trigger | Severity |
+|---|---|---|
+| `budget_burn_over_80pct` | project actuals / budget > 0.8 with <30% time remaining | warning |
+| `budget_overrun` | project actuals > budget, still active | action_needed |
+| `margin_erosion` | project's gross margin this month > 5 points below trailing 6-month average | warning |
+| `new_employee_on_project` | an employee with no prior billable time on this project started logging hours this week | info |
+| `rate_change_mid_project` | a rate_period boundary fell inside this project's active window in the last 7 days | info |
+
+**Category 3: Client risk**
+
+| Signal | Trigger | Severity |
+|---|---|---|
+| `invoice_overdue_30d` | any invoice with status=sent and issue_date > 30 days ago | action_needed |
+| `invoice_overdue_60d` | any invoice >60 days overdue | action_needed (escalated) |
+| `client_concentration_risk` | single client > 30% of trailing 90-day revenue | warning |
+| `client_hold` | client has payment_hold = true and active projects | action_needed |
+| `client_silent` | client has no new invoice or comment in >60 days but has active project | info |
+
+**Category 4: Cash and billing**
+
+| Signal | Trigger | Severity |
+|---|---|---|
+| `unbilled_approved_time` | approved timesheet entries older than 30 days with no matching invoice_line | action_needed |
+| `rate_below_floor` | any billed rate < 80% of employee_default_rate | warning |
+| `fx_rate_exposure` | >€10k of invoices issued in a non-base currency in last 30 days with no hedge policy | info |
+| `late_month_close` | month-end close has not been run within 3 days of month boundary | warning |
+
+**Category 5: Expense anomalies**
+
+| Signal | Trigger | Severity |
+|---|---|---|
+| `expense_outlier_personal` | expense amount > 2σ above submitter's personal 6-month median for that category | warning |
+| `expense_outlier_tenant` | expense amount > 2σ above tenant's 6-month median for that category | info |
+| `expense_unmatched` | expense older than 14 days with no project_id and no reimbursement_status set | action_needed |
+| `receipt_ocr_low_confidence` | OCR confidence < 0.6 on receipt submitted >7 days ago and not yet reviewed | info |
+| `duplicate_receipt_suspected` | two expenses within 48h from same employee, same merchant, same amount | warning |
+
+Total: **24 analyzers across 5 categories**, all deterministic, all unit-tested. Adding a new analyzer is one new file under `backend/app/features/insights/analyzers/`, no Gemini change needed.
+
+Gemini's input to the ranking + explanation step includes the full candidate list (20-100 signals on a typical night for a 200-employee tenant), the tenant's context (name, role of the user, current week), and a prompt asking for the top 3-5 signals by "what the finance/ops team should act on today". Output is 3-5 ranked cards with explanations. The analyzer library grows over time; the Gemini prompt and cost structure stay constant.
 
 ### 6.2 Why LLM-as-router applies
 

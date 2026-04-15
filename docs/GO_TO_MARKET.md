@@ -8,10 +8,12 @@
 
 ## 1. Positioning
 
-- **Category:** Operations platform for consulting firms and agencies.
+- **Category:** AI operations analyst for consulting firms and agencies.
 - **Sweet spot:** 50 to 500 employees, time-and-materials billing, multi-client.
-- **One-liner:** Gamma is the operations OS for modern consulting firms. It drafts, you confirm.
-- **Differentiator:** Flagship-quality UX + agentic AI that drafts month-end invoices + one design language. Two founders from day 0.
+- **One-liner:** Gamma is the AI operations analyst your firm cannot afford to hire. It runs a continuous audit across your people, projects, clients, and cash, and tells you what to act on every day.
+- **What this actually means:** every night Gamma runs dozens of deterministic checks across your firm (who is overworked, who has not taken PTO, which projects are over budget, which clients are overdue, which expenses are outliers, which invoices are ready for month-end close). Gemini ranks the top 3-5 findings by importance and writes a one-paragraph explanation per card. You scan the queue each morning and act. No human analyst does this proactively today because no firm can afford one.
+- **Differentiator:** Flagship-quality UX + a continuous AI audit across every operational dimension + one design language. Two founders from day 0. Not a SQL wrapper, not a chatbot, not a generic HR tool.
+- **Demonstrable value (measurable, provable):** Gamma customers close the month in 1 hour instead of 2 days. Gamma customers catch outlier expenses within 24 hours instead of at quarter-end. Gamma customers spot overwork before it becomes burnout. These are the numbers you quote on a sales call.
 - **Not for:** tiny teams (use Notion), payroll-first buyers (use Gusto), enterprises >500 seats (use Workday or Kantata).
 
 ---
@@ -218,3 +220,16 @@ Built in Framer or Next.js. Same design tokens as the app.
 - No P0 bugs in production for 30 consecutive days
 - Customer advocate willing to give a testimonial
 - Founder comfortable taking a week off without everything breaking
+
+---
+
+## 12. Pre-customer-2 measurement checklist
+
+Before signing customer 2, the founder runs this checklist against customer 1's real production data. Cross-reference: `THE_PLAN.md` "Pre-customer-2 commitment" section.
+
+- [ ] **Measured month-end close savings.** Run the full flow on customer 1's month-end data. Start timer at "Start month-end close" click, stop at "Send all ready". Record elapsed minutes, number of drafts, number of edits, number of accepted-as-is.
+- [ ] **Video of customer 1 CFO running the flow.** Face on camera, 3 minutes max, their explicit permission to share. Capture genuine reaction at queue load, at explanation render, at batch send.
+- [ ] **Before/after one-pager published.** Hero number, one quote, link to the video. Format matches the customer interview template in `docs/GO_TO_MARKET.md` section 6.
+- [ ] **Go/no-go decision.** If measured savings >= 90 minutes per month on a 201-employee-equivalent tenant: proceed to customer 2 at list pricing. If savings < 90 minutes: STOP, re-anchor the ACV story, potentially renegotiate the pricing down before any customer 2 commitment.
+
+**Why this is here:** customer 1 is locked at €70,260 ACV for 3 years per the grandfathered-pilot clause in section 2. Customer 2 is where the pricing test actually happens. If the demo does not justify €35 per seat against real data, the founder has exactly one chance to re-anchor before the next contract signature. This checklist forces that chance to be taken seriously instead of rationalized past.

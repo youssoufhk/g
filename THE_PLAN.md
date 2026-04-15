@@ -53,7 +53,7 @@ There are **two columns** below: an *optimistic* one (the original plan's wishfu
 |-------|-----------------:|---------------------------------:|-------|---------------|
 | 0 | done | done | Prototype | All 19 HTML pages approved |
 | 1 | done (2026-04-15) | done (2026-04-15) | Foundation docs | All specs + ADRs final, deferred registry extracted (DEF-001 to DEF-064) |
-| 2 | 4 to 7 | **4 to 7** | Foundation build | GCP projects provisioned, FastAPI scaffold + Next.js scaffold + migration runner + `ai/client.py` + `useOptimisticMutation` + `ConflictResolver` + minimum operator console + atom layer + shell infrastructure (Cmd+K palette, notifications, conflict resolver, entitlement lock UI) + month-end close agent scaffolding |
+| 2 | 4 to 7 | **6 to 9** | Foundation build | Local dev infrastructure + FastAPI scaffold + Next.js scaffold + migration runner + `ai/client.py` + `useOptimisticMutation` + `ConflictResolver` + minimum operator console + atom layer + shell infrastructure (Cmd+K palette, notifications, conflict resolver, entitlement lock UI) + month-end close agent scaffolding + GCP setup and first staging deploy. **Buffer note:** realistic column was 4-7 until 2026-04-15 brutal review; widened to 6-9 to absorb the frontend learning curve on the founder's solo atom-layer work (Tailwind 4 + React 19 + prototype-exact fidelity). Ship the buffer, do not consume it.
 | 3 | 8 to 11 | **8 to 13** | Auth + onboarding + full operator console | OIDC + passkey + password auth paths, onboarding wizard with AI column mapper, full operator console |
 | 4 | 12 to 15 | **13 to 18** | Core data + Dashboard pass 1 | Employees, clients, projects, dashboard scaffold. **Customer-validation gate clears here (see "Validated lead gate" below).** |
 | 5 | 16 to 24 | **20 to 32** | Core modules | Timesheets (week-as-entity), leaves, expenses (OCR), invoices (PDF) + month-end close agent full implementation, approvals, admin, account, dashboard pass 2, payroll export, ongoing imports, first-contact UX hardenings |
@@ -70,7 +70,7 @@ The realistic numbers come from these adjustments to the optimistic baseline:
 
 1. **Combined productive build time per week is 24 to 34 hours, not 40-60.** Two founders at "20-30 hours/week nominal" each still have to handle customer discovery (shared 50/50 from Phase 4), pilot management (shared in Phase 6+), weekly logs and cross-doc maintenance, founder review sessions for the flawless gate, learning curve, and ~10% lost to vacations, sickness, and life. Add ~15% coordination overhead (syncs, code review, decision alignment) between founders. Net combined productive build time = **24 to 34 hours/week**.
 2. **Phase 5 has 10 distinct features**, each at the flawless gate. Optimistic was "1 feature/week", which is still impossible at two-founder cadence because quality gates do not parallelize: one person builds, the other reviews. Bottom-up with two-founder parallelism: average 2 weeks/feature × 10 features = 20 weeks, with hard items (invoices + month-end close agent, approvals, week-as-entity timesheets) eating 3-4 weeks each. Realistic Phase 5 floor = 20 weeks, ceiling = 32.
-3. **Phase 2 includes the entire shell infrastructure** (atom layer + Cmd+K palette + notifications drawer + conflict resolver pattern + entitlement lock UI) plus the month-end close agent scaffolding. Two-founder split: founder runs the atom layer + shell in parallel to co-founder running the backend scaffold + `ai/client.py`. Realistic Phase 2 floor = 4 weeks, ceiling = 7.
+3. **Phase 2 includes the entire shell infrastructure** (atom layer + Cmd+K palette + notifications drawer + conflict resolver pattern + entitlement lock UI) plus the month-end close agent scaffolding plus GCP setup and the first staging deploy. Two-founder split: founder runs the atom layer + shell in parallel to co-founder running the backend scaffold + `ai/client.py`. Realistic Phase 2 floor = **6 weeks**, ceiling = **9 weeks**. The previous floor/ceiling of 4-7 underestimated the frontend learning curve. Ship the widened buffer, do not consume it.
 4. **Phase 4 has the customer-validation gate** before the heavy build of Phase 5 starts; this is a deliberate hold point. With two founders, discovery and demo outreach run on the co-founder's time without stealing Tier 1 build hours.
 5. **Phase 7 hardening + launch** is sized at 6-8 weeks of productive work plus the SOC 2 Type 1 audit window (see milestone below).
 
@@ -95,17 +95,27 @@ Two founders in place from day 0. Division of labor:
 
 **Phase 6-7 with 3+ active pilots running concurrently is still tight even with two founders.** Pilot management alone consumes 9-15 h/week across the two of us at 3 pilots. Choose between dropping pilots, dropping Tier 2 scope, or extending the calendar. Do not try to run 5 pilots concurrently.
 
-### Validated lead gate (required to clear before Phase 4 starts)
+### Validated lead gate (required to clear before Phase 4 starts, externalized to the co-founder)
 
 The original plan committed to **40 weeks of build before the first paying customer signs**. That is build-blind: betting a year of work on an avatar customer described in `CLAUDE.md` whose existence has not been verified. **Before Phase 4 (Core data + Dashboard pass 1) begins, this gate must be cleared:**
 
 - [ ] **At least one validated lead** in writing. Validation = a named decision-maker at a real consulting firm (50-500 employees, EU) who has done a 30-min discovery call AND has either (a) signed a non-binding pilot LOI, or (b) committed in writing to a paid pilot at first-customer pricing once Tier 1 is live, or (c) prepaid a deposit.
 - [ ] Two more leads at the "Interested" stage in the pipeline (per `docs/GO_TO_MARKET.md` section 4), even if not yet committed.
-- [ ] If neither (a), (b), nor (c) is achievable in 4 weeks of focused outreach: **STOP Phase 4** and reconsider whether to keep building. The architecture is good enough that the work to date is not wasted; you can resume later. But sinking another 30+ weeks into Phase 5 without a buyer is the failure mode this gate exists to prevent.
+- [ ] Target 3+ validated leads by week 20 (mid-Phase 4, two weeks before Phase 4 exit).
+
+### Gate enforcement (the anti-rationalization protection)
+
+The failure mode of this gate is not "the gate trips and we ignore it". The failure mode is "the gate feels close enough and the founder rationalizes past it because the code is moving". To prevent this:
+
+1. **The co-founder has written authority to halt Phase 5.** If the validated-lead gate has not cleared by end of week 20, the co-founder unilaterally halts Phase 5 build. The founder does not get a veto. This authority is written into the co-founder agreement, not a verbal understanding. It is the single most important anti-sunk-cost protection in the whole plan.
+2. **Three calendar reminders are set now:** week 18 (warning: gate review in 2 weeks), week 19 (warning: gate review in 1 week), week 20 (gate review meeting, 60 minutes, both founders present, decision binding). Put these in the shared founder calendar the same day as committing this plan change.
+3. **Consequence on gate failure is pre-specified:** if the gate fails at week 20, the founder goes full-time on customer discovery for **4 weeks**. No Phase 5 build during those 4 weeks. No exceptions. No "just this one feature". At the end of the 4 weeks, re-run the gate. If it still fails, the founder and co-founder hold a "fold vs pivot" conversation and either change the category, change the price, or pause the project. Writing the consequence down now is the only way to make it real at week 20 when sunk-cost thinking is strongest.
+4. **What "4 weeks of focused outreach" actually looks like:** founder books 20+ new discovery calls per week via LinkedIn, warm intros, and conference outreach. 2-3 hours of outreach per day. No code, no design, no meetings. The co-founder continues maintenance-only work on the existing Phase 4 codebase but does not start any new feature.
+5. **No retroactive scope creep.** Do not expand the gate criteria to include "qualified interest" or "active discussion" or "warm fuzzies". The only valid evidence is (a) signed LOI, (b) written pilot commitment, or (c) prepaid deposit. Anything else fails the gate.
 
 With a co-founder in place, the outreach playbook splits: founder handles demo calls and design reviews, co-founder handles technical deep-dives during discovery. This doubles the weekly discovery bandwidth without stealing Tier 1 build hours from either of us.
 
-The customer-validation gate exists because the harshest bug in the original plan was not technical: it was the assumption that the avatar is a buyer. It is not. You need a buyer to validate that.
+The customer-validation gate exists because the harshest bug in the original plan was not technical: it was the assumption that the avatar is a buyer. It is not. You need a buyer to validate that. Every week without a validated lead is a week the plan is wrong about its own assumptions.
 
 ### Go-to-market milestones
 
@@ -456,11 +466,27 @@ Each phase has: a list of concrete tasks, a definition of done, and the time tar
 6. **Video tutorials**: onboarding, timesheet, expense, invoice (short recordings, not Hollywood)
 7. **Legal review**: DPA, TOS, privacy policy reviewed by French SaaS lawyer (€500-2000)
 8. **Public status page**: `status.gammahr.com` on Cloudflare Workers + R2 (DEF-016 trigger fires here: "before first paying customer signs")
-9. **Incident response runbook review**: `docs/ROLLBACK_RUNBOOK.md` is already delivered in Phase 2; Phase 7 reviews for drift and updates for any new failure modes discovered during Phase 5. Still to write here: `docs/BILLING_LIFECYCLE.md`, `docs/DATA_RETENTION.md`, `docs/MIGRATION_PATTERNS.md` (referenced from multiple specs but do not exist yet; must be written before launch).
+9. **Incident response runbook review**: `docs/ROLLBACK_RUNBOOK.md`, `docs/COMPLIANCE.md`, `docs/DEGRADED_MODE.md`, `docs/BILLING_LIFECYCLE.md`, `docs/DATA_RETENTION.md`, and `docs/MIGRATION_PATTERNS.md` are all delivered before Phase 5 start. Phase 7 reviews all six for drift against the real implementation and updates them for any new failure modes discovered during Phase 5. The three that were missing in earlier drafts (billing lifecycle, data retention, migration patterns) were written in April 2026 after the brutal-review pass.
 10. **Audit log archival pipeline live**: weekly Celery export of >90-day-old `audit_log` partitions to `gammahr-prod-audit-archive` GCS bucket (Cold Line storage class, lifecycle policy, retention policy lock). The 7-year retention requirement cannot be met by Cloud SQL PITR alone.
 11. **Public launch**: announce, Product Hunt, LinkedIn
 
 **Definition of done:** 1 paying customer, no P0 bugs for 30 consecutive days, founder can take a week off without everything breaking.
+
+---
+
+## Pre-customer-2 commitment (measurement before the next signature)
+
+**Before customer 2 signs, these three things must be true:**
+
+1. **Run the full month-end close flow on customer 1's real data and time it end-to-end.** Start the timer when the founder clicks "Start month-end close", stop it when the last invoice is marked ready-to-send. Record the elapsed time in minutes. Record the number of drafts, the number of drafts the founder edited, and the number of drafts the founder accepted as-is. This is the demonstrable-value measurement.
+2. **Video-record the customer 1 CFO (or the equivalent finance approver) using the flow**, with their face on camera, with their permission. 3 minutes maximum. Capture the genuine reaction when the queue loads, when the explanations render, and when the batch-send completes. This video is the single most important sales asset for customers 2 through 10.
+3. **Publish a one-pager case study** with the before/after numbers and a pull-quote from the customer. Format: "Customer 1 (named or anonymized at their request) closed their month in X hours instead of Y days. That is an Nx improvement. The video is at <link>." One page, one hero number, one quote. This is what customer 2 reads before the first call.
+
+**Hard decision rule:** if the measured savings in step 1 are less than **90 minutes per month** (on a 201-employee canonical tenant), STOP before signing customer 2. Re-anchor the ACV story before any new pricing commitment. Do not grandfather customer 2 at €70k ACV if the demo cannot justify it. The €35/seat pricing depends on this feature being demonstrably differentiated, not approximately differentiated.
+
+**Why this is a hard gate, not a soft one:** customer 1 is locked at €70k ACV for 3 years (the grandfathered pilot pricing in `docs/GO_TO_MARKET.md` section 2). Customer 2 is where the real pricing test happens. If the founder signs customer 2 at €35/seat on the same pitch before validating savings, customers 2 through 10 all anchor on a possibly-unjustifiable number. The only lever to re-anchor is before customer 2, not after.
+
+This commitment is a **Phase 7 post-launch action**, not a Phase 7 launch task. It fires when customer 1 completes their second month-end close cycle on real data (typically 60-90 days after go-live).
 
 ---
 
