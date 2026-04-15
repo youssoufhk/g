@@ -1,25 +1,37 @@
 {
   "app": {
-    "name": "GammaHR",
-    "loading": "Loading"
+    "name": "Gamma",
+    "loading": "Loading",
+    "tagline": "The operations OS for modern consulting firms"
   },
   "nav": {
     "dashboard": "Dashboard",
-    "calendar": "Calendar",
+    "employees": "Employees",
+    "clients": "Clients",
+    "projects": "Projects",
     "timesheets": "Timesheets",
     "leaves": "Leaves",
     "expenses": "Expenses",
-    "projects": "Projects",
+    "approvals": "Approvals",
+    "invoices": "Invoices",
+    "calendar": "Calendar",
     "gantt": "Gantt",
     "planning": "Planning",
-    "clients": "Clients",
-    "invoices": "Invoices",
-    "team": "Team Directory",
     "hr": "Human Resources",
     "insights": "Insights",
     "admin": "Administration",
-    "approvals": "Approvals",
     "account": "Account",
     "help": "Help & Shortcuts"
+  },
+  "shell": {
+    "search_placeholder": "Search employees, clients, projects",
+    "new_button": "New",
+    "notifications": "Notifications"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "not_found": "Not found",
+    "unauthorized": "You need to sign in",
+    "forbidden": "You do not have access to this"
   }
 }
