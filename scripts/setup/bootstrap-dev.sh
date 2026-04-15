@@ -9,6 +9,7 @@
 #   4. Installs the infra/ops Python library in an isolated venv
 #   5. Runs the gamma-ops unit test suite (13 tests)
 #   6. Installs the Google Cloud SDK via Google's official apt repository
+#   7. Installs Docker Engine + compose plugin and adds the user to the docker group
 #
 # What you do after (interactive, manual):
 #   - gcloud auth login
@@ -99,9 +100,9 @@ SUDO_KEEPALIVE_PID=$!
 trap 'kill $SUDO_KEEPALIVE_PID 2>/dev/null || true' EXIT
 
 # ------------------------------------------------------------------------------
-# Step 1/6: System packages
+# Step 1/7: System packages
 # ------------------------------------------------------------------------------
-say "Step 1/6: System packages (apt)"
+say "Step 1/7: System packages (apt)"
 sudo apt-get update
 sudo apt-get install -y \
   python3 python3-venv python3-pip \
@@ -111,9 +112,9 @@ sudo apt-get install -y \
   apt-transport-https software-properties-common
 
 # ------------------------------------------------------------------------------
-# Step 2/6: Ensure Python 3.12+ (the infra/ops library requires it)
+# Step 2/7: Ensure Python 3.12+ (the infra/ops library requires it)
 # ------------------------------------------------------------------------------
-say "Step 2/6: Python ${REQUIRED_PY_MAJOR}.${REQUIRED_PY_MINOR}+ check"
+say "Step 2/7: Python ${REQUIRED_PY_MAJOR}.${REQUIRED_PY_MINOR}+ check"
 if python3 -c "import sys; sys.exit(0 if sys.version_info >= (${REQUIRED_PY_MAJOR}, ${REQUIRED_PY_MINOR}) else 1)" 2>/dev/null; then
   PY=python3
   echo "    $(python3 --version) is new enough, using it"
@@ -127,9 +128,9 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# Step 3/6: Pre-commit hooks (secrets + em dashes + utilisation)
+# Step 3/7: Pre-commit hooks (secrets + em dashes + utilisation)
 # ------------------------------------------------------------------------------
-say "Step 3/6: Pre-commit hooks"
+say "Step 3/7: Pre-commit hooks"
 if git config --get core.hooksPath >/dev/null 2>&1; then
   git config --unset core.hooksPath
   echo "    Unset redundant core.hooksPath (it was set to the default value)"
@@ -147,9 +148,9 @@ if ! pre-commit run --all-files; then
 fi
 
 # ------------------------------------------------------------------------------
-# Step 4/6: Install infra/ops library in its own venv
+# Step 4/7: Install infra/ops library in its own venv
 # ------------------------------------------------------------------------------
-say "Step 4/6: Install gamma-ops library"
+say "Step 4/7: Install gamma-ops library"
 cd "$REPO_ROOT/infra/ops"
 
 if [[ -d .venv ]]; then
@@ -171,15 +172,15 @@ INSTALLED_VERSION=$(.venv/bin/python -c "import gamma_ops; print(gamma_ops.__ver
 echo "    Installed gamma-ops $INSTALLED_VERSION"
 
 # ------------------------------------------------------------------------------
-# Step 5/6: Unit tests
+# Step 5/7: Unit tests
 # ------------------------------------------------------------------------------
-say "Step 5/6: gamma-ops unit tests"
+say "Step 5/7: gamma-ops unit tests"
 .venv/bin/pytest tests/ -v
 
 # ------------------------------------------------------------------------------
-# Step 6/6: Google Cloud SDK
+# Step 6/7: Google Cloud SDK
 # ------------------------------------------------------------------------------
-say "Step 6/6: Google Cloud SDK"
+say "Step 6/7: Google Cloud SDK"
 cd "$REPO_ROOT"
 
 if command -v gcloud >/dev/null 2>&1; then
@@ -195,6 +196,44 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Step 7/7: Docker Engine + compose plugin (for local dev stack)
+# ------------------------------------------------------------------------------
+say "Step 7/7: Docker Engine + compose plugin"
+if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+  echo "    docker already installed: $(docker --version)"
+  echo "    compose plugin already installed: $(docker compose version | head -1)"
+else
+  sudo apt-get install -y docker.io docker-compose-v2
+  echo "    Installed $(docker --version)"
+fi
+
+# Make sure the daemon is running on systems where apt does not auto-start it
+if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files docker.service >/dev/null 2>&1; then
+  if ! systemctl is-active --quiet docker; then
+    sudo systemctl enable --now docker || warn "Could not start docker.service via systemctl (WSL without systemd is OK; the daemon starts on first use)"
+  fi
+fi
+
+# Add the current user to the docker group so `docker` runs without sudo
+if ! id -nG "$USER" | tr ' ' '\n' | grep -qx docker; then
+  sudo usermod -aG docker "$USER"
+  NEEDS_RELOGIN=1
+  echo "    Added $USER to the docker group"
+else
+  NEEDS_RELOGIN=0
+  echo "    $USER already in the docker group"
+fi
+
+# Verify daemon reachability (will fail on first run without re-login, that is expected)
+if docker ps >/dev/null 2>&1; then
+  echo "    docker daemon reachable without sudo"
+else
+  warn "docker daemon is NOT reachable without sudo yet. This is expected if the"
+  warn "group membership was just added. Run 'newgrp docker' in your current shell"
+  warn "OR log out and back in, then re-run 'make dev-up' from the repo root."
+fi
+
+# ------------------------------------------------------------------------------
 # Done
 # ------------------------------------------------------------------------------
 echo ""
@@ -205,6 +244,12 @@ echo -e "${GREEN}============================================================${N
 cat <<EOF
 
 NEXT STEPS (interactive, run these manually in order):
+
+  0. If the script just added you to the docker group, either log out and back
+     in OR run in the current shell:
+       newgrp docker
+     Then verify:
+       docker ps
 
   1. Authenticate with Google:
        gcloud auth login
