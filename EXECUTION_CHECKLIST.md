@@ -57,6 +57,7 @@ Every feature merge goes through these ten steps in order. Do not skip steps, do
 - `/scaffold-atom` (`.claude/skills/scaffold-atom/SKILL.md`) - creating a new Gamma design-system atom with tokens, Storybook story, dark/light variants, WCAG checks. Used 20+ times in the Phase 2 atom layer.
 - `/scaffold-feature` (`.claude/skills/scaffold-feature/SKILL.md`) - scaffolding a new backend feature module (routes + schemas + service + models + tasks + ai_tools + tests + matching frontend folder) enforcing M1-M10. Used 11+ times in Phase 5.
 - `/scaffold-e2e-scenario` (`.claude/skills/scaffold-e2e-scenario/SKILL.md`) - creating a new Playwright end-to-end scenario from the `docs/TESTING_STRATEGY.md` inventory, with real database assertions. Target 45 scenarios by v1.0 launch.
+- `/commit` (`.claude/skills/commit/SKILL.md`) - running the 9 pre-commit hooks on staged files, applying safe auto-fixes (whitespace, EOF), reporting and blocking on unsafe findings (secrets, em dashes, banned words, large files), and creating the commit with a Co-Authored-By footer. The only commit path agents should use. Never skips hooks, never auto-fixes secrets, never pushes.
 
 **Forbidden skills (from CLAUDE.md rule 13):** NEVER invoke these even if they appear to match the task.
 - `frontend-design` - promotes creative, maximalist aesthetics that break the locked design system
