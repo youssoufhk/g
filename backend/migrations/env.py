@@ -28,6 +28,7 @@ from app.core.database import Base
 # Import every feature's models so ``Base.metadata`` sees them. Add new
 # imports as feature modules land.
 from app.features.admin import models as _admin_models  # noqa: F401
+from app.features.auth import models as _auth_models  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

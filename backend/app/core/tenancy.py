@@ -76,6 +76,34 @@ class TenancyMiddleware(BaseHTTPMiddleware):
 
 
 def _extract_from_jwt(request: Request) -> str | None:
-    # JWT parsing lives in security.py. The Phase 3 auth PR wires this so
-    # that authenticated requests drop the header and still get a tenant.
+    """Pull the tenant schema claim from a Bearer token.
+
+    Returns None if the request has no token, the token is invalid, the
+    token's audience is not accepted here, or the claim is missing. A
+    returned schema is always valid-shaped (``t_<slug>``).
+
+    Both ``app`` and ``ops`` audiences are accepted so that operators can
+    impersonate tenants from the ops console. Every impersonation action
+    is audited separately in the admin service; this middleware picks the
+    schema, it does not authorize.
+    """
+    from app.core.errors import Unauthorized
+    from app.core.security import decode_access_token
+
+    auth = request.headers.get("authorization", "")
+    if not auth.lower().startswith("bearer "):
+        return None
+    token = auth[7:].strip()
+    if not token:
+        return None
+
+    for audience in ("app", "ops"):
+        try:
+            claims = decode_access_token(token, audience=audience)
+        except Unauthorized:
+            continue
+        schema = claims.get("tenant_schema")
+        if isinstance(schema, str) and is_valid_tenant_schema(schema):
+            return schema
+        return None
     return None

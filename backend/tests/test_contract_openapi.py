@@ -15,6 +15,7 @@ def test_openapi_includes_health_and_auth(client: TestClient) -> None:
     assert spec["openapi"].startswith("3."), spec["openapi"]
     assert "/health" in spec["paths"]
     assert "/api/v1/auth/login" in spec["paths"]
+    assert "/api/v1/auth/register" in spec["paths"]
     assert "/api/v1/auth/me" in spec["paths"]
 
 
@@ -22,5 +23,8 @@ def test_openapi_components_schemas_are_stable(client: TestClient) -> None:
     spec = client.get("/openapi.json").json()
     schemas = spec.get("components", {}).get("schemas", {})
     assert "LoginRequest" in schemas
-    assert "LoginResponse" in schemas
+    assert "RegisterRequest" in schemas
+    assert "TokenPair" in schemas
     assert "MeResponse" in schemas
+    assert "UserOut" in schemas
+    assert "MembershipOut" in schemas
