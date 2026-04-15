@@ -24,6 +24,7 @@ from app.core.logging import configure_logging, get_logger
 from app.core.tenancy import TenancyMiddleware
 
 # Feature imports (side-effect: registers with feature_registry).
+from app.features.admin.routes import router as admin_router
 from app.features.auth.routes import router as auth_router
 
 logger = get_logger(__name__)
@@ -70,3 +71,4 @@ async def health() -> dict[str, Any]:
 
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(admin_router, prefix="/api/v1/ops", tags=["ops"])
