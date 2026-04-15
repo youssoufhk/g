@@ -4,7 +4,28 @@ Premium operations platform for consulting firms with 50 to 500 employees. Categ
 
 **Stack:** Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Vertex AI Gemini (LLM-as-router pattern) for AI. Hosted on GCP `europe-west9` + Cloudflare + GitHub.
 
-**Status:** planning phase closed. Phase 2 foundation build is next. Execution is tracked in [`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md).
+**Status:** Phase 2 foundation build in progress. The backend skeleton, vendor wrappers (M1), multi-country scaffolding, frontend shell, 20 atoms, testing infrastructure, and operator console minimum are in. Next: Phase 3 auth and onboarding. Execution is tracked in [`EXECUTION_CHECKLIST.md`](EXECUTION_CHECKLIST.md).
+
+### Quick dev loop
+
+```bash
+# One-time: bootstrap the machine (installs Python 3.12, pre-commit, gamma-ops, gcloud, Docker)
+bash scripts/setup/bootstrap-dev.sh
+# If the script just added you to the docker group, run: newgrp docker
+
+# Start the local stack (Postgres 16, Redis 7, Mailhog)
+make dev-up
+
+# Run the backend tests (45 passing)
+cd backend && python -m venv .venv && .venv/bin/pip install -e ".[dev]"
+.venv/bin/pytest -q
+
+# Run the frontend
+cd frontend && npm install && npm run dev
+# Browse http://localhost:3000/en/dashboard
+```
+
+See `docs/runbooks/dev-machine-bootstrap.md` for the full walkthrough.
 
 ---
 

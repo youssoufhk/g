@@ -23,7 +23,21 @@ from app.core.errors import GammaError
 from app.core.logging import configure_logging, get_logger
 from app.core.tenancy import TenancyMiddleware
 
-# Feature imports (side-effect: registers with feature_registry).
+# Feature imports (side-effect: every module registers with feature_registry).
+# New feature modules must be added to this list so operators see them in
+# the feature flag console on startup (M6).
+from app.features import (  # noqa: F401
+    approvals,
+    clients,
+    dashboard,
+    employees,
+    expenses,
+    imports,
+    invoices,
+    leaves,
+    projects,
+    timesheets,
+)
 from app.features.admin.routes import router as admin_router
 from app.features.auth.routes import router as auth_router
 

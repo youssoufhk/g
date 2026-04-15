@@ -13,13 +13,13 @@ Usage:
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 
 from app.core.config import settings
 from app.core.database import Base
 
 # Import every feature's models so Base.metadata sees them.
-# Add new imports as feature modules land.
+from app.features.admin import models as _admin_models  # noqa: F401
 
 config = context.config
 config.set_main_option(
@@ -61,15 +61,8 @@ def run_migrations_online() -> None:
     )
     with connectable.connect() as connection:
         if schema != "public":
-            connection.execute(
-                # type: ignore[arg-type]
-                __import__("sqlalchemy").text(
-                    f'CREATE SCHEMA IF NOT EXISTS "{schema}"'
-                )
-            )
-            connection.execute(
-                __import__("sqlalchemy").text(f'SET search_path TO "{schema}", public')
-            )
+            connection.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
+            connection.execute(text(f'SET search_path TO "{schema}", public'))
             connection.commit()
 
         context.configure(

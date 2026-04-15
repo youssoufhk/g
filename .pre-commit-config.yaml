@@ -52,10 +52,14 @@ repos:
         # for it. A grep pattern cannot show the character without
         # including it. Same rationale as the no-utilisation allowlist
         # below.
+        # frontend/styles/tokens.css is a byte-exact mirror of the LOCKED
+        # prototype/_tokens.css (CLAUDE.md rule 3). The prototype comments
+        # predate the em dash ban; fixing them would break the mirror.
         exclude: |
           (?x)^(
             \.claude/skills/.*|
-            scripts/hooks/no_em_dashes\.py
+            scripts/hooks/no_em_dashes\.py|
+            frontend/styles/tokens\.css
           )$
 
       - id: m1-vendor-imports

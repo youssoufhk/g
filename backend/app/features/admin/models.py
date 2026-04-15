@@ -6,6 +6,7 @@ it through the session.
 """
 
 from datetime import datetime
+from typing import ClassVar
 
 from sqlalchemy import BigInteger, String
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -16,7 +17,7 @@ from app.core.database import Base
 
 class Tenant(Base):
     __tablename__ = "tenants"
-    __table_args__ = {"schema": "public"}
+    __table_args__: ClassVar[dict[str, str]] = {"schema": "public"}
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     schema_name: Mapped[str] = mapped_column(String, unique=True)

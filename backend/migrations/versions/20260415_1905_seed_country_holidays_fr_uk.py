@@ -8,6 +8,7 @@ Create Date: 2026-04-15 19:05:00
 from collections.abc import Sequence
 from datetime import date
 
+import sqlalchemy as sa
 from alembic import op
 
 revision: str = "20260415_1905"
@@ -63,7 +64,7 @@ def upgrade() -> None:
     conn = op.get_bind()
     for country, holiday_date, name, kind in HOLIDAYS:
         conn.execute(
-            __import__("sqlalchemy").text(
+            sa.text(
                 "INSERT INTO public.country_holidays (country_code, date, name, kind) "
                 "VALUES (:country, :date, :name, :kind) "
                 "ON CONFLICT DO NOTHING"
@@ -76,7 +77,7 @@ def downgrade() -> None:
     conn = op.get_bind()
     for country, holiday_date, _name, _kind in HOLIDAYS:
         conn.execute(
-            __import__("sqlalchemy").text(
+            sa.text(
                 "DELETE FROM public.country_holidays "
                 "WHERE country_code = :country AND date = :date"
             ),
