@@ -58,6 +58,12 @@ repos:
             scripts/hooks/no_em_dashes\.py
           )$
 
+      - id: m1-vendor-imports
+        name: M1 forbid vendor SDK imports outside wrappers
+        language: system
+        entry: python3 scripts/hooks/check_vendor_imports.py
+        files: '^backend/.*\.py$'
+
       - id: no-utilisation
         name: Ban the word utilisation
         language: system
