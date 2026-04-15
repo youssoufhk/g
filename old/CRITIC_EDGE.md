@@ -112,4 +112,3 @@ The invoice detail view always shows a fully editable invoice. There is no handl
 
 ### [LOW] auth.html | Company registration wizard step 4 (Customize) — no validation before completion
 Step 4 of the company registration wizard allows finishing with no logo, no timezone selected (it defaults to a value), and no team size confirmed. The "Complete Setup" button fires immediately with no validation of whether critical fields are filled. A new company with a completely blank customization step proceeds to the dashboard without any confirmation of what settings were applied.
-

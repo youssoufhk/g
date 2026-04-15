@@ -12,6 +12,15 @@
 #   3. Banned vocabulary that the founder hates: em dashes and "utilisation"
 #      (CLAUDE.md rules 5 and 6).
 
+# Top-level exclude. These directories are never linted by any hook because
+# they are archived or frozen content we do not modify:
+#   - old/        archived originals from before the reorganization; historical record
+#   - prototype/  locked visual reference (CLAUDE.md rule 2)
+#   - .continue/  Continue IDE local configuration, not ours to lint
+#   - infra/ops/.venv/  Python virtual environment
+#   - node_modules/     Node dependencies
+exclude: '^(old/|prototype/|\.continue/|infra/ops/\.venv/|node_modules/)'
+
 repos:
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.21.2
@@ -27,7 +36,6 @@ repos:
       - id: end-of-file-fixer
       - id: check-added-large-files
         args: ['--maxkb=500']
-        exclude: '^prototype/'
       - id: check-yaml
       - id: check-json
       - id: check-merge-conflict
@@ -37,31 +45,38 @@ repos:
       - id: no-em-dashes
         name: Ban em dashes and en dashes
         language: system
+        entry: python3 scripts/hooks/no_em_dashes.py
         files: '\.(md|mdx|ts|tsx|js|jsx|py|txt|yaml|yml)$'
-        entry: >
-          python -c "import sys; bad = False;
-          [ (lambda p:
-              [ (lambda i, line:
-                  (print(f'{p}:{i+1}: contains em dash or en dash -> {line.rstrip()}') or (globals().__setitem__('bad', True)))
-                  if ('\u2014' in line or '\u2013' in line) else None
-                )(i, line)
-                for i, line in enumerate(open(p, encoding='utf-8', errors='replace').read().splitlines()) ]
-            )(p) for p in sys.argv[1:] ];
-          sys.exit(1 if bad else 0)"
+        # Skill definitions legitimately contain the literal em dash
+        # character when they document the grep command that searches
+        # for it. A grep pattern cannot show the character without
+        # including it. Same rationale as the no-utilisation allowlist
+        # below.
+        exclude: |
+          (?x)^(
+            \.claude/skills/.*|
+            scripts/hooks/no_em_dashes\.py
+          )$
 
       - id: no-utilisation
         name: Ban the word utilisation
         language: system
+        entry: python3 scripts/hooks/no_utilisation.py
         files: '\.(md|mdx|ts|tsx|js|jsx|py|txt|yaml|yml)$'
-        exclude: '^(CLAUDE\.md|docs/SCOPE\.md|docs/FLAWLESS_GATE\.md|agents/AGENTS\.md|docs/runbooks/secrets-management\.md|\.pre-commit-config\.yaml)$'
-        entry: >
-          python -c "import sys, re; bad = False;
-          rx = re.compile(r'utilisation', re.IGNORECASE);
-          [ (lambda p:
-              [ (lambda i, line:
-                  (print(f'{p}:{i+1}: contains banned word utilisation -> {line.rstrip()}') or (globals().__setitem__('bad', True)))
-                  if rx.search(line) else None
-                )(i, line)
-                for i, line in enumerate(open(p, encoding='utf-8', errors='replace').read().splitlines()) ]
-            )(p) for p in sys.argv[1:] ];
-          sys.exit(1 if bad else 0)"
+        # Files below legitimately reference the banned word because they
+        # define, document, or enforce the ban rule itself. Any NEW file
+        # that uses "utilisation" in real prose is caught.
+        exclude: |
+          (?x)^(
+            CLAUDE\.md|
+            EXECUTION_CHECKLIST\.md|
+            agents/AGENTS\.md|
+            docs/SCOPE\.md|
+            docs/FLAWLESS_GATE\.md|
+            docs/COUNTRY_PLAYBOOKS\.md|
+            docs/runbooks/secrets-management\.md|
+            specs/AI_FEATURES\.md|
+            \.pre-commit-config\.yaml|
+            scripts/hooks/no_utilisation\.py|
+            \.claude/skills/.*
+          )$
