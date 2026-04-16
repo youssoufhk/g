@@ -40,7 +40,16 @@ from app.features import (  # noqa: F401
 )
 from app.features.admin.routes import router as admin_router
 from app.features.auth.routes import router as auth_router
+
+# Model import side effects so Base.metadata sees every Phase 4 table.
+from app.features.clients import models as _clients_models  # noqa: F401
+from app.features.clients.routes import router as clients_router
+from app.features.dashboard.routes import router as dashboard_router
+from app.features.employees import models as _employees_models  # noqa: F401
+from app.features.employees.routes import router as employees_router
 from app.features.imports.routes import router as imports_router
+from app.features.projects import models as _projects_models  # noqa: F401
+from app.features.projects.routes import router as projects_router
 
 logger = get_logger(__name__)
 
@@ -88,3 +97,7 @@ async def health() -> dict[str, Any]:
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(admin_router, prefix="/api/v1/ops", tags=["ops"])
 app.include_router(imports_router, prefix="/api/v1/imports", tags=["imports"])
+app.include_router(employees_router, prefix="/api/v1/employees", tags=["employees"])
+app.include_router(clients_router, prefix="/api/v1/clients", tags=["clients"])
+app.include_router(projects_router, prefix="/api/v1/projects", tags=["projects"])
+app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["dashboard"])
