@@ -39,9 +39,9 @@ const ACTIVE_PROJECTS = [
 ];
 
 const TIMESHEET_BREAKDOWN = [
-  { project: "HSBC Digital Transformation", hours: 23 },
-  { project: "BNP Risk Model", hours: 6 },
-  { project: "Internal", hours: 1.5 },
+  { project: "HSBC Digital Transformation", projectId: "p1", hours: 23 },
+  { project: "BNP Risk Model", projectId: "p2", hours: 6 },
+  { project: "Internal", projectId: null, hours: 1.5 },
 ];
 
 export default function DashboardPage() {
@@ -194,14 +194,27 @@ export default function DashboardPage() {
                     alignItems: "center",
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: "var(--text-sm)",
-                      color: "var(--color-text-1)",
-                    }}
-                  >
-                    {row.project}
-                  </span>
+                  {row.projectId ? (
+                    <Link
+                      href={`/projects/${row.projectId}`}
+                      style={{
+                        fontSize: "var(--text-sm)",
+                        color: "var(--color-text-1)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      {row.project}
+                    </Link>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: "var(--text-sm)",
+                        color: "var(--color-text-1)",
+                      }}
+                    >
+                      {row.project}
+                    </span>
+                  )}
                   <span
                     style={{
                       fontSize: "var(--text-sm)",

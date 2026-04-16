@@ -808,9 +808,25 @@ body.dev-mode .state-toggle { display: flex; }
   flex-shrink: 1;
 }
 @media (max-width: 768px) {
-  .filter-bar-standard { flex-wrap: wrap; padding: var(--space-2) var(--space-3); }
-  .filter-bar-standard .filter-search { min-width: 100%; order: -1; }
-  .filter-bar-standard .form-select { flex: 1; min-width: calc(50% - var(--space-2)); min-height: 44px; }
+  .filter-bar-standard {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
+  }
+  .filter-bar-standard .filter-search {
+    flex-shrink: 0;
+    min-width: 160px;
+    max-width: 200px;
+  }
+  .filter-bar-standard .form-select {
+    flex-shrink: 0;
+    min-width: 120px;
+    height: 36px;
+    min-height: 36px;
+    font-size: var(--text-body-sm);
+  }
 }
 
 /* ── UI6: Guarantee filter-bar NEVER stacks on desktop ── */
@@ -922,23 +938,24 @@ body.dev-mode .state-toggle { display: flex; }
 /* ── MOBILE: Override inline min-width on filter selects (CRIT-2: employees) ── */
 @media (max-width: 639px) {
   /* Employees page inline width overrides on selects inside filter-bar-standard */
+  /* Keep selects compact in the horizontally-scrollable filter bar row */
   .filter-bar-standard select[style*="width"],
   .filter-bar-standard .form-select[style*="width"] {
     width: auto !important;
-    min-width: calc(50% - var(--space-2)) !important;
-    max-width: 100% !important;
-    flex: 1 !important;
+    min-width: 120px !important;
+    max-width: none !important;
+    flex-shrink: 0 !important;
   }
 }
 
 /* ── MOBILE: Invoice date range inputs (HIGH-6) ── */
 @media (max-width: 639px) {
-  /* Date inputs in filter bars shouldn't force wide widths on mobile */
+  /* Date inputs in filter bars stay compact in the scrollable row */
   .filter-bar-standard input[type="date"][style*="min-width"],
   .filter-bar-standard input[type="date"] {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    flex: 1 !important;
+    min-width: 120px !important;
+    max-width: none !important;
+    flex-shrink: 0 !important;
   }
 }
 
@@ -998,10 +1015,10 @@ body.dev-mode .state-toggle { display: flex; }
   .filter-bar-standard > label {
     display: none !important;
   }
-  /* Ensure selects use placeholder text instead of separate labels */
+  /* Selects stay compact and non-shrinking in the scrollable row */
   .filter-bar-standard .form-select {
-    flex: 1 !important;
-    min-width: calc(50% - var(--space-2)) !important;
+    flex-shrink: 0 !important;
+    min-width: 120px !important;
   }
 }
 

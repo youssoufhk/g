@@ -8,7 +8,15 @@ import {
   Settings,
   Shield,
   Mail,
+  Download,
+  CreditCard,
+  Lock,
+  ToggleLeft,
+  ClipboardList,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import { useEffect } from "react";
 
 import { PageHeader } from "@/components/patterns/page-header";
 import { StatPill } from "@/components/patterns/stat-pill";
@@ -29,12 +37,6 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -81,8 +83,8 @@ type AuditEntry = {
 const INITIAL_USERS: AdminUser[] = [
   {
     id: "u1",
-    name: "Youssouf Hassan",
-    email: "youssouf@globalid.uk",
+    name: "Youssouf Kerzika",
+    email: "youssouf.kerzika@globalg.consulting",
     role: "Owner",
     status: "active",
     lastSeen: "Just now",
@@ -91,7 +93,7 @@ const INITIAL_USERS: AdminUser[] = [
   {
     id: "u2",
     name: "Marie Dubois",
-    email: "marie@globalid.uk",
+    email: "marie.dubois@globalg.consulting",
     role: "Admin",
     status: "active",
     lastSeen: "2h ago",
@@ -100,7 +102,7 @@ const INITIAL_USERS: AdminUser[] = [
   {
     id: "u3",
     name: "Pierre Leclerc",
-    email: "pierre@globalid.uk",
+    email: "pierre.leclerc@globalg.consulting",
     role: "Finance Manager",
     status: "active",
     lastSeen: "Yesterday",
@@ -109,7 +111,7 @@ const INITIAL_USERS: AdminUser[] = [
   {
     id: "u4",
     name: "Anna Schmidt",
-    email: "anna@globalid.uk",
+    email: "anna.schmidt@globalg.consulting",
     role: "Project Manager",
     status: "active",
     lastSeen: "3 days ago",
@@ -118,7 +120,7 @@ const INITIAL_USERS: AdminUser[] = [
   {
     id: "u5",
     name: "Tom Baker",
-    email: "tom@globalid.uk",
+    email: "tom.baker@globalg.consulting",
     role: "Employee",
     status: "inactive",
     lastSeen: "2 weeks ago",
@@ -196,7 +198,7 @@ const AUDIT_LOG: AuditEntry[] = [
   {
     id: "a1",
     timestamp: "Today 09:15",
-    user: "Youssouf Hassan",
+    user: "Youssouf Kerzika",
     action: "LOGIN",
     resource: "auth",
     ip: "82.65.12.4",
@@ -212,7 +214,7 @@ const AUDIT_LOG: AuditEntry[] = [
   {
     id: "a3",
     timestamp: "Yesterday 17:00",
-    user: "Youssouf Hassan",
+    user: "Youssouf Kerzika",
     action: "CREATE",
     resource: "invoice:INV-2026-0042",
     ip: "82.65.12.4",
@@ -236,7 +238,7 @@ const AUDIT_LOG: AuditEntry[] = [
   {
     id: "a6",
     timestamp: "Apr 13 09:00",
-    user: "Youssouf Hassan",
+    user: "Youssouf Kerzika",
     action: "INVITE",
     resource: "user:invite@company.com",
     ip: "82.65.12.4",
@@ -244,7 +246,7 @@ const AUDIT_LOG: AuditEntry[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Sub-components
+// Shared helpers
 // ---------------------------------------------------------------------------
 
 function RoleBadge({ role }: { role: UserRole }) {
@@ -289,24 +291,98 @@ function ActionBadge({ action }: { action: AuditEntry["action"] }) {
 }
 
 // ---------------------------------------------------------------------------
+// Card header shared component
+// ---------------------------------------------------------------------------
+
+function CardHeader({
+  icon,
+  title,
+  action,
+  expanded,
+  onToggle,
+  count,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  action?: React.ReactNode;
+  expanded?: boolean;
+  onToggle?: () => void;
+  count?: number;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "var(--space-4) var(--space-5)",
+        borderBottom: "1px solid var(--color-border)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <span style={{ color: "var(--color-text-3)" }}>{icon}</span>
+        <span
+          style={{
+            fontWeight: "var(--weight-semibold)",
+            fontSize: "var(--text-body-sm)",
+            color: "var(--color-text-1)",
+          }}
+        >
+          {title}
+        </span>
+        {count !== undefined && (
+          <span
+            style={{
+              fontSize: "var(--text-caption)",
+              color: "var(--color-text-3)",
+              background: "var(--color-surface-2)",
+              borderRadius: "var(--radius-full)",
+              padding: "1px 8px",
+            }}
+          >
+            {count}
+          </span>
+        )}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+        {action}
+        {onToggle && (
+          <Button variant="ghost" size="xs" iconOnly onClick={onToggle} aria-label={expanded ? "Collapse" : "Expand"}>
+            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Invite Modal
 // ---------------------------------------------------------------------------
 
 function InviteModal({
   open,
   onClose,
+  onInvite,
 }: {
   open: boolean;
   onClose: () => void;
+  onInvite: (email: string, role: UserRole) => void;
 }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<UserRole>("Employee");
+  const [sending, setSending] = useState(false);
 
   function handleSend() {
-    console.log("Invite sent:", { email, role });
-    setEmail("");
-    setRole("Employee");
-    onClose();
+    if (!email.trim()) return;
+    setSending(true);
+    setTimeout(() => {
+      setSending(false);
+      onInvite(email.trim(), role);
+      setEmail("");
+      setRole("Employee");
+      onClose();
+    }, 800);
   }
 
   return (
@@ -321,8 +397,8 @@ function InviteModal({
           <Button variant="ghost" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" size="sm" onClick={handleSend}>
-            Send invite
+          <Button variant="primary" size="sm" onClick={handleSend} disabled={sending || !email.trim()}>
+            {sending ? "Sending..." : "Send invite"}
           </Button>
         </div>
       }
@@ -331,8 +407,7 @@ function InviteModal({
         <div>
           <label
             htmlFor="invite-email"
-            className="text-2"
-            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
+            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}
           >
             Email address
           </label>
@@ -347,8 +422,7 @@ function InviteModal({
         <div>
           <label
             htmlFor="invite-role"
-            className="text-2"
-            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
+            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}
           >
             Role
           </label>
@@ -368,35 +442,152 @@ function InviteModal({
   );
 }
 
+function EditRoleModal({
+  user,
+  onClose,
+  onSave,
+}: {
+  user: AdminUser | null;
+  onClose: () => void;
+  onSave: (id: string, role: UserRole) => void;
+}) {
+  const [role, setRole] = useState<UserRole>(user?.role ?? "Employee");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) setRole(user.role);
+  }, [user?.id]);
+
+  function handleSave() {
+    if (!user) return;
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      onSave(user.id, role);
+      onClose();
+    }, 800);
+  }
+
+  return (
+    <Modal
+      open={!!user}
+      onClose={onClose}
+      title="Edit role"
+      size="sm"
+      footer={
+        <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      }
+    >
+      <div>
+        <label
+          htmlFor="edit-role-select"
+          style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}
+        >
+          Role for {user?.name}
+        </label>
+        <Select
+          id="edit-role-select"
+          value={role}
+          onChange={(e) => setRole(e.target.value as UserRole)}
+        >
+          <option value="Admin">Admin</option>
+          <option value="Finance Manager">Finance Manager</option>
+          <option value="Project Manager">Project Manager</option>
+          <option value="Employee">Employee</option>
+        </Select>
+      </div>
+    </Modal>
+  );
+}
+
 // ---------------------------------------------------------------------------
-// Users & Roles tab
+// Users & Roles card
 // ---------------------------------------------------------------------------
 
-function UsersTab() {
+function UsersCard() {
+  const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [editRoleUser, setEditRoleUser] = useState<AdminUser | null>(null);
+  const [expanded, setExpanded] = useState(true);
+
+  function handleUpdateRole(id: string, role: UserRole) {
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)));
+  }
+  function handleDeactivate(id: string) {
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status: "inactive" as UserStatus } : u)));
+  }
+  function handleRemove(id: string) {
+    setUsers((prev) => prev.filter((u) => u.id !== id));
+  }
+  function handleInvite(email: string, role: UserRole) {
+    setUsers((prev) => [
+      ...prev,
+      {
+        id: `u-${Date.now()}`,
+        name: email.split("@")[0] ?? email,
+        email,
+        role,
+        status: "pending",
+        lastSeen: "-",
+        avatarColorIndex: prev.length % 8,
+      },
+    ]);
+  }
+
+  const activeCount = users.filter((u) => u.status === "active").length;
+  const pendingCount = users.filter((u) => u.status === "pending").length;
+  const previewUsers = expanded ? users : users.slice(0, 3);
 
   return (
     <>
-      <div className="kpi-grid" style={{ marginBottom: "var(--space-5)" }}>
-        <StatPill label="Total users" value={6} />
-        <StatPill label="Admins" value={2} accent="info" />
-        <StatPill label="Active sessions" value={4} accent="success" />
-        <StatPill label="Pending invites" value={1} accent="warning" />
-      </div>
+      <div className="card" style={{ gridColumn: "1 / -1" }}>
+        <CardHeader
+          icon={<Users size={16} />}
+          title="Users & Roles"
+          count={users.length}
+          action={
+            <Button
+              variant="secondary"
+              size="sm"
+              leadingIcon={<Plus size={14} />}
+              onClick={() => setInviteOpen(true)}
+            >
+              Invite user
+            </Button>
+          }
+          expanded={expanded}
+          onToggle={() => setExpanded((v) => !v)}
+        />
 
-      <DataTableWrapper>
-        <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4) var(--space-5)" }}>
-          <span className="card-title" style={{ margin: 0 }}>Users</span>
-          <Button
-            variant="secondary"
-            size="sm"
-            leadingIcon={<Plus size={14} />}
-            onClick={() => setInviteOpen(true)}
-          >
-            Invite user
-          </Button>
+        {/* Summary row - always visible */}
+        <div
+          style={{
+            display: "flex",
+            gap: "var(--space-4)",
+            padding: "var(--space-4) var(--space-5)",
+            borderBottom: "1px solid var(--color-border)",
+            flexWrap: "wrap",
+          }}
+        >
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{activeCount}</span> active
+          </span>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{pendingCount}</span> pending invite{pendingCount !== 1 ? "s" : ""}
+          </span>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{users.filter((u) => u.role === "Admin" || u.role === "Owner").length}</span> admins
+          </span>
         </div>
 
+        {/* Table */}
         <Table>
           <THead>
             <TR>
@@ -408,7 +599,7 @@ function UsersTab() {
             </TR>
           </THead>
           <TBody>
-            {INITIAL_USERS.map((user) => (
+            {previewUsers.map((user) => (
               <TR key={user.id}>
                 <TD>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
@@ -419,13 +610,10 @@ function UsersTab() {
                       status={user.status === "active" ? "online" : undefined}
                     />
                     <div style={{ minWidth: 0 }}>
-                      <div
-                        className="text-1"
-                        style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)" }}
-                      >
+                      <div style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)" }}>
                         {user.name}
                       </div>
-                      <div className="text-3" style={{ fontSize: "var(--text-caption)" }}>
+                      <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
                         {user.email}
                       </div>
                     </div>
@@ -452,165 +640,300 @@ function UsersTab() {
                       </Button>
                     )}
                   >
-                    <DropdownItem icon={<Settings size={14} />}>Edit role</DropdownItem>
+                    <DropdownItem icon={<Settings size={14} />} onClick={() => setEditRoleUser(user)}>
+                      Edit role
+                    </DropdownItem>
                     {user.status === "active" && (
-                      <DropdownItem icon={<Shield size={14} />} destructive>
+                      <DropdownItem icon={<Shield size={14} />} destructive onClick={() => handleDeactivate(user.id)}>
                         Deactivate
                       </DropdownItem>
                     )}
                     {user.status === "pending" && (
-                      <DropdownItem icon={<Mail size={14} />}>Resend invite</DropdownItem>
+                      <DropdownItem icon={<Mail size={14} />} onClick={() => {}}>
+                        Resend invite
+                      </DropdownItem>
                     )}
                     <DropdownDivider />
-                    <DropdownItem destructive>Remove</DropdownItem>
+                    <DropdownItem destructive onClick={() => handleRemove(user.id)}>
+                      Remove
+                    </DropdownItem>
                   </Dropdown>
                 </TD>
               </TR>
             ))}
           </TBody>
         </Table>
-      </DataTableWrapper>
 
-      <InviteModal open={inviteOpen} onClose={() => setInviteOpen(false)} />
+        {/* Show more toggle when collapsed */}
+        {!expanded && users.length > 3 && (
+          <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
+            <Button variant="ghost" size="sm" onClick={() => setExpanded(true)}>
+              Show all {users.length} users
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <InviteModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvite={handleInvite} />
+      <EditRoleModal user={editRoleUser} onClose={() => setEditRoleUser(null)} onSave={handleUpdateRole} />
     </>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Feature Flags tab
+// Feature Flags card
 // ---------------------------------------------------------------------------
 
-function FeatureFlagsTab() {
+function FeatureFlagsCard() {
   const [flags, setFlags] = useState<FeatureFlag[]>(INITIAL_FLAGS);
+  const [expanded, setExpanded] = useState(false);
 
   function toggleFlag(id: string) {
-    setFlags((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, enabled: !f.enabled } : f))
-    );
+    setFlags((prev) => prev.map((f) => (f.id === id ? { ...f, enabled: !f.enabled } : f)));
   }
 
+  const enabledCount = flags.filter((f) => f.enabled).length;
+  const visibleFlags = expanded ? flags : flags.slice(0, 4);
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-      {flags.map((flag) => (
-        <div
-          key={flag.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "var(--color-surface-1)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-lg)",
-            padding: "var(--space-4)",
-            gap: "var(--space-4)",
-          }}
-        >
-          <div style={{ minWidth: 0 }}>
-            <div
-              className="text-1"
-              style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body-sm)", marginBottom: "var(--space-1)" }}
-            >
-              {flag.name}
+    <div className="card">
+      <CardHeader
+        icon={<ToggleLeft size={16} />}
+        title="Feature Flags"
+        count={flags.length}
+        expanded={expanded}
+        onToggle={() => setExpanded((v) => !v)}
+      />
+
+      <div style={{ padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid var(--color-border)" }}>
+        <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+          <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{enabledCount}</span> of {flags.length} enabled
+        </span>
+      </div>
+
+      <div style={{ padding: "var(--space-2) 0" }}>
+        {visibleFlags.map((flag) => (
+          <div
+            key={flag.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "var(--space-3) var(--space-5)",
+              gap: "var(--space-4)",
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", marginBottom: "2px" }}>
+                {flag.name}
+              </div>
+              <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+                {flag.description}
+              </div>
             </div>
-            <div className="text-3" style={{ fontSize: "var(--text-caption)" }}>
-              {flag.description}
-            </div>
+            <Toggle
+              checked={flag.enabled}
+              onCheckedChange={() => toggleFlag(flag.id)}
+              label={`Toggle ${flag.name}`}
+            />
           </div>
-          <Toggle
-            checked={flag.enabled}
-            onCheckedChange={() => toggleFlag(flag.id)}
-            label={`Toggle ${flag.name}`}
-          />
+        ))}
+      </div>
+
+      {!expanded && flags.length > 4 && (
+        <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
+          <Button variant="ghost" size="sm" onClick={() => setExpanded(true)}>
+            Show {flags.length - 4} more flags
+          </Button>
         </div>
-      ))}
+      )}
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Audit Log tab
+// Audit Log card
 // ---------------------------------------------------------------------------
 
-function AuditLogTab() {
+function AuditLogCard() {
+  const [expanded, setExpanded] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  function handleExport() {
+    setExporting(true);
+    setTimeout(() => setExporting(false), 1200);
+  }
+
+  const visibleEntries = expanded ? AUDIT_LOG : AUDIT_LOG.slice(0, 3);
+
   return (
-    <DataTableWrapper>
-      <Table>
-        <THead>
-          <TR>
-            <TH>Timestamp</TH>
-            <TH>User</TH>
-            <TH>Action</TH>
-            <TH>Resource</TH>
-            <TH>IP</TH>
-          </TR>
-        </THead>
-        <TBody>
-          {AUDIT_LOG.map((entry) => (
-            <TR key={entry.id}>
-              <TD muted style={{ whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
-                {entry.timestamp}
-              </TD>
-              <TD style={{ fontSize: "var(--text-body-sm)" }}>{entry.user}</TD>
-              <TD><ActionBadge action={entry.action} /></TD>
-              <TD muted style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "var(--text-caption)" }}>
-                {entry.resource}
-              </TD>
-              <TD muted style={{ fontVariantNumeric: "tabular-nums", fontSize: "var(--text-caption)" }}>
-                {entry.ip}
-              </TD>
+    <div className="card">
+      <CardHeader
+        icon={<ClipboardList size={16} />}
+        title="Audit Log"
+        action={
+          <Button variant="secondary" size="sm" leadingIcon={<Download size={14} />} onClick={handleExport} disabled={exporting}>
+            {exporting ? "Exporting..." : "Export CSV"}
+          </Button>
+        }
+        expanded={expanded}
+        onToggle={() => setExpanded((v) => !v)}
+      />
+
+      <div style={{ padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid var(--color-border)" }}>
+        <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+          <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{AUDIT_LOG.length}</span> events in the last 7 days
+        </span>
+      </div>
+
+      <div style={{ overflowX: "auto" }}>
+        <Table>
+          <THead>
+            <TR>
+              <TH>When</TH>
+              <TH>User</TH>
+              <TH>Action</TH>
+              <TH>Resource</TH>
             </TR>
-          ))}
-        </TBody>
-      </Table>
-    </DataTableWrapper>
+          </THead>
+          <TBody>
+            {visibleEntries.map((entry) => (
+              <TR key={entry.id}>
+                <TD muted style={{ whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", fontSize: "var(--text-caption)" }}>
+                  {entry.timestamp}
+                </TD>
+                <TD style={{ fontSize: "var(--text-body-sm)" }}>{entry.user}</TD>
+                <TD><ActionBadge action={entry.action} /></TD>
+                <TD muted style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "var(--text-caption)" }}>
+                  {entry.resource}
+                </TD>
+              </TR>
+            ))}
+          </TBody>
+        </Table>
+      </div>
+
+      {!expanded && AUDIT_LOG.length > 3 && (
+        <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
+          <Button variant="ghost" size="sm" onClick={() => setExpanded(true)}>
+            Show all {AUDIT_LOG.length} events
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Billing tab
+// Billing card
 // ---------------------------------------------------------------------------
 
-function BillingTab() {
+function BillingCard() {
   const rows: { label: string; value: string }[] = [
     { label: "Plan", value: "Gamma Pro - Pilot" },
-    { label: "Billing period", value: "Active pilot (until June 30, 2026)" },
-    { label: "Users", value: "6 / 200 seats" },
+    { label: "Billing period", value: "Active pilot (until Jun 30, 2026)" },
+    { label: "Seats", value: "6 / 200" },
     { label: "Monthly cost", value: "\u20AC0 (pilot)" },
     { label: "Contact", value: "billing@gammahr.com" },
   ];
 
   return (
-    <div
-      className="card"
-      style={{ maxWidth: 520 }}
-    >
-      <div className="card-header">
-        <span className="card-title">Subscription</span>
+    <div className="card">
+      <CardHeader icon={<CreditCard size={16} />} title="Billing" />
+
+      <div style={{ padding: "var(--space-2) 0" }}>
+        {rows.map((row, i) => (
+          <div
+            key={row.label}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "var(--space-3) var(--space-5)",
+              borderBottom: i < rows.length - 1 ? "1px solid var(--color-border)" : undefined,
+              gap: "var(--space-4)",
+            }}
+          >
+            <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-3)" }}>
+              {row.label}
+            </span>
+            <span style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", textAlign: "right" }}>
+              {row.value}
+            </span>
+          </div>
+        ))}
       </div>
-      <div className="card-body">
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-          {rows.map((row) => (
-            <div
-              key={row.label}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingBottom: "var(--space-3)",
-                borderBottom: "1px solid var(--color-border)",
-              }}
-            >
-              <span className="text-3" style={{ fontSize: "var(--text-body-sm)" }}>
-                {row.label}
-              </span>
-              <span
-                className="text-1"
-                style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", textAlign: "right" }}
-              >
-                {row.value}
-              </span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Security card
+// ---------------------------------------------------------------------------
+
+function SecurityCard() {
+  const [mfaEnforced, setMfaEnforced] = useState(false);
+  const [sessionTimeout, setSessionTimeout] = useState(true);
+
+  const securityItems: { id: string; label: string; description: string; enabled: boolean; onChange: () => void }[] = [
+    {
+      id: "mfa",
+      label: "Enforce MFA for all users",
+      description: "All users must set up 2FA to log in",
+      enabled: mfaEnforced,
+      onChange: () => setMfaEnforced((v) => !v),
+    },
+    {
+      id: "session",
+      label: "Session timeout (8h)",
+      description: "Users are logged out after 8 hours of inactivity",
+      enabled: sessionTimeout,
+      onChange: () => setSessionTimeout((v) => !v),
+    },
+  ];
+
+  return (
+    <div className="card">
+      <CardHeader icon={<Lock size={16} />} title="Security" />
+
+      <div style={{ padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid var(--color-border)" }}>
+        <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+          <span style={{ fontWeight: "var(--weight-semibold)", color: mfaEnforced ? "var(--color-success)" : "var(--color-warning)" }}>
+            {mfaEnforced ? "MFA on" : "MFA off"}
+          </span>
+          {" - "}{mfaEnforced ? "All users require 2FA" : "2FA is optional"}
+        </span>
+      </div>
+
+      <div style={{ padding: "var(--space-2) 0" }}>
+        {securityItems.map((item) => (
+          <div
+            key={item.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "var(--space-3) var(--space-5)",
+              gap: "var(--space-4)",
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", marginBottom: "2px" }}>
+                {item.label}
+              </div>
+              <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+                {item.description}
+              </div>
             </div>
-          ))}
+            <Toggle checked={item.enabled} onCheckedChange={item.onChange} label={item.label} />
+          </div>
+        ))}
+      </div>
+
+      <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>Active sessions</span>
+          <span style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)" }}>3</span>
         </div>
       </div>
     </div>
@@ -626,38 +949,42 @@ export default function AdminPage() {
     <>
       <PageHeader title="Administration" />
 
-      <Tabs defaultValue="users">
-        <TabsList>
-          <TabsTrigger value="users">Users &amp; Roles</TabsTrigger>
-          <TabsTrigger value="flags">Feature Flags</TabsTrigger>
-          <TabsTrigger value="audit">Audit Log</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-        </TabsList>
+      {/* Stats row */}
+      <div className="kpi-grid" style={{ marginBottom: "var(--space-5)" }}>
+        <StatPill label="Total users" value={201} />
+        <StatPill label="Active sessions" value={3} accent="success" />
+        <StatPill label="Pending invites" value={1} accent="warning" />
+        <StatPill label="Flags enabled" value={5} accent="info" />
+      </div>
 
-        <TabsContent value="users">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <UsersTab />
-          </div>
-        </TabsContent>
+      {/* Card grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: "var(--space-4)",
+        }}
+        className="admin-card-grid"
+      >
+        {/* Users & Roles - full width */}
+        <UsersCard />
 
-        <TabsContent value="flags">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <FeatureFlagsTab />
-          </div>
-        </TabsContent>
+        {/* Feature Flags + Audit Log - 2 col */}
+        <FeatureFlagsCard />
+        <AuditLogCard />
 
-        <TabsContent value="audit">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <AuditLogTab />
-          </div>
-        </TabsContent>
+        {/* Billing + Security - 2 col */}
+        <BillingCard />
+        <SecurityCard />
+      </div>
 
-        <TabsContent value="billing">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <BillingTab />
-          </div>
-        </TabsContent>
-      </Tabs>
+      <style>{`
+        @media (max-width: 768px) {
+          .admin-card-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

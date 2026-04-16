@@ -71,8 +71,14 @@ Two build passes: Pass 1 after employees/clients/projects (Phase 4). Pass 2 afte
 
 | # | Page | Route | Prototype | Pattern |
 |---|------|-------|-----------|---------|
-| 3.1 | Employees list | `/employees` | `prototype/employees.html` | List |
+| 3.1 | Employees list | `/employees` | `prototype/employees.html` | List + Gantt (view toggle) |
 | 3.2 | Employee profile | `/employees/[id]` | `prototype/employees.html` (drawer) | Detail + tabs |
+
+**View toggle on 3.1 (List | Gantt):**
+- **List view** (default): searchable, filterable directory table. Existing pattern.
+- **Gantt view**: resource schedule. Each employee is a row. Their project assignments are horizontal bars on a timeline (configurable window: 1 month, 3 months, 6 months). Bars are colored by project. Employees with no assignment in the selected future window are surfaced at the top with an amber "Unassigned" indicator. The AI flags these proactively in the command palette and in dashboard insight cards.
+- Filters in Gantt view: search by name, filter by project, filter by client, filter by assignment status (assigned/unassigned/on leave), filter by team. Same filter bar pattern as List view.
+- This view replaces the standalone `/planning` page. The Planning sidebar nav item is removed.
 
 Tabs on profile: Overview, Timesheets, Leaves, Expenses, Projects, Documents, Activity.
 
@@ -139,10 +145,21 @@ OCR latency goal p95 < 8 s. End-to-end submission goal < 30 s.
 
 | # | Page | Route | Prototype | Pattern |
 |---|------|-------|-----------|---------|
-| 7.1 | Clients list | `/clients` | `prototype/clients.html` | List |
+| 7.1 | Clients list | `/clients` | `prototype/clients.html` | List + Gantt (view toggle) |
 | 7.2 | Client detail | `/clients/[id]` | `prototype/clients.html` (drawer) | Detail + tabs |
-| 7.3 | Projects list | `/projects` | `prototype/projects.html` | List |
+| 7.3 | Projects list | `/projects` | `prototype/projects.html` | List + Gantt (view toggle) |
 | 7.4 | Project detail | `/projects/[id]` | `prototype/projects.html` (drawer) | Detail + tabs |
+
+**View toggle on 7.3 (List | Gantt):**
+- **List view** (default): existing searchable, filterable table. Board/Kanban view removed - it added complexity with no consulting-firm payoff.
+- **Gantt view**: project timeline. Each project is a row. Start/end dates are plotted as a bar with a progress fill. Color-coded by status (active/completed/pipeline/at-risk). Today marker. Configurable window: 3 months, 6 months, 12 months.
+- Filters: search by name, filter by client, filter by status, filter by phase.
+- This view absorbs the standalone `/gantt` page. The Gantt sidebar nav item is removed.
+
+**View toggle on 7.1 (List | Gantt):**
+- **List view** (default): existing directory.
+- **Gantt view**: client engagement timeline. Each client is a row. Their projects are bars on a timeline. Hovering a bar shows project name, status, and total billed. Useful for spotting clients with no active engagement (pipeline gap detection).
+- Filters: search by name, filter by industry, filter by status, filter by account manager.
 
 Client tabs: Overview, Projects, Invoices, Contacts, Documents, Activity.
 Project tabs: Overview, Team, Tasks, Time, Invoices, Files, Activity.
@@ -244,8 +261,14 @@ Gemini does NOT:
 
 | # | Page | Route | Prototype | Pattern |
 |---|------|-------|-----------|---------|
-| 9.1 | Admin console | `/admin` | `prototype/admin.html` | Settings |
-| 9.2 | Account settings | `/account` | `prototype/account.html` | Settings |
+| 9.1 | Admin console | `/admin` | `prototype/admin.html` | Settings (card-based, no tab overload) |
+| 9.2 | Account settings | `/account` | `prototype/account.html` | Profile-first layout |
+
+**Admin console (9.1) layout direction:**
+Not a settings page with 7 stacked tabs. Instead: a card grid. Each card is a domain (Users, Roles, Teams, Feature Flags, Audit Log, Security, Billing). Clicking a card expands it inline or navigates to a focused sub-page. The most-used action (invite user, toggle flag, export audit log) is one click from the card surface without navigating away. Density is high but calm - one card per domain, not one row per setting.
+
+**Account settings (9.2) layout direction:**
+Mirrors the employee profile layout. Large avatar anchored on the left (desktop: fixed-width left column, ~280px). Right side: a card grid of setting domains (Profile, Security, Notifications, Preferences, API tokens). Each card is a self-contained editable section - no full-page tab navigation. The user can see and edit everything without leaving the page. On mobile: avatar at top, cards stacked below.
 
 Admin sections: Users, Roles, Teams, Integrations, Billing, Audit Log, Security.
 Account sections: Profile, Security (MFA + passkeys + sessions), Notifications, Language, API tokens.
@@ -257,10 +280,12 @@ Account sections: Profile, Security (MFA + passkeys + sessions), Notifications, 
 | # | Page | Route | Prototype | Pattern | v1.0 scope |
 |---|------|-------|-----------|---------|------------|
 | 10.1 | Calendar | `/calendar` | `prototype/calendar.html` | Board | Month view only, read-only overlays |
-| 10.2 | Gantt | `/gantt` | `prototype/gantt.html` | Board | Read-only pan/zoom |
-| 10.3 | Planning | `/planning` | `prototype/planning.html` | Board | Read-only heatmap |
+| 10.2 | ~~Gantt~~ | ~~`/gantt`~~ | - | **ABSORBED** | Folded into Projects list (§7.3) and Clients list (§7.1) as a view toggle. Standalone page removed. Sidebar nav item removed. |
+| 10.3 | ~~Planning~~ | ~~`/planning`~~ | - | **ABSORBED** | Folded into Employees list (§3.1) as Gantt view. Standalone page removed. Sidebar nav item removed. |
 | 10.4 | HR | `/hr` | `prototype/hr.html` | Dashboard + list | Recruitment pipeline read-only |
 | 10.5 | Insights | `/insights` | `prototype/insights.html` | Dashboard | Ranked AI insights list |
+
+> **Architectural decision (2026-04-16):** Gantt and Planning were standalone pages that duplicated navigation for data already owned by Employees, Clients, and Projects. Moving them to view toggles on those list pages (List | Gantt) gives the same capability with a shorter sidebar, no dead-end navigation, and a consistent interaction pattern across all three core entity types. This is the deterministic view model: every list page in Gamma supports exactly the same set of view modes.
 
 ---
 
@@ -376,9 +401,9 @@ API: `POST /api/v1/feedback`. Rate-limited to 5 per day per user. Success toast 
 |-------|----------|
 | 2 | Foundation: auth infrastructure, tenancy middleware, migration runner, gated_feature decorator, ai/client.py, optimistic wrapper, ConflictResolver, operator console 11.1-11.3 minimum |
 | 3 | (app) auth pages 1.1-1.8, (ops) operator console full tier 11.1-11.13 |
-| 4 | People (3.x), Clients + Projects (7.1-7.4), Dashboard pass 1 (2.1), Operator console 11.14-11.18 |
-| 5 | Time (4.x) with week-as-entity, Leaves (5.x), Expenses (6.x), Invoices (8.x), Admin + Account (9.x), Dashboard pass 2 (2.1) |
-| 6 | Tier 2 pages (10.x), Portal (12.x) |
+| 4 | People (3.x) with List+Gantt view toggle, Clients + Projects (7.1-7.4) with List+Gantt view toggle, Dashboard pass 1 (2.1), Operator console 11.14-11.18 |
+| 5 | Time (4.x) with week-as-entity, Leaves (5.x), Expenses (6.x), Invoices (8.x), Admin + Account (9.x) redesigned layouts, Dashboard pass 2 (2.1) |
+| 6 | Remaining Tier 2 pages (10.1 Calendar, 10.4 HR, 10.5 Insights), Portal (12.x). Note: 10.2 Gantt and 10.3 Planning are already delivered as view modes in Phase 4. |
 | 7 | Hardening, polish batches, final flawless-gate passes |
 
 Each row in Tier 1 must pass the flawless gate before the next begins. Operator console work runs in parallel with (app) work during Phases 2-5 because it has its own route group.

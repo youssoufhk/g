@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { Modal } from "@/components/ui/modal";
+import { Select } from "@/components/ui/select";
 import {
   Table,
   THead,
@@ -26,7 +28,6 @@ import {
 } from "@/components/ui/table";
 import {
   useTimesheetWeek,
-  useSubmitTimesheet,
   getWeekDates,
 } from "@/features/timesheets/use-timesheets";
 import type { TimesheetEntry } from "@/features/timesheets/types";
@@ -259,17 +260,86 @@ function MobileEntryCard({ entry, edits }: { entry: TimesheetEntry; edits: CellE
   );
 }
 
+// ── Add project row modal ────────────────────────────────────────────────────
+
+const AVAILABLE_PROJECTS = [
+  { id: "p1", name: "HSBC Digital Transformation", client: "HSBC UK" },
+  { id: "p2", name: "BNP Risk Model", client: "BNP Paribas" },
+  { id: "p3", name: "TotalEnergies ESG Strategy", client: "TotalEnergies" },
+  { id: "p4", name: "Renault Lean Analytics", client: "Renault" },
+  { id: "p5", name: "Internal", client: "Gamma" },
+];
+
+function AddRowModal({
+  open,
+  existingIds,
+  onAdd,
+  onClose,
+}: {
+  open: boolean;
+  existingIds: string[];
+  onAdd: (project: { id: string; name: string; client: string }) => void;
+  onClose: () => void;
+}) {
+  const available = AVAILABLE_PROJECTS.filter((p) => !existingIds.includes(p.id));
+  const [selected, setSelected] = useState(available[0]?.id ?? "");
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Add project row"
+      description="Select a project to track hours for this week."
+      size="sm"
+      footer={
+        <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
+          <Button variant="ghost" size="md" onClick={onClose}>Cancel</Button>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => {
+              const proj = AVAILABLE_PROJECTS.find((p) => p.id === selected);
+              if (proj) { onAdd(proj); onClose(); }
+            }}
+          >
+            Add row
+          </Button>
+        </div>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+        <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>
+          Project
+        </label>
+        <Select value={selected} onChange={(e) => setSelected(e.target.value)}>
+          {available.map((p) => (
+            <option key={p.id} value={p.id}>{p.name} ({p.client})</option>
+          ))}
+        </Select>
+      </div>
+    </Modal>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TimesheetsPage() {
   const [currentWeekStart, setCurrentWeekStart] = useState<string>(getCurrentMonday);
   const [edits, setEdits] = useState<CellEdits>({});
+  const [weekStatus, setWeekStatus] = useState<"draft" | "submitted" | "approved">("draft");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addRowOpen, setAddRowOpen] = useState(false);
+  const [extraEntries, setExtraEntries] = useState<TimesheetEntry[]>([]);
 
   const { data: week, isLoading } = useTimesheetWeek(currentWeekStart);
-  const submitMutation = useSubmitTimesheet();
 
   const dates = getWeekDates(currentWeekStart);
   const weekendDates = new Set([dates[5], dates[6]]);
+
+  const baseEntries = week?.entries ?? [];
+  const entries = [...baseEntries, ...extraEntries];
+  const existingProjectIds = baseEntries.map((e) => e.project_id);
+  const isEmpty = !isLoading && entries.length === 0;
 
   function handleEdit(key: string, val: number) {
     setEdits((prev) => ({ ...prev, [key]: val }));
@@ -282,8 +352,7 @@ export default function TimesheetsPage() {
   }
 
   function getEffectiveDailyTotal(date: string): number {
-    if (!week) return 0;
-    return week.entries.reduce((sum, e) => {
+    return entries.reduce((sum, e) => {
       return sum + getEffectiveHours(e.id, date, e.hours[date] ?? 0);
     }, 0);
   }
@@ -295,50 +364,68 @@ export default function TimesheetsPage() {
   }
 
   function getEffectiveWeekTotal(): number {
-    if (!week) return 0;
-    return week.entries.reduce((sum, e) => sum + getEffectiveEntryTotal(e), 0);
+    return entries.reduce((sum, e) => sum + getEffectiveEntryTotal(e), 0);
   }
 
   const effectiveWeekTotal = getEffectiveWeekTotal();
   const targetHours = week?.target_hours ?? 40;
   const progressPct = targetHours > 0 ? Math.min(100, (effectiveWeekTotal / targetHours) * 100) : 0;
-  const progressTone = week?.status === "submitted" || week?.status === "approved"
+  const progressTone = weekStatus === "submitted" || weekStatus === "approved"
     ? "primary"
     : effectiveWeekTotal > targetHours
       ? "warning"
       : "primary";
 
-  const isSubmitted = week?.status === "submitted" || week?.status === "approved";
-  const canSubmit = !isSubmitted && effectiveWeekTotal > 0 && !submitMutation.isPending;
+  const isSubmitted = weekStatus === "submitted" || weekStatus === "approved";
+  const canSubmit = !isSubmitted && effectiveWeekTotal > 0 && !isSubmitting;
 
   function handlePrevWeek() {
     setCurrentWeekStart((prev) => addDays(prev, -7));
     setEdits({});
+    setWeekStatus("draft");
+    setExtraEntries([]);
   }
 
   function handleNextWeek() {
     setCurrentWeekStart((prev) => addDays(prev, 7));
     setEdits({});
+    setWeekStatus("draft");
+    setExtraEntries([]);
   }
 
   function handleToday() {
     setCurrentWeekStart(getCurrentMonday());
     setEdits({});
+    setWeekStatus("draft");
+    setExtraEntries([]);
   }
 
   function handleSubmit() {
     if (!canSubmit) return;
-    submitMutation.mutate(currentWeekStart);
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setWeekStatus("submitted");
+      setIsSubmitting(false);
+    }, 800);
   }
 
-  const entries = week?.entries ?? [];
-  const isEmpty = !isLoading && entries.length === 0;
+  function handleAddRow(project: { id: string; name: string; client: string }) {
+    const newEntry: TimesheetEntry = {
+      id: `extra-${project.id}`,
+      project_id: project.id,
+      project_name: project.name,
+      client_name: project.client,
+      hours: {},
+      total_hours: 0,
+    };
+    setExtraEntries((prev) => [...prev, newEntry]);
+  }
 
   return (
     <>
       <PageHeader
         title="Timesheets"
-        actions={week ? <StatusBadge status={week.status} /> : undefined}
+        actions={week ? <StatusBadge status={weekStatus} /> : undefined}
       />
 
       {/* Status bar */}
@@ -414,11 +501,11 @@ export default function TimesheetsPage() {
           variant="primary"
           size="sm"
           disabled={!canSubmit}
-          loading={submitMutation.isPending}
+          loading={isSubmitting}
           leadingIcon={isSubmitted ? <CheckCircle size={14} /> : <Send size={14} />}
           onClick={handleSubmit}
         >
-          {isSubmitted ? "Submitted" : "Submit week"}
+          {isSubmitting ? "Submitting..." : isSubmitted ? "Submitted" : "Submit week"}
         </Button>
       </div>
 
@@ -650,7 +737,7 @@ export default function TimesheetsPage() {
             variant="ghost"
             size="sm"
             leadingIcon={<Plus size={14} />}
-            onClick={() => console.log("[Timesheets] add project row")}
+            onClick={() => setAddRowOpen(true)}
           >
             Add project row
           </Button>
@@ -687,6 +774,13 @@ export default function TimesheetsPage() {
           </div>
         )}
       </div>
+
+      <AddRowModal
+        open={addRowOpen}
+        existingIds={existingProjectIds}
+        onAdd={handleAddRow}
+        onClose={() => setAddRowOpen(false)}
+      />
     </>
   );
 }

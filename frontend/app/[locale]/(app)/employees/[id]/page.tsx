@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import {
   Pencil,
@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
+import { Modal } from "@/components/ui/modal";
+import { Input } from "@/components/ui/input";
 import { useEmployee } from "@/features/employees/use-employees";
 
 function formatDate(iso: string): string {
@@ -87,6 +89,32 @@ export default function EmployeeProfilePage({
 }) {
   const { id } = use(params);
   const { data: employee, isLoading, error } = useEmployee(id);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const [activeTab, setActiveTab] = useState("overview");
+
+  function openEditModal() {
+    setEditName(employee?.name ?? "");
+    setEditTitle(employee?.title ?? "");
+    setShowEditModal(true);
+  }
+
+  function handleEditSave() {
+    setEditSaving(true);
+    setTimeout(() => {
+      setEditSaving(false);
+      setShowEditModal(false);
+    }, 800);
+  }
+
+  function handleExport() {
+    setExportLoading(true);
+    setTimeout(() => setExportLoading(false), 1200);
+  }
 
   if (error) {
     return (
@@ -260,6 +288,7 @@ export default function EmployeeProfilePage({
                 variant="secondary"
                 size="sm"
                 leadingIcon={<Pencil size={14} />}
+                onClick={openEditModal}
               >
                 Edit profile
               </Button>
@@ -278,15 +307,15 @@ export default function EmployeeProfilePage({
                   </Button>
                 )}
               >
-                <DropdownItem icon={<Receipt size={14} />}>
+                <DropdownItem icon={<Receipt size={14} />} onClick={() => setActiveTab("expenses")}>
                   View expenses
                 </DropdownItem>
-                <DropdownItem icon={<Umbrella size={14} />}>
+                <DropdownItem icon={<Umbrella size={14} />} onClick={() => setActiveTab("leaves")}>
                   View leaves
                 </DropdownItem>
                 <DropdownDivider />
-                <DropdownItem icon={<FileText size={14} />}>
-                  Export profile
+                <DropdownItem icon={<FileText size={14} />} onClick={handleExport}>
+                  {exportLoading ? "Exporting..." : "Export profile"}
                 </DropdownItem>
               </Dropdown>
             </div>
@@ -326,7 +355,7 @@ export default function EmployeeProfilePage({
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="overview">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="timesheets">Timesheets</TabsTrigger>
@@ -431,8 +460,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={Clock}
-                  title="Timesheets not yet wired"
-                  description="Weekly timesheet entries and approval status will appear here."
+                  title="No timesheet history"
+                  description="Timesheet entries and approval status will appear here once the employee starts logging time."
                 />
               </div>
             </div>
@@ -446,8 +475,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={Receipt}
-                  title="Expenses not yet wired"
-                  description="Submitted and approved expenses will appear here."
+                  title="No expenses"
+                  description="Submitted and approved expenses will appear here once the employee submits a claim."
                 />
               </div>
             </div>
@@ -461,8 +490,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={Umbrella}
-                  title="Leaves not yet wired"
-                  description="Annual leave, sick days, and balances will appear here."
+                  title="No leave requests"
+                  description="Annual leave, sick days, and leave balances will appear here."
                 />
               </div>
             </div>
@@ -476,14 +505,49 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={FileText}
-                  title="Documents not yet wired"
-                  description="Contracts and signed documents will appear here."
+                  title="No documents"
+                  description="Contracts and signed documents will appear here once uploaded."
                 />
               </div>
             </div>
           </div>
         </TabsContent>
       </Tabs>
+
+      <Modal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit profile"
+        footer={
+          <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
+            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" size="sm" onClick={handleEditSave} disabled={editSaving}>
+              {editSaving ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        }
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <div>
+            <label className="form-label" htmlFor="edit-name">Full name</label>
+            <Input
+              id="edit-name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="edit-title">Job title</label>
+            <Input
+              id="edit-title"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+            />
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

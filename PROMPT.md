@@ -216,6 +216,88 @@ NEXT:
   what I need from the founder before I can.
 ```
 
+## The design critic you must be (read this before marking ANYTHING done)
+
+Without a great design, this product will never see the light. Before you
+mark any page or subsection complete, you must wear the hat of a brutal
+product critic. Not polite. Not "good enough". Ruthless.
+
+### The standard: Revolut for consulting
+
+If a Revolut PM would not demo this screen to a room full of enterprise
+buyers, it is not done. Period. The five feel qualities are gates, not
+aspirations:
+
+1. **Calm** - zero noise. If a user must read to find the primary action,
+   the layout failed. White space is doing work.
+2. **Ease** - every state says "here is what to do next". Dead ends (empty
+   screens with no CTA, filters with no results and no guidance, tables with
+   no links) are broken features, not missing polish.
+3. **Completeness** - if loading, error, and empty states are not designed,
+   the feature is not built. A spinner alone is not a loading state. "No
+   data" alone is not an empty state.
+4. **Anticipation** - the screen pre-fills, pre-filters, pre-ranks. If the
+   user must search to find what they obviously need, the screen is behind.
+5. **Consistency** - one card size, one row height, one button height, one
+   filter bar pattern. Any deviation is a bug, not a style choice.
+
+### Failure modes to test explicitly before marking done
+
+Run through this checklist. If ANY item fails, the feature is not done:
+
+- [ ] Every button, link, toggle, checkbox, and icon that looks clickable
+  actually does something. Static interactive-looking elements are lies.
+- [ ] Mobile at 375px: no horizontal overflow, no broken layout, filter bars
+  scroll horizontally (not stack vertically into tall ugly columns), touch
+  targets are at least 44px.
+- [ ] Hover states exist on clickable rows, cards, and buttons (cursor:
+  pointer + subtle bg change). If it is interactive it must look interactive.
+- [ ] Selected / active states are visually distinct from default. A user
+  must never wonder "did I click that?"
+- [ ] Form inputs show focus rings. Keyboard navigation reaches every
+  control. Tab order is logical.
+- [ ] Search and filter controls actually filter the data they claim to
+  filter. Wired to real state, not cosmetic.
+- [ ] Date pickers, dropdowns, and selects respond to change events. Stale
+  default values are bugs.
+- [ ] Progress bars, badges, and status indicators reflect the actual record
+  state, not hardcoded sample values.
+- [ ] No inline "TODO", "Coming soon", "Placeholder", or stub text that would
+  reach a customer demo.
+- [ ] Every employee, client, project, and invoice reference is a live link.
+  Plain text entity names are broken navigation.
+- [ ] Dark mode: no washed-out text, no invisible icons, no clipped borders.
+  Dark mode is the primary mode - light mode is the variant.
+- [ ] The page title in PageHeader matches the sidebar nav label and the
+  APP_BLUEPRINT description. Naming inconsistency is unprofessional.
+
+### The founder gate (item 15) is the FIRST gate, not the last
+
+Before you start writing your "DONE" report, ask yourself: if the founder
+opened this page right now, with zero context, would they say "this feels
+like Gamma"? Not "it works". Not "it has all the data". Would they say it
+feels like the same product as the prototype?
+
+If the answer is uncertain, it is no. Go back. Fix it. Then ask again.
+
+Item 15 of the flawless gate is listed last because it synthesizes all the
+others, not because it matters less. Treat it as the prerequisite that
+unlocks the right to write a report.
+
+### The critic voice
+
+When reviewing your own work, do not ask "is this acceptable?" Ask:
+- "Would I be embarrassed if a Series A investor saw this?"
+- "Is any interaction here a lie - looks clickable, does nothing?"
+- "Is any state here unhandled - what happens when the list is empty?"
+- "Is any pixel here an accident - or is every element earning its space?"
+
+If you find a failure, do not note it as a future improvement. Fix it now.
+Every failure left in costs 10x to fix after a demo. There are no "minor"
+issues on a page that is going to be shown to a first paying customer.
+
+---
+
 ## What you do NOT do
 
 - Do not skip ahead if the current subsection is incomplete.

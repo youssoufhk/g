@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use } from "react";
+import { use, useState } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Modal } from "@/components/ui/modal";
+import { Input } from "@/components/ui/input";
 import { useClient } from "@/features/clients/use-clients";
 import type { Client } from "@/features/clients/types";
 
@@ -121,38 +123,33 @@ function OverviewTab({ client }: { client: Client }) {
             />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-              {/* Active project list */}
-              {Array.from({ length: client.active_projects }).map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "var(--space-3)",
-                    padding: "var(--space-3) var(--space-4)",
-                    borderBottom: i < client.active_projects - 1 ? "1px solid var(--color-border-subtle)" : "none",
-                  }}
-                >
-                  <FolderKanban size={16} style={{ color: "var(--color-text-3)", flexShrink: 0 }} aria-hidden />
-                  <div style={{ flex: 1 }}>
-                    {/* Click navigates to project detail page */}
-                    <span
-                      style={{
-                        fontWeight: "var(--weight-medium)",
-                        fontSize: "var(--text-body)",
-                        color: "var(--color-primary)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Project {i + 1}
-                    </span>
-                    <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-                      Active project
-                    </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "var(--space-3)",
+                  padding: "var(--space-4)",
+                  background: "var(--color-surface-1)",
+                  borderRadius: "var(--radius-md)",
+                }}
+              >
+                <FolderKanban size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
+                <div style={{ flex: 1 }}>
+                  <span
+                    style={{
+                      fontWeight: "var(--weight-medium)",
+                      fontSize: "var(--text-body-sm)",
+                      color: "var(--color-text-1)",
+                    }}
+                  >
+                    {client.active_projects} active {client.active_projects === 1 ? "project" : "projects"}
+                  </span>
+                  <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>
+                    See Projects tab for full details
                   </div>
-                  <Badge tone="success">Active</Badge>
                 </div>
-              ))}
+                <Badge tone="success">{client.active_projects}</Badge>
+              </div>
             </div>
           )}
         </CardBody>
@@ -227,12 +224,19 @@ function OverviewTab({ client }: { client: Client }) {
 
 // ── Placeholder tab ───────────────────────────────────────────────────────────
 
+const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {
+  Projects: "All projects for this client will appear here. Go to Projects to create one.",
+  Invoices: "All invoices for this client will appear here. Use the New Invoice button to create one.",
+  Team: "Team members allocated to this client will appear here once projects are assigned.",
+  Documents: "Contracts and signed documents for this client will appear here once uploaded.",
+};
+
 function PlaceholderTab({ icon: Icon, label }: { icon: typeof FileText; label: string }) {
   return (
     <EmptyState
       icon={Icon}
-      title={`${label}`}
-      description="No data available yet."
+      title={`No ${label.toLowerCase()} yet`}
+      description={PLACEHOLDER_DESCRIPTIONS[label] ?? `${label} will appear here once available.`}
     />
   );
 }
@@ -246,6 +250,36 @@ export default function ClientProfilePage({
 }) {
   const { id } = use(params);
   const { data: client, isLoading, error } = useClient(id);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editIndustry, setEditIndustry] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceAmount, setInvoiceAmount] = useState("");
+  const [invoiceDesc, setInvoiceDesc] = useState("");
+  const [invoiceSaving, setInvoiceSaving] = useState(false);
+
+  function openEdit() {
+    setEditName(client?.name ?? "");
+    setEditIndustry(client?.industry ?? "");
+    setShowEditModal(true);
+  }
+
+  function handleEditSave() {
+    setEditSaving(true);
+    setTimeout(() => { setEditSaving(false); setShowEditModal(false); }, 800);
+  }
+
+  function handleInvoiceSave() {
+    if (!invoiceAmount.trim()) return;
+    setInvoiceSaving(true);
+    setTimeout(() => {
+      setInvoiceSaving(false);
+      setShowInvoiceModal(false);
+      setInvoiceAmount("");
+      setInvoiceDesc("");
+    }, 800);
+  }
 
   if (isLoading) {
     return (
@@ -381,8 +415,8 @@ export default function ClientProfilePage({
 
             {/* Actions */}
             <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0 }}>
-              <Button variant="secondary" size="sm">Edit</Button>
-              <Button variant="primary" size="sm" leadingIcon={<Receipt size={14} aria-hidden />}>
+              <Button variant="secondary" size="sm" onClick={openEdit}>Edit</Button>
+              <Button variant="primary" size="sm" leadingIcon={<Receipt size={14} aria-hidden />} onClick={() => setShowInvoiceModal(true)}>
                 New invoice
               </Button>
             </div>
@@ -412,7 +446,7 @@ export default function ClientProfilePage({
         />
         <StatPill
           label="Open invoices"
-          value="0"
+          value="-"
           accent="warning"
         />
         <StatPill
@@ -469,6 +503,57 @@ export default function ClientProfilePage({
           }
         }
       `}</style>
+
+      <Modal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit client"
+        footer={
+          <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
+            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button variant="primary" size="sm" onClick={handleEditSave} disabled={editSaving}>
+              {editSaving ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        }
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <div>
+            <label className="form-label" htmlFor="edit-client-name">Company name</label>
+            <Input id="edit-client-name" value={editName} onChange={(e) => setEditName(e.target.value)} />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="edit-client-industry">Industry</label>
+            <Input id="edit-client-industry" value={editIndustry} onChange={(e) => setEditIndustry(e.target.value)} />
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        open={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        title="New invoice"
+        description={client ? `Create a new invoice for ${client.name}.` : "Create a new invoice."}
+        footer={
+          <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
+            <Button variant="secondary" size="sm" onClick={() => setShowInvoiceModal(false)}>Cancel</Button>
+            <Button variant="primary" size="sm" onClick={handleInvoiceSave} disabled={invoiceSaving || !invoiceAmount.trim()}>
+              {invoiceSaving ? "Creating..." : "Create invoice"}
+            </Button>
+          </div>
+        }
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <div>
+            <label className="form-label" htmlFor="invoice-amount">Amount ({client?.currency ?? "EUR"})</label>
+            <Input id="invoice-amount" type="number" placeholder="0.00" value={invoiceAmount} onChange={(e) => setInvoiceAmount(e.target.value)} />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="invoice-desc">Description</label>
+            <Input id="invoice-desc" placeholder="e.g. Consulting services - April 2026" value={invoiceDesc} onChange={(e) => setInvoiceDesc(e.target.value)} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

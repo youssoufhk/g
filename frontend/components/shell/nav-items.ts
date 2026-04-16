@@ -6,8 +6,6 @@ import {
   Umbrella,
   Receipt,
   Folder,
-  BarChart2,
-  CalendarRange,
   Building2,
   FileText,
   Users,
@@ -38,8 +36,6 @@ export type NavItem = {
     | "leaves"
     | "expenses"
     | "projects"
-    | "gantt"
-    | "planning"
     | "clients"
     | "invoices"
     | "employees"
@@ -75,8 +71,6 @@ export const navSections: NavSection[] = [
       { key: "projects", href: "/projects", icon: Folder, messageKey: "projects" },
       { key: "clients", href: "/clients", icon: Building2, messageKey: "clients" },
       { key: "calendar", href: "/calendar", icon: Calendar, messageKey: "calendar" },
-      { key: "gantt", href: "/gantt", icon: BarChart2, messageKey: "gantt" },
-      { key: "planning", href: "/planning", icon: CalendarRange, messageKey: "planning" },
     ],
   },
   {

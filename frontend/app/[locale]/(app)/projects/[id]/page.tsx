@@ -1,8 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useRef } from "react";
 import Link from "next/link";
-import { FolderOpen, CheckCircle, Circle } from "lucide-react";
+import { FolderOpen, CheckCircle, Circle, Plus, Check, Pencil, MoreHorizontal, FileText, UserPlus } from "lucide-react";
 
 import { EmptyState } from "@/components/patterns/empty-state";
 import { StatPill } from "@/components/patterns/stat-pill";
@@ -12,6 +12,9 @@ import { Avatar } from "@/components/ui/avatar";
 import { ProgressBar, type ProgressTone } from "@/components/ui/progress-bar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Modal } from "@/components/ui/modal";
+import { Input } from "@/components/ui/input";
+import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
 import { useProject } from "@/features/projects/use-projects";
 import type { ProjectPhase } from "@/features/projects/types";
 
@@ -75,6 +78,31 @@ export default function ProjectDetailPage({
 }) {
   const { id } = use(params);
   const { data: project, isLoading, error } = useProject(id);
+
+  const [completedOverrides, setCompletedOverrides] = useState<Record<number, boolean>>({});
+  const [localMilestones, setLocalMilestones] = useState<Array<{ name: string; date: string; complete: boolean }>>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newMilestoneName, setNewMilestoneName] = useState("");
+  const addInputRef = useRef<HTMLInputElement>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editProjectName, setEditProjectName] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+
+  function openEditModal() {
+    setEditProjectName(project?.name ?? "");
+    setShowEditModal(true);
+  }
+
+  function handleEditSave() {
+    setEditSaving(true);
+    setTimeout(() => { setEditSaving(false); setShowEditModal(false); }, 800);
+  }
+
+  function handleExport() {
+    setExportLoading(true);
+    setTimeout(() => setExportLoading(false), 1200);
+  }
 
   if (isLoading) {
     return (
@@ -230,12 +258,23 @@ export default function ProjectDetailPage({
           </div>
 
           <div style={{ display: "flex", gap: "var(--space-2)" }}>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" leadingIcon={<Pencil size={14} />} onClick={openEditModal}>
               Edit
             </Button>
-            <Button variant="ghost" size="sm">
-              More
-            </Button>
+            <Dropdown
+              align="right"
+              trigger={({ toggle, open }) => (
+                <Button variant="ghost" size="sm" iconOnly aria-label="More actions" aria-expanded={open} onClick={toggle}>
+                  <MoreHorizontal size={16} />
+                </Button>
+              )}
+            >
+              <DropdownItem icon={<UserPlus size={14} />}>Add team member</DropdownItem>
+              <DropdownDivider />
+              <DropdownItem icon={<FileText size={14} />} onClick={handleExport}>
+                {exportLoading ? "Exporting..." : "Export project"}
+              </DropdownItem>
+            </Dropdown>
           </div>
         </div>
       </div>
@@ -301,33 +340,167 @@ export default function ProjectDetailPage({
             <div className="card" style={{ padding: 0 }}>
               <div className="card-header">
                 <span className="card-title">Milestones</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowAddForm(true);
+                    setTimeout(() => addInputRef.current?.focus(), 0);
+                  }}
+                >
+                  <Plus size={14} />
+                  Add
+                </Button>
               </div>
               <div className="card-body" style={{ paddingTop: 0 }}>
-                {project.milestones && project.milestones.length > 0 ? (
+                {(project.milestones && project.milestones.length > 0) || localMilestones.length > 0 ? (
                   <div className="milestone-list">
-                    {project.milestones.map((m, i) => (
-                      <div key={i} className="milestone-item">
-                        <div
-                          className={`milestone-icon ${m.complete ? "complete" : "upcoming"}`}
-                        >
-                          {m.complete ? (
-                            <CheckCircle size={16} />
-                          ) : (
-                            <Circle size={16} />
-                          )}
-                        </div>
-                        <div className="milestone-content">
-                          <div className="milestone-name">{m.name}</div>
-                          <div className="milestone-dates">
-                            {new Date(m.date).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                    {[...(project.milestones ?? []), ...localMilestones].map((m, i) => {
+                      const isComplete = completedOverrides[i] ?? m.complete;
+                      return (
+                        <div key={i} className="milestone-item">
+                          <div
+                            className={`milestone-icon ${isComplete ? "complete" : "upcoming"}`}
+                            style={{ cursor: "pointer" }}
+                            title="Click to toggle complete"
+                            onClick={() =>
+                              setCompletedOverrides((prev) => ({
+                                ...prev,
+                                [i]: !(prev[i] ?? m.complete),
+                              }))
+                            }
+                          >
+                            {isComplete ? (
+                              <CheckCircle size={16} />
+                            ) : (
+                              <Circle size={16} />
+                            )}
+                          </div>
+                          <div className="milestone-content">
+                            <div className="milestone-name">{m.name}</div>
+                            <div className="milestone-dates">
+                              {new Date(m.date).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </div>
                           </div>
                         </div>
+                      );
+                    })}
+                    {showAddForm && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "var(--space-2)",
+                          paddingTop: "var(--space-3)",
+                        }}
+                      >
+                        <input
+                          ref={addInputRef}
+                          type="text"
+                          className="form-input"
+                          placeholder="Add milestone name..."
+                          value={newMilestoneName}
+                          onChange={(e) => setNewMilestoneName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && newMilestoneName.trim()) {
+                              setLocalMilestones((prev) => [
+                                ...prev,
+                                {
+                                  name: newMilestoneName.trim(),
+                                  date: new Date().toISOString(),
+                                  complete: false,
+                                },
+                              ]);
+                              setNewMilestoneName("");
+                              setShowAddForm(false);
+                            } else if (e.key === "Escape") {
+                              setNewMilestoneName("");
+                              setShowAddForm(false);
+                            }
+                          }}
+                          style={{ flex: 1, height: 32 }}
+                        />
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => {
+                            if (newMilestoneName.trim()) {
+                              setLocalMilestones((prev) => [
+                                ...prev,
+                                {
+                                  name: newMilestoneName.trim(),
+                                  date: new Date().toISOString(),
+                                  complete: false,
+                                },
+                              ]);
+                              setNewMilestoneName("");
+                              setShowAddForm(false);
+                            }
+                          }}
+                        >
+                          <Check size={14} />
+                        </Button>
                       </div>
-                    ))}
+                    )}
+                  </div>
+                ) : showAddForm ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "var(--space-2)",
+                    }}
+                  >
+                    <input
+                      ref={addInputRef}
+                      type="text"
+                      className="form-input"
+                      placeholder="Add milestone name..."
+                      value={newMilestoneName}
+                      onChange={(e) => setNewMilestoneName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newMilestoneName.trim()) {
+                          setLocalMilestones((prev) => [
+                            ...prev,
+                            {
+                              name: newMilestoneName.trim(),
+                              date: new Date().toISOString(),
+                              complete: false,
+                            },
+                          ]);
+                          setNewMilestoneName("");
+                          setShowAddForm(false);
+                        } else if (e.key === "Escape") {
+                          setNewMilestoneName("");
+                          setShowAddForm(false);
+                        }
+                      }}
+                      style={{ flex: 1, height: 32 }}
+                    />
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => {
+                        if (newMilestoneName.trim()) {
+                          setLocalMilestones((prev) => [
+                            ...prev,
+                            {
+                              name: newMilestoneName.trim(),
+                              date: new Date().toISOString(),
+                              complete: false,
+                            },
+                          ]);
+                          setNewMilestoneName("");
+                          setShowAddForm(false);
+                        }
+                      }}
+                    >
+                      <Check size={14} />
+                    </Button>
                   </div>
                 ) : (
                   <EmptyState title="No milestones" description="Milestones will appear here once added." />
@@ -417,6 +590,31 @@ export default function ProjectDetailPage({
           </div>
         </TabsContent>
       </Tabs>
+
+      <Modal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit project"
+        footer={
+          <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
+            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button variant="primary" size="sm" onClick={handleEditSave} disabled={editSaving}>
+              {editSaving ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        }
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <div>
+            <label className="form-label" htmlFor="edit-project-name">Project name</label>
+            <Input
+              id="edit-project-name"
+              value={editProjectName}
+              onChange={(e) => setEditProjectName(e.target.value)}
+            />
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

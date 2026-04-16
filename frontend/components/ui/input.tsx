@@ -15,6 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <input
       ref={ref}
       aria-invalid={invalid || undefined}
+      suppressHydrationWarning
       className={clsx(
         "form-input",
         size === "sm" && "form-input-sm",

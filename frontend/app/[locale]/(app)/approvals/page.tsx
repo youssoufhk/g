@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Receipt, Umbrella, CheckSquare, AlertCircle } from "lucide-react";
+import { Clock, Receipt, Umbrella, CheckSquare, AlertCircle, Search } from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
 import { StatPill } from "@/components/patterns/stat-pill";
@@ -62,8 +62,33 @@ const STATUS_BADGE_TONE: Record<ApprovalStatus, BadgeTone> = {
 
 // ── approval card ──────────────────────────────────────────────────────────
 
-function ApprovalCard({ item, showActions }: { item: ApprovalRequest; showActions: boolean }) {
+type ApprovalCardProps = {
+  item: ApprovalRequest;
+  showActions: boolean;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+};
+
+function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardProps) {
   const TypeIcon = TYPE_ICON[item.type];
+  const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+
+  function handleApprove() {
+    setApproving(true);
+    setTimeout(() => {
+      setApproving(false);
+      onApprove(item.id);
+    }, 800);
+  }
+
+  function handleReject() {
+    setRejecting(true);
+    setTimeout(() => {
+      setRejecting(false);
+      onReject(item.id);
+    }, 800);
+  }
 
   return (
     <div
@@ -148,6 +173,9 @@ function ApprovalCard({ item, showActions }: { item: ApprovalRequest; showAction
         }}
       >
         <Badge tone={TYPE_BADGE_TONE[item.type]}>{TYPE_LABEL[item.type]}</Badge>
+        <Badge tone={STATUS_BADGE_TONE[item.status]}>
+          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+        </Badge>
         {item.period && (
           <span
             style={{
@@ -180,7 +208,7 @@ function ApprovalCard({ item, showActions }: { item: ApprovalRequest; showAction
         )}
       </div>
 
-      {/* Row 4: actions (only in pending/all tabs) */}
+      {/* Row 4: actions (only when pending) */}
       {showActions && (
         <div
           style={{
@@ -193,24 +221,19 @@ function ApprovalCard({ item, showActions }: { item: ApprovalRequest; showAction
           <Button
             variant="primary"
             size="sm"
-            onClick={() => console.log("approve", item.id)}
+            onClick={handleApprove}
+            disabled={approving || rejecting}
           >
-            Approve
+            {approving ? "Approving..." : "Approve"}
           </Button>
           <Button
             variant="ghost"
             size="sm"
             style={{ color: "var(--color-error)" }}
-            onClick={() => console.log("reject", item.id)}
+            onClick={handleReject}
+            disabled={approving || rejecting}
           >
-            Reject
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => console.log("view", item.id)}
-          >
-            View details
+            {rejecting ? "Rejecting..." : "Reject"}
           </Button>
         </div>
       )}
@@ -234,40 +257,171 @@ function ApprovalListSkeleton() {
   );
 }
 
+// ── search bar ─────────────────────────────────────────────────────────────
+
+function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "var(--space-2)",
+        background: "var(--color-surface-1)",
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius-md)",
+        padding: "var(--space-2) var(--space-3)",
+        marginBottom: "var(--space-4)",
+      }}
+    >
+      <Search size={14} style={{ color: "var(--color-text-3)", flexShrink: 0 }} aria-hidden />
+      <input
+        type="search"
+        placeholder="Search by name, subject, or project..."
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          flex: 1,
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          fontSize: "var(--text-body-sm)",
+          color: "var(--color-text-1)",
+        }}
+      />
+    </div>
+  );
+}
+
 // ── pending tab ────────────────────────────────────────────────────────────
 
 function PendingTab() {
-  const { data: items, isLoading } = useApprovals({ status: "pending" });
+  const { data: rawItems, isLoading } = useApprovals({ status: "pending" });
+  const [localStatuses, setLocalStatuses] = useState<Record<string, ApprovalStatus>>({});
+  const [search, setSearch] = useState("");
+
+  function handleApprove(id: string) {
+    setLocalStatuses((prev) => ({ ...prev, [id]: "approved" }));
+  }
+
+  function handleReject(id: string) {
+    setLocalStatuses((prev) => ({ ...prev, [id]: "rejected" }));
+  }
 
   if (isLoading) return <ApprovalListSkeleton />;
 
-  if (!items || items.length === 0) {
-    return (
-      <EmptyState
-        icon={CheckSquare}
-        title="All caught up"
-        description="No pending requests at this time."
-      />
-    );
-  }
+  const allItems = rawItems ?? [];
+
+  // Apply local status overrides
+  const items = allItems
+    .map((item) =>
+      localStatuses[item.id] ? { ...item, status: localStatuses[item.id] as ApprovalStatus } : item
+    )
+    .filter((item) => item.status === "pending");
+
+  // Apply search
+  const filtered = search.trim()
+    ? items.filter(
+        (item) =>
+          item.requester_name.toLowerCase().includes(search.toLowerCase()) ||
+          item.subject.toLowerCase().includes(search.toLowerCase()) ||
+          (item.project_name ?? "").toLowerCase().includes(search.toLowerCase())
+      )
+    : items;
+
+  const pendingCount = items.length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-      {items.map((item) => (
-        <ApprovalCard key={item.id} item={item} showActions={true} />
-      ))}
-    </div>
+    <>
+      <SearchBar value={search} onChange={setSearch} />
+
+      {pendingCount > 0 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "var(--space-4)",
+          }}
+        >
+          <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-3)" }}>
+            {pendingCount} pending request{pendingCount !== 1 ? "s" : ""}
+          </span>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              items.forEach((item) => handleApprove(item.id));
+            }}
+          >
+            Approve all
+          </Button>
+        </div>
+      )}
+
+      {filtered.length === 0 && !search && (
+        <EmptyState
+          icon={CheckSquare}
+          title="All caught up"
+          description="No pending requests at this time."
+        />
+      )}
+
+      {filtered.length === 0 && search && (
+        <EmptyState
+          icon={Search}
+          title="No results"
+          description={`No pending requests match "${search}".`}
+        />
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+        {filtered.map((item) => (
+          <ApprovalCard
+            key={item.id}
+            item={item}
+            showActions={item.status === "pending"}
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
 // ── all tab ────────────────────────────────────────────────────────────────
 
 function AllTab() {
-  const { data: items, isLoading } = useApprovals({});
+  const { data: rawItems, isLoading } = useApprovals({});
+  const [localStatuses, setLocalStatuses] = useState<Record<string, ApprovalStatus>>({});
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<ApprovalType | "all">("all");
+
+  function handleApprove(id: string) {
+    setLocalStatuses((prev) => ({ ...prev, [id]: "approved" }));
+  }
+
+  function handleReject(id: string) {
+    setLocalStatuses((prev) => ({ ...prev, [id]: "rejected" }));
+  }
 
   if (isLoading) return <ApprovalListSkeleton />;
 
-  if (!items || items.length === 0) {
+  const items = (rawItems ?? []).map((item) =>
+    localStatuses[item.id] ? { ...item, status: localStatuses[item.id] as ApprovalStatus } : item
+  );
+
+  const filtered = items.filter((item) => {
+    const matchSearch =
+      !search.trim() ||
+      item.requester_name.toLowerCase().includes(search.toLowerCase()) ||
+      item.subject.toLowerCase().includes(search.toLowerCase()) ||
+      (item.project_name ?? "").toLowerCase().includes(search.toLowerCase());
+    const matchType = typeFilter === "all" || item.type === typeFilter;
+    return matchSearch && matchType;
+  });
+
+  if (items.length === 0) {
     return (
       <EmptyState
         icon={CheckSquare}
@@ -278,11 +432,70 @@ function AllTab() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-      {items.map((item) => (
-        <ApprovalCard key={item.id} item={item} showActions={item.status === "pending"} />
-      ))}
-    </div>
+    <>
+      <div
+        style={{
+          display: "flex",
+          gap: "var(--space-3)",
+          marginBottom: "var(--space-4)",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <SearchBar value={search} onChange={setSearch} />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            background: "var(--color-surface-1)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            overflow: "hidden",
+          }}
+        >
+          {(["all", "timesheet", "expense", "leave"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTypeFilter(t)}
+              style={{
+                padding: "var(--space-1-5) var(--space-3)",
+                fontSize: "var(--text-sm)",
+                fontWeight: "var(--weight-medium)",
+                color: typeFilter === t ? "var(--color-text-1)" : "var(--color-text-3)",
+                background: typeFilter === t ? "var(--color-surface-0)" : "transparent",
+                border: "none",
+                cursor: "pointer",
+                textTransform: "capitalize",
+              }}
+            >
+              {t === "all" ? "All" : TYPE_LABEL[t]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          title="No results"
+          description="No requests match your filters."
+        />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          {filtered.map((item) => (
+            <ApprovalCard
+              key={item.id}
+              item={item}
+              showActions={item.status === "pending"}
+              onApprove={handleApprove}
+              onReject={handleReject}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -290,6 +503,7 @@ function AllTab() {
 
 function HistoryTab() {
   const { data: items, isLoading } = useApprovals({});
+  const [search, setSearch] = useState("");
 
   const history = items?.filter((a) => a.status !== "pending") ?? [];
 
@@ -305,89 +519,106 @@ function HistoryTab() {
     );
   }
 
+  const filtered = search.trim()
+    ? history.filter(
+        (item) =>
+          item.requester_name.toLowerCase().includes(search.toLowerCase()) ||
+          item.subject.toLowerCase().includes(search.toLowerCase())
+      )
+    : history;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-      {history.map((item) => {
-        const TypeIcon = TYPE_ICON[item.type];
-        return (
-          <div
-            key={item.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-4)",
-              padding: "var(--space-3) var(--space-4)",
-              background: "var(--color-surface-0)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-lg)",
-            }}
-          >
-            <Avatar
-              name={item.requester_name}
-              colorIndex={item.requester_avatar_color_index}
-              size="sm"
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontWeight: "var(--weight-semibold)",
-                  fontSize: "var(--text-body-sm)",
-                  color: "var(--color-text-1)",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {item.requester_name}
+    <>
+      <SearchBar value={search} onChange={setSearch} />
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+        {filtered.map((item) => {
+          const TypeIcon = TYPE_ICON[item.type];
+          return (
+            <div
+              key={item.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-4)",
+                padding: "var(--space-3) var(--space-4)",
+                background: "var(--color-surface-0)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-lg)",
+              }}
+            >
+              <Avatar
+                name={item.requester_name}
+                colorIndex={item.requester_avatar_color_index}
+                size="sm"
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontWeight: "var(--weight-semibold)",
+                    fontSize: "var(--text-body-sm)",
+                    color: "var(--color-text-1)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {item.requester_name}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-1)",
+                    marginTop: "var(--space-0-5)",
+                    fontSize: "var(--text-caption)",
+                    color: "var(--color-text-2)",
+                  }}
+                >
+                  <TypeIcon size={12} aria-hidden />
+                  <span>{item.subject}</span>
+                </div>
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "var(--space-1)",
-                  marginTop: "var(--space-0-5)",
-                  fontSize: "var(--text-caption)",
-                  color: "var(--color-text-2)",
-                }}
-              >
-                <TypeIcon size={12} aria-hidden />
-                <span>{item.subject}</span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "var(--space-1)", flexShrink: 0 }}>
+                <Badge tone={STATUS_BADGE_TONE[item.status]}>
+                  {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                </Badge>
+                {item.reviewer_note && (
+                  <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+                    {item.reviewer_note}
+                  </span>
+                )}
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "var(--space-1)", flexShrink: 0 }}>
-              <Badge tone={STATUS_BADGE_TONE[item.status]}>
-                {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-              </Badge>
-              {item.reviewer_note && (
-                <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-                  {item.reviewer_note}
-                </span>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
 // ── page ────────────────────────────────────────────────────────────────────
 
 export default function ApprovalsPage() {
+  const { data: allItems } = useApprovals({});
+
+  const pendingCount = allItems?.filter((a) => a.status === "pending").length ?? 0;
+  const highUrgencyCount = allItems?.filter((a) => a.status === "pending" && a.urgency === "high").length ?? 0;
+  const approvedThisWeek = allItems?.filter((a) => a.status === "approved").length ?? 0;
+
   return (
     <>
       <PageHeader title="Approvals" />
 
       <div className="kpi-grid" style={{ marginBottom: "var(--space-6)" }}>
-        <StatPill label="Pending" value="4" accent="warning" />
-        <StatPill label="High urgency" value="1" accent="error" />
-        <StatPill label="Approved this week" value="2" accent="success" />
+        <StatPill label="Pending" value={pendingCount} accent="warning" />
+        <StatPill label="High urgency" value={highUrgencyCount} accent="error" />
+        <StatPill label="Approved this week" value={approvedThisWeek} accent="success" />
         <StatPill label="Avg response time" value="< 1 day" accent="info" />
       </div>
 
       <Tabs defaultValue="pending">
         <TabsList>
-          <TabsTrigger value="pending">Pending (4)</TabsTrigger>
+          <TabsTrigger value="pending" count={pendingCount > 0 ? pendingCount : undefined}>Pending</TabsTrigger>
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>

@@ -7,34 +7,17 @@ import {
   Tablet,
   Globe,
   Key,
-  Bell,
   Shield,
-  Users,
+  Camera,
+  Bell,
 } from "lucide-react";
 
-import { PageHeader } from "@/components/patterns/page-header";
-import {
-  DataTableWrapper,
-  Table,
-  THead,
-  TBody,
-  TR,
-  TH,
-  TD,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,6 +27,7 @@ type ProfileForm = {
   name: string;
   email: string;
   jobTitle: string;
+  department: string;
   timezone: string;
   language: string;
 };
@@ -51,6 +35,7 @@ type ProfileForm = {
 type NotificationPref = {
   id: string;
   label: string;
+  description: string;
   enabled: boolean;
 };
 
@@ -69,537 +54,117 @@ type Session = {
 // ---------------------------------------------------------------------------
 
 const INITIAL_PREFS: NotificationPref[] = [
-  { id: "ts-approved", label: "Email me when a timesheet is approved", enabled: true },
-  { id: "exp-approved", label: "Email me when an expense is approved", enabled: true },
-  { id: "inv-paid", label: "Email me when an invoice is paid", enabled: true },
-  { id: "weekly-summary", label: "Weekly summary email every Monday", enabled: true },
-  { id: "ai-insights", label: "AI insight alerts", enabled: false },
-  { id: "team-digest", label: "Team activity digest", enabled: false },
+  { id: "ts-approved", label: "Timesheet approved", description: "When your timesheet is approved or rejected", enabled: true },
+  { id: "exp-approved", label: "Expense approved", description: "When an expense claim is approved or rejected", enabled: true },
+  { id: "inv-paid", label: "Invoice paid", description: "When a client invoice is marked as paid", enabled: true },
+  { id: "weekly-summary", label: "Weekly summary", description: "Monday morning digest of last week", enabled: true },
+  { id: "ai-insights", label: "AI insights", description: "Anomaly alerts from the AI agent", enabled: false },
+  { id: "team-digest", label: "Team digest", description: "Daily activity summary from your team", enabled: false },
 ];
 
 const SESSIONS: Session[] = [
-  {
-    id: "s1",
-    device: "MacBook Pro",
-    deviceIcon: "desktop",
-    browser: "Chrome 123",
-    location: "Paris, France",
-    lastActive: "Active now",
-    isCurrent: true,
-  },
-  {
-    id: "s2",
-    device: "iPhone 15",
-    deviceIcon: "mobile",
-    browser: "Safari 17",
-    location: "London, UK",
-    lastActive: "2 hours ago",
-    isCurrent: false,
-  },
-  {
-    id: "s3",
-    device: "iPad",
-    deviceIcon: "tablet",
-    browser: "Chrome 120",
-    location: "Paris, France",
-    lastActive: "5 days ago",
-    isCurrent: false,
-  },
+  { id: "s1", device: "MacBook Pro", deviceIcon: "desktop", browser: "Chrome 123", location: "Paris, France", lastActive: "Active now", isCurrent: true },
+  { id: "s2", device: "iPhone 15", deviceIcon: "mobile", browser: "Safari 17", location: "London, UK", lastActive: "2 hours ago", isCurrent: false },
+  { id: "s3", device: "iPad", deviceIcon: "tablet", browser: "Chrome 120", location: "Paris, France", lastActive: "5 days ago", isCurrent: false },
 ];
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return (parts[0] ?? "").slice(0, 2).toUpperCase();
+  return ((parts[0]?.[0] ?? "") + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase();
+}
+
+function DeviceIcon({ type }: { type: Session["deviceIcon"] }) {
+  const size = 15;
+  switch (type) {
+    case "mobile": return <Smartphone size={size} />;
+    case "tablet": return <Tablet size={size} />;
+    default: return <Monitor size={size} />;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Change Password Modal
 // ---------------------------------------------------------------------------
 
-function ChangePasswordModal({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+function ChangePasswordModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handleSave() {
-    console.log("Password change submitted");
-    setCurrent("");
-    setNext("");
-    setConfirm("");
-    onClose();
+    if (!current || !next || !confirm) { setError("All fields are required."); return; }
+    if (next !== confirm) { setError("New passwords do not match."); return; }
+    if (next.length < 8) { setError("Password must be at least 8 characters."); return; }
+    setError(null);
+    setSaving(true);
+    setTimeout(() => { setSaving(false); setCurrent(""); setNext(""); setConfirm(""); onClose(); }, 800);
   }
 
+  const label = (text: string, htmlFor: string) => (
+    <label htmlFor={htmlFor} style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>
+      {text}
+    </label>
+  );
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Change password"
-      size="sm"
+    <Modal open={open} onClose={onClose} title="Change password" size="sm"
       footer={
         <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" size="sm" onClick={handleSave}>
-            Save password
+          <Button variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
+          <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? "Saving..." : "Save password"}
           </Button>
         </div>
       }
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <div>{label("Current password", "pwd-current")}<Input id="pwd-current" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" /></div>
+        <div>{label("New password", "pwd-new")}<Input id="pwd-new" type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" /></div>
         <div>
-          <label
-            htmlFor="pwd-current"
-            className="text-2"
-            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-          >
-            Current password
-          </label>
-          <Input
-            id="pwd-current"
-            type="password"
-            value={current}
-            onChange={(e) => setCurrent(e.target.value)}
-            autoComplete="current-password"
-          />
+          {label("Confirm new password", "pwd-confirm")}
+          <Input id="pwd-confirm" type="password" value={confirm} onChange={(e) => { setConfirm(e.target.value); setError(null); }} autoComplete="new-password" />
         </div>
-        <div>
-          <label
-            htmlFor="pwd-new"
-            className="text-2"
-            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-          >
-            New password
-          </label>
-          <Input
-            id="pwd-new"
-            type="password"
-            value={next}
-            onChange={(e) => setNext(e.target.value)}
-            autoComplete="new-password"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="pwd-confirm"
-            className="text-2"
-            style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-          >
-            Confirm new password
-          </label>
-          <Input
-            id="pwd-confirm"
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            autoComplete="new-password"
-          />
-        </div>
+        {error && (
+          <div style={{ fontSize: "var(--text-body-sm)", color: "var(--color-error)", padding: "var(--space-2) var(--space-3)", background: "var(--color-error-muted)", borderRadius: "var(--radius-md)" }}>
+            {error}
+          </div>
+        )}
       </div>
     </Modal>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Profile tab
+// Section heading (shared across all setting sections)
 // ---------------------------------------------------------------------------
 
-function ProfileTab() {
-  const [form, setForm] = useState<ProfileForm>({
-    name: "Youssouf Hassan",
-    email: "youssouf@globalid.uk",
-    jobTitle: "Founder & CEO",
-    timezone: "Europe/Paris",
-    language: "English",
-  });
-
-  function handleChange(field: keyof ProfileForm, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  function handleSave() {
-    console.log("Profile saved:", form);
-  }
-
+function SectionHeading({ icon, title, description }: { icon: React.ReactNode; title: string; description?: string }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "200px 1fr",
-        gap: "var(--space-8)",
-        alignItems: "start",
-      }}
-    >
-      {/* Left: avatar block */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "var(--space-3)",
-          textAlign: "center",
-        }}
-      >
-        <Avatar name={form.name} colorIndex={0} size="xl" />
-        <Button variant="ghost" size="sm">
-          Change photo
-        </Button>
-        <div>
-          <h2
-            className="text-1"
-            style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-heading-3)", margin: 0 }}
-          >
-            {form.name}
-          </h2>
-          <div className="text-3" style={{ fontSize: "var(--text-body-sm)", marginTop: "var(--space-1)" }}>
-            Owner
-          </div>
-        </div>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", marginBottom: "var(--space-5)" }}>
+      <div style={{
+        width: 32, height: 32, borderRadius: "var(--radius-md)",
+        backgroundColor: "var(--color-surface-2)", display: "flex", alignItems: "center",
+        justifyContent: "center", flexShrink: 0, color: "var(--color-text-2)",
+      }}>
+        {icon}
       </div>
-
-      {/* Right: form */}
-      <div className="card">
-        <div className="card-header">
-          <span className="card-title">Profile details</span>
+      <div>
+        <div style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)" }}>
+          {title}
         </div>
-        <div className="card-body">
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-            <div>
-              <label
-                htmlFor="profile-name"
-                className="text-2"
-                style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-              >
-                Full name
-              </label>
-              <Input
-                id="profile-name"
-                value={form.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="profile-email"
-                className="text-2"
-                style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-              >
-                Email address
-              </label>
-              <Input
-                id="profile-email"
-                type="email"
-                value={form.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="profile-title"
-                className="text-2"
-                style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-              >
-                Job title
-              </label>
-              <Input
-                id="profile-title"
-                value={form.jobTitle}
-                onChange={(e) => handleChange("jobTitle", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="profile-timezone"
-                className="text-2"
-                style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-              >
-                Timezone
-              </label>
-              <Select
-                id="profile-timezone"
-                value={form.timezone}
-                onChange={(e) => handleChange("timezone", e.target.value)}
-              >
-                <option value="Europe/Paris">Europe/Paris</option>
-                <option value="Europe/London">Europe/London</option>
-                <option value="America/New_York">America/New_York</option>
-                <option value="Asia/Tokyo">Asia/Tokyo</option>
-              </Select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="profile-language"
-                className="text-2"
-                style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)" }}
-              >
-                Language
-              </label>
-              <Select
-                id="profile-language"
-                value={form.language}
-                onChange={(e) => handleChange("language", e.target.value)}
-              >
-                <option value="English">English</option>
-                <option value="French">French</option>
-              </Select>
-            </div>
-
-            <div style={{ paddingTop: "var(--space-2)" }}>
-              <Button variant="primary" size="sm" onClick={handleSave}>
-                Save changes
-              </Button>
-            </div>
+        {description && (
+          <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>
+            {description}
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Security tab
-// ---------------------------------------------------------------------------
-
-function SecurityTab() {
-  const [pwdModalOpen, setPwdModalOpen] = useState(false);
-
-  return (
-    <>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)", maxWidth: 560 }}>
-
-        {/* Password card */}
-        <div className="card">
-          <div className="card-header">
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-              <Key size={16} className="text-3" />
-              <span className="card-title" style={{ margin: 0 }}>Password</span>
-            </div>
-          </div>
-          <div className="card-body">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-4)" }}>
-              <span className="text-3" style={{ fontSize: "var(--text-body-sm)" }}>
-                Last changed 30 days ago
-              </span>
-              <Button variant="secondary" size="sm" onClick={() => setPwdModalOpen(true)}>
-                Change password
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* 2FA card */}
-        <div className="card">
-          <div className="card-header">
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-              <Shield size={16} className="text-3" />
-              <span className="card-title" style={{ margin: 0 }}>Two-factor authentication</span>
-            </div>
-          </div>
-          <div className="card-body">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-4)" }}>
-              <Badge tone="default">Inactive</Badge>
-              <Button variant="secondary" size="sm">
-                Enable 2FA
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Active sessions card */}
-        <div className="card">
-          <div className="card-header">
-            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-              <Monitor size={16} className="text-3" />
-              <span className="card-title" style={{ margin: 0 }}>Active sessions</span>
-            </div>
-          </div>
-          <div className="card-body" style={{ padding: 0 }}>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {[
-                { label: "This device", detail: "Chrome / Mac - Paris", active: true },
-                { label: "iPhone", detail: "Safari - London", active: false, lastSeen: "2h ago" },
-              ].map((s, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "var(--space-4) var(--space-5)",
-                    borderBottom: i === 0 ? "1px solid var(--color-border)" : undefined,
-                    gap: "var(--space-4)",
-                  }}
-                >
-                  <div>
-                    <div className="text-1" style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)" }}>
-                      {s.label}
-                    </div>
-                    <div className="text-3" style={{ fontSize: "var(--text-caption)" }}>
-                      {s.detail} {s.active ? (
-                        <Badge tone="success" dot>Active now</Badge>
-                      ) : (
-                        <span>- {s.lastSeen}</span>
-                      )}
-                    </div>
-                  </div>
-                  {!s.active && (
-                    <Button variant="ghost" size="sm">
-                      Revoke
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <ChangePasswordModal open={pwdModalOpen} onClose={() => setPwdModalOpen(false)} />
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Notifications tab
-// ---------------------------------------------------------------------------
-
-function NotificationsTab() {
-  const [prefs, setPrefs] = useState<NotificationPref[]>(INITIAL_PREFS);
-
-  function toggle(id: string) {
-    setPrefs((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p))
-    );
-  }
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", maxWidth: 560 }}>
-      {prefs.map((pref) => (
-        <div
-          key={pref.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "var(--color-surface-1)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-lg)",
-            padding: "var(--space-4)",
-            gap: "var(--space-4)",
-          }}
-        >
-          <span
-            className="text-2"
-            style={{ fontSize: "var(--text-body-sm)" }}
-          >
-            {pref.label}
-          </span>
-          <Toggle
-            checked={pref.enabled}
-            onCheckedChange={() => toggle(pref.id)}
-            label={pref.label}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Sessions tab
-// ---------------------------------------------------------------------------
-
-function DeviceIcon({ type }: { type: Session["deviceIcon"] }) {
-  const size = 16;
-  switch (type) {
-    case "mobile":
-      return <Smartphone size={size} />;
-    case "tablet":
-      return <Tablet size={size} />;
-    default:
-      return <Monitor size={size} />;
-  }
-}
-
-function SessionsTab() {
-  const [sessions, setSessions] = useState<Session[]>(SESSIONS);
-
-  function revoke(id: string) {
-    console.log("Revoke session:", id);
-    setSessions((prev) => prev.filter((s) => s.id !== id));
-  }
-
-  function revokeAll() {
-    console.log("Revoke all other sessions");
-    setSessions((prev) => prev.filter((s) => s.isCurrent));
-  }
-
-  return (
-    <div style={{ maxWidth: 700 }}>
-      <DataTableWrapper>
-        <Table>
-          <THead>
-            <TR>
-              <TH>Device</TH>
-              <TH>Browser</TH>
-              <TH>Location</TH>
-              <TH>Last active</TH>
-              <TH style={{ width: 80 }} />
-            </TR>
-          </THead>
-          <TBody>
-            {sessions.map((session) => (
-              <TR key={session.id}>
-                <TD>
-                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", color: "var(--color-text-3)" }}>
-                    <DeviceIcon type={session.deviceIcon} />
-                    <span className="text-1" style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-1)" }}>
-                      {session.device}
-                    </span>
-                  </div>
-                </TD>
-                <TD muted style={{ fontSize: "var(--text-body-sm)" }}>
-                  {session.browser}
-                </TD>
-                <TD muted style={{ fontSize: "var(--text-body-sm)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-                    <Globe size={12} />
-                    {session.location}
-                  </div>
-                </TD>
-                <TD muted style={{ fontSize: "var(--text-body-sm)" }}>
-                  {session.isCurrent ? (
-                    <Badge tone="success" dot>Active now</Badge>
-                  ) : (
-                    session.lastActive
-                  )}
-                </TD>
-                <TD style={{ width: 80 }}>
-                  {!session.isCurrent && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => revoke(session.id)}
-                    >
-                      Revoke
-                    </Button>
-                  )}
-                </TD>
-              </TR>
-            ))}
-          </TBody>
-        </Table>
-      </DataTableWrapper>
-
-      <div style={{ marginTop: "var(--space-4)" }}>
-        <Button variant="secondary" size="sm" onClick={revokeAll}>
-          Revoke all other sessions
-        </Button>
+        )}
       </div>
     </div>
   );
@@ -610,42 +175,270 @@ function SessionsTab() {
 // ---------------------------------------------------------------------------
 
 export default function AccountPage() {
+  const [form, setForm] = useState<ProfileForm>({
+    name: "Youssouf Kerzika",
+    email: "youssouf.kerzika@globalg.consulting",
+    jobTitle: "Founding Director",
+    department: "Leadership",
+    timezone: "Europe/Paris",
+    language: "English",
+  });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  const [pwdModalOpen, setPwdModalOpen] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [mfaToggling, setMfaToggling] = useState(false);
+
+  const [sessions, setSessions] = useState<Session[]>(SESSIONS);
+  const [prefs, setPrefs] = useState<NotificationPref[]>(INITIAL_PREFS);
+
+  function handleChange(field: keyof ProfileForm, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setProfileSaved(false);
+  }
+
+  function handleSave() {
+    setProfileSaving(true);
+    setTimeout(() => { setProfileSaving(false); setProfileSaved(true); }, 800);
+  }
+
+  function handleToggleMfa() {
+    setMfaToggling(true);
+    setTimeout(() => { setMfaToggling(false); setMfaEnabled((v) => !v); }, 800);
+  }
+
+  const label = (text: string, htmlFor: string, hint?: string) => (
+    <div style={{ marginBottom: "var(--space-2)" }}>
+      <label htmlFor={htmlFor} style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>
+        {text}
+      </label>
+      {hint && <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginLeft: "var(--space-2)" }}>{hint}</span>}
+    </div>
+  );
+
   return (
     <>
-      <PageHeader title="Account" />
+      <ChangePasswordModal open={pwdModalOpen} onClose={() => setPwdModalOpen(false)} />
 
-      <Tabs defaultValue="profile">
-        <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="profile">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <ProfileTab />
+      {/* Profile identity hero - part of the page, not a card */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "var(--space-5)",
+        padding: "var(--space-6) 0 var(--space-6)",
+        borderBottom: "1px solid var(--color-border)",
+        marginBottom: "var(--space-6)",
+        flexWrap: "wrap",
+      }}>
+        {/* Avatar with photo change overlay */}
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: "50%",
+            backgroundColor: "var(--color-primary)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "var(--text-heading-2)", fontWeight: "bold", color: "#fff",
+          }}>
+            {getInitials(form.name)}
           </div>
-        </TabsContent>
+          <button
+            onClick={() => { const i = document.createElement("input"); i.type = "file"; i.accept = "image/*"; i.click(); }}
+            title="Change photo"
+            style={{
+              position: "absolute", bottom: 0, right: 0,
+              width: 24, height: 24, borderRadius: "50%",
+              backgroundColor: "var(--color-surface-0)",
+              border: "2px solid var(--color-border)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", color: "var(--color-text-2)",
+            }}
+          >
+            <Camera size={11} />
+          </button>
+        </div>
 
-        <TabsContent value="security">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <SecurityTab />
+        {/* Identity text */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: "var(--text-heading-2)", fontWeight: "var(--weight-bold)", color: "var(--color-text-1)", lineHeight: 1.2 }}>
+            {form.name}
           </div>
-        </TabsContent>
+          <div style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-3)", marginTop: "var(--space-1)" }}>
+            {form.jobTitle}
+            {form.department ? <span style={{ color: "var(--color-text-3)" }}> &middot; {form.department}</span> : null}
+          </div>
+          <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: "var(--space-1)" }}>
+            {form.email}
+          </div>
+        </div>
 
-        <TabsContent value="notifications">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <NotificationsTab />
-          </div>
-        </TabsContent>
+        {/* Role badge + owner pill */}
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexShrink: 0 }}>
+          <Badge tone="primary">Owner</Badge>
+          <Badge tone="success" dot>Active</Badge>
+        </div>
+      </div>
 
-        <TabsContent value="sessions">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <SessionsTab />
+      {/* Settings cards - 2 column grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--space-5)" }} className="account-grid">
+
+        {/* Profile card - full width */}
+        <div className="card" style={{ gridColumn: "1 / -1" }}>
+          <div className="card-body">
+            <SectionHeading icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>} title="Profile" description="Your name, title, and regional preferences" />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--space-4)" }} className="profile-form-grid">
+              <div>
+                {label("Full name", "profile-name")}
+                <Input id="profile-name" value={form.name} onChange={(e) => handleChange("name", e.target.value)} />
+              </div>
+              <div>
+                {label("Email address", "profile-email", "Contact support to change")}
+                <Input id="profile-email" type="email" value={form.email} readOnly style={{ opacity: 0.55, cursor: "not-allowed" }} onChange={() => {}} />
+              </div>
+              <div>
+                {label("Job title", "profile-title")}
+                <Input id="profile-title" value={form.jobTitle} onChange={(e) => handleChange("jobTitle", e.target.value)} />
+              </div>
+              <div>
+                {label("Department", "profile-dept")}
+                <Input id="profile-dept" value={form.department} onChange={(e) => handleChange("department", e.target.value)} />
+              </div>
+              <div>
+                {label("Timezone", "profile-tz")}
+                <Select id="profile-tz" value={form.timezone} onChange={(e) => handleChange("timezone", e.target.value)}>
+                  <option value="Europe/Paris">Europe/Paris (CET)</option>
+                  <option value="Europe/London">Europe/London (GMT)</option>
+                  <option value="America/New_York">America/New_York (ET)</option>
+                  <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                </Select>
+              </div>
+              <div>
+                {label("Language", "profile-lang")}
+                <Select id="profile-lang" value={form.language} onChange={(e) => handleChange("language", e.target.value)}>
+                  <option value="English">English</option>
+                  <option value="French">French</option>
+                </Select>
+              </div>
+            </div>
+            <div style={{ paddingTop: "var(--space-5)", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "var(--space-3)", borderTop: "1px solid var(--color-border)", marginTop: "var(--space-5)" }}>
+              {profileSaved && <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-success)" }}>Saved</span>}
+              <Button variant="primary" size="sm" onClick={handleSave} disabled={profileSaving}>
+                {profileSaving ? "Saving..." : "Save changes"}
+              </Button>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+
+        {/* Security card */}
+        <div className="card">
+          <div className="card-body">
+            <SectionHeading icon={<Key size={15} />} title="Security" description="Password and two-factor authentication" />
+
+            {/* Password row */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "var(--space-4)", borderBottom: "1px solid var(--color-border)", gap: "var(--space-4)" }}>
+              <div>
+                <div style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-1)" }}>Password</div>
+                <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>Last changed 30 days ago</div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => setPwdModalOpen(true)}>Change</Button>
+            </div>
+
+            {/* 2FA row */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "var(--space-4)", gap: "var(--space-4)" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                  <Shield size={14} style={{ color: "var(--color-text-3)" }} />
+                  <span style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-1)" }}>Two-factor auth</span>
+                  <Badge tone={mfaEnabled ? "success" : "default"}>{mfaEnabled ? "On" : "Off"}</Badge>
+                </div>
+                <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>
+                  {mfaEnabled ? "Your account is protected with 2FA." : "Add a second layer of protection."}
+                </div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={handleToggleMfa} disabled={mfaToggling}>
+                {mfaToggling ? (mfaEnabled ? "Disabling..." : "Enabling...") : (mfaEnabled ? "Disable" : "Enable")}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Active sessions card */}
+        <div className="card">
+          <div className="card-body" style={{ paddingBottom: 0 }}>
+            <SectionHeading icon={<Monitor size={15} />} title="Active sessions" description="Devices currently signed in to your account" />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {sessions.map((session, i) => (
+              <div key={session.id} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "var(--space-3) var(--space-5)",
+                borderTop: i === 0 ? "none" : "1px solid var(--color-border)",
+                gap: "var(--space-4)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+                  <span style={{ color: "var(--color-text-3)" }}><DeviceIcon type={session.deviceIcon} /></span>
+                  <div>
+                    <div style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-1)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                      {session.device}
+                      {session.isCurrent && <Badge tone="success" dot>Now</Badge>}
+                    </div>
+                    <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
+                      <Globe size={10} />
+                      {session.browser} &middot; {session.location}
+                      {!session.isCurrent && <span style={{ marginLeft: "var(--space-1)" }}>&middot; {session.lastActive}</span>}
+                    </div>
+                  </div>
+                </div>
+                {!session.isCurrent && (
+                  <Button variant="ghost" size="sm" onClick={() => setSessions((prev) => prev.filter((s) => s.id !== session.id))}>
+                    Revoke
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
+            <Button variant="ghost" size="sm" onClick={() => setSessions((prev) => prev.filter((s) => s.isCurrent))}>
+              Revoke all other sessions
+            </Button>
+          </div>
+        </div>
+
+        {/* Notifications card - full width */}
+        <div className="card" style={{ gridColumn: "1 / -1" }}>
+          <div className="card-body" style={{ paddingBottom: "var(--space-4)" }}>
+            <SectionHeading icon={<Bell size={15} />} title="Notifications" description="Choose which emails Gamma sends you" />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 0, borderTop: "1px solid var(--color-border)" }} className="notif-grid">
+            {prefs.map((pref, i) => (
+              <div
+                key={pref.id}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "var(--space-4) var(--space-5)", gap: "var(--space-4)",
+                  borderBottom: i < prefs.length - 2 ? "1px solid var(--color-border)" : undefined,
+                  borderRight: i % 2 === 0 ? "1px solid var(--color-border)" : undefined,
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-1)" }}>{pref.label}</div>
+                  <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>{pref.description}</div>
+                </div>
+                <Toggle checked={pref.enabled} onCheckedChange={() => setPrefs((prev) => prev.map((p) => p.id === pref.id ? { ...p, enabled: !p.enabled } : p))} label={pref.label} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .account-grid { grid-template-columns: 1fr !important; }
+          .account-grid > * { grid-column: 1 !important; }
+          .profile-form-grid { grid-template-columns: 1fr !important; }
+          .notif-grid { grid-template-columns: 1fr !important; }
+          .notif-grid > * { border-right: none !important; }
+        }
+      `}</style>
     </>
   );
 }

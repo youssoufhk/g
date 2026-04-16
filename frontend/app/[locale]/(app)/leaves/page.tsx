@@ -79,18 +79,32 @@ type RequestLeaveFormState = {
   reason: string;
 };
 
-function RequestLeaveModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function RequestLeaveModal({
+  open,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (form: RequestLeaveFormState) => void;
+}) {
   const [form, setForm] = useState<RequestLeaveFormState>({
     type: "",
     start_date: "",
     end_date: "",
     reason: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    console.log("Request leave:", form);
-    onClose();
+  function handleSubmit() {
+    if (!form.type || !form.start_date || !form.end_date) return;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onSubmit(form);
+      setForm({ type: "", start_date: "", end_date: "", reason: "" });
+      onClose();
+    }, 600);
   }
 
   const LEAVE_TYPE_OPTIONS: Array<{ value: LeaveType | ""; label: string }> = [
@@ -114,14 +128,19 @@ function RequestLeaveModal({ open, onClose }: { open: boolean; onClose: () => vo
           <Button variant="ghost" size="md" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" size="md" onClick={handleSubmit}>
-            Submit request
+          <Button
+            variant="primary"
+            size="md"
+            loading={isSubmitting}
+            onClick={handleSubmit}
+          >
+            {isSubmitting ? "Submitting..." : "Submit request"}
           </Button>
         </div>
       }
     >
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
         style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}
       >
         {/* Leave type */}
@@ -208,8 +227,21 @@ function RequestLeaveModal({ open, onClose }: { open: boolean; onClose: () => vo
 
 // ── my leaves table ────────────────────────────────────────────────────────
 
-function MyLeavesTab() {
-  const { data: leaves, isLoading } = useLeaveRequests({});
+function MyLeavesTab({ extraLeaves }: { extraLeaves: LeaveRequest[] }) {
+  const { data: rawLeaves, isLoading } = useLeaveRequests({});
+  const [localStatuses, setLocalStatuses] = useState<Record<string, LeaveStatus>>({});
+  const [statusFilter, setStatusFilter] = useState<LeaveStatus | "all">("all");
+
+  const allLeaves: LeaveRequest[] = [
+    ...extraLeaves,
+    ...(rawLeaves ?? []),
+  ].map((l) => (l.id in localStatuses ? { ...l, status: localStatuses[l.id] as LeaveStatus } : l));
+
+  const filtered = statusFilter === "all" ? allLeaves : allLeaves.filter((l) => l.status === statusFilter);
+
+  function handleCancel(id: string) {
+    setLocalStatuses((prev) => ({ ...prev, [id]: "cancelled" }));
+  }
 
   if (isLoading) {
     return (
@@ -221,7 +253,7 @@ function MyLeavesTab() {
     );
   }
 
-  if (!leaves || leaves.length === 0) {
+  if (allLeaves.length === 0) {
     return (
       <EmptyState
         icon={Umbrella}
@@ -231,96 +263,152 @@ function MyLeavesTab() {
     );
   }
 
+  const STATUS_FILTER_OPTIONS: Array<{ value: LeaveStatus | "all"; label: string }> = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "approved", label: "Approved" },
+    { value: "rejected", label: "Rejected" },
+    { value: "cancelled", label: "Cancelled" },
+  ];
+
   return (
-    <div className="data-table-wrapper">
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            {["Type", "Period", "Days", "Status", "Submitted", "Actions"].map((col) => (
-              <th
-                key={col}
-                style={{
-                  padding: "var(--space-2) var(--space-4)",
-                  textAlign: "left",
-                  fontSize: "var(--text-caption)",
-                  fontWeight: "var(--weight-semibold)",
-                  color: "var(--color-text-3)",
-                  borderBottom: "1px solid var(--color-border)",
-                  whiteSpace: "nowrap",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {leaves.map((leave) => (
-            <tr
-              key={leave.id}
-              style={{ borderBottom: "1px solid var(--color-border-subtle)" }}
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+      {/* Status filter tabs */}
+      <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
+        {STATUS_FILTER_OPTIONS.map((opt) => {
+          const isActive = statusFilter === opt.value;
+          const count = opt.value === "all" ? allLeaves.length : allLeaves.filter((l) => l.status === opt.value).length;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setStatusFilter(opt.value)}
+              style={{
+                padding: "var(--space-1) var(--space-3)",
+                borderRadius: "var(--radius-full)",
+                border: `1px solid ${isActive ? "var(--color-primary)" : "var(--color-border)"}`,
+                background: isActive ? "var(--color-primary-muted)" : "transparent",
+                color: isActive ? "var(--color-primary)" : "var(--color-text-2)",
+                fontSize: "var(--text-body-sm)",
+                fontWeight: isActive ? "var(--weight-semibold)" : "var(--weight-regular)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-1)",
+              }}
             >
-              <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                <Badge tone={TYPE_BADGE_TONE[leave.type]}>{TYPE_LABEL[leave.type]}</Badge>
-              </td>
-              <td
-                style={{
-                  padding: "var(--space-3) var(--space-4)",
-                  fontSize: "var(--text-body-sm)",
-                  color: "var(--color-text-1)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {formatPeriod(leave.start_date, leave.end_date)}
-              </td>
-              <td
-                style={{
-                  padding: "var(--space-3) var(--space-4)",
-                  fontSize: "var(--text-body-sm)",
-                  color: "var(--color-text-2)",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {leave.days}d
-              </td>
-              <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                <Badge tone={STATUS_BADGE_TONE[leave.status]} dot={leave.status === "pending"}>
-                  {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
-                </Badge>
-              </td>
-              <td
-                style={{
-                  padding: "var(--space-3) var(--space-4)",
-                  fontSize: "var(--text-caption)",
-                  color: "var(--color-text-3)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {formatDate(leave.submitted_at)}
-              </td>
-              <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                <div style={{ display: "flex", gap: "var(--space-1)" }}>
-                  <Button variant="ghost" size="sm" onClick={() => console.log("view", leave.id)}>
-                    View
-                  </Button>
-                  {leave.status === "pending" && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      style={{ color: "var(--color-error)" }}
-                      onClick={() => console.log("cancel", leave.id)}
-                    >
-                      Cancel
-                    </Button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              {opt.label}
+              {count > 0 && (
+                <span
+                  style={{
+                    fontSize: "var(--text-caption)",
+                    fontFamily: "var(--font-mono)",
+                    opacity: 0.7,
+                  }}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={Umbrella}
+          title="No leaves match this filter"
+          description="Try a different status filter."
+        />
+      ) : (
+        <div className="data-table-wrapper">
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                {["Type", "Period", "Days", "Status", "Submitted", "Actions"].map((col) => (
+                  <th
+                    key={col}
+                    style={{
+                      padding: "var(--space-2) var(--space-4)",
+                      textAlign: "left",
+                      fontSize: "var(--text-caption)",
+                      fontWeight: "var(--weight-semibold)",
+                      color: "var(--color-text-3)",
+                      borderBottom: "1px solid var(--color-border)",
+                      whiteSpace: "nowrap",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((leave) => (
+                <tr
+                  key={leave.id}
+                  style={{ borderBottom: "1px solid var(--color-border-subtle)" }}
+                >
+                  <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                    <Badge tone={TYPE_BADGE_TONE[leave.type]}>{TYPE_LABEL[leave.type]}</Badge>
+                  </td>
+                  <td
+                    style={{
+                      padding: "var(--space-3) var(--space-4)",
+                      fontSize: "var(--text-body-sm)",
+                      color: "var(--color-text-1)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatPeriod(leave.start_date, leave.end_date)}
+                  </td>
+                  <td
+                    style={{
+                      padding: "var(--space-3) var(--space-4)",
+                      fontSize: "var(--text-body-sm)",
+                      color: "var(--color-text-2)",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    {leave.days}d
+                  </td>
+                  <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                    <Badge tone={STATUS_BADGE_TONE[leave.status]} dot={leave.status === "pending"}>
+                      {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
+                    </Badge>
+                  </td>
+                  <td
+                    style={{
+                      padding: "var(--space-3) var(--space-4)",
+                      fontSize: "var(--text-caption)",
+                      color: "var(--color-text-3)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatDate(leave.submitted_at)}
+                  </td>
+                  <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                    <div style={{ display: "flex", gap: "var(--space-1)" }}>
+                      {leave.status === "pending" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          style={{ color: "var(--color-error)" }}
+                          onClick={() => handleCancel(leave.id)}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -486,7 +574,27 @@ function TeamCalendarTab() {
 
 export default function LeavesPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [extraLeaves, setExtraLeaves] = useState<LeaveRequest[]>([]);
   const { data: balance } = useLeaveBalance();
+
+  function handleLeaveSubmit(form: RequestLeaveFormState) {
+    const start = new Date(form.start_date);
+    const end = new Date(form.end_date);
+    const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+    const newLeave: LeaveRequest = {
+      id: `new-${Date.now()}`,
+      employee_id: "emp-me",
+      employee_name: "Me",
+      type: form.type as LeaveType,
+      start_date: form.start_date,
+      end_date: form.end_date,
+      days,
+      status: "pending",
+      reason: form.reason || undefined,
+      submitted_at: new Date().toISOString(),
+    };
+    setExtraLeaves((prev) => [newLeave, ...prev]);
+  }
 
   return (
     <>
@@ -531,7 +639,7 @@ export default function LeavesPage() {
 
         <TabsContent value="my-leaves">
           <div style={{ paddingTop: "var(--space-5)" }}>
-            <MyLeavesTab />
+            <MyLeavesTab extraLeaves={extraLeaves} />
           </div>
         </TabsContent>
 
@@ -542,7 +650,11 @@ export default function LeavesPage() {
         </TabsContent>
       </Tabs>
 
-      <RequestLeaveModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <RequestLeaveModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleLeaveSubmit}
+      />
     </>
   );
 }

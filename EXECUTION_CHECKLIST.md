@@ -391,17 +391,23 @@ Split into **3a (MVP onboarding critical path)** and **3b (auth hardening)**. Th
 2. **Profiles + team allocations** (what Phase 5a timesheets and invoices read from)
 3. **Dashboard pass 1 KPI strip** (the single most-scrutinized page in every demo)
 
+**Architectural decision (2026-04-16): Deterministic view model.**
+Every list page (Employees, Clients, Projects) supports exactly two view modes: List (default) and Gantt. The view toggle lives in the page header. This replaces the standalone Gantt page and the standalone Planning page - both are absorbed as view modes on their respective entity pages. The Gantt and Planning sidebar nav items are removed. See `specs/APP_BLUEPRINT.md` §§3, 7, 10 for the full spec.
+
 **Feature order (list first, profile second, dashboard last):**
 
 - [x] 👥 🤖 Employees directory (list + filter + search + pagination) (2026-04-16, frontend done)
+- [ ] 🧑 🤖 Employees Gantt view (resource schedule: employee per row, project assignment bars on timeline, filters for unassigned/by project/by client/by team, configurable window 1/3/6 months) - **replaces standalone Planning page**
 - [x] 👥 🤖 Clients directory (list + filter + search + pagination) (2026-04-16, frontend done)
+- [ ] 🧑 🤖 Clients Gantt view (engagement timeline: client per row, projects as bars, gap detection for clients with no active projects)
 - [x] 👥 🤖 Projects list (list + filter by client + filter by status) (2026-04-16, frontend done)
+- [ ] 🧑 🤖 Projects Gantt view (project timeline: project per row, start/end/progress bars, configurable window, **replaces standalone Gantt page**) - Board/Kanban view removed (DEF-076: Kanban for consulting PSA - low payoff, defer to v1.1 if customers request it)
 - [x] 👥 🤖 Employee profile page (overview + team + allocations + contribution) (2026-04-16, frontend done)
 - [x] 👥 🤖 Client profile page (overview + projects + invoices + revenue) (2026-04-16, frontend done)
 - [x] 👥 🤖 Project detail page (client + status + budget + allocations + pipeline) (2026-04-16, frontend done)
 - [ ] 👥 🤖 Team allocation CRUD with overlap prevention + `allocation_pct` constraint
 - [x] 🧑 🤖 Dashboard pass 1 KPI strip: 4 cards (Revenue YTD, Billable days this week, Approvals pending, Team capacity) with empty-state handling (2026-04-16, frontend done)
-- [ ] 🧑 Flawless gate run on Employees, Clients, Projects, Dashboard pass 1
+- [ ] 🧑 Flawless gate run on Employees (List + Gantt), Clients (List + Gantt), Projects (List + Gantt), Dashboard pass 1
 
 > **Note on the validated lead gate:** the lead gate is a **founder** gate, not an agent gate. The agent proceeds from Phase 4 to Phase 5a regardless of pipeline state. The founder enforces the lead gate from `FOUNDER_CHECKLIST.md` and can halt Phase 5 work if they choose. The agent is never the enforcer.
 
@@ -505,14 +511,14 @@ Each feature follows the 10-step quality chain in §1.1. Test-first is non-negot
 
 **The 20% of Phase 6 that matters most (do these first):**
 1. **Calendar (month view, read-only)**. The one Tier 2 feature prospects ask about in every demo.
-2. **Resource planning page** (capacity heatmap). The differentiator versus Kantata and Personio.
-3. **Client portal login + invoices view**. Unlocks the "customers can see their own invoices" pitch.
+2. **Client portal login + invoices view**. Unlocks the "customers can see their own invoices" pitch.
+3. **Insights page**. Expands the dashboard AI strip into a full ranked intelligence feed.
 
-Gantt, HR module enhancements, and insights page polish are lower leverage and can slide if needed.
+> **Note (2026-04-16):** Standalone Gantt page and standalone Planning page are removed from Phase 6. Both are absorbed into Phase 4 as view modes on Employees (Gantt = resource schedule), Projects (Gantt = timeline), and Clients (Gantt = engagement timeline). The standalone pages at `/gantt` and `/planning` are deleted. Sidebar items removed. See `specs/APP_BLUEPRINT.md` §§3, 7, 10.
 
 - [x] 🤝 🤖 Calendar (month view read-only, projects + leaves as colored blocks, no drag-edit) (2026-04-16, frontend done)
-- [x] 🤝 🤖 Gantt (read-only, project timelines) (2026-04-16, frontend done)
-- [x] 🤝 🤖 Resource planning page (capacity heatmap, read-only in v1.0) (2026-04-16, frontend done)
+- ~~[x] 🤝 🤖 Gantt (read-only, project timelines)~~ **ABSORBED into Projects List Gantt view (Phase 4)**
+- ~~[x] 🤝 🤖 Resource planning page (capacity heatmap, read-only in v1.0)~~ **ABSORBED into Employees List Gantt view (Phase 4)**
 - [ ] 🤝 🤖 HR module (people directory, enhanced profile, historical data)
 - [ ] 🤝 🤖 Insights page (expanded AI insight cards beyond the dashboard strip)
 - [ ] 🤝 🤖 Client portal: login page
@@ -522,7 +528,7 @@ Gantt, HR module enhancements, and insights page polish are lower leverage and c
 
 ### Phase 6 exit criteria
 
-- [ ] 7 Tier 2 features shipped and passing the gate
+- [ ] 5 Tier 2 features shipped and passing the gate (Calendar, HR, Insights, Portal login, Portal invoices)
 - [ ] Customer 2 live in production (requires §16 Deploy Track green)
 - [ ] Quarterly chaos drill run (requires §16 Deploy Track green for realistic drill)
 

@@ -13,6 +13,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     <select
       ref={ref}
       aria-invalid={invalid || undefined}
+      suppressHydrationWarning
       className={clsx("form-select", invalid && "error", className)}
       {...rest}
     >

@@ -81,6 +81,7 @@ export function TabsTrigger({
       aria-controls={`${idPrefix}-panel-${value}`}
       id={`${idPrefix}-trigger-${value}`}
       onClick={() => setValue(value)}
+      suppressHydrationWarning
       className={clsx("tab", selected && "active")}
     >
       {children}

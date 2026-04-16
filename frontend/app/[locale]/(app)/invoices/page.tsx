@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, FileText, MoreHorizontal, Download, CheckCircle, Ban } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, FileText, MoreHorizontal, Download, CheckCircle, Ban, Send } from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
 import { FilterBar } from "@/components/patterns/filter-bar";
@@ -10,9 +11,11 @@ import { StatPill } from "@/components/patterns/stat-pill";
 import { EmptyState } from "@/components/patterns/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SearchInput } from "@/components/ui/search-input";
 import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Modal } from "@/components/ui/modal";
 import {
   DataTableWrapper,
   Table,
@@ -146,10 +149,145 @@ function InvoiceMobileCard({ invoice }: { invoice: Invoice }) {
   );
 }
 
+// ── New invoice modal ─────────────────────────────────────────────────────────
+
+type NewInvoiceFormState = {
+  client_id: string;
+  project_id: string;
+  currency: Invoice["currency"];
+  issue_date: string;
+  due_date: string;
+  amount: string;
+};
+
+function NewInvoiceModal({
+  open,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSave: (inv: Invoice) => void;
+}) {
+  const [form, setForm] = useState<NewInvoiceFormState>({
+    client_id: "c1",
+    project_id: "p1",
+    currency: "GBP",
+    issue_date: "",
+    due_date: "",
+    amount: "",
+  });
+
+  const CLIENT_OPTIONS = [
+    { value: "c1", label: "HSBC UK" },
+    { value: "c2", label: "BNP Paribas" },
+    { value: "c3", label: "TotalEnergies" },
+    { value: "c4", label: "Renault" },
+  ];
+  const PROJECT_OPTIONS = [
+    { value: "p1", label: "HSBC Digital Transformation" },
+    { value: "p2", label: "BNP Risk Model" },
+    { value: "p3", label: "TotalEnergies ESG Strategy" },
+    { value: "p4", label: "Renault Lean Analytics" },
+  ];
+  const CLIENT_NAMES: Record<string, string> = { c1: "HSBC UK", c2: "BNP Paribas", c3: "TotalEnergies", c4: "Renault" };
+  const PROJECT_NAMES: Record<string, string> = { p1: "HSBC Digital Transformation", p2: "BNP Risk Model", p3: "TotalEnergies ESG Strategy", p4: "Renault Lean Analytics" };
+
+  function handleSave() {
+    const amount = parseFloat(form.amount) || 0;
+    const taxAmount = amount * 0.2;
+    const inv: Invoice = {
+      id: `inv-new-${Date.now()}`,
+      number: `INV-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+      client_id: form.client_id,
+      client_name: CLIENT_NAMES[form.client_id] ?? form.client_id,
+      project_id: form.project_id || undefined,
+      project_name: form.project_id ? (PROJECT_NAMES[form.project_id] ?? undefined) : undefined,
+      status: "draft",
+      currency: form.currency,
+      issue_date: form.issue_date || new Date().toISOString().slice(0, 10),
+      due_date: form.due_date || new Date().toISOString().slice(0, 10),
+      subtotal: amount,
+      tax_rate: 0.2,
+      tax_amount: taxAmount,
+      total: amount + taxAmount,
+      line_items: [],
+    };
+    onSave(inv);
+    onClose();
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="New invoice"
+      description="Create a draft invoice to review before sending."
+      size="md"
+      footer={
+        <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
+          <Button variant="ghost" size="md" onClick={onClose}>Cancel</Button>
+          <Button variant="primary" size="md" onClick={handleSave}>Create invoice</Button>
+        </div>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+          <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Client</label>
+          <Select value={form.client_id} onChange={(e) => setForm((f) => ({ ...f, client_id: e.target.value }))}>
+            {CLIENT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </Select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+          <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Project (optional)</label>
+          <Select value={form.project_id} onChange={(e) => setForm((f) => ({ ...f, project_id: e.target.value }))}>
+            <option value="">No project</option>
+            {PROJECT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </Select>
+        </div>
+        <div style={{ display: "flex", gap: "var(--space-3)" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: 1 }}>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Amount (excl. VAT)</label>
+            <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", width: 100 }}>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Currency</label>
+            <Select value={form.currency} onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value as Invoice["currency"] }))}>
+              <option value="GBP">GBP</option>
+              <option value="EUR">EUR</option>
+              <option value="USD">USD</option>
+            </Select>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: "var(--space-3)" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: 1 }}>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Issue date</label>
+            <Input type="date" value={form.issue_date} onChange={(e) => setForm((f) => ({ ...f, issue_date: e.target.value }))} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: 1 }}>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Due date</label>
+            <Input type="date" value={form.due_date} onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))} />
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 // ── Actions dropdown ──────────────────────────────────────────────────────────
 
-function InvoiceActions({ invoice }: { invoice: Invoice }) {
+function InvoiceActions({
+  invoice,
+  onStatusChange,
+  onDownload,
+}: {
+  invoice: Invoice;
+  onStatusChange: (id: string, status: InvoiceStatus) => void;
+  onDownload: (id: string) => void;
+}) {
+  const router = useRouter();
   const canMarkPaid = invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "viewed";
+  const canSend = invoice.status === "draft";
   const canVoid = invoice.status !== "paid" && invoice.status !== "void";
 
   return (
@@ -161,16 +299,36 @@ function InvoiceActions({ invoice }: { invoice: Invoice }) {
         </Button>
       )}
     >
-      <DropdownItem icon={<FileText size={14} aria-hidden />}>
+      <DropdownItem
+        icon={<FileText size={14} aria-hidden />}
+        onClick={() => router.push(`/invoices/${invoice.id}`)}
+      >
         View
       </DropdownItem>
-      <DropdownItem icon={<Download size={14} aria-hidden />}>
+      <DropdownItem
+        icon={<Download size={14} aria-hidden />}
+        onClick={() => onDownload(invoice.id)}
+      >
         Download PDF
       </DropdownItem>
+      {canSend && (
+        <>
+          <DropdownDivider />
+          <DropdownItem
+            icon={<Send size={14} aria-hidden />}
+            onClick={() => onStatusChange(invoice.id, "sent")}
+          >
+            Send to client
+          </DropdownItem>
+        </>
+      )}
       {canMarkPaid && (
         <>
           <DropdownDivider />
-          <DropdownItem icon={<CheckCircle size={14} aria-hidden />}>
+          <DropdownItem
+            icon={<CheckCircle size={14} aria-hidden />}
+            onClick={() => onStatusChange(invoice.id, "paid")}
+          >
             Mark as paid
           </DropdownItem>
         </>
@@ -178,7 +336,11 @@ function InvoiceActions({ invoice }: { invoice: Invoice }) {
       {canVoid && (
         <>
           <DropdownDivider />
-          <DropdownItem icon={<Ban size={14} aria-hidden />} destructive>
+          <DropdownItem
+            icon={<Ban size={14} aria-hidden />}
+            destructive
+            onClick={() => onStatusChange(invoice.id, "void")}
+          >
             Void
           </DropdownItem>
         </>
@@ -193,6 +355,10 @@ export default function InvoicesPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [clientFilter, setClientFilter] = useState("all");
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [localOverrides, setLocalOverrides] = useState<Record<string, InvoiceStatus>>({});
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [localNew, setLocalNew] = useState<Invoice[]>([]);
 
   const { data, isLoading, error } = useInvoices({
     search: search || undefined,
@@ -200,15 +366,50 @@ export default function InvoicesPage() {
     client_id: clientFilter !== "all" ? clientFilter : undefined,
   });
 
-  const invoices = data?.items ?? [];
-  const total = data?.total ?? 0;
+  // Apply local status overrides and prepend locally created invoices
+  const rawInvoices = data?.items ?? [];
+  const invoicesWithOverrides = rawInvoices.map((inv) =>
+    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv,
+  );
 
-  // KPI calculations from full unfiltered list (use raw hook with no filters for KPIs)
+  // Filter locally-created invoices through filters too
+  const filteredLocalNew = localNew.filter((inv) => {
+    if (search) {
+      const q = search.toLowerCase();
+      if (!inv.number.toLowerCase().includes(q) && !inv.client_name.toLowerCase().includes(q)) return false;
+    }
+    if (statusFilter !== "all" && inv.status !== statusFilter) return false;
+    if (clientFilter !== "all" && inv.client_id !== clientFilter) return false;
+    return true;
+  }).map((inv) =>
+    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv,
+  );
+
+  const invoices = [...filteredLocalNew, ...invoicesWithOverrides];
+  const total = invoices.length;
+
+  // KPI calculations from full unfiltered list
   const { data: allData } = useInvoices({});
-  const allInvoices = allData?.items ?? [];
+  const allInvoicesRaw = allData?.items ?? [];
+  const allInvoices = [...localNew, ...allInvoicesRaw].map((inv) =>
+    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv,
+  );
+
+  function handleStatusChange(id: string, status: InvoiceStatus) {
+    setLocalOverrides((prev) => ({ ...prev, [id]: status }));
+  }
+
+  function handleDownload(id: string) {
+    setDownloadingId(id);
+    setTimeout(() => setDownloadingId(null), 1200);
+  }
+
+  function handleNewInvoiceSave(inv: Invoice) {
+    setLocalNew((prev) => [inv, ...prev]);
+  }
 
   const outstanding = allInvoices
-    .filter((inv) => inv.status === "sent" || inv.status === "viewed" || inv.status === "overdue")
+    .filter((inv) => ["sent", "viewed", "overdue"].includes(inv.status))
     .reduce((acc, inv) => acc + inv.total, 0);
 
   const overdueTotal = allInvoices
@@ -229,7 +430,12 @@ export default function InvoicesPage() {
         title="Invoices"
         count={total}
         actions={
-          <Button variant="primary" size="md" leadingIcon={<Plus size={16} aria-hidden />}>
+          <Button
+            variant="primary"
+            size="md"
+            leadingIcon={<Plus size={16} aria-hidden />}
+            onClick={() => setShowNewModal(true)}
+          >
             New invoice
           </Button>
         }
@@ -300,6 +506,26 @@ export default function InvoicesPage() {
         </Select>
       </FilterBar>
 
+      {/* Downloading feedback */}
+      {downloadingId && (
+        <div
+          style={{
+            padding: "var(--space-2) var(--space-4)",
+            background: "var(--color-info-muted)",
+            borderRadius: "var(--radius-md)",
+            color: "var(--color-info)",
+            fontSize: "var(--text-body-sm)",
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-2)",
+            marginTop: "var(--space-2)",
+          }}
+        >
+          <Download size={14} aria-hidden />
+          Preparing PDF...
+        </div>
+      )}
+
       {/* Error state */}
       {error && (
         <div
@@ -361,7 +587,12 @@ export default function InvoicesPage() {
                             Clear filters
                           </Button>
                         ) : (
-                          <Button variant="primary" size="sm" leadingIcon={<Plus size={14} aria-hidden />}>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            leadingIcon={<Plus size={14} aria-hidden />}
+                            onClick={() => setShowNewModal(true)}
+                          >
                             New invoice
                           </Button>
                         )
@@ -459,7 +690,11 @@ export default function InvoicesPage() {
                       </Badge>
                     </TD>
                     <TD>
-                      <InvoiceActions invoice={invoice} />
+                      <InvoiceActions
+                        invoice={invoice}
+                        onStatusChange={handleStatusChange}
+                        onDownload={handleDownload}
+                      />
                     </TD>
                   </TR>
                 );
@@ -501,6 +736,12 @@ export default function InvoicesPage() {
           )}
         </div>
       )}
+
+      <NewInvoiceModal
+        open={showNewModal}
+        onClose={() => setShowNewModal(false)}
+        onSave={handleNewInvoiceSave}
+      />
 
       <style>{`
         @media (max-width: 767px) {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use } from "react";
+import { use, useState } from "react";
 import {
   ChevronLeft,
   FileText,
@@ -214,6 +214,8 @@ export default function InvoiceDetailPage({
 }) {
   const { id } = use(params);
   const { data: invoice, isLoading, error } = useInvoice(id);
+  const [localStatus, setLocalStatus] = useState<InvoiceStatus | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   if (isLoading) {
     return (
@@ -252,9 +254,23 @@ export default function InvoiceDetailPage({
     );
   }
 
+  const effectiveStatus: InvoiceStatus = localStatus ?? invoice.status;
   const symbol = CURRENCY_SYMBOL[invoice.currency];
-  const canMarkPaid = invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "viewed";
-  const canVoid = invoice.status !== "paid" && invoice.status !== "void";
+  const canMarkPaid = effectiveStatus === "sent" || effectiveStatus === "overdue" || effectiveStatus === "viewed";
+  const canVoid = effectiveStatus !== "paid" && effectiveStatus !== "void";
+
+  function handleDownload() {
+    setIsDownloading(true);
+    setTimeout(() => setIsDownloading(false), 1200);
+  }
+
+  function handleMarkPaid() {
+    setLocalStatus("paid");
+  }
+
+  function handleVoid() {
+    setLocalStatus("void");
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
@@ -290,8 +306,8 @@ export default function InvoiceDetailPage({
             >
               {invoice.number}
             </h1>
-            <Badge tone={statusTone(invoice.status)} dot={invoice.status === "viewed"} size="lg">
-              {statusLabel(invoice.status)}
+            <Badge tone={statusTone(effectiveStatus)} dot={effectiveStatus === "viewed"} size="lg">
+              {statusLabel(effectiveStatus)}
             </Badge>
             {invoice.ai_generated && (
               <Badge tone="primary">AI drafted</Badge>
@@ -333,16 +349,32 @@ export default function InvoiceDetailPage({
 
         {/* Action buttons */}
         <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0, flexWrap: "wrap" }}>
-          <Button variant="secondary" size="sm" leadingIcon={<Download size={14} aria-hidden />}>
-            Download PDF
+          <Button
+            variant="secondary"
+            size="sm"
+            leadingIcon={<Download size={14} aria-hidden />}
+            loading={isDownloading}
+            onClick={handleDownload}
+          >
+            {isDownloading ? "Preparing..." : "Download PDF"}
           </Button>
           {canMarkPaid && (
-            <Button variant="primary" size="sm" leadingIcon={<CheckCircle size={14} aria-hidden />}>
+            <Button
+              variant="primary"
+              size="sm"
+              leadingIcon={<CheckCircle size={14} aria-hidden />}
+              onClick={handleMarkPaid}
+            >
               Mark as paid
             </Button>
           )}
           {canVoid && (
-            <Button variant="ghost" size="sm" leadingIcon={<Ban size={14} aria-hidden />}>
+            <Button
+              variant="ghost"
+              size="sm"
+              leadingIcon={<Ban size={14} aria-hidden />}
+              onClick={handleVoid}
+            >
               Void
             </Button>
           )}
@@ -350,7 +382,7 @@ export default function InvoiceDetailPage({
       </div>
 
       {/* Status timeline */}
-      <StatusTimeline currentStatus={invoice.status} />
+      <StatusTimeline currentStatus={effectiveStatus} />
 
       {/* Info grid */}
       <div

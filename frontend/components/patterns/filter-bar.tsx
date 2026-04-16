@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type React from "react";
 import clsx from "clsx";
 
 export type FilterBarProps = {
@@ -31,7 +32,9 @@ export function FilterBar({ children, actions, embedded = false }: FilterBarProp
           display: "flex",
           gap: "var(--space-2)",
           flex: 1,
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch" as React.CSSProperties["WebkitOverflowScrolling"],
           alignItems: "center",
           minWidth: 0,
         }}

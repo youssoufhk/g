@@ -43,6 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
+      suppressHydrationWarning
       className={clsx(
         "btn",
         `btn-${variant}`,

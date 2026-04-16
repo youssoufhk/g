@@ -102,7 +102,15 @@ function statusLabel(status: ExpenseStatus): string {
 
 // ── expense item ───────────────────────────────────────────────────────────
 
-function ExpenseItem({ expense }: { expense: Expense }) {
+function ExpenseItem({
+  expense,
+  onStatusChange,
+  onDelete,
+}: {
+  expense: Expense;
+  onStatusChange?: (id: string, status: ExpenseStatus) => void;
+  onDelete?: (id: string) => void;
+}) {
   const Icon = CATEGORY_ICON[expense.category];
 
   return (
@@ -269,17 +277,39 @@ function ExpenseItem({ expense }: { expense: Expense }) {
               </Button>
             )}
           >
-            <DropdownItem>View details</DropdownItem>
+            <DropdownItem onClick={() => onStatusChange?.(expense.id, expense.status)}>
+              View details
+            </DropdownItem>
             {(expense.status === "draft" || expense.status === "submitted") && (
-              <DropdownItem>Edit</DropdownItem>
+              <DropdownItem onClick={() => onStatusChange?.(expense.id, "submitted")}>
+                {expense.status === "draft" ? "Submit" : "Edit"}
+              </DropdownItem>
             )}
             {expense.status === "rejected" && (
-              <DropdownItem>Re-submit</DropdownItem>
+              <DropdownItem onClick={() => onStatusChange?.(expense.id, "submitted")}>
+                Re-submit
+              </DropdownItem>
+            )}
+            {expense.status === "submitted" && (
+              <>
+                <DropdownDivider />
+                <DropdownItem onClick={() => onStatusChange?.(expense.id, "approved")}>
+                  Approve
+                </DropdownItem>
+                <DropdownItem
+                  destructive
+                  onClick={() => onStatusChange?.(expense.id, "rejected")}
+                >
+                  Reject
+                </DropdownItem>
+              </>
             )}
             {expense.status === "draft" && (
               <>
                 <DropdownDivider />
-                <DropdownItem destructive>Delete</DropdownItem>
+                <DropdownItem destructive onClick={() => onDelete?.(expense.id)}>
+                  Delete
+                </DropdownItem>
               </>
             )}
           </Dropdown>
@@ -329,7 +359,28 @@ function ExpenseListSkeleton() {
 
 function MyExpensesTab() {
   const [filters, setFilters] = useState<ExpenseListFilters>({});
-  const { data: expenses, isLoading, error } = useExpenses(filters);
+  const [localStatuses, setLocalStatuses] = useState<Record<string, ExpenseStatus>>({});
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const { data: rawExpenses, isLoading, error } = useExpenses(filters);
+  const { data: rawAllExpenses } = useExpenses({});
+
+  function applyLocalState(items: Expense[] | undefined): Expense[] {
+    if (!items) return [];
+    return items
+      .filter((e) => !deletedIds.has(e.id))
+      .map((e) => (e.id in localStatuses ? { ...e, status: localStatuses[e.id] as ExpenseStatus } : e));
+  }
+
+  const expenses = applyLocalState(rawExpenses);
+  const allExpenses = applyLocalState(rawAllExpenses);
+
+  function handleStatusChange(id: string, status: ExpenseStatus) {
+    setLocalStatuses((prev) => ({ ...prev, [id]: status }));
+  }
+
+  function handleDelete(id: string) {
+    setDeletedIds((prev) => new Set([...prev, id]));
+  }
 
   const STATUS_OPTIONS = [
     { value: "", label: "All statuses" },
@@ -353,13 +404,25 @@ function MyExpensesTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
-      {/* KPI strip */}
-      <div className="kpi-grid">
-        <StatPill label="Pending" value="EUR 607.50" accent="warning" />
-        <StatPill label="Approved" value="EUR 219.80" accent="success" />
-        <StatPill label="Reimbursed (this month)" value="EUR 96.00" accent="info" />
-        <StatPill label="Rejected" value="1" accent="error" />
-      </div>
+      {/* KPI strip - derived from live data */}
+      {(() => {
+        const all = allExpenses ?? [];
+        const pending = all.filter((e) => e.status === "submitted" || e.status === "draft");
+        const approved = all.filter((e) => e.status === "approved");
+        const reimbursed = all.filter((e) => e.status === "reimbursed");
+        const rejected = all.filter((e) => e.status === "rejected");
+        const pendingTotal = pending.reduce((s, e) => s + e.amount, 0);
+        const approvedTotal = approved.reduce((s, e) => s + e.amount, 0);
+        const reimbursedTotal = reimbursed.reduce((s, e) => s + e.amount, 0);
+        return (
+          <div className="kpi-grid">
+            <StatPill label="Pending" value={pendingTotal > 0 ? `EUR ${pendingTotal.toFixed(2)}` : "-"} accent="warning" />
+            <StatPill label="Approved" value={approvedTotal > 0 ? `EUR ${approvedTotal.toFixed(2)}` : "-"} accent="success" />
+            <StatPill label="Reimbursed (this month)" value={reimbursedTotal > 0 ? `EUR ${reimbursedTotal.toFixed(2)}` : "-"} accent="info" />
+            <StatPill label="Rejected" value={rejected.length > 0 ? rejected.length : "-"} accent="error" />
+          </div>
+        );
+      })()}
 
       {/* Filter bar */}
       <FilterBar>
@@ -425,7 +488,12 @@ function MyExpensesTab() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
           {expenses.map((e) => (
-            <ExpenseItem key={e.id} expense={e} />
+            <ExpenseItem
+              key={e.id}
+              expense={e}
+              onStatusChange={handleStatusChange}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}
@@ -455,6 +523,9 @@ function SubmitNewTab() {
     project_id: "",
     billable: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
 
   const PROJECT_OPTIONS = [
     { value: "", label: "No project (internal)" },
@@ -475,9 +546,39 @@ function SubmitNewTab() {
     { value: "other", label: "Other" },
   ];
 
+  function handleOcrUpload() {
+    setIsOcrProcessing(true);
+    setTimeout(() => {
+      setForm((f) => ({
+        ...f,
+        description: "Client dinner - La Brasserie Parisienne",
+        amount: "142.50",
+        currency: "EUR",
+        expense_date: "2026-04-15",
+        category: "meals",
+        billable: true,
+      }));
+      setIsOcrProcessing(false);
+    }, 1800);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Submit expense:", form);
+    if (isSubmitting || submitted) return;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubmitted(true);
+      setForm({
+        description: "",
+        amount: "",
+        currency: "EUR",
+        expense_date: "",
+        category: "",
+        project_id: "",
+        billable: false,
+      });
+    }, 800);
   }
 
   return (
@@ -493,8 +594,8 @@ function SubmitNewTab() {
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
         <div
           style={{
-            border: "2px dashed var(--color-border)",
-            background: "var(--color-surface-1)",
+            border: `2px dashed ${isOcrProcessing ? "var(--color-info)" : "var(--color-border)"}`,
+            background: isOcrProcessing ? "var(--color-info-muted)" : "var(--color-surface-1)",
             borderRadius: "var(--radius-xl)",
             padding: "var(--space-8)",
             textAlign: "center",
@@ -504,36 +605,44 @@ function SubmitNewTab() {
             alignItems: "center",
             justifyContent: "center",
             gap: "var(--space-3)",
+            cursor: "pointer",
+            transition: "background 0.2s",
           }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => { e.preventDefault(); handleOcrUpload(); }}
+          onClick={handleOcrUpload}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleOcrUpload(); }}
+          aria-label="Upload receipt"
         >
           <UploadCloud
             size={40}
             aria-hidden
-            style={{ color: "var(--color-text-3)" }}
+            style={{ color: isOcrProcessing ? "var(--color-info)" : "var(--color-text-3)" }}
           />
           <p
             style={{
               fontWeight: "var(--weight-semibold)",
               fontSize: "var(--text-body)",
-              color: "var(--color-text-1)",
+              color: isOcrProcessing ? "var(--color-info)" : "var(--color-text-1)",
               margin: 0,
             }}
           >
-            Drop receipt here
+            {isOcrProcessing ? "Scanning receipt..." : "Drop receipt here"}
           </p>
-          <p
-            style={{
-              fontSize: "var(--text-caption)",
-              color: "var(--color-text-3)",
-              margin: 0,
-            }}
-          >
-            or
-          </p>
-          <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", justifyContent: "center" }}>
-            <Button variant="secondary" size="sm">Browse files</Button>
-            <Button variant="ghost" size="sm">Take photo</Button>
-          </div>
+          {!isOcrProcessing && (
+            <>
+              <p style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", margin: 0 }}>or</p>
+              <div
+                style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", justifyContent: "center" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button variant="secondary" size="sm" onClick={handleOcrUpload}>Browse files</Button>
+                <Button variant="ghost" size="sm" onClick={handleOcrUpload}>Take photo</Button>
+              </div>
+            </>
+          )}
         </div>
 
         <p
@@ -732,8 +841,29 @@ function SubmitNewTab() {
         </div>
 
         {/* Submit */}
-        <Button variant="primary" size="md" style={{ width: "100%" }}>
-          Submit expense
+        {submitted && (
+          <div
+            style={{
+              padding: "var(--space-3) var(--space-4)",
+              background: "var(--color-success-muted)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--color-success)",
+              fontSize: "var(--text-body-sm)",
+              fontWeight: "var(--weight-medium)",
+              textAlign: "center",
+            }}
+          >
+            Expense submitted for approval.
+          </div>
+        )}
+        <Button
+          variant="primary"
+          size="md"
+          style={{ width: "100%" }}
+          loading={isSubmitting}
+          onClick={(e: React.MouseEvent) => handleSubmit(e as unknown as React.FormEvent)}
+        >
+          {isSubmitting ? "Submitting..." : "Submit expense"}
         </Button>
       </form>
     </div>
@@ -743,18 +873,20 @@ function SubmitNewTab() {
 // ── page ────────────────────────────────────────────────────────────────────
 
 export default function ExpensesPage() {
+  const [activeTab, setActiveTab] = useState("my-expenses");
+
   return (
     <>
       <PageHeader
         title="Expenses"
         actions={
-          <Button variant="primary" size="md">
+          <Button variant="primary" size="md" onClick={() => setActiveTab("submit-new")}>
             New expense
           </Button>
         }
       />
 
-      <Tabs defaultValue="my-expenses">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="my-expenses">My expenses</TabsTrigger>
           <TabsTrigger value="submit-new">Submit new</TabsTrigger>
