@@ -1,8 +1,15 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import clsx from "clsx";
 
-type Variant = "primary" | "secondary" | "tertiary" | "danger";
-type Size = "sm" | "md" | "lg";
+type Variant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "destructive"
+  | "destructive-ghost"
+  | "accent"
+  | "link";
+type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
@@ -10,23 +17,8 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
-};
-
-const variants: Record<Variant, string> = {
-  primary:
-    "bg-[var(--color-primary)] text-[var(--color-text-inv)] hover:bg-[var(--color-primary-hover)] active:bg-[var(--color-primary-active)]",
-  secondary:
-    "bg-[var(--color-surface-1)] text-[var(--color-text-1)] border border-[var(--color-border)] hover:bg-[var(--color-surface-2)]",
-  tertiary:
-    "bg-transparent text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:bg-[var(--color-surface-1)]",
-  danger:
-    "bg-[var(--color-error)] text-[var(--color-text-inv)] hover:bg-[var(--color-error-hover)]",
-};
-
-const sizes: Record<Size, string> = {
-  sm: "h-8 px-2.5 text-xs rounded-[var(--radius-sm)]",
-  md: "h-9 px-3 text-sm rounded-[var(--radius-md)]",
-  lg: "h-10 px-4 text-sm rounded-[var(--radius-md)]",
+  /** Render as an icon-only square button. */
+  iconOnly?: boolean;
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -37,8 +29,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     disabled,
     leadingIcon,
     trailingIcon,
+    iconOnly = false,
     className,
     children,
+    type = "button",
     ...rest
   },
   ref,
@@ -46,20 +40,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   return (
     <button
       ref={ref}
+      type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={clsx(
-        "inline-flex items-center justify-center gap-1.5 font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-bg)]",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        variants[variant],
-        sizes[size],
+        "btn",
+        `btn-${variant}`,
+        `btn-${size}`,
+        iconOnly && "btn-icon",
+        loading && "btn-loading",
         className,
       )}
       {...rest}
     >
       {leadingIcon}
-      <span>{children}</span>
+      {!iconOnly && children}
       {trailingIcon}
     </button>
   );

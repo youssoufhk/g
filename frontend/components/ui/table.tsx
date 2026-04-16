@@ -1,26 +1,45 @@
 import type { HTMLAttributes, ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
 import clsx from "clsx";
 
+/**
+ * Table primitives that wrap the prototype's `.data-table-wrapper`
+ * + `.data-table` classes. Use like this:
+ *
+ *   <DataTableWrapper>
+ *     <Table>
+ *       <THead>
+ *         <TR>
+ *           <TH>Name</TH>
+ *           <TH numeric sorted sortDirection="asc">Amount</TH>
+ *         </TR>
+ *       </THead>
+ *       <TBody>
+ *         <TR><TD>Alice</TD><TD numeric>€ 1,200</TD></TR>
+ *       </TBody>
+ *     </Table>
+ *   </DataTableWrapper>
+ */
+
+export function DataTableWrapper({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
+  return <div className={clsx("data-table-wrapper", className)}>{children}</div>;
+}
+
 export function Table({ className, ...rest }: HTMLAttributes<HTMLTableElement>) {
   return (
     <div className="overflow-x-auto">
-      <table
-        className={clsx(
-          "w-full text-sm text-left text-[var(--color-text-1)]",
-          className,
-        )}
-        {...rest}
-      />
+      <table className={clsx("data-table", className)} {...rest} />
     </div>
   );
 }
 
 export function THead({ children }: { children: ReactNode }) {
-  return (
-    <thead className="bg-[var(--color-surface-0)] border-b border-[var(--color-border)]">
-      {children}
-    </thead>
-  );
+  return <thead>{children}</thead>;
 }
 
 export function TBody({ children }: { children: ReactNode }) {
@@ -31,27 +50,24 @@ export function TR({
   className,
   ...rest
 }: HTMLAttributes<HTMLTableRowElement>) {
-  return (
-    <tr
-      className={clsx(
-        "h-11 border-b border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-1)]/60",
-        className,
-      )}
-      {...rest}
-    />
-  );
+  return <tr className={className} {...rest} />;
 }
 
 export function TH({
   className,
+  sorted,
+  sortDirection,
+  numeric,
   ...rest
-}: ThHTMLAttributes<HTMLTableCellElement>) {
+}: ThHTMLAttributes<HTMLTableCellElement> & {
+  sorted?: boolean;
+  sortDirection?: "asc" | "desc";
+  numeric?: boolean;
+}) {
   return (
     <th
-      className={clsx(
-        "px-3 py-2 font-medium text-xs uppercase tracking-wide text-[var(--color-text-3)]",
-        className,
-      )}
+      className={clsx(sorted && "sorted", numeric && "text-right", className)}
+      aria-sort={sorted ? (sortDirection === "asc" ? "ascending" : "descending") : undefined}
       {...rest}
     />
   );
@@ -59,7 +75,23 @@ export function TH({
 
 export function TD({
   className,
+  numeric,
+  muted,
   ...rest
-}: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={clsx("px-3 py-2 align-middle", className)} {...rest} />;
+}: TdHTMLAttributes<HTMLTableCellElement> & {
+  /** Applies tabular-nums monospace rendering for amounts, dates, counts. */
+  numeric?: boolean;
+  /** Renders as secondary text color for supporting details. */
+  muted?: boolean;
+}) {
+  return (
+    <td
+      className={clsx(
+        numeric && "cell-mono text-right",
+        muted && "cell-secondary",
+        className,
+      )}
+      {...rest}
+    />
+  );
 }

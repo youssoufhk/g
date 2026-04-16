@@ -5,8 +5,15 @@
     "tagline": "The operations OS for modern consulting firms"
   },
   "nav": {
+    "sections": {
+      "my-week": "My Week",
+      "delivery": "Delivery",
+      "finance": "Finance",
+      "people": "People",
+      "admin": "Admin"
+    },
     "dashboard": "Dashboard",
-    "employees": "Employees",
+    "employees": "Team Directory",
     "clients": "Clients",
     "projects": "Projects",
     "timesheets": "Timesheets",
@@ -15,18 +22,20 @@
     "approvals": "Approvals",
     "invoices": "Invoices",
     "calendar": "Calendar",
-    "gantt": "Gantt",
-    "planning": "Planning",
+    "gantt": "Gantt Chart",
+    "planning": "Resource Planning",
     "hr": "Human Resources",
-    "insights": "Insights",
+    "insights": "AI Insights",
     "admin": "Administration",
     "account": "Account",
-    "help": "Help & Shortcuts"
+    "help": "Help and Shortcuts"
   },
   "shell": {
-    "search_placeholder": "Search employees, clients, projects",
+    "search_placeholder": "Search anything...",
+    "search": "Search",
     "new_button": "New",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "open_menu": "Open navigation"
   },
   "errors": {
     "generic": "Something went wrong",

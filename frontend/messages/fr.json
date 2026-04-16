@@ -5,8 +5,15 @@
     "tagline": "Le systeme d'exploitation des cabinets de conseil modernes"
   },
   "nav": {
+    "sections": {
+      "my-week": "Ma semaine",
+      "delivery": "Delivery",
+      "finance": "Finance",
+      "people": "Personnes",
+      "admin": "Admin"
+    },
     "dashboard": "Tableau de bord",
-    "employees": "Collaborateurs",
+    "employees": "Annuaire",
     "clients": "Clients",
     "projects": "Projets",
     "timesheets": "Feuilles de temps",
@@ -15,18 +22,20 @@
     "approvals": "Approbations",
     "invoices": "Factures",
     "calendar": "Calendrier",
-    "gantt": "Gantt",
-    "planning": "Planning",
+    "gantt": "Diagramme de Gantt",
+    "planning": "Planification",
     "hr": "Ressources humaines",
-    "insights": "Insights",
+    "insights": "Insights IA",
     "admin": "Administration",
     "account": "Compte",
     "help": "Aide et raccourcis"
   },
   "shell": {
-    "search_placeholder": "Chercher un collaborateur, un client, un projet",
+    "search_placeholder": "Rechercher...",
+    "search": "Rechercher",
     "new_button": "Nouveau",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "open_menu": "Ouvrir la navigation"
   },
   "errors": {
     "generic": "Une erreur est survenue",

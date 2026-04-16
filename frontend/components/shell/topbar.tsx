@@ -1,52 +1,110 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Bell, Search, Plus } from "lucide-react";
+import { Bell, Menu, Search } from "lucide-react";
+
+import { Avatar } from "@/components/ui/avatar";
 
 /**
- * Topbar is 56px tall (h-14). Contains the global search on desktop,
- * a New button, and notifications. Cmd+K command palette is wired via
- * the shell provider (not on this component) so it works anywhere.
+ * Topbar wraps the prototype's `.top-header` row. Structure mirrors
+ * prototype/index.html:
+ *
+ *   .top-header
+ *     .header-left  (mobile menu button + page title)
+ *     .header-search (desktop only, opens cmd palette)
+ *     .header-right  (mobile search button + notifications + user)
  */
-export function Topbar() {
+export type TopbarProps = {
+  title?: string;
+  user?: {
+    name: string;
+    role: string;
+    initials?: string;
+    colorIndex?: number;
+    avatarSrc?: string;
+  };
+  onOpenCommandPalette?: () => void;
+  onOpenNotifications?: () => void;
+  onOpenMobileMenu?: () => void;
+};
+
+const DEFAULT_USER = {
+  name: "Dev Admin",
+  role: "Owner",
+  initials: "DA",
+  colorIndex: 0,
+};
+
+export function Topbar({
+  title,
+  user = DEFAULT_USER,
+  onOpenCommandPalette,
+  onOpenNotifications,
+  onOpenMobileMenu,
+}: TopbarProps) {
   const t = useTranslations("shell");
 
   return (
-    <header className="h-14 flex items-center gap-3 px-4 border-b border-[var(--color-border)] bg-[var(--color-surface-0)]">
-      <div className="flex-1 flex items-center gap-3">
-        <label className="hidden md:flex items-center gap-2 w-[280px] h-9 px-3 rounded-[var(--radius-md)] bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)] focus-within:border-[var(--color-primary)]">
-          <Search className="h-4 w-4 text-[var(--color-text-3)]" aria-hidden />
-          <input
-            type="search"
-            placeholder={t("search_placeholder")}
-            aria-label={t("search_placeholder")}
-            className="bg-transparent border-0 outline-none text-sm flex-1 text-[var(--color-text-1)] placeholder:text-[var(--color-text-3)]"
-          />
-        </label>
-        <button
-          type="button"
-          aria-label={t("search_placeholder")}
-          className="md:hidden h-9 w-9 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)]"
-        >
-          <Search className="h-4 w-4" aria-hidden />
-        </button>
+    <header className="top-header">
+      <div className="header-left">
+        {onOpenMobileMenu && (
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={onOpenMobileMenu}
+            aria-label={t("open_menu")}
+          >
+            <Menu size={20} aria-hidden />
+          </button>
+        )}
+        {title && <h1 className="page-title">{title}</h1>}
       </div>
 
       <button
         type="button"
-        className="h-9 px-3 inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-primary)] text-[var(--color-text-inv)] text-sm font-medium hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+        className="header-search"
+        onClick={onOpenCommandPalette}
+        aria-label={t("search")}
       >
-        <Plus className="h-4 w-4" aria-hidden />
-        <span className="hidden sm:inline">{t("new_button")}</span>
+        <Search size={16} aria-hidden />
+        <span>{t("search_placeholder")}</span>
+        <kbd>Cmd K</kbd>
       </button>
 
-      <button
-        type="button"
-        aria-label={t("notifications")}
-        className="h-9 w-9 flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:bg-[var(--color-surface-1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-      >
-        <Bell className="h-4 w-4" aria-hidden />
-      </button>
+      <div className="header-right">
+        <button
+          type="button"
+          className="mobile-search-btn"
+          onClick={onOpenCommandPalette}
+          aria-label={t("search")}
+        >
+          <Search size={20} aria-hidden />
+        </button>
+
+        <button
+          type="button"
+          className="header-icon-btn"
+          onClick={onOpenNotifications}
+          aria-label={t("notifications")}
+        >
+          <Bell size={18} aria-hidden />
+          <span className="notif-dot" aria-hidden />
+        </button>
+
+        <button type="button" className="header-user" aria-label={user.name}>
+          <Avatar
+            name={user.name}
+            initials={user.initials}
+            src={user.avatarSrc}
+            colorIndex={user.colorIndex}
+            size="sm"
+          />
+          <div className="hidden xl:flex" style={{ flexDirection: "column" }}>
+            <span className="user-name">{user.name}</span>
+            <span className="user-role">{user.role}</span>
+          </div>
+        </button>
+      </div>
     </header>
   );
 }
