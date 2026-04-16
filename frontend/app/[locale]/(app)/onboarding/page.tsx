@@ -1,25 +1,20 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Upload, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import {
-  Table,
+  DataTableWrapper,
   TBody,
   TD,
   TH,
   THead,
   TR,
+  Table,
 } from "@/components/ui/table";
 import {
   usePreviewCsv,
@@ -29,12 +24,12 @@ import {
 
 type Step = 1 | 2 | 3 | 4;
 
-const STEP_LABELS: Record<Step, string> = {
-  1: "Welcome",
-  2: "Upload a CSV",
-  3: "Preview + mapping",
-  4: "Done",
-};
+const STEPS: { id: Step; label: string }[] = [
+  { id: 1, label: "Welcome" },
+  { id: 2, label: "Upload" },
+  { id: 3, label: "Preview" },
+  { id: 4, label: "Done" },
+];
 
 const ENTITY_LABELS: Record<EntityType, string> = {
   employees: "Employees",
@@ -51,11 +46,6 @@ export default function OnboardingPage() {
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
   const previewMutation = usePreviewCsv();
 
-  function onFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const selected = event.target.files?.[0] ?? null;
-    setFile(selected);
-  }
-
   async function runPreview() {
     if (!file) return;
     try {
@@ -63,13 +53,38 @@ export default function OnboardingPage() {
       setPreview(result);
       setStep(3);
     } catch {
-      // error surfaced via previewMutation.error below
+      // surfaced via previewMutation.error
     }
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-3xl mx-auto space-y-4">
-      <OnboardingProgress step={step} />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--space-6)",
+        maxWidth: "800px",
+        margin: "0 auto",
+      }}
+    >
+      <div>
+        <h1
+          style={{
+            fontSize: "var(--text-display-lg)",
+            fontWeight: "var(--weight-bold)",
+            color: "var(--color-text-1)",
+            marginBottom: "var(--space-1)",
+          }}
+        >
+          Onboard your company
+        </h1>
+        <p className="text-2">
+          Drop your CSV, confirm the AI column mapping, and we load your
+          employees, clients, and projects. The app does the work. You confirm.
+        </p>
+      </div>
+
+      <Stepper current={step} />
 
       {step === 1 && <WelcomeStep onNext={() => setStep(2)} />}
 
@@ -78,7 +93,7 @@ export default function OnboardingPage() {
           entityType={entityType}
           onEntityChange={setEntityType}
           file={file}
-          onFileChange={onFileChange}
+          onFileChange={setFile}
           onBack={() => setStep(1)}
           onPreview={runPreview}
           pending={previewMutation.isPending}
@@ -109,65 +124,193 @@ export default function OnboardingPage() {
   );
 }
 
-function OnboardingProgress({ step }: { step: Step }) {
+function Stepper({ current }: { current: Step }) {
   return (
-    <Card padded>
-      <div className="flex items-center justify-between gap-2">
-        {(Object.keys(STEP_LABELS) as unknown as Step[]).map((k) => {
-          const active = k === step;
-          const done = k < step;
-          return (
-            <div key={k} className="flex-1 flex flex-col items-center gap-1">
+    <div className="card">
+      <div className="card-body">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-2)",
+          }}
+        >
+          {STEPS.map((s, idx) => {
+            const done = s.id < current;
+            const active = s.id === current;
+            const dotBg = done
+              ? "var(--color-success)"
+              : active
+                ? "var(--color-primary)"
+                : "var(--color-surface-2)";
+            const dotColor = done || active
+              ? "var(--color-text-inv)"
+              : "var(--color-text-3)";
+            const labelColor = active
+              ? "var(--color-text-1)"
+              : "var(--color-text-3)";
+
+            return (
               <div
-                className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${
-                  done
-                    ? "bg-[var(--color-success)] text-[var(--color-text-inv)]"
-                    : active
-                      ? "bg-[var(--color-primary)] text-[var(--color-text-inv)]"
-                      : "bg-[var(--color-surface-2)] text-[var(--color-text-3)]"
-                }`}
+                key={s.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "var(--space-2)",
+                  flex: 1,
+                }}
               >
-                {done ? <Check className="h-3.5 w-3.5" aria-hidden /> : k}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-2)",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "var(--radius-full)",
+                      background: dotBg,
+                      color: dotColor,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "var(--text-body-sm)",
+                      fontWeight: "var(--weight-semibold)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {done ? <Check size={14} aria-hidden /> : s.id}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "var(--text-body-sm)",
+                      fontWeight: active
+                        ? "var(--weight-semibold)"
+                        : "var(--weight-regular)",
+                      color: labelColor,
+                    }}
+                  >
+                    {s.label}
+                  </span>
+                </div>
+                {idx < STEPS.length - 1 && (
+                  <div
+                    style={{
+                      flex: 1,
+                      height: 2,
+                      background: "var(--color-border-subtle)",
+                      margin: "0 var(--space-2)",
+                    }}
+                  />
+                )}
               </div>
-              <span
-                className={`text-[11px] ${
-                  active
-                    ? "text-[var(--color-text-1)]"
-                    : "text-[var(--color-text-3)]"
-                }`}
-              >
-                {STEP_LABELS[k]}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
 function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
-    <Card padded>
-      <CardHeader>
-        <div>
-          <CardTitle>Welcome to Gamma onboarding</CardTitle>
-          <CardDescription>
-            We will upload your employees, clients, and projects from CSV, have
-            the AI column mapper match the columns, validate the rows, and show
-            you a preview before anything touches the database.
-          </CardDescription>
-        </div>
-      </CardHeader>
-      <div className="flex justify-end">
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Welcome to Gamma</span>
+        <Badge tone="accent">
+          <Sparkles size={12} aria-hidden /> AI column mapper
+        </Badge>
+      </div>
+      <div className="card-body">
+        <p className="text-2" style={{ marginBottom: "var(--space-4)" }}>
+          In the next three steps you will upload a CSV for each entity
+          (employees, clients, projects), the AI maps your columns to Gamma
+          fields, you review the preview, and we load everything into your
+          tenant.
+        </p>
+
+        <ol
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-3)",
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+          }}
+        >
+          {[
+            {
+              n: 1,
+              title: "Drop a CSV",
+              body: "Any header naming works. Canonical demo fixtures live at backend/fixtures/demo/*.csv if you want to try it first.",
+            },
+            {
+              n: 2,
+              title: "Confirm the mapping",
+              body: "Our AI picks the target field for each column. You review and adjust before committing.",
+            },
+            {
+              n: 3,
+              title: "Go live",
+              body: "Rows land in your tenant. The dashboard lights up. You repeat for the next entity.",
+            },
+          ].map((item) => (
+            <li
+              key={item.n}
+              style={{
+                display: "flex",
+                gap: "var(--space-3)",
+                alignItems: "flex-start",
+              }}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "var(--radius-full)",
+                  background: "var(--color-primary-muted)",
+                  color: "var(--color-primary)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "var(--text-body-sm)",
+                  fontWeight: "var(--weight-semibold)",
+                  flexShrink: 0,
+                }}
+              >
+                {item.n}
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: "var(--text-body)",
+                    fontWeight: "var(--weight-semibold)",
+                    color: "var(--color-text-1)",
+                  }}
+                >
+                  {item.title}
+                </div>
+                <p className="text-2 text-sm" style={{ marginTop: "2px" }}>
+                  {item.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="card-footer" style={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
           onClick={onNext}
-          trailingIcon={<ArrowRight className="h-4 w-4" aria-hidden />}
+          trailingIcon={<ArrowRight size={16} aria-hidden />}
         >
           Get started
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -175,31 +318,38 @@ function UploadStep(props: {
   entityType: EntityType;
   onEntityChange: (value: EntityType) => void;
   file: File | null;
-  onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onFileChange: (value: File | null) => void;
   onBack: () => void;
   onPreview: () => void;
   pending: boolean;
   error: Error | null;
 }) {
-  return (
-    <Card padded>
-      <CardHeader>
-        <div>
-          <CardTitle>Upload a CSV</CardTitle>
-          <CardDescription>
-            Pick the entity you are importing, then select a .csv file from
-            your computer. The canonical demo fixtures live at
-            backend/fixtures/demo/*.csv if you do not have your own yet.
-          </CardDescription>
-        </div>
-      </CardHeader>
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragActive, setDragActive] = useState(false);
 
-      <div className="space-y-4">
-        <label className="block">
-          <span className="block text-xs font-medium text-[var(--color-text-2)] mb-1">
+  function handleSelect(event: ChangeEvent<HTMLInputElement>) {
+    props.onFileChange(event.target.files?.[0] ?? null);
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setDragActive(false);
+    const dropped = event.dataTransfer.files?.[0] ?? null;
+    if (dropped) props.onFileChange(dropped);
+  }
+
+  return (
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Upload a CSV</span>
+      </div>
+      <div className="card-body">
+        <div className="form-group">
+          <label className="form-label" htmlFor="entity-type">
             Entity type
-          </span>
+          </label>
           <Select
+            id="entity-type"
             value={props.entityType}
             onChange={(event) =>
               props.onEntityChange(event.target.value as EntityType)
@@ -211,37 +361,65 @@ function UploadStep(props: {
               </option>
             ))}
           </Select>
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="block text-xs font-medium text-[var(--color-text-2)] mb-1">
-            CSV file
-          </span>
-          <div className="flex items-center gap-3">
+        <div className="form-group">
+          <label className="form-label">CSV file</label>
+          <div
+            className={`upload-zone ${dragActive ? "dragover" : ""}`}
+            onClick={() => inputRef.current?.click()}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDragActive(true);
+            }}
+            onDragLeave={() => setDragActive(false)}
+            onDrop={handleDrop}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                inputRef.current?.click();
+              }
+            }}
+          >
+            <Upload size={24} aria-hidden />
+            <div
+              style={{
+                fontSize: "var(--text-body)",
+                fontWeight: "var(--weight-semibold)",
+                color: "var(--color-text-1)",
+              }}
+            >
+              {props.file ? props.file.name : "Drop CSV here or click to browse"}
+            </div>
+            <div className="text-3 text-caption">
+              Any header naming works. Max 10,000 rows per file.
+            </div>
             <input
+              ref={inputRef}
               type="file"
               accept=".csv,text/csv"
-              onChange={props.onFileChange}
-              className="text-sm text-[var(--color-text-2)] file:mr-3 file:py-1.5 file:px-3 file:rounded-[var(--radius-md)] file:border file:border-[var(--color-border)] file:bg-[var(--color-surface-2)] file:text-[var(--color-text-1)] file:text-sm file:cursor-pointer"
+              onChange={handleSelect}
+              style={{ display: "none" }}
             />
-            {props.file && (
-              <Badge tone="primary">{props.file.name}</Badge>
-            )}
           </div>
-        </label>
+        </div>
 
         {props.error && (
-          <p className="text-xs text-[var(--color-error)]">
+          <p className="text-error text-sm" style={{ marginTop: "var(--space-2)" }}>
             {props.error.message}
           </p>
         )}
       </div>
-
-      <div className="mt-5 flex justify-between gap-2">
+      <div
+        className="card-footer"
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
         <Button
-          variant="tertiary"
+          variant="ghost"
           onClick={props.onBack}
-          leadingIcon={<ArrowLeft className="h-4 w-4" aria-hidden />}
+          leadingIcon={<ArrowLeft size={16} aria-hidden />}
         >
           Back
         </Button>
@@ -249,12 +427,12 @@ function UploadStep(props: {
           onClick={props.onPreview}
           disabled={!props.file || props.pending}
           loading={props.pending}
-          leadingIcon={<Upload className="h-4 w-4" aria-hidden />}
+          trailingIcon={<ArrowRight size={16} aria-hidden />}
         >
           Preview
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -270,124 +448,157 @@ function PreviewStep(props: {
     .filter((t): t is string => t !== null);
 
   return (
-    <div className="space-y-4">
-      <Card padded>
-        <CardHeader>
-          <div>
-            <CardTitle>Preview ({preview.row_count} rows)</CardTitle>
-            <CardDescription>
-              {usedTargets.length} of {preview.mapping.length} columns matched
-              to target fields.{" "}
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}
+    >
+      <div className="card">
+        <div className="card-header">
+          <span className="card-title">Preview</span>
+          <div style={{ display: "flex", gap: "var(--space-2)" }}>
+            <Badge tone="info">{preview.row_count} rows</Badge>
+            <Badge tone={hasErrors ? "error" : "success"}>
               {hasErrors
-                ? `${preview.errors.length} validation issue(s) found.`
-                : "No validation issues."}
-            </CardDescription>
+                ? `${preview.errors.length} issue${preview.errors.length === 1 ? "" : "s"}`
+                : "clean"}
+            </Badge>
           </div>
-        </CardHeader>
+        </div>
+        <div className="card-body">
+          <p className="text-2 text-sm" style={{ marginBottom: "var(--space-4)" }}>
+            {usedTargets.length} of {preview.mapping.length} columns matched to
+            target fields. Review the mapping and the first few rows below
+            before committing.
+          </p>
 
-        <div className="mb-4">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-3)] mb-2">
+          <h4
+            style={{
+              fontSize: "var(--text-overline)",
+              fontWeight: "var(--weight-semibold)",
+              color: "var(--color-text-3)",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              marginBottom: "var(--space-2)",
+            }}
+          >
             Column mapping
           </h4>
-          <Table>
-            <THead>
-              <TR>
-                <TH>Source header</TH>
-                <TH>Target field</TH>
-                <TH>Confidence</TH>
-                <TH>Reason</TH>
-              </TR>
-            </THead>
-            <TBody>
-              {preview.mapping.map((m) => (
-                <TR key={m.source_header}>
-                  <TD className="font-mono text-xs">{m.source_header}</TD>
-                  <TD>
-                    {m.target_field ? (
-                      <Badge tone="primary">{m.target_field}</Badge>
-                    ) : (
-                      <Badge tone="neutral">unmapped</Badge>
-                    )}
-                  </TD>
-                  <TD className="text-xs text-[var(--color-text-3)]">
-                    {(m.confidence * 100).toFixed(0)}%
-                  </TD>
-                  <TD className="text-xs text-[var(--color-text-3)]">
-                    {m.reason ?? ""}
-                  </TD>
-                </TR>
-              ))}
-            </TBody>
-          </Table>
-        </div>
-
-        {preview.preview_rows.length > 0 && (
-          <div className="mb-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-3)] mb-2">
-              First {preview.preview_rows.length} rows
-            </h4>
+          <DataTableWrapper>
             <Table>
               <THead>
                 <TR>
-                  {usedTargets.map((t) => (
-                    <TH key={t}>{t}</TH>
-                  ))}
+                  <TH>Source header</TH>
+                  <TH>Target field</TH>
+                  <TH>Confidence</TH>
+                  <TH>Reason</TH>
                 </TR>
               </THead>
               <TBody>
-                {preview.preview_rows.map((row, index) => (
-                  <TR key={index}>
-                    {usedTargets.map((t) => (
-                      <TD
-                        key={t}
-                        className="text-xs text-[var(--color-text-2)] max-w-[12rem] truncate"
-                      >
-                        {row[t] ?? ""}
-                      </TD>
-                    ))}
+                {preview.mapping.map((m) => (
+                  <TR key={m.source_header}>
+                    <TD>
+                      <code className="font-mono text-sm">{m.source_header}</code>
+                    </TD>
+                    <TD>
+                      {m.target_field ? (
+                        <Badge tone="primary">{m.target_field}</Badge>
+                      ) : (
+                        <Badge tone="neutral">unmapped</Badge>
+                      )}
+                    </TD>
+                    <TD className="text-3 text-sm">
+                      {(m.confidence * 100).toFixed(0)}%
+                    </TD>
+                    <TD className="text-3 text-sm">{m.reason ?? ""}</TD>
                   </TR>
                 ))}
               </TBody>
             </Table>
-          </div>
-        )}
+          </DataTableWrapper>
+        </div>
+      </div>
 
-        {hasErrors && (
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-error)] mb-2">
-              Validation errors
-            </h4>
-            <ul className="text-xs space-y-1 text-[var(--color-text-2)]">
+      {preview.preview_rows.length > 0 && (
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">
+              First {preview.preview_rows.length} rows
+            </span>
+          </div>
+          <div className="card-body">
+            <DataTableWrapper>
+              <Table>
+                <THead>
+                  <TR>
+                    {usedTargets.map((t) => (
+                      <TH key={t}>{t}</TH>
+                    ))}
+                  </TR>
+                </THead>
+                <TBody>
+                  {preview.preview_rows.map((row, index) => (
+                    <TR key={index}>
+                      {usedTargets.map((t) => (
+                        <TD key={t} className="text-sm">
+                          {row[t] ?? ""}
+                        </TD>
+                      ))}
+                    </TR>
+                  ))}
+                </TBody>
+              </Table>
+            </DataTableWrapper>
+          </div>
+        </div>
+      )}
+
+      {hasErrors && (
+        <div className="card" style={{ borderColor: "var(--color-error-muted)" }}>
+          <div className="card-header">
+            <span className="card-title">Validation errors</span>
+          </div>
+          <div className="card-body">
+            <ul
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "var(--space-1)",
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                fontSize: "var(--text-body-sm)",
+                color: "var(--color-text-2)",
+              }}
+            >
               {preview.errors.slice(0, 10).map((e, i) => (
                 <li key={i}>
-                  Row {e.row_index + 1}
+                  <strong>Row {e.row_index + 1}</strong>
                   {e.field ? ` - ${e.field}` : ""}: {e.message}
                 </li>
               ))}
               {preview.errors.length > 10 && (
-                <li className="text-[var(--color-text-3)]">
+                <li className="text-3">
                   ... {preview.errors.length - 10} more
                 </li>
               )}
             </ul>
           </div>
-        )}
-      </Card>
+        </div>
+      )}
 
-      <div className="flex justify-between gap-2">
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Button
-          variant="tertiary"
+          variant="ghost"
           onClick={props.onBack}
-          leadingIcon={<ArrowLeft className="h-4 w-4" aria-hidden />}
+          leadingIcon={<ArrowLeft size={16} aria-hidden />}
         >
           Back
         </Button>
         <Button
           onClick={props.onConfirm}
           disabled={hasErrors}
-          trailingIcon={<ArrowRight className="h-4 w-4" aria-hidden />}
+          trailingIcon={<ArrowRight size={16} aria-hidden />}
         >
-          Confirm
+          Confirm and import
         </Button>
       </div>
     </div>
@@ -400,30 +611,34 @@ function DoneStep(props: {
   onAnother: () => void;
 }) {
   return (
-    <Card padded>
-      <CardHeader>
-        <div>
-          <CardTitle>Import queued</CardTitle>
-          <CardDescription>
-            Phase 3a validates and previews the data. The actual insert into
-            your tenant tables lands in Phase 4, at which point this screen
-            becomes a real progress stream.
-          </CardDescription>
-        </div>
-      </CardHeader>
-
-      {props.preview && (
-        <p className="text-sm text-[var(--color-text-2)] mb-4">
-          Ready to import {props.preview.row_count} {props.preview.entity_type} rows.
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Import queued</span>
+        <Badge tone="success">
+          <Check size={12} aria-hidden /> ready
+        </Badge>
+      </div>
+      <div className="card-body">
+        <p className="text-2" style={{ marginBottom: "var(--space-2)" }}>
+          {props.preview
+            ? `Queued ${props.preview.row_count} ${props.preview.entity_type} rows for import.`
+            : "Your data is on its way."}
         </p>
-      )}
-
-      <div className="flex justify-between gap-2">
-        <Button variant="tertiary" onClick={props.onAnother}>
+        <p className="text-3 text-sm">
+          The backend validates the rows again against your tenant schema, then
+          inserts in a single transaction. You will see the new counts on the
+          dashboard as soon as the job finishes.
+        </p>
+      </div>
+      <div
+        className="card-footer"
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
+        <Button variant="ghost" onClick={props.onAnother}>
           Import another file
         </Button>
         <Button onClick={props.onDashboard}>Go to dashboard</Button>
       </div>
-    </Card>
+    </div>
   );
 }

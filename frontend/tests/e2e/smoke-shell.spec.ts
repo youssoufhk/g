@@ -16,9 +16,10 @@ test("dashboard renders shell chrome in dark mode at 1440", async ({ page }) => 
   const box = await sidebar.boundingBox();
   expect(box?.width).toBe(224);
 
-  // Topbar search placeholder is localized via next-intl.
+  // Topbar search trigger shows the prototype "Search anything..." copy
+  // via next-intl. The trigger is a button, not an input, so we match on text.
   await expect(
-    page.getByPlaceholder("Search employees, clients, projects"),
+    page.getByRole("button", { name: /Search anything/i }),
   ).toBeVisible();
 
   // Dark mode is home (CLAUDE.md principle 9).

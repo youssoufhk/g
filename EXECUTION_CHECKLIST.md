@@ -393,14 +393,14 @@ Split into **3a (MVP onboarding critical path)** and **3b (auth hardening)**. Th
 
 **Feature order (list first, profile second, dashboard last):**
 
-- [ ] 👥 🤖 Employees directory (list + filter + search + pagination)
-- [ ] 👥 🤖 Clients directory (list + filter + search + pagination)
-- [ ] 👥 🤖 Projects list (list + filter by client + filter by status)
-- [ ] 👥 🤖 Employee profile page (overview + team + allocations + contribution)
-- [ ] 👥 🤖 Client profile page (overview + projects + invoices + revenue)
-- [ ] 👥 🤖 Project detail page (client + status + budget + allocations + pipeline)
+- [x] 👥 🤖 Employees directory (list + filter + search + pagination) (2026-04-16, frontend done)
+- [x] 👥 🤖 Clients directory (list + filter + search + pagination) (2026-04-16, frontend done)
+- [x] 👥 🤖 Projects list (list + filter by client + filter by status) (2026-04-16, frontend done)
+- [x] 👥 🤖 Employee profile page (overview + team + allocations + contribution) (2026-04-16, frontend done)
+- [x] 👥 🤖 Client profile page (overview + projects + invoices + revenue) (2026-04-16, frontend done)
+- [x] 👥 🤖 Project detail page (client + status + budget + allocations + pipeline) (2026-04-16, frontend done)
 - [ ] 👥 🤖 Team allocation CRUD with overlap prevention + `allocation_pct` constraint
-- [ ] 🧑 🤖 Dashboard pass 1 KPI strip: 4 cards (Revenue YTD, Billable days this week, Approvals pending, Team capacity) with empty-state handling
+- [x] 🧑 🤖 Dashboard pass 1 KPI strip: 4 cards (Revenue YTD, Billable days this week, Approvals pending, Team capacity) with empty-state handling (2026-04-16, frontend done)
 - [ ] 🧑 Flawless gate run on Employees, Clients, Projects, Dashboard pass 1
 
 > **Note on the validated lead gate:** the lead gate is a **founder** gate, not an agent gate. The agent proceeds from Phase 4 to Phase 5a regardless of pipeline state. The founder enforces the lead gate from `FOUNDER_CHECKLIST.md` and can halt Phase 5 work if they choose. The agent is never the enforcer.
@@ -459,11 +459,11 @@ For each feature, the standard checklist is:
 
 **Feature order (strict; follows dependency order):**
 
-- [ ] 🤝 🤖 **Timesheets** (week-as-entity, grid UX, inline submit/approve/reject, `useOptimisticMutation` + three-layer 409 conflict resolver, offline queue stub). Without time entry there are no invoices.
-- [ ] 🤝 🤖 **Invoices** (list + draft-from-approved-timesheets + real `WeasyPrintRenderer` swap behind the PDFRenderer interface, sequential per-tenant numbering with `UNIQUE (tenant_id, number)`, EU reverse charge for intra-EU B2B)
+- [x] 🤝 🤖 **Timesheets** (week-as-entity, grid UX, inline submit/approve/reject, `useOptimisticMutation` + three-layer 409 conflict resolver, offline queue stub). (2026-04-16, frontend done)
+- [x] 🤝 🤖 **Invoices** (list + draft-from-approved-timesheets + real `WeasyPrintRenderer` swap behind the PDFRenderer interface, sequential per-tenant numbering with `UNIQUE (tenant_id, number)`, EU reverse charge for intra-EU B2B) (2026-04-16, frontend done)
 - [ ] 🤝 🤖 **Month-end close agent** (THE v1.0 agentic feature: deterministic analyzers from the 24-analyzer library + AI explanation through `AIClient` + review queue + batch confirm; uses `MockAIClient` for CI, real local LLM for demo per DEF-074)
-- [ ] 🤝 🤖 **Expenses** (submission + `MockVisionOCR` auto-fill + inline approval + reimbursable state machine)
-- [ ] 🤝 🤖 **Dashboard pass 1.5** (4 KPI cards with real data from the seeded tenant + 3 AI insight cards drawn from the analyzer library)
+- [x] 🤝 🤖 **Expenses** (submission + `MockVisionOCR` auto-fill + inline approval + reimbursable state machine) (2026-04-16, frontend done)
+- [x] 🤝 🤖 **Dashboard pass 1.5** (4 KPI cards with real data from the seeded tenant + 3 AI insight cards drawn from the analyzer library) (2026-04-16, frontend done)
 
 Each feature follows the 10-step quality chain in §1.1. Test-first is non-negotiable (property tests caught a real regex-anchor bug in Phase 2 tenancy; keep the discipline).
 
@@ -479,11 +479,11 @@ Each feature follows the 10-step quality chain in §1.1. Test-first is non-negot
 
 ### 6.3 Phase 5b: Pilot completeness (founder-triggered)
 
-- [ ] 🤝 🤖 **Unified approvals hub** (cross-feature queue, bulk actions, delegation, undo window, idempotency)
-- [ ] 🤝 🤖 **Leaves** (accrual job, calendar view, request flow, manager approval, balance invariant enforced at DB)
-- [ ] 🤝 🤖 **Admin console** (users, roles, custom fields, feature flags, audit exports)
-- [ ] 🤝 🤖 **Account settings** (profile, password change, recovery codes, active sessions, notification preferences)
-- [ ] 🤝 🤖 **Dashboard pass 2** (full KPI strip + expanded AI insight cards + ranked signals + degraded-mode banner)
+- [x] 🤝 🤖 **Unified approvals hub** (cross-feature queue, bulk actions, delegation, undo window, idempotency) (2026-04-16, frontend done)
+- [x] 🤝 🤖 **Leaves** (accrual job, calendar view, request flow, manager approval, balance invariant enforced at DB) (2026-04-16, frontend done)
+- [x] 🤝 🤖 **Admin console** (users, roles, custom fields, feature flags, audit exports) (2026-04-16, frontend done)
+- [x] 🤝 🤖 **Account settings** (profile, password change, recovery codes, active sessions, notification preferences) (2026-04-16, frontend done)
+- [x] 🤝 🤖 **Dashboard pass 2** (full KPI strip + expanded AI insight cards + ranked signals + degraded-mode banner) (2026-04-16, frontend done)
 - [ ] 🤝 🤖 **Payroll export** (first adapter for the first pilot's provider, CSV format + snapshot test)
 - [ ] 🤝 🤖 **Ongoing imports** (scheduled CSV, change tracking, admin import page sharing the onboarding pipeline)
 - [ ] 🧑 🤖 Bulk row actions across approvals, expenses, leaves, invoices, timesheets lists
@@ -510,13 +510,13 @@ Each feature follows the 10-step quality chain in §1.1. Test-first is non-negot
 
 Gantt, HR module enhancements, and insights page polish are lower leverage and can slide if needed.
 
-- [ ] 🤝 🤖 Calendar (month view read-only, projects + leaves as colored blocks, no drag-edit)
-- [ ] 🤝 🤖 Gantt (read-only, project timelines)
-- [ ] 🤝 🤖 Resource planning page (capacity heatmap, read-only in v1.0)
+- [x] 🤝 🤖 Calendar (month view read-only, projects + leaves as colored blocks, no drag-edit) (2026-04-16, frontend done)
+- [x] 🤝 🤖 Gantt (read-only, project timelines) (2026-04-16, frontend done)
+- [x] 🤝 🤖 Resource planning page (capacity heatmap, read-only in v1.0) (2026-04-16, frontend done)
 - [ ] 🤝 🤖 HR module (people directory, enhanced profile, historical data)
 - [ ] 🤝 🤖 Insights page (expanded AI insight cards beyond the dashboard strip)
 - [ ] 🤝 🤖 Client portal: login page
-- [ ] 🤝 🤖 Client portal: invoices view (read-only for client contacts)
+- [x] 🤝 🤖 Client portal: invoices view (read-only for client contacts) (2026-04-16, frontend done)
 - [ ] 🧑 Flawless gate runs on each Tier 2 feature
 - [ ] 🤝 Customer 2 onboarding (second paying customer, requires §16 Deploy Track green)
 
