@@ -392,7 +392,7 @@ export default function ProjectDetailPage({
           <div className="detail-tabs-content">
             <EmptyState
               title="Full team view"
-              description="Detailed team capacity and contribution view is available in Phase 5."
+              description="Team capacity and contribution data will appear here."
             />
           </div>
         </TabsContent>
@@ -402,7 +402,7 @@ export default function ProjectDetailPage({
           <div className="detail-tabs-content">
             <EmptyState
               title="Budget breakdown"
-              description="Detailed budget tracking by category is available in Phase 5."
+              description="Detailed budget tracking by category will appear here."
             />
           </div>
         </TabsContent>
@@ -412,7 +412,7 @@ export default function ProjectDetailPage({
           <div className="detail-tabs-content">
             <EmptyState
               title="Project timeline"
-              description="Interactive Gantt timeline view is available in Phase 6."
+              description="Interactive Gantt timeline view will appear here."
             />
           </div>
         </TabsContent>

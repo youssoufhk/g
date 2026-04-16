@@ -416,7 +416,7 @@ export default function EmployeeProfilePage({
                   <EmptyState
                     icon={Clock}
                     title="No recent activity"
-                    description="Phase 5a wires this - timesheet and approval history will appear here."
+                    description="Timesheet and approval history will appear here once timesheets are logged."
                   />
                 </div>
               </div>
@@ -432,7 +432,7 @@ export default function EmployeeProfilePage({
                 <EmptyState
                   icon={Clock}
                   title="Timesheets not yet wired"
-                  description="Phase 5a connects timesheet data. Weekly entries and approval status will appear here."
+                  description="Weekly timesheet entries and approval status will appear here."
                 />
               </div>
             </div>
@@ -447,7 +447,7 @@ export default function EmployeeProfilePage({
                 <EmptyState
                   icon={Receipt}
                   title="Expenses not yet wired"
-                  description="Phase 5b connects expense data. Submitted and approved expenses will appear here."
+                  description="Submitted and approved expenses will appear here."
                 />
               </div>
             </div>
@@ -462,7 +462,7 @@ export default function EmployeeProfilePage({
                 <EmptyState
                   icon={Umbrella}
                   title="Leaves not yet wired"
-                  description="Phase 5b connects leave data. Annual leave, sick days, and balances will appear here."
+                  description="Annual leave, sick days, and balances will appear here."
                 />
               </div>
             </div>
@@ -477,7 +477,7 @@ export default function EmployeeProfilePage({
                 <EmptyState
                   icon={FileText}
                   title="Documents not yet wired"
-                  description="Phase 6 connects document storage. Contracts and signed documents will appear here."
+                  description="Contracts and signed documents will appear here."
                 />
               </div>
             </div>

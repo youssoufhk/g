@@ -240,13 +240,15 @@ export default function CalendarPage() {
         )}
       </div>
 
-      {/* Calendar grid */}
+      {/* Calendar grid - overflow-x-auto for narrow screens */}
+      <div style={{ overflowX: "auto" }}>
       <div
         style={{
           background: "var(--color-surface-0)",
           border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-xl)",
           overflow: "hidden",
+          minWidth: 420,
         }}
       >
         {/* Day name header */}
@@ -386,6 +388,7 @@ export default function CalendarPage() {
             })}
           </div>
         ))}
+      </div>
       </div>
 
       {/* Legend */}

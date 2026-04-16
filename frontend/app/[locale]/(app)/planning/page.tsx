@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { PageHeader } from "@/components/patterns/page-header";
 import { StatPill } from "@/components/patterns/stat-pill";
 import { Avatar } from "@/components/ui/avatar";
@@ -256,10 +257,9 @@ export default function PlanningPage() {
           {EMPLOYEES.map((emp, ei) => {
             const isLast = ei === EMPLOYEES.length - 1;
             return (
-              <>
+              <Fragment key={emp.id}>
                 {/* Name cell */}
                 <div
-                  key={`name-${emp.id}`}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -330,7 +330,7 @@ export default function PlanningPage() {
                     </div>
                   );
                 })}
-              </>
+              </Fragment>
             );
           })}
         </div>

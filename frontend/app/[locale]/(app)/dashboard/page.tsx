@@ -27,9 +27,9 @@ function formatDate(): string {
 }
 
 const TEAM_MEMBERS = [
-  { name: "Amara Diallo", title: "Senior Consultant", status: "active" as const },
-  { name: "Lucas Ferreira", title: "Project Manager", status: "active" as const },
-  { name: "Sophie Martin", title: "Junior Analyst", status: "active" as const },
+  { id: "1", name: "Amara Diallo", title: "Senior Consultant", status: "active" as const },
+  { id: "2", name: "Lucas Ferreira", title: "Project Manager", status: "active" as const },
+  { id: "3", name: "Sophie Martin", title: "Junior Analyst", status: "active" as const },
 ];
 
 const ACTIVE_PROJECTS = [
@@ -333,19 +333,21 @@ export default function DashboardPage() {
           <div className="card-body">
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
               {TEAM_MEMBERS.map((member) => (
-                <div
-                  key={member.name}
+                <Link
+                  key={member.id}
+                  href={`/employees/${member.id}`}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "var(--space-2-5)",
+                    textDecoration: "none",
                   }}
                 >
                   <Avatar name={member.name} size="sm" status="online" />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p
                       style={{
-                        fontSize: "var(--text-sm)",
+                        fontSize: "var(--text-body-sm)",
                         fontWeight: "var(--weight-medium)",
                         color: "var(--color-text-1)",
                         overflow: "hidden",
@@ -357,7 +359,7 @@ export default function DashboardPage() {
                     </p>
                     <p
                       style={{
-                        fontSize: "var(--text-xs)",
+                        fontSize: "var(--text-caption)",
                         color: "var(--color-text-3)",
                       }}
                     >
@@ -365,7 +367,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <Badge tone="success">Active</Badge>
-                </div>
+                </Link>
               ))}
             </div>
             <div style={{ marginTop: "var(--space-3)", textAlign: "right" }}>

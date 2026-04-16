@@ -249,7 +249,8 @@ export default function PortalInvoicesPage() {
         </div>
       </div>
 
-      {/* Invoice table */}
+      {/* Invoice table - overflow-x-auto for narrow screens */}
+      <div style={{ overflowX: "auto" }}>
       <DataTableWrapper>
         <Table>
           <THead>
@@ -361,6 +362,20 @@ export default function PortalInvoicesPage() {
           </TBody>
         </Table>
       </DataTableWrapper>
+      </div>
+
+      {/* Empty state (shown when no invoices) */}
+      {MOCK_INVOICES.length === 0 && (
+        <div
+          style={{
+            padding: "var(--space-12) var(--space-4)",
+            textAlign: "center",
+            color: "var(--color-text-3)",
+          }}
+        >
+          <p style={{ fontSize: "var(--text-body-sm)" }}>No invoices found.</p>
+        </div>
+      )}
 
       {/* Footer note */}
       <p

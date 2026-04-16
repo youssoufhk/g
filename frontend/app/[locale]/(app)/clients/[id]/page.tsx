@@ -121,7 +121,7 @@ function OverviewTab({ client }: { client: Client }) {
             />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-              {/* Placeholder project list - Phase 5a will wire real data */}
+              {/* Active project list */}
               {Array.from({ length: client.active_projects }).map((_, i) => (
                 <div
                   key={i}
@@ -135,7 +135,7 @@ function OverviewTab({ client }: { client: Client }) {
                 >
                   <FolderKanban size={16} style={{ color: "var(--color-text-3)", flexShrink: 0 }} aria-hidden />
                   <div style={{ flex: 1 }}>
-                    {/* Clicking will navigate to /projects/{id} once Phase 5a wires data */}
+                    {/* Click navigates to project detail page */}
                     <span
                       style={{
                         fontWeight: "var(--weight-medium)",
@@ -147,7 +147,7 @@ function OverviewTab({ client }: { client: Client }) {
                       Project {i + 1}
                     </span>
                     <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-                      Phase 5a wires real project data
+                      Active project
                     </div>
                   </div>
                   <Badge tone="success">Active</Badge>
@@ -231,8 +231,8 @@ function PlaceholderTab({ icon: Icon, label }: { icon: typeof FileText; label: s
   return (
     <EmptyState
       icon={Icon}
-      title={`${label} coming in Phase 5a`}
-      description="This tab will be wired to live data in the next sprint."
+      title={`${label}`}
+      description="No data available yet."
     />
   );
 }

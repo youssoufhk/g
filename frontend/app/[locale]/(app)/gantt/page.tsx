@@ -75,33 +75,52 @@ const PROJECTS: GanttProject[] = [
   },
 ];
 
-// Timeline constants
-const TIMELINE_START = new Date("2026-01-01");
-const TIMELINE_END = new Date("2026-12-31");
-const TOTAL_DAYS =
-  (TIMELINE_END.getTime() - TIMELINE_START.getTime()) / (1000 * 60 * 60 * 24);
+// Today (fixed reference)
+const TODAY = new Date("2026-04-16");
 
-const MONTH_LABELS = [
+const ALL_MONTH_LABELS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-// Today marker
-const TODAY = new Date("2026-04-16");
-const TODAY_PCT =
-  ((TODAY.getTime() - TIMELINE_START.getTime()) / (1000 * 60 * 60 * 24) /
-    TOTAL_DAYS) *
-  100;
+function msPerDay() { return 1000 * 60 * 60 * 24; }
 
-function daysSinceStart(dateStr: string): number {
-  const d = new Date(dateStr);
-  return (d.getTime() - TIMELINE_START.getTime()) / (1000 * 60 * 60 * 24);
+type TimelineCtx = {
+  start: Date;
+  end: Date;
+  totalDays: number;
+  monthLabels: string[];
+};
+
+function buildCtx(range: "3 months" | "6 months"): TimelineCtx {
+  if (range === "3 months") {
+    // Apr 1 to Jun 30
+    const start = new Date("2026-04-01");
+    const end = new Date("2026-06-30");
+    return {
+      start,
+      end,
+      totalDays: (end.getTime() - start.getTime()) / msPerDay(),
+      monthLabels: ["Apr", "May", "Jun"],
+    };
+  }
+  // 6 months: Jan 1 to Jun 30
+  const start = new Date("2026-01-01");
+  const end = new Date("2026-06-30");
+  return {
+    start,
+    end,
+    totalDays: (end.getTime() - start.getTime()) / msPerDay(),
+    monthLabels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  };
+}
+
+function daysSince(dateStr: string, ctx: TimelineCtx): number {
+  return (new Date(dateStr).getTime() - ctx.start.getTime()) / msPerDay();
 }
 
 function durationDays(startStr: string, endStr: string): number {
-  const s = new Date(startStr);
-  const e = new Date(endStr);
-  return (e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24);
+  return (new Date(endStr).getTime() - new Date(startStr).getTime()) / msPerDay();
 }
 
 // ---------------------------------------------------------------------------
@@ -111,7 +130,8 @@ function durationDays(startStr: string, endStr: string): number {
 const LEFT_WIDTH = 220;
 const RIGHT_WIDTH = 800;
 
-function MonthHeader() {
+function MonthHeader({ ctx }: { ctx: TimelineCtx }) {
+  const colPct = 100 / ctx.monthLabels.length;
   return (
     <div
       style={{
@@ -119,10 +139,7 @@ function MonthHeader() {
         borderBottom: "1px solid var(--color-border-subtle)",
       }}
     >
-      {/* Left spacer */}
       <div style={{ width: LEFT_WIDTH, flexShrink: 0 }} />
-
-      {/* Month columns */}
       <div
         style={{
           width: RIGHT_WIDTH,
@@ -131,11 +148,11 @@ function MonthHeader() {
           position: "relative",
         }}
       >
-        {MONTH_LABELS.map((m) => (
+        {ctx.monthLabels.map((m) => (
           <div
             key={m}
             style={{
-              width: `${100 / 12}%`,
+              width: `${colPct}%`,
               padding: "var(--space-2) var(--space-2)",
               fontSize: "var(--text-caption)",
               fontWeight: "var(--weight-medium)",
@@ -152,14 +169,15 @@ function MonthHeader() {
   );
 }
 
-function ProjectRow({ project }: { project: GanttProject }) {
-  const leftPct =
-    (daysSinceStart(project.startDate) / TOTAL_DAYS) * 100;
-  const widthPct =
-    (durationDays(project.startDate, project.endDate) / TOTAL_DAYS) * 100;
-
+function ProjectRow({ project, ctx }: { project: GanttProject; ctx: TimelineCtx }) {
+  // Clamp dates to the visible window
+  const startDay = Math.max(0, daysSince(project.startDate, ctx));
+  const endDay = Math.min(ctx.totalDays, daysSince(project.endDate, ctx));
+  const leftPct = (startDay / ctx.totalDays) * 100;
+  const widthPct = Math.max(0, ((endDay - startDay) / ctx.totalDays) * 100);
   const widthPx = (widthPct / 100) * RIGHT_WIDTH;
   const isWide = widthPx > 80;
+  const colPct = 100 / ctx.monthLabels.length;
 
   return (
     <div
@@ -170,7 +188,6 @@ function ProjectRow({ project }: { project: GanttProject }) {
         minHeight: 60,
       }}
     >
-      {/* Left: project info */}
       <div
         style={{
           width: LEFT_WIDTH,
@@ -191,35 +208,20 @@ function ProjectRow({ project }: { project: GanttProject }) {
         >
           {project.name}
         </div>
-        <div
-          style={{
-            fontSize: "var(--text-caption)",
-            color: "var(--color-text-3)",
-            marginTop: 2,
-          }}
-        >
+        <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>
           {project.client}
         </div>
       </div>
 
-      {/* Right: bar area */}
-      <div
-        style={{
-          width: RIGHT_WIDTH,
-          flexShrink: 0,
-          position: "relative",
-          padding: "var(--space-2) 0",
-        }}
-      >
-        {/* Month column grid lines */}
-        {MONTH_LABELS.map((_, i) => (
+      <div style={{ width: RIGHT_WIDTH, flexShrink: 0, position: "relative", padding: "var(--space-2) 0" }}>
+        {ctx.monthLabels.map((_, i) => (
           <div
             key={i}
             style={{
               position: "absolute",
               top: 0,
               bottom: 0,
-              left: `${(i / 12) * 100}%`,
+              left: `${i * colPct}%`,
               width: 1,
               background: "var(--color-border-subtle)",
               pointerEvents: "none",
@@ -227,37 +229,31 @@ function ProjectRow({ project }: { project: GanttProject }) {
           />
         ))}
 
-        {/* Bar */}
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            transform: "translateY(-50%)",
-            left: `${leftPct}%`,
-            width: `${widthPct}%`,
-            height: 24,
-            borderRadius: "var(--radius-sm)",
-            background: project.color,
-            opacity: project.opacity ?? 1,
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: "var(--space-2)",
-            overflow: "hidden",
-          }}
-        >
-          {isWide && project.phase && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: "var(--weight-medium)",
-                color: "#fff",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {project.phase}
-            </span>
-          )}
-        </div>
+        {widthPct > 0 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              left: `${leftPct}%`,
+              width: `${widthPct}%`,
+              height: 24,
+              borderRadius: "var(--radius-sm)",
+              background: project.color,
+              opacity: project.opacity ?? 1,
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: "var(--space-2)",
+              overflow: "hidden",
+            }}
+          >
+            {isWide && project.phase && (
+              <span style={{ fontSize: 10, fontWeight: "var(--weight-medium)", color: "#fff", whiteSpace: "nowrap" }}>
+                {project.phase}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -269,6 +265,10 @@ function ProjectRow({ project }: { project: GanttProject }) {
 
 export default function GanttPage() {
   const [range, setRange] = useState<"3 months" | "6 months">("6 months");
+  const ctx = buildCtx(range);
+  const todayPct = Math.min(100, Math.max(0,
+    ((TODAY.getTime() - ctx.start.getTime()) / msPerDay() / ctx.totalDays) * 100
+  ));
 
   return (
     <>
@@ -291,7 +291,7 @@ export default function GanttPage() {
             color: "var(--color-text-3)",
           }}
         >
-          April 2026 - October 2026
+          {ALL_MONTH_LABELS[ctx.start.getMonth()]} {ctx.start.getFullYear()} - {ALL_MONTH_LABELS[ctx.end.getMonth()]} {ctx.end.getFullYear()}
         </span>
 
         <div style={{ display: "flex", gap: "var(--space-2)" }}>
@@ -319,16 +319,16 @@ export default function GanttPage() {
       {/* Gantt card */}
       <div className="card" style={{ padding: 0, overflowX: "auto" }}>
         <div style={{ minWidth: LEFT_WIDTH + RIGHT_WIDTH }}>
-          <MonthHeader />
+          <MonthHeader ctx={ctx} />
 
-          {/* Today marker (positioned relative to the right panel) */}
+          {/* Today marker */}
           <div style={{ position: "relative" }}>
             <div
               style={{
                 position: "absolute",
                 top: 0,
                 bottom: 0,
-                left: LEFT_WIDTH + (TODAY_PCT / 100) * RIGHT_WIDTH,
+                left: LEFT_WIDTH + (todayPct / 100) * RIGHT_WIDTH,
                 width: 1,
                 borderLeft: "1px dashed var(--color-text-3)",
                 zIndex: 2,
@@ -337,7 +337,7 @@ export default function GanttPage() {
             />
 
             {PROJECTS.map((project) => (
-              <ProjectRow key={project.id} project={project} />
+              <ProjectRow key={project.id} project={project} ctx={ctx} />
             ))}
           </div>
         </div>
