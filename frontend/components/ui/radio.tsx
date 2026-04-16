@@ -1,25 +1,47 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
 import clsx from "clsx";
 
-export type RadioProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
+/**
+ * Wraps the prototype's `.form-check` label + radio input pattern. Pass
+ * `label` for the standard row layout, or omit it to get just the styled
+ * input.
+ */
+export type RadioProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
+  label?: ReactNode;
+  description?: ReactNode;
+};
 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
-  { className, ...rest },
+  { className, label, description, id, ...rest },
   ref,
 ) {
-  return (
+  const input = (
     <input
       ref={ref}
+      id={id}
       type="radio"
-      className={clsx(
-        "h-4 w-4 rounded-full",
-        "border border-[var(--color-border-strong)] bg-[var(--color-surface-1)]",
-        "accent-[var(--color-primary)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-bg)]",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        className,
-      )}
+      className={clsx(className)}
       {...rest}
     />
+  );
+  if (!label && !description) return input;
+  return (
+    <label className="form-check" htmlFor={id}>
+      {input}
+      {(label || description) && (
+        <span
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "2px",
+          }}
+        >
+          {label && <span>{label}</span>}
+          {description && (
+            <span className="text-3 text-caption">{description}</span>
+          )}
+        </span>
+      )}
+    </label>
   );
 });

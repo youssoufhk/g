@@ -4,92 +4,175 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import clsx from "clsx";
+import { ChevronsLeft } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
-import { primaryNav, secondaryNav } from "./nav-items";
+import {
+  footerNav,
+  navSections,
+  type NavItem,
+  type NavRole,
+  type NavSection,
+} from "./nav-items";
+
+const STORAGE_KEY = "gamma-sidebar-collapsed";
+
+type SidebarProps = {
+  /** Current viewer's role. Controls section / item visibility. */
+  role?: NavRole;
+  /** Override for badge counts keyed by nav-item key. */
+  badges?: Partial<Record<string, number>>;
+};
 
 /**
- * Sidebar is 224px wide on desktop. Never 240. (CLAUDE.md rule 3.)
- * Hidden below md breakpoint - the bottom nav takes over on mobile.
- *
- * Shared across every (app) page; individual pages must NOT copy this
- * markup (CLAUDE.md rule 7).
+ * Sidebar wraps the prototype's `.sidebar` + `.sidebar-logo` +
+ * `.sidebar-nav` + `.sidebar-footer` + `.nav-section` + `.nav-item`
+ * pattern. Structure mirrors specs/DESIGN_SYSTEM.md section 3.2 and
+ * prototype _shared.js GHR.renderSidebar() output.
  */
-export function Sidebar() {
+export function Sidebar({ role = "admin", badges }: SidebarProps) {
   const t = useTranslations("nav");
   const appT = useTranslations("app");
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "1");
+  }, []);
+
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      }
+      return next;
+    });
+  }, []);
+
+  const visibleSections = navSections.filter((section) =>
+    canAccess(role, section.minRole),
+  );
 
   return (
     <aside
+      className={clsx("sidebar", collapsed && "collapsed")}
       aria-label="Primary navigation"
-      className="hidden md:flex md:flex-col md:w-[224px] md:shrink-0 md:h-screen md:sticky md:top-0 border-r border-[var(--color-border)] bg-[var(--color-surface-0)]"
     >
-      <div className="h-14 flex items-center px-4 border-b border-[var(--color-border)]">
-        <span className="font-semibold tracking-tight text-[var(--color-text-1)]">
-          {appT("name")}
-        </span>
+      <div className="sidebar-logo">
+        <div className="logo-icon" aria-hidden>
+          G
+        </div>
+        <span className="logo-text">{appT("name")}</span>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-3">
-        <ul className="space-y-0.5 px-2">
-          {primaryNav.map((item) => (
+      <nav className="sidebar-nav" aria-label="Main navigation">
+        {visibleSections.map((section) => (
+          <SidebarSection
+            key={section.key}
+            section={section}
+            role={role}
+            pathname={pathname}
+            badges={badges}
+            t={t}
+          />
+        ))}
+      </nav>
+
+      <div className="sidebar-footer">
+        {footerNav
+          .filter((item) => canAccess(role, item.minRole))
+          .map((item) => (
             <SidebarLink
               key={item.key}
-              href={item.href}
-              label={t(item.messageKey)}
-              Icon={item.icon}
-              active={isActive(pathname, item.href)}
+              item={item}
+              pathname={pathname}
+              badge={badges?.[item.key]}
+              t={t}
             />
           ))}
-        </ul>
 
-        <div className="mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
-          <ul className="space-y-0.5 px-2">
-            {secondaryNav.map((item) => (
-              <SidebarLink
-                key={item.key}
-                href={item.href}
-                label={t(item.messageKey)}
-                Icon={item.icon}
-                active={isActive(pathname, item.href)}
-              />
-            ))}
-          </ul>
-        </div>
-      </nav>
+        <button
+          type="button"
+          className="sidebar-collapse-btn"
+          onClick={toggleCollapsed}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-pressed={collapsed}
+        >
+          <ChevronsLeft aria-hidden />
+          <span>{collapsed ? "Expand" : "Collapse"}</span>
+        </button>
+      </div>
     </aside>
   );
 }
 
-function SidebarLink({
-  href,
-  label,
-  Icon,
-  active,
+type TranslateFn = ReturnType<typeof useTranslations>;
+
+function SidebarSection({
+  section,
+  role,
+  pathname,
+  badges,
+  t,
 }: {
-  href: string;
-  label: string;
-  Icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
-  active: boolean;
+  section: NavSection;
+  role: NavRole;
+  pathname: string | null;
+  badges?: Partial<Record<string, number>>;
+  t: TranslateFn;
 }) {
+  const items = section.items.filter((item) => canAccess(role, item.minRole));
+  if (items.length === 0) return null;
   return (
-    <li>
-      <Link
-        href={href}
-        aria-current={active ? "page" : undefined}
-        className={clsx(
-          "flex items-center gap-3 px-3 h-9 rounded-[var(--radius-md)] text-sm",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]",
-          active
-            ? "bg-[var(--color-primary-muted)] text-[var(--color-text-1)]"
-            : "text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:bg-[var(--color-surface-1)]",
-        )}
-      >
-        <Icon className="h-4 w-4" aria-hidden />
-        <span>{label}</span>
-      </Link>
-    </li>
+    <div className="nav-section">
+      <div className="nav-section-label">{t(`sections.${section.key}`)}</div>
+      {items.map((item) => (
+        <SidebarLink
+          key={item.key}
+          item={item}
+          pathname={pathname}
+          badge={badges?.[item.key]}
+          t={t}
+        />
+      ))}
+    </div>
   );
+}
+
+function SidebarLink({
+  item,
+  pathname,
+  badge,
+  t,
+}: {
+  item: NavItem;
+  pathname: string | null;
+  badge?: number;
+  t: TranslateFn;
+}) {
+  const Icon = item.icon;
+  const active = isActive(pathname, item.href);
+  return (
+    <Link
+      href={item.href}
+      className={clsx("nav-item", active && "active")}
+      aria-current={active ? "page" : undefined}
+    >
+      <Icon aria-hidden />
+      <span className="nav-label">{t(item.messageKey)}</span>
+      {typeof badge === "number" && badge > 0 && (
+        <span className="nav-badge">{badge}</span>
+      )}
+    </Link>
+  );
+}
+
+function canAccess(role: NavRole, minRole?: NavRole): boolean {
+  if (!minRole) return true;
+  const order: Record<NavRole, number> = { employee: 0, pm: 1, admin: 2 };
+  return order[role] >= order[minRole];
 }
 
 function isActive(pathname: string | null, href: string): boolean {

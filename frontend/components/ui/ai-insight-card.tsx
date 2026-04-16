@@ -1,60 +1,47 @@
 import type { ReactNode } from "react";
 import { Sparkles } from "lucide-react";
-import clsx from "clsx";
-
-import { Card } from "./card";
-
-type Severity = "info" | "warning" | "error" | "success";
 
 export type AIInsightCardProps = {
   title: string;
-  severity?: Severity;
-  summary: string;
+  summary: ReactNode;
   evidence?: string[];
   actions?: ReactNode;
-  className?: string;
 };
 
-const severityToBorder: Record<Severity, string> = {
-  info: "border-[var(--color-info-muted)]",
-  warning: "border-[var(--color-warning-muted)]",
-  error: "border-[var(--color-error-muted)]",
-  success: "border-[var(--color-success-muted)]",
-};
-
+/**
+ * Wraps the prototype's `.ai-insight-card` pattern. The CSS lives in
+ * components.css under .ai-insight-card / .ai-header / .ai-body / .ai-actions.
+ * The left border color is chart-5 (brand violet) via the CSS itself.
+ */
 export function AIInsightCard({
   title,
-  severity = "info",
   summary,
   evidence,
   actions,
-  className,
 }: AIInsightCardProps) {
   return (
-    <Card
-      padded
-      className={clsx("border", severityToBorder[severity], className)}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-2">
-          <Sparkles
-            className="h-4 w-4 text-[var(--color-primary)] mt-0.5"
-            aria-hidden
-          />
-          <h4 className="text-sm font-semibold text-[var(--color-text-1)]">
-            {title}
-          </h4>
-        </div>
+    <div className="ai-insight-card">
+      <div className="ai-header">
+        <Sparkles size={16} aria-hidden />
+        <span>{title}</span>
       </div>
-      <p className="mt-2 text-sm text-[var(--color-text-2)]">{summary}</p>
-      {evidence && evidence.length > 0 && (
-        <ul className="mt-3 space-y-1 list-disc pl-5 text-xs text-[var(--color-text-3)]">
-          {evidence.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      )}
-      {actions && <div className="mt-4 flex items-center gap-2">{actions}</div>}
-    </Card>
+      <div className="ai-body">
+        {summary}
+        {evidence && evidence.length > 0 && (
+          <ul
+            style={{
+              marginTop: "var(--space-2)",
+              paddingLeft: "var(--space-5)",
+              listStyle: "disc",
+            }}
+          >
+            {evidence.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+      {actions && <div className="ai-actions">{actions}</div>}
+    </div>
   );
 }

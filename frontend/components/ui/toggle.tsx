@@ -9,6 +9,11 @@ export type ToggleProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> 
   label: string;
 };
 
+/**
+ * Toggle switch. Wraps the prototype's `.toggle` + `.toggle.active` pattern
+ * in _components.css (40x22 pill, 16x16 knob, 18px slide). The knob slides
+ * via the `::after` pseudo-element defined in the prototype CSS.
+ */
 export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(function Toggle(
   { checked, onCheckedChange, label, disabled, className, ...rest },
   ref,
@@ -22,24 +27,8 @@ export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(function Toggle
       aria-label={label}
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
-      className={clsx(
-        "relative inline-flex h-6 w-10 items-center rounded-full border transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-bg)]",
-        checked
-          ? "bg-[var(--color-primary)] border-[var(--color-primary)]"
-          : "bg-[var(--color-surface-2)] border-[var(--color-border-strong)]",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        className,
-      )}
+      className={clsx("toggle", checked && "active", className)}
       {...rest}
-    >
-      <span
-        aria-hidden
-        className={clsx(
-          "inline-block h-5 w-5 rounded-full bg-[var(--color-text-inv)] transition-transform",
-          checked ? "translate-x-4" : "translate-x-0.5",
-        )}
-      />
-    </button>
+    />
   );
 });

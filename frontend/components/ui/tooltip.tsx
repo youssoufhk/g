@@ -1,7 +1,11 @@
-"use client";
+import type { ReactNode } from "react";
 
-import { useState, type ReactNode } from "react";
-
+/**
+ * Wraps the prototype's `.tooltip` class. The CSS uses `::after` bound to
+ * the `data-tooltip` attribute on the wrapper, so the caller does not need
+ * to manage visibility state. For interactive keyboard focus, make sure the
+ * child is focusable.
+ */
 export function Tooltip({
   label,
   children,
@@ -9,24 +13,9 @@ export function Tooltip({
   label: string;
   children: ReactNode;
 }) {
-  const [visible, setVisible] = useState(false);
   return (
-    <span
-      className="relative inline-flex"
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
-      onFocus={() => setVisible(true)}
-      onBlur={() => setVisible(false)}
-    >
+    <span className="tooltip" data-tooltip={label}>
       {children}
-      {visible && (
-        <span
-          role="tooltip"
-          className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1.5 z-40 whitespace-nowrap px-2 py-1 text-[11px] rounded-[var(--radius-sm)] bg-[var(--color-surface-3)] text-[var(--color-text-1)] border border-[var(--color-border)] shadow-[var(--shadow-2)]"
-        >
-          {label}
-        </span>
-      )}
     </span>
   );
 }

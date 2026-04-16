@@ -1,9 +1,26 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 import clsx from "clsx";
-import { X } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  X,
+} from "lucide-react";
 
+/**
+ * Wraps the prototype's `.toast-container` + `.toast.toast-{success|error|warning|info}`
+ * pattern. Use <ToastProvider> near the root and call useToast().show(...)
+ * from any client component.
+ */
 type ToastTone = "info" | "success" | "warning" | "error";
 
 type Toast = {
@@ -25,11 +42,11 @@ export function useToast(): ToastContextValue {
   return ctx;
 }
 
-const tones: Record<ToastTone, string> = {
-  info: "border-[var(--color-info-muted)]",
-  success: "border-[var(--color-success-muted)]",
-  warning: "border-[var(--color-warning-muted)]",
-  error: "border-[var(--color-error-muted)]",
+const TONE_ICON: Record<ToastTone, typeof Info> = {
+  info: Info,
+  success: CheckCircle2,
+  warning: AlertTriangle,
+  error: AlertCircle,
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -50,41 +67,35 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      <div
-        aria-live="polite"
-        className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"
-      >
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            role="status"
-            className={clsx(
-              "pointer-events-auto w-80 rounded-[var(--radius-lg)] border bg-[var(--color-surface-1)] p-3 shadow-[var(--shadow-3)]",
-              tones[toast.tone],
-            )}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[var(--color-text-1)]">
-                  {toast.title}
-                </p>
+      <div className="toast-container" aria-live="polite">
+        {toasts.map((toast) => {
+          const Icon = TONE_ICON[toast.tone];
+          return (
+            <div
+              key={toast.id}
+              role="status"
+              className={clsx("toast", `toast-${toast.tone}`)}
+            >
+              <div className="toast-icon">
+                <Icon size={18} aria-hidden />
+              </div>
+              <div className="toast-content">
+                <div className="toast-title">{toast.title}</div>
                 {toast.description && (
-                  <p className="text-xs text-[var(--color-text-2)] mt-1">
-                    {toast.description}
-                  </p>
+                  <div className="toast-message">{toast.description}</div>
                 )}
               </div>
               <button
                 type="button"
+                className="toast-close"
                 onClick={() => dismiss(toast.id)}
                 aria-label="Dismiss"
-                className="h-6 w-6 flex items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-3)] hover:text-[var(--color-text-1)]"
               >
-                <X className="h-3.5 w-3.5" aria-hidden />
+                <X size={14} aria-hidden />
               </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );

@@ -1,15 +1,51 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 
 export type FilterBarProps = {
+  /**
+   * Filter inputs. Each child should be a form control (Select, Input,
+   * SearchInput). They lay out in a row, truncating each to half-width on
+   * mobile.
+   */
   children: ReactNode;
+  /** Right-aligned actions (view toggle, filter button, export). */
   actions?: ReactNode;
+  /**
+   * Embedded variant: use the data-table-internal `.table-toolbar` class
+   * when the FilterBar sits inside a `<DataTableWrapper>`. Default is the
+   * standalone `.filter-bar-standard` used above a list.
+   */
+  embedded?: boolean;
 };
 
-export function FilterBar({ children, actions }: FilterBarProps) {
+/**
+ * FilterBar wraps the prototype's `.filter-bar-standard` (standalone, for
+ * list pages above a DataTable) OR `.table-toolbar` (when nested inside a
+ * DataTableWrapper). Toggle via the `embedded` prop.
+ */
+export function FilterBar({ children, actions, embedded = false }: FilterBarProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
-      <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">{children}</div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+    <div className={clsx(embedded ? "table-toolbar" : "filter-bar-standard")}>
+      <div
+        style={{
+          display: "flex",
+          gap: "var(--space-2)",
+          flex: 1,
+          flexWrap: "wrap",
+          alignItems: "center",
+          minWidth: 0,
+        }}
+      >
+        {children}
+      </div>
+      {actions && (
+        <div
+          className="table-actions"
+          style={{ marginLeft: "auto" }}
+        >
+          {actions}
+        </div>
+      )}
     </div>
   );
 }

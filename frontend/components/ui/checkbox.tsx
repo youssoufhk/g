@@ -1,24 +1,49 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
 import clsx from "clsx";
 
-export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
+/**
+ * Wraps the prototype's `.form-check` label + input pattern. Provide a
+ * `label` node to render the full interactive row, or omit it to render
+ * just the styled input when composing your own layout.
+ */
+export type CheckboxProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "type"
+> & {
+  label?: ReactNode;
+  description?: ReactNode;
+};
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  function Checkbox({ className, ...rest }, ref) {
-    return (
+  function Checkbox({ className, label, description, id, ...rest }, ref) {
+    const input = (
       <input
         ref={ref}
+        id={id}
         type="checkbox"
-        className={clsx(
-          "h-4 w-4 rounded-[var(--radius-sm)]",
-          "border border-[var(--color-border-strong)] bg-[var(--color-surface-1)]",
-          "accent-[var(--color-primary)]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-bg)]",
-          "disabled:opacity-50 disabled:cursor-not-allowed",
-          className,
-        )}
+        className={clsx(className)}
         {...rest}
       />
+    );
+    if (!label && !description) return input;
+    return (
+      <label className="form-check" htmlFor={id}>
+        {input}
+        {(label || description) && (
+          <span
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "2px",
+            }}
+          >
+            {label && <span>{label}</span>}
+            {description && (
+              <span className="text-3 text-caption">{description}</span>
+            )}
+          </span>
+        )}
+      </label>
     );
   },
 );

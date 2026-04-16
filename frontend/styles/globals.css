@@ -1,12 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "./tokens.css";
+@import "./components.css";
+@import "./layout.css";
 
 /*
   Tailwind 4 theme bridge.
-  Values are references, not copies. The prototype tokens file is the source of truth.
-  Utility classes like `bg-primary`, `text-1`, `shadow-2`, `rounded-lg` resolve to
-  var(--color-primary), var(--color-text-1), etc., so [data-theme="light"] overrides
-  in tokens.css flow through automatically.
+
+  The prototype CSS is the source of truth for Gamma's visual feel. The three
+  files above (tokens, components, layout) are byte-exact mirrors of
+  prototype/_tokens.css, prototype/_components.css, prototype/_layout.css.
+  Our React atoms apply the prototype class names (`btn btn-primary`, `card`,
+  `form-input`, ...) instead of re-implementing the same styles in Tailwind.
+
+  The @theme inline block below still exists so Tailwind utility classes like
+  `bg-surface-0` and `text-1` resolve to the same CSS variables. Use Tailwind
+  utilities for one-off layout tweaks inside a component; use the prototype
+  class names for every reusable element.
 */
 @theme inline {
   --color-bg: var(--color-bg);

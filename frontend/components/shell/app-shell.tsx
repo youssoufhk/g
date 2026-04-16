@@ -1,23 +1,27 @@
 import type { ReactNode } from "react";
 
+import { BottomNav } from "./bottom-nav";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
-import { BottomNav } from "./bottom-nav";
 
 /**
- * AppShell wraps every page inside the (app) route group. Shell is
- * pixel-identical on every page (CLAUDE.md principle: "shell identical
- * on every page"). Never hand-edit this layout in individual pages.
+ * AppShell wraps every page in the (app) route group. Uses the prototype
+ * `.app`, `.main-wrapper`, `.top-header`, `.page-content` classes.
+ * The shell is pixel-identical on every page; never edit it per page.
  */
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  title,
+}: {
+  children: ReactNode;
+  title?: string;
+}) {
   return (
-    <div className="min-h-screen flex bg-[var(--color-bg)] text-[var(--color-text-1)]">
+    <div className="app">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar />
-        <main className="flex-1 overflow-x-hidden pb-14 md:pb-0">
-          {children}
-        </main>
+      <div className="main-wrapper">
+        <Topbar title={title} />
+        <main className="page-content">{children}</main>
       </div>
       <BottomNav />
     </div>

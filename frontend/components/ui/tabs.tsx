@@ -9,6 +9,10 @@ import {
 } from "react";
 import clsx from "clsx";
 
+/**
+ * Wraps the prototype's `.tabs` + `.tab.active` + `.tab-count` pattern.
+ * Controlled or uncontrolled via `value` / `defaultValue`.
+ */
 type TabsContextValue = {
   value: string;
   setValue: (next: string) => void;
@@ -52,10 +56,7 @@ export function Tabs({
 
 export function TabsList({ children }: { children: ReactNode }) {
   return (
-    <div
-      role="tablist"
-      className="flex items-center gap-0.5 border-b border-[var(--color-border)]"
-    >
+    <div role="tablist" className="tabs">
       {children}
     </div>
   );
@@ -63,9 +64,11 @@ export function TabsList({ children }: { children: ReactNode }) {
 
 export function TabsTrigger({
   value,
+  count,
   children,
 }: {
   value: string;
+  count?: number;
   children: ReactNode;
 }) {
   const { value: active, setValue, idPrefix } = useTabs();
@@ -78,15 +81,10 @@ export function TabsTrigger({
       aria-controls={`${idPrefix}-panel-${value}`}
       id={`${idPrefix}-trigger-${value}`}
       onClick={() => setValue(value)}
-      className={clsx(
-        "h-9 px-3 text-sm border-b-2 -mb-px",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]",
-        selected
-          ? "border-[var(--color-primary)] text-[var(--color-text-1)]"
-          : "border-transparent text-[var(--color-text-2)] hover:text-[var(--color-text-1)]",
-      )}
+      className={clsx("tab", selected && "active")}
     >
       {children}
+      {typeof count === "number" && <span className="tab-count">{count}</span>}
     </button>
   );
 }
@@ -99,13 +97,14 @@ export function TabsContent({
   children: ReactNode;
 }) {
   const { value: active, idPrefix } = useTabs();
-  if (active !== value) return null;
+  const selected = active === value;
   return (
     <div
       role="tabpanel"
       id={`${idPrefix}-panel-${value}`}
       aria-labelledby={`${idPrefix}-trigger-${value}`}
-      className="pt-4"
+      className={clsx("tab-content", selected && "active")}
+      hidden={!selected}
     >
       {children}
     </div>

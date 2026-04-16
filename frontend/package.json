@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "sync-tokens": "cp ../prototype/_tokens.css styles/tokens.css",
+    "sync-tokens": "node scripts/sync-tokens.mjs",
     "test": "vitest",
     "test:e2e": "playwright test"
   },
