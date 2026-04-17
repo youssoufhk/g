@@ -44,6 +44,24 @@
     "palette_nav": "pour naviguer",
     "palette_open": "pour ouvrir"
   },
+  "search": {
+    "group_employees": "Employes",
+    "group_clients": "Clients",
+    "group_projects": "Projets",
+    "group_navigation": "Navigation",
+    "searching": "Recherche en cours",
+    "retry": "Reessayer",
+    "error": "La recherche n'a pas pu joindre le serveur. Reessayez dans un instant.",
+    "empty_for_query": "Aucun resultat pour \"{query}\" parmi les employes, clients ou projets. Essayez un des raccourcis ci-dessous.",
+    "nav_employees_label": "Ouvrir Employes",
+    "nav_employees_hint": "Annuaire de l'equipe",
+    "nav_clients_label": "Ouvrir Clients",
+    "nav_clients_hint": "Liste des clients",
+    "nav_projects_label": "Ouvrir Projets",
+    "nav_projects_hint": "Engagements actifs",
+    "nav_approvals_label": "Ouvrir Approbations",
+    "nav_approvals_hint": "Approbations en attente"
+  },
   "errors": {
     "generic": "Une erreur est survenue",
     "not_found": "Introuvable",

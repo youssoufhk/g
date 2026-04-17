@@ -3212,7 +3212,7 @@ svg circle[data-animate].chart-animate-in {
   padding: var(--space-4);
   text-align: center;
   color: var(--color-text-3);
-  font-size: var(--text-sm);
+  font-size: var(--text-body-sm);
 }
 
 .cmd-hit {
@@ -3234,7 +3234,7 @@ svg circle[data-animate].chart-animate-in {
 
 .cmd-hit-label {
   flex: 1;
-  font-size: var(--text-sm);
+  font-size: var(--text-body-sm);
   font-weight: var(--weight-medium);
   min-width: 0;
   overflow: hidden;
@@ -3245,6 +3245,54 @@ svg circle[data-animate].chart-animate-in {
 .cmd-hit-hint {
   font-size: var(--text-caption);
   color: var(--color-text-3);
+}
+
+.cmd-group-header {
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-3);
+}
+.cmd-results li[role="group"] + li[role="group"] .cmd-group-header {
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--color-border-subtle);
+}
+.cmd-group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cmd-status {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+  padding: 0 var(--space-2);
+  letter-spacing: 0.04em;
+}
+
+.cmd-error {
+  margin: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-error-muted);
+  border-left: 3px solid var(--color-error);
+  color: var(--color-text-1);
+  font-size: var(--text-body-sm);
+}
+
+.cmd-input-row:focus-within {
+  border-bottom-color: var(--color-primary);
+}
+.cmd-hit:active {
+  background: var(--color-surface-3);
+}
+
+@media (max-width: 640px) {
+  .cmd-hit { min-height: 44px; }
+  .cmd-input { min-height: 48px; }
+  .cmd-footer { display: none; }
 }
 
 .cmd-footer {

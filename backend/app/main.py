@@ -36,6 +36,7 @@ from app.features import (  # noqa: F401
     invoices,
     leaves,
     projects,
+    search,
     timesheets,
 )
 from app.features.admin.routes import router as admin_router
@@ -50,6 +51,7 @@ from app.features.employees.routes import router as employees_router
 from app.features.imports.routes import router as imports_router
 from app.features.projects import models as _projects_models  # noqa: F401
 from app.features.projects.routes import router as projects_router
+from app.features.search.routes import router as search_router
 
 logger = get_logger(__name__)
 
@@ -101,3 +103,4 @@ app.include_router(employees_router, prefix="/api/v1/employees", tags=["employee
 app.include_router(clients_router, prefix="/api/v1/clients", tags=["clients"])
 app.include_router(projects_router, prefix="/api/v1/projects", tags=["projects"])
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["dashboard"])
+app.include_router(search_router, prefix="/api/v1/search", tags=["search"])

@@ -36,7 +36,9 @@ export function AppShell({
     function onKeyDown(event: KeyboardEvent) {
       const isMetaK =
         (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
-      if (isMetaK) {
+      const isMetaSlash =
+        (event.metaKey || event.ctrlKey) && event.key === "/";
+      if (isMetaK || isMetaSlash) {
         event.preventDefault();
         setPaletteOpen((current) => !current);
       }

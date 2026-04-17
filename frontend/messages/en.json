@@ -44,6 +44,24 @@
     "palette_nav": "to navigate",
     "palette_open": "to open"
   },
+  "search": {
+    "group_employees": "Employees",
+    "group_clients": "Clients",
+    "group_projects": "Projects",
+    "group_navigation": "Navigation",
+    "searching": "Searching",
+    "retry": "Retry",
+    "error": "Search could not reach the server. Try again in a moment.",
+    "empty_for_query": "No match for \"{query}\" in employees, clients, or projects. Try one of the shortcuts below.",
+    "nav_employees_label": "Open Employees",
+    "nav_employees_hint": "Team directory",
+    "nav_clients_label": "Open Clients",
+    "nav_clients_hint": "Client list",
+    "nav_projects_label": "Open Projects",
+    "nav_projects_hint": "Active engagements",
+    "nav_approvals_label": "Open Approvals",
+    "nav_approvals_hint": "Pending approvals"
+  },
   "errors": {
     "generic": "Something went wrong",
     "not_found": "Not found",
