@@ -4,6 +4,10 @@ import { useMutation } from "@tanstack/react-query";
 
 import { apiFetch } from "@/lib/api-client";
 
+function newIdempotencyKey(): string {
+  return crypto.randomUUID();
+}
+
 export type EntityType = "employees" | "clients" | "projects" | "teams";
 
 export type ColumnMapping = {
@@ -29,6 +33,13 @@ export type PreviewResponse = {
   ai_explanation: string | null;
 };
 
+export type CommitResponse = {
+  entity_type: EntityType;
+  imported: number;
+  skipped: number;
+  errors: RowValidationError[];
+};
+
 export function usePreviewCsv() {
   return useMutation({
     mutationFn: async (input: { file: File; entityType: EntityType }) => {
@@ -38,6 +49,26 @@ export function usePreviewCsv() {
       return apiFetch<PreviewResponse>("/imports/preview", {
         method: "POST",
         body: form,
+      });
+    },
+  });
+}
+
+export function useCommitImport() {
+  return useMutation({
+    mutationFn: async (input: {
+      file: File;
+      entityType: EntityType;
+      confirmedMapping: ColumnMapping[];
+    }) => {
+      const form = new FormData();
+      form.append("entity_type", input.entityType);
+      form.append("file", input.file);
+      form.append("confirmed_mapping", JSON.stringify(input.confirmedMapping));
+      return apiFetch<CommitResponse>("/imports/commit", {
+        method: "POST",
+        body: form,
+        headers: { "Idempotency-Key": newIdempotencyKey() },
       });
     },
   });
