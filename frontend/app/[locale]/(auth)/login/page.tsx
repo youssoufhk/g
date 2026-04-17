@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertCircle, Info } from "lucide-react";
 
@@ -32,6 +32,7 @@ export default function LoginPage() {
   const t = useTranslations("auth");
   const login = useLogin();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const emailRef = useRef<HTMLInputElement>(null);
 
   const [email, setEmail] = useState("");
@@ -89,7 +90,13 @@ export default function LoginPage() {
         password,
         tenantSchema: "t_dev",
       });
-      router.push("/dashboard");
+      const raw = searchParams.get("next");
+      const decoded = raw ? decodeURIComponent(raw) : "";
+      const isSafePath =
+        decoded.startsWith("/") &&
+        !decoded.startsWith("//") &&
+        !decoded.startsWith("/\\");
+      router.push(isSafePath ? decoded : "/dashboard");
     } catch {
       // Rendered via backendError above.
     }
