@@ -1,5 +1,5 @@
 /* ============================================================
-   GammaHR v2 — Component Library
+   GammaHR v2 - Component Library
    All reusable UI components
    ============================================================ */
 
@@ -1187,7 +1187,7 @@
 .worktime-bar .worktime-fill.high { background: var(--color-success); }
 .worktime-bar .worktime-fill.mid { background: var(--color-warning); }
 .worktime-bar .worktime-fill.low { background: var(--color-error); }
-/* Overflow state for >100% (overwork) — amber/warning color */
+/* Overflow state for >100% (overwork) - amber/warning color */
 .worktime-bar .worktime-fill.overflow {
   background: var(--color-warning);
 }
@@ -1462,7 +1462,7 @@
 .skeleton-title { height: 22px; width: 60%; border-radius: var(--radius-sm); }
 .skeleton-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
 .skeleton-card { height: 120px; }
-/* Page-level loading — applied via JS */
+/* Page-level loading - applied via JS */
 .ghr-skeleton-loading { pointer-events: none; }
 .ghr-skeleton-loading::after {
   content: '';
@@ -1631,7 +1631,7 @@
 
 
 /* ============================================================
-   ADDITIONS — _shared.js companion CSS
+   ADDITIONS - _shared.js companion CSS
    ============================================================ */
 
 /* ── HOVER MINI-PROFILE CARD (global, fixed-position) ── */
@@ -1721,7 +1721,7 @@
 }
 
 
-/* ── GLASSMORPHISM — MODALS & NOTIFICATION PANEL ── */
+/* ── GLASSMORPHISM - MODALS & NOTIFICATION PANEL ── */
 .modal-content,
 .modal-body,
 [class*="modal-container"] {
@@ -1751,7 +1751,7 @@
 }
 
 
-/* ── AVATAR GROUP — row-reverse overlap variant ── */
+/* ── AVATAR GROUP - row-reverse overlap variant ── */
 /* The existing .avatar-group is ltr; this provides the reverse variant */
 .avatar-group-reverse {
   display: flex;
@@ -1840,7 +1840,7 @@
 .role-badge-employee { color: var(--color-info);    font-weight: var(--weight-semibold); }
 
 
-/* ── CURRENTLY-VIEWING PRESENCE BANNER — REMOVED (AT-1 Anti-Tempolia) ── */
+/* ── CURRENTLY-VIEWING PRESENCE BANNER - REMOVED (AT-1 Anti-Tempolia) ── */
 
 
 /* Sidebar logo - no float animation, professional ops tool */
@@ -1913,7 +1913,7 @@ svg circle[data-animate].chart-animate-in {
 .breadcrumb > *:last-child { color: var(--color-text-1); font-weight: var(--weight-medium); }
 
 
-/* ── REDUCED MOTION — DECORATIVE ANIMATIONS ONLY ── */
+/* ── REDUCED MOTION - DECORATIVE ANIMATIONS ONLY ── */
 @media (prefers-reduced-motion: reduce) {
   /* Disable decorative keyframe animations */
   .page-content { animation: none; }
@@ -2181,7 +2181,7 @@ svg circle[data-animate].chart-animate-in {
    Rule: if an item has < 5 data points and fits on one line, use a row not a card.
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Wrapper: replaces card-styled container — no border, no card padding */
+/* Wrapper: replaces card-styled container - no border, no card padding */
 .action-table {
   width: 100%;
   border: 1px solid var(--color-border-subtle);
@@ -2206,7 +2206,7 @@ svg circle[data-animate].chart-animate-in {
   letter-spacing: 0.5px;
 }
 
-/* One horizontal row per item — 48–52px tall, full width, never becomes a card */
+/* One horizontal row per item - 48-52px tall, full width, never becomes a card */
 .action-row {
   display: flex;
   align-items: center;
@@ -2245,7 +2245,7 @@ svg circle[data-animate].chart-animate-in {
   height: 14px;
 }
 
-/* Type icon — 32×32 circle, flex-shrink: 0 */
+/* Type icon - 32×32 circle, flex-shrink: 0 */
 .action-row-icon {
   flex-shrink: 0;
   width: 32px;
@@ -2262,7 +2262,7 @@ svg circle[data-animate].chart-animate-in {
   height: 16px;
 }
 
-/* Employee name + avatar — fixed width ~180px, flex-shrink: 0 */
+/* Employee name + avatar - fixed width ~180px, flex-shrink: 0 */
 .action-row-employee {
   flex-shrink: 0;
   width: 180px;
@@ -2280,7 +2280,7 @@ svg circle[data-animate].chart-animate-in {
   text-overflow: ellipsis;
 }
 
-/* Main detail text — grows to fill remaining space */
+/* Main detail text - grows to fill remaining space */
 .action-row-detail {
   flex: 1;
   min-width: 0;
@@ -2291,7 +2291,7 @@ svg circle[data-animate].chart-animate-in {
   text-overflow: ellipsis;
 }
 
-/* Secondary info: date, hours, amount — muted, monospace numbers */
+/* Secondary info: date, hours, amount - muted, monospace numbers */
 .action-row-meta {
   flex-shrink: 0;
   font-size: var(--text-body-sm);
@@ -2309,7 +2309,7 @@ svg circle[data-animate].chart-animate-in {
   justify-content: flex-end;
 }
 
-/* Action buttons — right-aligned, visible on hover for cleaner look */
+/* Action buttons - right-aligned, visible on hover for cleaner look */
 .action-row-actions {
   flex-shrink: 0;
   display: flex;
@@ -2611,4 +2611,613 @@ svg circle[data-animate].chart-animate-in {
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-border-subtle);
   margin-bottom: var(--space-4);
+}
+
+
+/* ============================================================
+   ACCESSIBILITY PRIMITIVES - skip link + sr-only
+   Used by app-shell.tsx for WCAG 2.2 AA keyboard reach.
+   ============================================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-2);
+  top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform 150ms ease;
+  z-index: 1000;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.page-content:focus {
+  outline: none;
+}
+
+
+/* ============================================================
+   STAT CARD - clickable variant
+   StatPill with href wraps the body in a Link; this adds the
+   hover and focus states a Revolut-grade card needs.
+   ============================================================ */
+.stat-card[data-interactive="true"] {
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: background 80ms ease, transform 80ms ease, border-color 80ms ease;
+}
+
+.stat-card[data-interactive="true"]:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+}
+
+.stat-card[data-interactive="true"]:active {
+  transform: translateY(1px);
+}
+
+.stat-card[data-interactive="true"]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+
+/* ============================================================
+   DASHBOARD GREETING ROW
+   ============================================================ */
+.dashboard-greeting {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.dashboard-greeting-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dashboard-greeting-title {
+  font-size: var(--text-display-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-1);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.dashboard-greeting-date {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+  margin: 0;
+}
+
+.dashboard-greeting-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+
+/* ============================================================
+   DEGRADED MODE BANNER
+   Yellow banner surfaced when kill_switch.ai is on.
+   ============================================================ */
+.degraded-banner {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-warning-muted);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+
+/* ============================================================
+   DASHBOARD ERROR PANEL
+   ============================================================ */
+.dashboard-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-error-muted);
+  border-radius: var(--radius-md);
+}
+
+.dashboard-error-icon {
+  flex-shrink: 0;
+  color: var(--color-error);
+  padding-top: var(--space-0-5);
+}
+
+.dashboard-error-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-error-title {
+  font-size: var(--text-heading-3);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.dashboard-error-body {
+  font-size: var(--text-sm);
+  color: var(--color-text-2);
+  margin: 0;
+}
+
+.dashboard-error-detail {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+  margin: var(--space-1) 0 0 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+
+/* ============================================================
+   DASHBOARD ONBOARDING EMPTY STATE
+   Shown when the tenant has zero employees/clients/projects.
+   ============================================================ */
+.onboarding-panel {
+  padding: var(--space-5);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.onboarding-title {
+  font-size: var(--text-heading-2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.onboarding-body {
+  font-size: var(--text-sm);
+  color: var(--color-text-2);
+  margin: 0 auto var(--space-4);
+  max-width: 48ch;
+}
+
+.onboarding-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+   DASHBOARD ATTENTION BLOCK
+   ============================================================ */
+.attention-card {
+  padding: 0;
+}
+
+.attention-empty {
+  text-align: center;
+  padding: var(--space-4) var(--space-3);
+}
+
+.attention-empty-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-1);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.attention-empty-body {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+  margin: 0 auto;
+  max-width: 56ch;
+}
+
+.attention-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.attention-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.attention-row:last-child {
+  border-bottom: none;
+}
+
+.attention-row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.attention-row-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-1);
+  margin: 0;
+}
+
+.attention-row-body {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+  margin: var(--space-0-5) 0 0 0;
+}
+
+
+/* ============================================================
+   AI INSIGHTS ROW
+   ============================================================ */
+.ai-insights-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section-title {
+  font-size: var(--text-heading-3);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  margin: 0;
+}
+
+
+/* ============================================================
+   AI INSIGHT CARD - optional affordances
+   ============================================================ */
+.ai-header-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-dismiss {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-text-3);
+  transition: background 80ms ease, color 80ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-dismiss:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+
+.ai-dismiss:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.ai-evidence {
+  margin-top: var(--space-2);
+  padding-left: var(--space-5);
+  list-style: disc;
+  font-size: var(--text-sm);
+  color: var(--color-text-2);
+}
+
+.ai-evidence li {
+  margin-bottom: var(--space-0-5);
+}
+
+.ai-why-toggle {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: var(--space-1) 0;
+  margin-top: var(--space-2);
+  color: var(--color-text-3);
+  font-size: var(--text-caption);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+.ai-why-toggle:hover {
+  color: var(--color-text-1);
+}
+
+.ai-why-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.ai-why-panel {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-caption);
+  color: var(--color-text-2);
+}
+
+
+/* ============================================================
+   COMMAND PALETTE
+   Modal overlay + keyboard-driven result list.
+   ============================================================ */
+.cmd-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  z-index: 900;
+  animation: cmd-overlay-fade 200ms ease-out;
+}
+
+@keyframes cmd-overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cmd-dialog-scale {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmd-overlay,
+  .cmd-dialog {
+    animation: none;
+  }
+}
+
+.cmd-dialog {
+  width: min(560px, calc(100vw - var(--space-4)));
+  max-height: 70vh;
+  background: var(--color-surface-2);
+  animation: cmd-dialog-scale 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: 50% 20%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cmd-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-3);
+}
+
+.cmd-input {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--text-body);
+  color: var(--color-text-1);
+}
+
+.cmd-input::placeholder {
+  color: var(--color-text-3);
+}
+
+.cmd-kbd {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--text-caption);
+  padding: 2px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-3);
+  color: var(--color-text-2);
+}
+
+.cmd-degraded {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-warning-muted);
+  color: var(--color-warning);
+  font-size: var(--text-caption);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cmd-results {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+}
+
+.cmd-empty {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-text-3);
+  font-size: var(--text-sm);
+}
+
+.cmd-hit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--color-text-2);
+  transition: background 80ms ease;
+}
+
+.cmd-hit-active,
+.cmd-hit:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text-1);
+}
+
+.cmd-hit-label {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmd-hit-hint {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+}
+
+.cmd-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+}
+
+.cmd-footer .cmd-kbd {
+  margin-right: var(--space-1);
+}
+
+
+/* ============================================================
+   ERROR BOUNDARY PANEL
+   Full-viewport fallback for (app) route-group crashes.
+   ============================================================ */
+.error-panel {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+.error-panel-inner {
+  max-width: 52ch;
+  text-align: center;
+}
+
+.error-panel-icon {
+  display: inline-flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+  border-radius: 50%;
+  background: var(--color-error-muted);
+  color: var(--color-error);
+}
+
+.error-panel-title {
+  font-size: var(--text-heading-2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.error-panel-body {
+  font-size: var(--text-sm);
+  color: var(--color-text-2);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.error-panel-ref {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.error-panel-ref code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.error-panel-actions {
+  display: inline-flex;
+  gap: var(--space-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+   Mobile-first responsive tweaks for new components.
+   ============================================================ */
+@media (max-width: 640px) {
+  .dashboard-greeting {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dashboard-greeting-actions {
+    flex-wrap: wrap;
+  }
+  .dashboard-greeting-title {
+    font-size: var(--text-heading-1);
+  }
+  .cmd-overlay {
+    padding-top: 0;
+    align-items: flex-end;
+  }
+  .cmd-dialog {
+    width: 100%;
+    max-height: 90vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom: none;
+  }
+  .attention-row {
+    flex-wrap: wrap;
+  }
 }

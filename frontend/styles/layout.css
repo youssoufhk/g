@@ -1,5 +1,5 @@
 /* ============================================================
-   GammaHR v2 — Layout System
+   GammaHR v2 - Layout System
    Sidebar + Header + Content + Responsive
    ============================================================ */
 
@@ -291,11 +291,11 @@
 .grid-60-40 { display: grid; grid-template-columns: 3fr 2fr; gap: var(--space-6); }
 .grid-70-30 { display: grid; grid-template-columns: 7fr 3fr; gap: var(--space-6); }
 
-/* ── KPI / STAT CARD GRIDS (UI11: FOUC prevention — desktop-first base rules) ──
+/* ── KPI / STAT CARD GRIDS (UI11: FOUC prevention - desktop-first base rules) ──
    These classes must have their full-width desktop grid as the BASE rule so the
    browser renders them correctly on first paint at desktop widths. Mobile overrides
    are applied only via media queries below. Never define these as block/flex at base
-   and then upgrade to grid in a media query — that causes FOUC. */
+   and then upgrade to grid in a media query - that causes FOUC. */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -311,7 +311,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
 }
-/* 3-column variant — used where 3 KPIs are shown */
+/* 3-column variant - used where 3 KPIs are shown */
 .kpi-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -323,7 +323,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
 }
-/* Auto-fit KPI strip — collapses gracefully from 4 to 2 to 1 col without media query */
+/* Auto-fit KPI strip - collapses gracefully from 4 to 2 to 1 col without media query */
 .kpi-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -358,7 +358,7 @@
 .mt-4 { margin-top: var(--space-4); }
 .mt-6 { margin-top: var(--space-6); }
 
-/* ── EMPTY STATE TOGGLE BUTTON (prototype demo tool — hidden by default, reveal with Shift+E) ── */
+/* ── EMPTY STATE TOGGLE BUTTON (prototype demo tool - hidden by default, reveal with Shift+E) ── */
 .state-toggle {
   position: fixed;
   bottom: var(--space-4);
@@ -446,7 +446,7 @@ body.dev-mode .state-toggle { display: flex; }
   .stat-card .stat-trend { font-size: var(--text-overline); }
   .stat-card .stat-sparkline { height: 24px; margin-top: var(--space-1); }
 
-  /* 2-col grids stay 2-col on mobile — they're already compact */
+  /* 2-col grids stay 2-col on mobile - they're already compact */
   .grid-2 { grid-template-columns: repeat(2, 1fr); }
   /* 3/4/6-col grids compress to 2-col on mobile, not 1 */
   .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -575,7 +575,7 @@ body.dev-mode .state-toggle { display: flex; }
 
 
 /* ============================================================
-   MOBILE SYSTEM — Added Phase 1 Round 2
+   MOBILE SYSTEM - Added Phase 1 Round 2
    ============================================================ */
 
 /* ── BOTTOM NAVIGATION BAR ── */
@@ -839,7 +839,7 @@ body.dev-mode .state-toggle { display: flex; }
   }
 }
 
-/* ── UI7: Consistent page content alignment — consolidated into .page-content above ── */
+/* ── UI7: Consistent page content alignment - consolidated into .page-content above ── */
 
 
 /* ── MOBILE: Extended mobile-cards support (CRIT-1: sessions-table) ── */
@@ -980,7 +980,7 @@ body.dev-mode .state-toggle { display: flex; }
 
 /* ── MOBILE: Leaves calendar min-width (HIGH-10) ── */
 @media (max-width: 639px) {
-  /* Leave calendar grid — reduce from 480px to 308px to allow minimal fit */
+  /* Leave calendar grid - reduce from 480px to 308px to allow minimal fit */
   [style*="min-width:480px"],
   [style*="min-width: 480px"] {
     min-width: 308px !important;
@@ -996,9 +996,9 @@ body.dev-mode .state-toggle { display: flex; }
   }
 }
 
-/* ── MOBILE: Employees view toggle — force card view on mobile (MED-17) ── */
+/* ── MOBILE: Employees view toggle - force card view on mobile (MED-17) ── */
 @media (max-width: 639px) {
-  /* Hide list and org views on mobile — only card view works */
+  /* Hide list and org views on mobile - only card view works */
   .view-list, .view-org, [data-view="list"], [data-view="org"] {
     display: none !important;
   }

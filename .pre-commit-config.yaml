@@ -55,11 +55,15 @@ repos:
         # frontend/styles/tokens.css is a byte-exact mirror of the LOCKED
         # prototype/_tokens.css (CLAUDE.md rule 3). The prototype comments
         # predate the em dash ban; fixing them would break the mirror.
+        # HAIKU_CRITICS.md is a founder-provided baseline audit preserved
+        # as-is for historical reference (OPUS_CRITICS.md supersedes it).
         exclude: |
           (?x)^(
             \.claude/skills/.*|
+            \.claude/agents/.*|
             scripts/hooks/no_em_dashes\.py|
-            frontend/styles/tokens\.css
+            frontend/styles/tokens\.css|
+            HAIKU_CRITICS\.md
           )$
 
       - id: m1-vendor-imports
@@ -93,5 +97,8 @@ repos:
             scripts/hooks/no_utilisation\.py|
             scripts/setup/bootstrap-dev\.sh|
             PROMPT\.md|
-            \.claude/skills/.*
+            OPUS_CRITICS\.md|
+            HAIKU_CRITICS\.md|
+            \.claude/skills/.*|
+            \.claude/agents/.*
           )$
