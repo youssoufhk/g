@@ -45,3 +45,10 @@ class PreviewResponse(BaseModel):
     errors: list[RowValidationError]
     ai_explanation: str | None = None
     idempotency_key: str | None = None
+
+
+class CommitResponse(BaseModel):
+    entity_type: EntityType
+    imported: int
+    skipped: int
+    errors: list[RowValidationError]

@@ -225,7 +225,7 @@ def test_imports_route_parses_valid_csv() -> None:
     assert len(body["mapping"]) == 4
 
 
-def test_imports_commit_returns_501() -> None:
+def test_imports_commit_rejects_missing_form_fields() -> None:
     with TestClient(app) as client:
         response = client.post("/api/v1/imports/commit")
-    assert response.status_code == 501
+    assert response.status_code == 422
