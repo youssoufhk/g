@@ -27,6 +27,9 @@ router = APIRouter()
     response_model=TokenPair,
     status_code=status.HTTP_201_CREATED,
 )
+# z2-lint: ok -- TODO Phase 3a.2 apply @audited(action="auth.register") once
+# actor_id can be resolved post-registration. @gated_feature skipped on
+# register endpoint itself (bootstrap).
 async def register(
     body: RegisterRequest,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -51,6 +54,8 @@ async def register(
 
 
 @router.post("/login", response_model=TokenPair)
+# z2-lint: ok -- TODO Phase 3a.2 apply @audited(action="auth.login.succeed").
+# @gated_feature skipped on login endpoint itself (bootstrap).
 async def login(
     body: LoginRequest,
     session: Annotated[AsyncSession, Depends(get_session)],

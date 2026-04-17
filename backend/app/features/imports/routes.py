@@ -13,6 +13,8 @@ MAX_CSV_BYTES = 10 * 1024 * 1024  # 10 MiB
 
 
 @router.post("/preview", response_model=PreviewResponse)
+# z2-lint: ok -- TODO Phase 4 CSV import rebuild apply
+# @audited(action="import.preview") + @gated_feature("imports.csv").
 async def preview(
     entity_type: Annotated[EntityType, Form()],
     file: UploadFile,
@@ -38,6 +40,8 @@ async def preview(
 
 
 @router.post("/commit")
+# z2-lint: ok -- TODO Phase 4 CSV import rebuild apply
+# @audited(action="import.commit") + @gated_feature("imports.csv").
 async def commit() -> JSONResponse:
     """Persist a previously-previewed CSV to the target tenant tables.
 

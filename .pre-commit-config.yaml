@@ -72,6 +72,12 @@ repos:
         entry: python3 scripts/hooks/check_vendor_imports.py
         files: '^backend/.*\.py$'
 
+      - id: z2-mutation-decorators
+        name: Z.2 require @audited + @gated_feature on mutating routes
+        language: system
+        entry: python3 scripts/hooks/check_mutation_decorators.py
+        files: '^backend/app/features/[^/]+/routes\.py$'
+
       - id: no-utilisation
         name: Ban the word utilisation
         language: system

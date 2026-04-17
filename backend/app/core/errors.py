@@ -47,6 +47,16 @@ class PaymentRequired(GammaError):
     code = "payment_required"
 
 
+class EntitlementLocked(GammaError):
+    """Raised by ``@gated_feature`` when a feature is disabled, killed,
+    or not entitled for the current tenant. 402 is intentional so the
+    frontend EntitlementLock UI surfaces this as a paywall / degraded
+    state rather than a generic error."""
+
+    http_status = 402
+    code = "entitlement_locked"
+
+
 class RateLimited(GammaError):
     http_status = 429
     code = "rate_limited"
