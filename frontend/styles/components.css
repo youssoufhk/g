@@ -705,6 +705,134 @@
   border-top: 1px solid var(--color-border-subtle);
 }
 
+/* ── CONFLICT RESOLVER (pattern, DESIGN_SYSTEM §5.11) ── */
+.modal.conflict-resolver {
+  width: 640px;
+}
+.conflict-resolver-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.conflict-resolver-list-header {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 1.4fr) minmax(0, 1.4fr);
+  gap: var(--space-3);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-3);
+  padding: 0 var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.conflict-resolver-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 1.4fr) minmax(0, 1.4fr);
+  gap: var(--space-3);
+  align-items: stretch;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.conflict-resolver-row:last-child { border-bottom: none; }
+.conflict-resolver-row-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+}
+.conflict-resolver-field-name {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  font-size: var(--text-body);
+}
+.conflict-resolver-field-hint {
+  font-size: var(--text-caption);
+  color: var(--color-text-3);
+}
+.conflict-resolver-expand {
+  align-self: flex-start;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+}
+.conflict-resolver-value {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-1);
+  cursor: pointer;
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+  font-variant-numeric: tabular-nums;
+}
+.conflict-resolver-value:hover {
+  background: var(--color-surface-2);
+}
+.conflict-resolver-value[data-active] {
+  border-color: var(--color-primary);
+  background: var(--color-surface-2);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+.conflict-resolver-value-text {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+  color: var(--color-text-1);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+.conflict-resolver-value-empty {
+  color: var(--color-text-3);
+  font-style: italic;
+}
+.conflict-resolver-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+}
+.conflict-resolver-primary-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* Mobile collapse. 767.98px aligns with Tailwind md: breakpoint and the
+   DESIGN_SYSTEM §7.3 "< 768px" content-transform contract. */
+@media (max-width: 767.98px) {
+  .modal.conflict-resolver {
+    width: 100%;
+    max-width: none;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  .conflict-resolver-list-header,
+  .conflict-resolver-row {
+    grid-template-columns: 1fr;
+  }
+  .conflict-resolver-list-header {
+    display: none;
+  }
+  .conflict-resolver-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .conflict-resolver-primary-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* Bare <Radio> inside the value cells does not match the global
+     `.form-check input[type=radio]` tap-target override. Apply the
+     44x44 hit area locally so mobile taps remain comfortable. */
+  .conflict-resolver-value input[type="radio"] {
+    width: 20px;
+    height: 20px;
+  }
+}
 
 /* ── TOAST NOTIFICATIONS ── */
 .toast-container {

@@ -20,6 +20,19 @@ export type ApiErrorBody = {
   details?: Record<string, unknown>;
 };
 
+/**
+ * 409 conflict body contract. Backend returns this shape when a mutation
+ * collides with a newer version; the three-layer ConflictResolver pattern
+ * in `components/patterns/conflict-resolver.tsx` consumes it.
+ */
+export type ConflictErrorBody<T = unknown> = ApiErrorBody & {
+  code: "conflict";
+  details: {
+    serverState: T;
+    mineFields?: string[];
+  };
+};
+
 export class ApiClientError extends Error {
   readonly status: number;
   readonly body: ApiErrorBody | null;
@@ -41,6 +54,21 @@ export class ApiClientError extends Error {
 
   get isUnauthorized(): boolean {
     return this.status === 401;
+  }
+
+  /**
+   * Typed accessor for the server-state payload on a 409 response. Returns
+   * null if the status is not 409 or the body does not carry a serverState
+   * under `details`. Callers that consume the ConflictResolver pattern
+   * should go through this getter rather than casting `body`.
+   */
+  conflictState<T>(): T | null {
+    if (!this.isConflict) return null;
+    const details = this.body?.details;
+    if (!details || typeof details !== "object") return null;
+    const serverState = (details as { serverState?: unknown }).serverState;
+    if (serverState === undefined) return null;
+    return serverState as T;
   }
 }
 

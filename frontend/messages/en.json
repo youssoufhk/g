@@ -53,7 +53,9 @@
     "app_crash_body": "Something broke on our side. We saved a trace and the team has been notified. You can try again or head back to the dashboard.",
     "reference": "Reference",
     "retry": "Try again",
-    "back_home": "Back to dashboard"
+    "back_home": "Back to dashboard",
+    "conflict_fallback_title": "This record changed while you were editing",
+    "conflict_fallback_body": "We could not show a side-by-side view. Your edit was not saved. Reload to see the latest version and try again."
   },
   "dashboard": {
     "greeting_morning": "Good morning",
@@ -88,5 +90,24 @@
     "empty_cta_import": "Import via CSV",
     "empty_cta_invite": "Invite your first employee",
     "loading_label": "Dashboard is loading"
+  },
+  "conflict_resolver": {
+    "title": "Edits don't match. Pick what to keep.",
+    "subtitle": "Someone saved a newer version while you were editing. Choose your version or theirs, field by field.",
+    "field": "Field",
+    "your_value": "Your version",
+    "their_value": "Their version",
+    "keep_mine": "Keep mine",
+    "take_theirs": "Take theirs",
+    "merge_and_continue": "Merge and continue",
+    "cancel": "Cancel",
+    "show_full": "Show full",
+    "show_less": "Show less",
+    "array_hint": "This field is an array. Choose one side for the whole list.",
+    "empty": "Empty",
+    "keep_mine_field": "Keep your value for {field}",
+    "take_theirs_field": "Take their value for {field}",
+    "diff_label": "Field-by-field differences",
+    "actions_label": "Resolve conflict"
   }
 }

@@ -53,7 +53,9 @@
     "app_crash_body": "Un probleme s'est produit de notre cote. Nous avons enregistre une trace et l'equipe a ete prevenue. Vous pouvez reessayer ou revenir au tableau de bord.",
     "reference": "Reference",
     "retry": "Reessayer",
-    "back_home": "Retour au tableau de bord"
+    "back_home": "Retour au tableau de bord",
+    "conflict_fallback_title": "Cet enregistrement a change pendant votre modification",
+    "conflict_fallback_body": "Impossible d'afficher une vue cote a cote. Votre modification n'a pas ete enregistree. Rechargez pour voir la derniere version et reessayez."
   },
   "dashboard": {
     "greeting_morning": "Bonjour",
@@ -88,5 +90,24 @@
     "empty_cta_import": "Importer via CSV",
     "empty_cta_invite": "Inviter le premier employe",
     "loading_label": "Le tableau de bord se charge"
+  },
+  "conflict_resolver": {
+    "title": "Les modifications ne concordent pas. Choisissez ce qu'il faut garder.",
+    "subtitle": "Quelqu'un a enregistre une version plus recente pendant que vous editiez. Choisissez votre version ou la sienne, champ par champ.",
+    "field": "Champ",
+    "your_value": "Votre version",
+    "their_value": "Leur version",
+    "keep_mine": "Garder la mienne",
+    "take_theirs": "Prendre la leur",
+    "merge_and_continue": "Fusionner et continuer",
+    "cancel": "Annuler",
+    "show_full": "Tout afficher",
+    "show_less": "Reduire",
+    "array_hint": "Ce champ est une liste. Choisissez un cote pour toute la liste.",
+    "empty": "Vide",
+    "keep_mine_field": "Garder votre valeur pour {field}",
+    "take_theirs_field": "Prendre leur valeur pour {field}",
+    "diff_label": "Differences champ par champ",
+    "actions_label": "Resoudre le conflit"
   }
 }

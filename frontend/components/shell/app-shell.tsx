@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
+import { ConflictResolverProvider } from "@/components/patterns/conflict-resolver-provider";
+
 import { BottomNav } from "./bottom-nav";
 import { CommandPalette } from "./command-palette";
 import { Sidebar } from "./sidebar";
@@ -44,19 +46,21 @@ export function AppShell({
   }, []);
 
   return (
-    <div className="app">
-      <a href="#main-content" className="skip-link">
-        {t("skip_to_content")}
-      </a>
-      <Sidebar />
-      <div className="main-wrapper">
-        <Topbar title={title} onOpenCommandPalette={openPalette} />
-        <main id="main-content" className="page-content" tabIndex={-1}>
-          {children}
-        </main>
+    <ConflictResolverProvider>
+      <div className="app">
+        <a href="#main-content" className="skip-link">
+          {t("skip_to_content")}
+        </a>
+        <Sidebar />
+        <div className="main-wrapper">
+          <Topbar title={title} onOpenCommandPalette={openPalette} />
+          <main id="main-content" className="page-content" tabIndex={-1}>
+            {children}
+          </main>
+        </div>
+        <BottomNav />
+        <CommandPalette open={paletteOpen} onClose={closePalette} />
       </div>
-      <BottomNav />
-      <CommandPalette open={paletteOpen} onClose={closePalette} />
-    </div>
+    </ConflictResolverProvider>
   );
 }

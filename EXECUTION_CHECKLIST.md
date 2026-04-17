@@ -255,7 +255,7 @@ Real wrappers (VertexGeminiClient, GCSBlobStorage, WeasyPrintRenderer, Workspace
 - [x] 🧑 `lib/offline.ts` IndexedDB queue stub (2026-04-15)
 - [ ] 🧑 Cmd+K command palette - deferred to Phase 5a month-end close
 - [ ] 🧑 Notifications drawer (S2) - deferred to Phase 5b notifications inbox
-- [ ] 🧑 ConflictResolver UI (S3) - deferred to Phase 5a timesheets (uses three-layer 409 resolver)
+- [x] 🧑 ConflictResolver UI (S3) - Phase Z.4. Pattern + provider + useOptimisticMutation retry wiring + Modal focus trap. Both senior-ui-critic + senior-ux-critic returned PASS with zero red items. Playwright scenario `tests/e2e/409-conflict.spec.ts` is `test.describe.fixme` pending the first Tier-1 409-capable mutation (Phase 4 Employee PATCH).
 - [ ] 🧑 EntitlementLock UI (S4) - deferred to Phase 7 billing surface
 - [ ] 🧑 PWA manifest + service worker - deferred to Phase 6
 
