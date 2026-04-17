@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.database import get_session
 from app.core.errors import Unauthorized
-from app.features.admin.models import Tenant
+from app.features.admin import service as admin_service
 from app.features.auth import service
 from app.features.auth.models import AppUser
 from app.features.auth.schemas import (
@@ -95,10 +95,7 @@ async def me(
         raise Unauthorized("user not found")
 
     tenant_ids = [m.tenant_id for m in user.memberships]
-    tenant_rows = await session.execute(
-        select(Tenant).where(Tenant.id.in_(tenant_ids))
-    )
-    tenants_by_id = {t.id: t for t in tenant_rows.scalars().all()}
+    tenants_by_id = await admin_service.get_tenants_by_ids(session, tenant_ids)
 
     memberships = [
         MembershipOut(

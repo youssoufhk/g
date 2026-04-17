@@ -98,6 +98,29 @@ def set_feature_override(
     return registry.get(key)
 
 
+async def get_tenant_by_schema(
+    session: AsyncSession, schema_name: str
+) -> TenantRecord | None:
+    """Look up a tenant by its schema name. Returns None if not found."""
+    result = await session.execute(
+        select(Tenant).where(Tenant.schema_name == schema_name)
+    )
+    row = result.scalar_one_or_none()
+    return _to_record(row) if row is not None else None
+
+
+async def get_tenants_by_ids(
+    session: AsyncSession, ids: list[int]
+) -> dict[int, TenantRecord]:
+    """Return a mapping of tenant_id -> TenantRecord for the given IDs."""
+    if not ids:
+        return {}
+    result = await session.execute(
+        select(Tenant).where(Tenant.id.in_(ids))
+    )
+    return {row.id: _to_record(row) for row in result.scalars().all()}
+
+
 def _to_record(row: Tenant) -> TenantRecord:
     return TenantRecord(
         id=row.id,

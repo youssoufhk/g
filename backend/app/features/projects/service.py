@@ -1,7 +1,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.features.clients.models import Client
+from app.features.clients import service as clients_service
 from app.features.projects.models import Project
 
 
@@ -44,6 +44,27 @@ async def count_active_projects(session: AsyncSession, *, tenant_id: int) -> int
     return int(result.scalar_one() or 0)
 
 
+async def search_projects(
+    session: AsyncSession,
+    *,
+    tenant_id: int,
+    query: str,
+    limit: int = 5,
+) -> list[tuple[int, str, str | None]]:
+    """Return (id, name, status) tuples matching query for topbar search."""
+    pattern = f"%{query}%"
+    rows = (
+        await session.execute(
+            select(Project)
+            .where(Project.tenant_id == tenant_id)
+            .where(Project.name.ilike(pattern))
+            .order_by(Project.name)
+            .limit(limit)
+        )
+    ).scalars().all()
+    return [(p.id, p.name, p.status) for p in rows]
+
+
 async def bulk_create_projects(
     session: AsyncSession,
     *,
@@ -59,11 +80,7 @@ async def bulk_create_projects(
     if not rows:
         return 0
 
-    client_rows = await session.execute(
-        select(Client).where(Client.tenant_id == tenant_id)
-    )
-    clients_by_id = {c.id: c for c in client_rows.scalars().all()}
-    valid_ids = set(clients_by_id.keys())
+    valid_ids = await clients_service.get_valid_client_ids(session, tenant_id=tenant_id)
 
     inserted = 0
     for row in rows:

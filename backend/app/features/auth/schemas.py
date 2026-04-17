@@ -1,16 +1,33 @@
+import re
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from email_validator import validate_email as pydantic_validate_email
+from pydantic import BaseModel, Field, field_validator
 
 from app.core.tenancy import is_valid_tenant_schema
 
+EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9-]+$")
+
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str = Field(min_length=8, max_length=256)
     display_name: str = Field(min_length=1, max_length=200)
     tenant_schema: str
     locale: str = "en-GB"
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def validate_email(cls, value: str) -> str:
+        if value.endswith(".local"):
+            if not EMAIL_REGEX.match(value):
+                raise ValueError("Invalid email format")
+        else:
+            try:
+                pydantic_validate_email(value, check_deliverability=False)
+            except Exception as e:
+                raise ValueError(f"Invalid email: {e}") from e
+        return value
 
     @field_validator("tenant_schema")
     @classmethod
@@ -21,9 +38,22 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str = Field(min_length=1, max_length=256)
     tenant_schema: str | None = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def validate_email(cls, value: str) -> str:
+        if value.endswith(".local"):
+            if not EMAIL_REGEX.match(value):
+                raise ValueError("Invalid email format")
+        else:
+            try:
+                pydantic_validate_email(value, check_deliverability=False)
+            except Exception as e:
+                raise ValueError(f"Invalid email: {e}") from e
+        return value
 
     @field_validator("tenant_schema")
     @classmethod

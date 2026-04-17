@@ -27,6 +27,37 @@ async def list_employees(
     return items, total
 
 
+async def search_employees(
+    session: AsyncSession,
+    *,
+    tenant_id: int,
+    query: str,
+    limit: int = 5,
+) -> list[tuple[int, str, str | None]]:
+    """Return (id, full_name, subtitle) tuples matching query for topbar search."""
+    pattern = f"%{query}%"
+    from sqlalchemy import or_
+    rows = (
+        await session.execute(
+            select(Employee)
+            .where(Employee.tenant_id == tenant_id)
+            .where(
+                or_(
+                    Employee.first_name.ilike(pattern),
+                    Employee.last_name.ilike(pattern),
+                    Employee.email.ilike(pattern),
+                )
+            )
+            .order_by(Employee.last_name, Employee.first_name)
+            .limit(limit)
+        )
+    ).scalars().all()
+    return [
+        (e.id, f"{e.first_name} {e.last_name}", e.role if e.role else e.email)
+        for e in rows
+    ]
+
+
 async def count_employees(session: AsyncSession, *, tenant_id: int) -> int:
     result = await session.execute(
         select(func.count(Employee.id)).where(Employee.tenant_id == tenant_id)

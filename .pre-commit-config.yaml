@@ -72,6 +72,12 @@ repos:
         entry: python3 scripts/hooks/check_vendor_imports.py
         files: '^backend/.*\.py$'
 
+      - id: m3-cross-feature-models
+        name: M3 forbid cross-feature model imports
+        language: system
+        entry: python3 scripts/hooks/check_cross_feature_models.py
+        files: '^backend/app/features/[^/]+/.*\.py$'
+
       - id: z2-mutation-decorators
         name: Z.2 require @audited + @gated_feature on mutating routes
         language: system

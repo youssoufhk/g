@@ -19,7 +19,7 @@ from app.core.security import (
     issue_access_token,
     verify_password,
 )
-from app.features.admin.models import Tenant
+from app.features.admin import service as admin_service
 from app.features.auth.models import AppUser, TenantMembership
 
 
@@ -53,10 +53,7 @@ async def register_user(
     if existing.scalar_one_or_none() is not None:
         raise Conflict(f"email already registered: {email}")
 
-    tenant_row = await session.execute(
-        select(Tenant).where(Tenant.schema_name == tenant_schema)
-    )
-    tenant = tenant_row.scalar_one_or_none()
+    tenant = await admin_service.get_tenant_by_schema(session, tenant_schema)
     if tenant is None:
         raise NotFound(f"tenant not found: {tenant_schema}")
 
@@ -72,7 +69,7 @@ async def register_user(
 
     membership = TenantMembership(
         user_id=user.id,
-        tenant_id=tenant.id,
+        tenant_id=tenant.id,  # TenantRecord.id
         role=role,
     )
     session.add(membership)
@@ -96,7 +93,7 @@ async def authenticate_user(
         raise Unauthorized("invalid credentials")
     if not verify_password(password, user.password_hash):
         raise Unauthorized("invalid credentials")
-    user.last_login_at = datetime.now(UTC)
+    user.last_login_at = datetime.now(UTC).replace(tzinfo=None)
     await session.flush()
     return user
 
@@ -118,10 +115,7 @@ async def resolve_tenant_for_user(
         return None
 
     tenant_ids = [m.tenant_id for m in memberships]
-    tenant_rows = await session.execute(
-        select(Tenant).where(Tenant.id.in_(tenant_ids))
-    )
-    tenants_by_id = {t.id: t for t in tenant_rows.scalars().all()}
+    tenants_by_id = await admin_service.get_tenants_by_ids(session, tenant_ids)
 
     if requested_schema is not None:
         for membership in memberships:
