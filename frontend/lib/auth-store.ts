@@ -9,6 +9,11 @@ import { persist } from "zustand/middleware";
  * flow (app_user_sessions table + /api/v1/auth/refresh endpoint). For
  * Phase 3a demo we trust the access token until it expires and then
  * force a re-login.
+ *
+ * _hasHydrated is NOT persisted. It starts false on every page load and
+ * flips to true once the persist middleware has read from localStorage.
+ * RequireAuth gates all auth checks on this flag to avoid false redirects
+ * on the first render tick before hydration completes.
  */
 
 export type AuthSnapshot = {
@@ -16,6 +21,10 @@ export type AuthSnapshot = {
   refreshToken: string | null;
   tenantSchema: string | null;
   expiresAt: number | null; // epoch ms
+};
+
+type AuthState = AuthSnapshot & {
+  _hasHydrated: boolean;
 };
 
 type AuthActions = {
@@ -27,6 +36,7 @@ type AuthActions = {
   }) => void;
   clear: () => void;
   isExpired: () => boolean;
+  setHasHydrated: (v: boolean) => void;
 };
 
 const EMPTY: AuthSnapshot = {
@@ -36,10 +46,12 @@ const EMPTY: AuthSnapshot = {
   expiresAt: null,
 };
 
-export const useAuthStore = create<AuthSnapshot & AuthActions>()(
+export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set, get) => ({
       ...EMPTY,
+      _hasHydrated: false,
+      setHasHydrated: (v: boolean) => set({ _hasHydrated: v }),
       setTokens: ({ accessToken, refreshToken, tenantSchema, expiresInSeconds }) =>
         set({
           accessToken,
@@ -62,6 +74,9 @@ export const useAuthStore = create<AuthSnapshot & AuthActions>()(
         tenantSchema: state.tenantSchema,
         expiresAt: state.expiresAt,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

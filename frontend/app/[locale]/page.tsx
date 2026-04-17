@@ -17,13 +17,15 @@ function CheckingShell({ children }: { children?: ReactNode }) {
 
 export default function LocaleRootPage() {
   const router = useRouter();
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const accessToken = useAuthStore((s) => s.accessToken);
   const isExpired = useAuthStore((s) => s.isExpired);
 
   useEffect(() => {
+    if (!hasHydrated) return;
     const authed = Boolean(accessToken) && !isExpired();
     router.replace(authed ? "/dashboard" : "/login");
-  }, [accessToken, isExpired, router]);
+  }, [hasHydrated, accessToken, isExpired, router]);
 
   return <CheckingShell>Checking session</CheckingShell>;
 }
