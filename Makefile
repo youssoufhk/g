@@ -133,6 +133,12 @@ backend-lint-local:
 backend-seed-demo-local:
 	cd backend && ../$(BACKEND_VENV)/bin/python -m scripts.generate_demo_seed
 
+seed-demo-tenant:
+	$(BACKEND_EXEC) python -m scripts.seed_demo_tenant --tenant t_dev
+
+seed-demo-tenant-local:
+	cd backend && ../$(BACKEND_VENV)/bin/python -m scripts.seed_demo_tenant --tenant t_dev
+
 # ----- one-shot --------------------------------------------------------------
 mvp-up: dev-up dev-migrate
 	@echo ""
