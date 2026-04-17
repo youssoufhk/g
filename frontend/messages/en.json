@@ -44,6 +44,24 @@
     "palette_nav": "to navigate",
     "palette_open": "to open"
   },
+  "auth": {
+    "login_title": "Sign in to Gamma",
+    "login_subtitle": "The operations OS for modern consulting firms.",
+    "email_label": "Work email",
+    "email_placeholder": "you@firm.com",
+    "email_required": "Enter your work email.",
+    "email_invalid": "That does not look like a valid email.",
+    "password_label": "Password",
+    "password_placeholder": "Your password",
+    "password_required": "Enter your password.",
+    "submit": "Sign in",
+    "submitting": "Signing in",
+    "dev_hint_title": "Dev environment",
+    "dev_hint_body": "Seeded credentials: admin@gamma.local / gamma_dev_password on tenant t_dev. Replace with real credentials in production.",
+    "error_invalid_credentials": "The email or password is wrong. Try again.",
+    "error_network": "We could not reach the server. Check your connection and try again.",
+    "error_generic": "Sign in failed. Please try again in a moment."
+  },
   "search": {
     "group_employees": "Employees",
     "group_clients": "Clients",

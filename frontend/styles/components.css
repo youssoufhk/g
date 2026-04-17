@@ -3397,3 +3397,153 @@ svg circle[data-animate].chart-animate-in {
     flex-wrap: wrap;
   }
 }
+
+/* ============================================================
+   AUTH PANEL (Phase 3a login / register)
+   Centered card on surface-0 with the shared tokens. No shell.
+   ============================================================ */
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: var(--color-surface-0);
+  color: var(--color-text-1);
+}
+.auth-shell-inner {
+  width: 100%;
+  max-width: 440px;
+}
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+}
+.auth-panel-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-panel-wordmark {
+  font-size: var(--text-heading-2);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--color-primary);
+}
+.auth-panel-title {
+  font-size: var(--text-heading-3);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+  text-align: center;
+  margin: 0;
+}
+.auth-panel-subtitle {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-3);
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.auth-field-label {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-2);
+  letter-spacing: 0.02em;
+}
+.auth-field-error {
+  color: var(--color-error);
+  font-size: var(--text-caption);
+  line-height: 1.4;
+}
+.auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-error-muted);
+  border-left: 3px solid var(--color-error);
+  color: var(--color-text-1);
+  font-size: var(--text-body-sm);
+  line-height: 1.5;
+}
+.auth-error > :first-child {
+  color: var(--color-error);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.auth-submit {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+.auth-dev-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-2);
+  font-size: var(--text-caption);
+  line-height: 1.5;
+}
+.auth-dev-hint > :first-child {
+  color: var(--color-text-3);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.auth-dev-hint-title {
+  margin: 0 0 var(--space-1) 0;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: var(--text-caption);
+}
+.auth-dev-hint-body {
+  margin: 0;
+  color: var(--color-text-3);
+  word-break: break-word;
+}
+
+/* iOS Safari auto-zooms when an input's effective font-size is below
+   16px. Force 16px for inputs inside the auth panel so the viewport
+   stays stable on focus; the 44px lg height preserves touch-target. */
+.auth-panel .form-input {
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  .auth-shell {
+    padding: var(--space-3);
+    align-items: flex-start;
+    padding-top: var(--space-5);
+  }
+  .auth-panel {
+    padding: var(--space-4);
+  }
+  .auth-panel .form-input {
+    min-height: 48px;
+  }
+  .auth-submit {
+    min-height: 48px;
+  }
+}

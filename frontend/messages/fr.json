@@ -44,6 +44,24 @@
     "palette_nav": "pour naviguer",
     "palette_open": "pour ouvrir"
   },
+  "auth": {
+    "login_title": "Connexion a Gamma",
+    "login_subtitle": "Le systeme d'exploitation des cabinets de conseil modernes.",
+    "email_label": "Email professionnel",
+    "email_placeholder": "vous@cabinet.com",
+    "email_required": "Entrez votre email professionnel.",
+    "email_invalid": "Cet email ne semble pas valide.",
+    "password_label": "Mot de passe",
+    "password_placeholder": "Votre mot de passe",
+    "password_required": "Entrez votre mot de passe.",
+    "submit": "Se connecter",
+    "submitting": "Connexion en cours",
+    "dev_hint_title": "Environnement de developpement",
+    "dev_hint_body": "Identifiants de test: admin@gamma.local / gamma_dev_password sur le tenant t_dev. A remplacer par de vrais identifiants en production.",
+    "error_invalid_credentials": "L'email ou le mot de passe est incorrect. Reessayez.",
+    "error_network": "Le serveur est injoignable. Verifiez votre connexion et reessayez.",
+    "error_generic": "La connexion a echoue. Reessayez dans un instant."
+  },
   "search": {
     "group_employees": "Employes",
     "group_clients": "Clients",
