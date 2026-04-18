@@ -7,6 +7,7 @@ class ApprovalOut(BaseModel):
     id: str
     type: str
     requester_id: int
+    requester_name: str | None = None
     subject: str
     submitted_at: datetime
     period: str | None = None

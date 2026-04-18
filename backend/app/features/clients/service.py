@@ -65,6 +65,20 @@ async def get_valid_client_ids(
     return {row for row, in result.all()}
 
 
+async def get_names_by_ids(
+    session: AsyncSession, *, tenant_id: int, ids: list[int]
+) -> dict[int, str]:
+    """Return {id: name} for the given client ids, filtered to this tenant."""
+    if not ids:
+        return {}
+    rows = await session.execute(
+        select(Client.id, Client.name)
+        .where(Client.tenant_id == tenant_id)
+        .where(Client.id.in_(ids))
+    )
+    return {row_id: row_name for row_id, row_name in rows.all()}
+
+
 async def count_clients(session: AsyncSession, *, tenant_id: int) -> int:
     result = await session.execute(
         select(func.count(Client.id)).where(Client.tenant_id == tenant_id)

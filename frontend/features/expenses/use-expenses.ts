@@ -10,9 +10,12 @@ import type { Expense, ExpenseCategory, ExpenseListFilters, ExpenseStatus } from
 type ExpenseOutDto = {
   id: number;
   employee_id: number;
+  employee_name: string | null;
   category_id: number;
   project_id: number | null;
+  project_name: string | null;
   client_id: number | null;
+  client_name: string | null;
   expense_date: string;
   merchant: string | null;
   amount_cents: number;
@@ -43,8 +46,10 @@ function adaptExpense(dto: ExpenseOutDto): Expense {
   return {
     id: String(dto.id),
     employee_id: String(dto.employee_id),
-    employee_name: `Employee #${dto.employee_id}`,
+    employee_name: dto.employee_name ?? "Unknown",
     project_id: dto.project_id ? String(dto.project_id) : undefined,
+    project_name: dto.project_name ?? undefined,
+    client_name: dto.client_name ?? undefined,
     category: "other" as ExpenseCategory,
     description: dto.merchant ?? "",
     amount: dto.amount_cents / 100,

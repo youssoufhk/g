@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
 from app.core.tenant_ctx import get_tenant_id
+from app.features.clients import service as clients_service
 from app.features.invoices import service
 from app.features.invoices.models import Invoice
 from app.features.invoices.schemas import InvoiceOut, InvoicesListResponse
@@ -22,16 +23,20 @@ async def list_invoices(
     items, total = await service.list_invoices(
         session, tenant_id=tenant_id, limit=limit, offset=offset
     )
+    client_names = await clients_service.get_names_by_ids(
+        session, tenant_id=tenant_id, ids=[i.client_id for i in items]
+    )
     return InvoicesListResponse(
-        items=[_to_out(i) for i in items],
+        items=[_to_out(i, client_names.get(i.client_id)) for i in items],
         total=total,
     )
 
 
-def _to_out(i: Invoice) -> InvoiceOut:
+def _to_out(i: Invoice, client_name: str | None) -> InvoiceOut:
     return InvoiceOut(
         id=i.id,
         client_id=i.client_id,
+        client_name=client_name,
         number=i.number,
         issue_date=i.issue_date,
         due_date=i.due_date,

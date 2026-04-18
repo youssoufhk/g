@@ -6,9 +6,12 @@ from pydantic import BaseModel
 class ExpenseOut(BaseModel):
     id: int
     employee_id: int
+    employee_name: str | None = None
     category_id: int
     project_id: int | None
+    project_name: str | None = None
     client_id: int | None
+    client_name: str | None = None
     expense_date: date
     merchant: str | None
     amount_cents: int

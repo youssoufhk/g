@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class InvoiceOut(BaseModel):
     id: int
     client_id: int
+    client_name: str | None = None
     number: str
     issue_date: date
     due_date: date

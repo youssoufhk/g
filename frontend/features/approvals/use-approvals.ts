@@ -10,6 +10,7 @@ type ApprovalOutDto = {
   id: string;
   type: string;
   requester_id: number;
+  requester_name: string | null;
   subject: string;
   submitted_at: string;
   period: string | null;
@@ -32,7 +33,7 @@ function adaptApproval(dto: ApprovalOutDto): ApprovalRequest {
     id: dto.id,
     type,
     requester_id: String(dto.requester_id),
-    requester_name: `Employee #${dto.requester_id}`,
+    requester_name: dto.requester_name ?? "Unknown",
     subject: dto.subject,
     amount: dto.amount_cents != null ? dto.amount_cents / 100 : undefined,
     currency: dto.currency ?? undefined,

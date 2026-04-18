@@ -28,6 +28,20 @@ async def list_projects(
     return items, total
 
 
+async def get_names_by_ids(
+    session: AsyncSession, *, tenant_id: int, ids: list[int]
+) -> dict[int, str]:
+    """Return {id: name} for the given project ids, filtered to this tenant."""
+    if not ids:
+        return {}
+    rows = await session.execute(
+        select(Project.id, Project.name)
+        .where(Project.tenant_id == tenant_id)
+        .where(Project.id.in_(ids))
+    )
+    return {rid: name for rid, name in rows.all()}
+
+
 async def count_projects(session: AsyncSession, *, tenant_id: int) -> int:
     result = await session.execute(
         select(func.count(Project.id)).where(Project.tenant_id == tenant_id)

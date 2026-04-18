@@ -10,6 +10,7 @@ import type { Invoice, InvoiceListFilters, InvoiceStatus } from "./types";
 type InvoiceOutDto = {
   id: number;
   client_id: number;
+  client_name: string | null;
   number: string;
   issue_date: string;
   due_date: string;
@@ -45,7 +46,7 @@ function adaptInvoice(dto: InvoiceOutDto): Invoice {
     id: String(dto.id),
     number: dto.number,
     client_id: String(dto.client_id),
-    client_name: `Client #${dto.client_id}`,
+    client_name: dto.client_name ?? "Unknown client",
     status,
     currency,
     issue_date: dto.issue_date,

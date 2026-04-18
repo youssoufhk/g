@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class LeaveRequestOut(BaseModel):
     id: int
     employee_id: int
+    employee_name: str | None = None
     leave_type_id: int
     start_date: date
     end_date: date

@@ -58,6 +58,20 @@ async def search_employees(
     ]
 
 
+async def get_names_by_ids(
+    session: AsyncSession, *, tenant_id: int, ids: list[int]
+) -> dict[int, str]:
+    """Return {id: "First Last"} for the given employee ids, filtered to this tenant."""
+    if not ids:
+        return {}
+    rows = await session.execute(
+        select(Employee.id, Employee.first_name, Employee.last_name)
+        .where(Employee.tenant_id == tenant_id)
+        .where(Employee.id.in_(ids))
+    )
+    return {rid: f"{first} {last}" for rid, first, last in rows.all()}
+
+
 async def count_employees(session: AsyncSession, *, tenant_id: int) -> int:
     result = await session.execute(
         select(func.count(Employee.id)).where(Employee.tenant_id == tenant_id)

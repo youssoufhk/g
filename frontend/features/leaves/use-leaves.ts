@@ -10,6 +10,7 @@ import type { LeaveBalance, LeaveListFilters, LeaveRequest, LeaveStatus, LeaveTy
 type LeaveRequestOutDto = {
   id: number;
   employee_id: number;
+  employee_name: string | null;
   leave_type_id: number;
   start_date: string;
   end_date: string;
@@ -37,7 +38,7 @@ function adaptLeave(dto: LeaveRequestOutDto): LeaveRequest {
   return {
     id: String(dto.id),
     employee_id: String(dto.employee_id),
-    employee_name: `Employee #${dto.employee_id}`,
+    employee_name: dto.employee_name ?? "Unknown",
     type: "annual" as LeaveType,
     start_date: dto.start_date,
     end_date: dto.end_date,
