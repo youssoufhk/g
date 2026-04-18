@@ -95,6 +95,17 @@ repos:
             frontend/components/design-system/.*
           )$
 
+      - id: no-icon-only-button-without-aria-label
+        name: Icon-only buttons must carry an aria-label (CRITIC_PLAN C15)
+        language: system
+        entry: python3 scripts/hooks/no_icon_only_button_aria_label.py
+        files: '^frontend/(components|features|app)/.*\.(tsx|jsx)$'
+        exclude: |
+          (?x)^(
+            frontend/tests/.*|
+            frontend/components/design-system/.*
+          )$
+
       - id: no-hex-or-rgba-in-tsx
         name: Ban hardcoded hex/rgba colours in frontend code (use var(--color-*))
         language: system

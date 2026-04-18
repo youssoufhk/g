@@ -87,6 +87,14 @@ SKIP_PREFIXES = (
 # ``debug`` / ``info`` / ``warn`` are still banned inside these files.
 ERROR_BOUNDARY_FILENAMES = frozenset({"error.tsx", "global-error.tsx"})
 
+# Shared helpers used exclusively by error boundaries. Treated like the
+# boundary files themselves: ``console.error`` is allowed, other levels
+# are not. Kept narrow by full path match so the escape hatch does not
+# widen on accident.
+ERROR_BOUNDARY_HELPERS = frozenset({
+    "frontend/components/patterns/route-error-panel.tsx",
+})
+
 
 def _norm(path: str) -> str:
     return path.replace("\\", "/")
@@ -100,8 +108,13 @@ def _should_scan(path: str) -> bool:
 
 
 def _is_error_boundary(path: str) -> bool:
-    name = PurePosixPath(_norm(path)).name
-    return name in ERROR_BOUNDARY_FILENAMES
+    normalised = _norm(path)
+    name = PurePosixPath(normalised).name
+    if name in ERROR_BOUNDARY_FILENAMES:
+        return True
+    return normalised in ERROR_BOUNDARY_HELPERS or any(
+        normalised.endswith("/" + helper) for helper in ERROR_BOUNDARY_HELPERS
+    )
 
 
 def scan(path: str) -> list[str]:

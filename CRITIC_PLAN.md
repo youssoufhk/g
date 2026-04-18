@@ -10,10 +10,10 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 - Part A (UX reds, highest-visibility): 3/8
 - Part B (UI reds, atom lock-down): 8/12
-- Part C (yellow polish): 9/15
+- Part C (yellow polish): 11/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 20/35
+Overall in-session: 22/35
 
 ---
 
@@ -91,7 +91,7 @@ Overall in-session: 20/35
 24. [x] **C4 [C14]** KPI label: tracked-out caps at 12px in `.kpi-label`.
 25. [x] **C5 [D21]** Filter-bar shape unification: one `FilterBar` pattern across expenses/invoices/approvals/resources.
 26. [x] **C6 [D22]** Sidebar selected state: verify 3px primary left-border on `.nav-item.active`.
-27. [ ] **C7 [G33]** Per-page route error boundaries: add `error.tsx` to every list page segment.
+27. [x] **C7 [G33]** Per-page route error boundaries: add `error.tsx` to every list page segment.
 28. [x] **C8 [D29]** Action-named CTAs: "Submit week", "Approve 3 expenses", etc. Grep for bare "Submit"/"Approve" on approvals and expenses.
 29. [ ] **C9 [E37]** Page-level degraded banner when `kill_switch.ai` on: dashboard, expenses, invoices.
 30. [x] **C10 [G54]** Filter bars at 375px: horizontal scroll, not vertical wrap.
@@ -99,7 +99,7 @@ Overall in-session: 20/35
 32. [ ] **C12 [C21]** Undo pattern on destructive admin flows (password reset, user disable).
 33. [ ] **C13 [C19]** Smoke-test `ConflictResolverProvider` in a real mutation path (invoice status change).
 34. [x] **C14 [H34..H39]** Re-run grep guards: no em dashes, banned terminology, no sparklines, no donut charts.
-35. [ ] **C15 [E25 lint]** Lint rule: ban icon-only `<button>` without `aria-label` literal or i18n key.
+35. [x] **C15 [E25 lint]** Lint rule: ban icon-only `<button>` without `aria-label` literal or i18n key.
 
 ---
 
