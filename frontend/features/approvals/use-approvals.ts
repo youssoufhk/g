@@ -1,6 +1,47 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import type { ApprovalRequest, ApprovalListFilters } from "./types";
+
+import { apiFetch } from "@/lib/api-client";
+import { USE_API } from "@/lib/api-mode";
+
+import type { ApprovalListFilters, ApprovalRequest, ApprovalType } from "./types";
+
+type ApprovalOutDto = {
+  id: string;
+  type: string;
+  requester_id: number;
+  subject: string;
+  submitted_at: string;
+  period: string | null;
+  amount_cents: number | null;
+  currency: string | null;
+};
+
+type ApprovalsListResponseDto = {
+  items: ApprovalOutDto[];
+  total: number;
+};
+
+const VALID_TYPES: ApprovalType[] = ["timesheet", "expense", "leave"];
+
+function adaptApproval(dto: ApprovalOutDto): ApprovalRequest {
+  const type: ApprovalType = (VALID_TYPES as string[]).includes(dto.type)
+    ? (dto.type as ApprovalType)
+    : "timesheet";
+  return {
+    id: dto.id,
+    type,
+    requester_id: String(dto.requester_id),
+    requester_name: `Employee #${dto.requester_id}`,
+    subject: dto.subject,
+    amount: dto.amount_cents != null ? dto.amount_cents / 100 : undefined,
+    currency: dto.currency ?? undefined,
+    period: dto.period ?? undefined,
+    status: "pending",
+    submitted_at: dto.submitted_at,
+    urgency: "normal",
+  };
+}
 
 const MOCK_APPROVALS: ApprovalRequest[] = [
   {
@@ -23,7 +64,7 @@ const MOCK_APPROVALS: ApprovalRequest[] = [
     requester_name: "Lucas Ferreira",
     requester_avatar_color_index: 4,
     subject: "Eurostar Paris-London",
-    amount: 287.50,
+    amount: 287.5,
     currency: "EUR",
     project_name: "BNP Risk Model",
     status: "pending",
@@ -49,7 +90,7 @@ const MOCK_APPROVALS: ApprovalRequest[] = [
     requester_name: "James Morel",
     requester_avatar_color_index: 0,
     subject: "Team dinner",
-    amount: 145.00,
+    amount: 145.0,
     currency: "EUR",
     status: "pending",
     submitted_at: "2026-04-13T11:20:00Z",
@@ -77,7 +118,7 @@ const MOCK_APPROVALS: ApprovalRequest[] = [
     requester_name: "Omar Hassan",
     requester_avatar_color_index: 5,
     subject: "Hotel - client site",
-    amount: 312.00,
+    amount: 312.0,
     currency: "EUR",
     status: "approved",
     submitted_at: "2026-04-12T17:00:00Z",
@@ -86,28 +127,32 @@ const MOCK_APPROVALS: ApprovalRequest[] = [
   },
 ];
 
+function filterApprovals(items: ApprovalRequest[], filters: ApprovalListFilters): ApprovalRequest[] {
+  let next = items;
+  if (filters.status) next = next.filter((a) => a.status === filters.status);
+  if (filters.type) next = next.filter((a) => a.type === filters.type);
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    next = next.filter(
+      (a) =>
+        a.requester_name.toLowerCase().includes(q) ||
+        a.subject.toLowerCase().includes(q) ||
+        (a.project_name ?? "").toLowerCase().includes(q),
+    );
+  }
+  return next;
+}
+
 export function useApprovals(filters: ApprovalListFilters = {}) {
   return useQuery<ApprovalRequest[]>({
-    queryKey: ["approvals", filters],
+    queryKey: ["approvals", USE_API ? "api" : "mock", filters],
     queryFn: async () => {
+      if (USE_API) {
+        const data = await apiFetch<ApprovalsListResponseDto>(`/approvals/pending?limit=500`);
+        return filterApprovals(data.items.map(adaptApproval), filters);
+      }
       await new Promise((r) => setTimeout(r, 200));
-      let items = MOCK_APPROVALS;
-      if (filters.status) {
-        items = items.filter((a) => a.status === filters.status);
-      }
-      if (filters.type) {
-        items = items.filter((a) => a.type === filters.type);
-      }
-      if (filters.search) {
-        const q = filters.search.toLowerCase();
-        items = items.filter(
-          (a) =>
-            a.requester_name.toLowerCase().includes(q) ||
-            a.subject.toLowerCase().includes(q) ||
-            (a.project_name ?? "").toLowerCase().includes(q),
-        );
-      }
-      return items;
+      return filterApprovals(MOCK_APPROVALS, filters);
     },
     staleTime: 30_000,
   });
