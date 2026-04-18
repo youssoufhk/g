@@ -118,3 +118,44 @@ These are weeks-to-months of work and need founder alignment. Listed so they are
 ## Execution log
 
 - 2026-04-18: plan created, HEAD a32ecc1. Starting with A1 (cheapest, highest-visibility).
+- 2026-04-18: 26/35 at HEAD 5329f68. Session closure pass landed six commits:
+  C7 per-page error.tsx (a34499c), C15 icon-only button lint (a34499c),
+  C9 AI kill-switch banner (cae187e), B10 skeleton fidelity (0209fd4),
+  C12 undo on admin destructive flows (0b08311), B9 axe-core in Playwright (5329f68).
+  Standalone plan commit SELLABILITY_PLAN.md (ea71e01).
+
+## Handoff for next agent (2026-04-18)
+
+Remaining 9 items split into three buckets by blocker type. Work them in
+this order:
+
+**Needs only frontend code (pick these first):**
+- B6 (Icon wrapper + ESLint rule banning raw sizes). Medium. Grep for
+  `size={14|18|22}` in components and features; map to xs/sm/md/lg/xl.
+- A8 (AI signal chips + "why this insight" expansion on the dashboard
+  insight banner). Open `features/dashboard/insight-banner.tsx`.
+- A4 (OCR two-stage: detected merchant/amount/confidence row above
+  auto-filled fields in the expense upload drawer).
+- A5 (OCR mobile camera: `<input type="file" accept="image/*" capture="environment">`
+  on the same expense upload).
+
+**Needs backend write endpoints (CRITIC_PLAN D5 is the gate):**
+- A2 (timesheets real backend wire). Dual-arm USE_API in
+  `features/timesheets/use-timesheets.ts`.
+- A3 (retrofit `lib/optimistic.ts::useOptimisticMutation` into
+  approvals/leaves/expenses/invoices mutation paths).
+- C11 (Recent activity wired to real audit_log with before/after diffs
+  on detail pages).
+- C13 (ConflictResolverProvider smoke test in a real mutation path,
+  invoice status change).
+
+**Needs founder decision:**
+- B1 (retire or formally approve 8 invented patterns not in
+  specs/DESIGN_SYSTEM.md: ai-recommendations, detail-header-bar,
+  range-calendar, resources-filter-bar, timeline-window-selector,
+  multi-select-pill, ai-insight-card, ai-invoice-explanation).
+
+Every new commit should update the Progress block at the top and tick
+its box. Keep commits logically scoped (one item or one tight group).
+SELLABILITY_PLAN.md (HEAD ea71e01) lays out the 35 EUR/seat roadmap;
+CRITIC_PLAN closure is its Phase F1 gate.
