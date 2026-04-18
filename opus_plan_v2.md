@@ -295,6 +295,22 @@ If the two pages did NOT land, redo §P10 and §P11 (one page at a time from thi
 
 Commit as: `opus bar sweep batch E: cross-cutting hygiene`.
 
+### 7.5 Latest resume checkpoint
+
+2026-04-18 resume: §9 items 1-16 all verified complete in prior
+passes (see §12.7 history D7-D16 and commits `70ebcf2` for §8.3,
+`71d0d26` for Batch D, and §10 KPI=3 is green across all
+`*-kpis.tsx`). §P12 hygiene: em dash, dashboard-portal console.log,
+inline Intl.DateTimeFormat all already closed. Critic loop pass
+continuing: commit `09a2dd0` exempts `features/*/mock-*.ts`
+fixture modules from the hex/rgba hook (those carry per-entity DB
+swatches, not UI tokens). Next agent: resume §12 layer sweep. Note
+that `npx tsc --noEmit` on HEAD already has pre-existing errors
+(trend-badge module missing for admin/approvals/timesheets KPIs,
+error-boundary override modifiers, use-undoable-action durationMs)
+that are unrelated to the hook commit; typecheck-gating should be
+scoped to files touched, not the whole tree, until those land.
+
 ---
 
 ## 8. Founder answers to OPUS_CRITICS_V2 follow-ups (received 2026-04-18, acted on overnight)
