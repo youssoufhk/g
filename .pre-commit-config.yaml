@@ -84,6 +84,17 @@ repos:
         entry: python3 scripts/hooks/check_mutation_decorators.py
         files: '^backend/app/features/[^/]+/routes\.py$'
 
+      - id: no-hardcoded-aria-labels
+        name: Ban hardcoded aria-label string literals in frontend components
+        language: system
+        entry: python3 scripts/hooks/no_hardcoded_aria_labels.py
+        files: '^frontend/(components|features|app)/.*\.(tsx|jsx)$'
+        exclude: |
+          (?x)^(
+            frontend/tests/.*|
+            frontend/components/design-system/.*
+          )$
+
       - id: no-utilisation
         name: Ban the word utilisation
         language: system
