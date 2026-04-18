@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 1/8
+- Part A (UX reds, highest-visibility): 2/8
 - Part B (UI reds, atom lock-down): 5/12
-- Part C (yellow polish): 2/15
+- Part C (yellow polish): 3/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 8/35
+Overall in-session: 10/35
 
 ---
 
@@ -36,7 +36,7 @@ Overall in-session: 8/35
 
 5. [ ] **A5 [G50/G57]** OCR "Take photo" mobile path: add `<input type="file" accept="image/*" capture="environment">` so the camera opens on 375px devices.
 
-6. [ ] **A6 [B7]** Add `useUrlListState` on 4 list pages that lose state on reload:
+6. [x] **A6 [B7]** Add `useUrlListState` on 4 list pages that lose state on reload:
    - `app/[locale]/(app)/employees/page.tsx`
    - `app/[locale]/(app)/clients/page.tsx`
    - `app/[locale]/(app)/projects/page.tsx`
@@ -92,7 +92,7 @@ Overall in-session: 8/35
 25. [ ] **C5 [D21]** Filter-bar shape unification: one `FilterBar` pattern across expenses/invoices/approvals/resources.
 26. [ ] **C6 [D22]** Sidebar selected state: verify 3px primary left-border on `.nav-item.active`.
 27. [ ] **C7 [G33]** Per-page route error boundaries: add `error.tsx` to every list page segment.
-28. [ ] **C8 [D29]** Action-named CTAs: "Submit week", "Approve 3 expenses", etc. Grep for bare "Submit"/"Approve" on approvals and expenses.
+28. [x] **C8 [D29]** Action-named CTAs: "Submit week", "Approve 3 expenses", etc. Grep for bare "Submit"/"Approve" on approvals and expenses.
 29. [ ] **C9 [E37]** Page-level degraded banner when `kill_switch.ai` on: dashboard, expenses, invoices.
 30. [ ] **C10 [G54]** Filter bars at 375px: horizontal scroll, not vertical wrap.
 31. [ ] **C11 [B15]** "Recent activity" on detail pages: wire real `audit_log` with before/after diffs (backend endpoint + frontend list).

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Users,
   Plus,
@@ -860,8 +861,42 @@ export default function AdminPage() {
   const t = useTranslations("admin");
   const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS);
   const [flags, setFlags] = useState<FeatureFlag[]>(INITIAL_FLAGS);
-  const [activeKpi, setActiveKpi] = useState<"users" | "flags" | "audit" | undefined>();
-  const [userFilter, setUserFilter] = useState<"all" | "pending">("all");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const kpiParam = searchParams.get("kpi");
+  const activeKpi: "users" | "flags" | "audit" | undefined =
+    kpiParam === "users" || kpiParam === "flags" || kpiParam === "audit" ? kpiParam : undefined;
+  const filterParam = searchParams.get("filter");
+  const userFilter: "all" | "pending" = filterParam === "pending" ? "pending" : "all";
+
+  const writeParams = useCallback(
+    (mutate: (next: URLSearchParams) => void) => {
+      const next = new URLSearchParams(searchParams.toString());
+      mutate(next);
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+  const setActiveKpi = useCallback(
+    (key: "users" | "flags" | "audit" | undefined) => {
+      writeParams((p) => {
+        if (key) p.set("kpi", key);
+        else p.delete("kpi");
+      });
+    },
+    [writeParams],
+  );
+  const setUserFilter = useCallback(
+    (value: "all" | "pending") => {
+      writeParams((p) => {
+        if (value === "pending") p.set("filter", "pending");
+        else p.delete("filter");
+      });
+    },
+    [writeParams],
+  );
 
   const pendingInvites = users.filter((u) => u.status === "pending").length;
   const flagsEnabled = flags.filter((f) => f.enabled).length;

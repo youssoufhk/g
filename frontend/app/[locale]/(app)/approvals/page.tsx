@@ -203,7 +203,7 @@ function ApprovalCard({ item, showActions, selected, onToggleSelect, onApprove, 
           }}
         >
           <Button variant="primary" size="sm" onClick={() => onApprove(item.id)}>
-            {t("action_approve")}
+            {t(`action_approve_${item.type}` as "action_approve_timesheet" | "action_approve_expense" | "action_approve_leave")}
           </Button>
           <Button
             variant="ghost"
@@ -516,10 +516,10 @@ export default function ApprovalsPage() {
                       {t("bulk_clear")}
                     </Button>
                     <Button variant="ghost" size="sm" style={{ color: "var(--color-error)" }} onClick={bulkReject}>
-                      {t("bulk_reject")}
+                      {t("bulk_reject", { count: selected.size })}
                     </Button>
                     <Button variant="primary" size="sm" leadingIcon={<CheckCircle2 size={14} aria-hidden />} onClick={bulkApprove}>
-                      {t("bulk_approve")}
+                      {t("bulk_approve", { count: selected.size })}
                     </Button>
                   </div>
                 </div>
