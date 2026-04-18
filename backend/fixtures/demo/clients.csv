@@ -1,121 +1,121 @@
 client_id,name,country_code,currency,primary_contact_name,primary_contact_email,size_band
 1,HSBC UK,GB,GBP,Dawn Booth,treasury.ops@hsbc-demo.local,large
-2,Moreau Group,FR,EUR,Anastasie Marty-Hubert,finance@moreaugroup-demo.local,large
-3,Valette et Fils Group,FR,EUR,Alexandre Hoarau,finance@valetteetfilsgroup-demo.local,large
-4,Lefebvre Loiseau S.A. SE,FR,EUR,Christophe Reynaud-Laroche,finance@lefebvreloiseausas-demo.local,large
-5,Thibault S.A. SE,FR,EUR,Joséphine Gosselin,finance@thibaultsase-demo.local,large
-6,Brun Group,FR,EUR,Céline Merle de la Langlois,finance@brungroup-demo.local,large
-7,Delorme SA SA,FR,EUR,Sébastien Labbé du Chauvin,finance@delormesasa-demo.local,large
-8,Sanchez Allain et Fils SE,FR,EUR,Bernard Grenier-Leleu,finance@sanchezallainetfil-demo.local,large
-9,Pottier Group,FR,EUR,Célina Moreno de Perrot,finance@pottiergroup-demo.local,large
-10,Peltier SA,FR,EUR,Antoinette Guillou,finance@peltiersa-demo.local,large
-11,Richard SE,FR,EUR,Victoire Gautier,finance@richardse-demo.local,large
-12,Étienne SA,FR,EUR,Colette Gay,finance@étiennesa-demo.local,large
-13,Peron Barbe et Fils SE,FR,EUR,Thibault-René Becker,finance@peronbarbeetfilsse-demo.local,large
-14,Turpin Group,FR,EUR,Juliette Breton,finance@turpingroup-demo.local,large
-15,Fernandez Lopes S.A.R.L. Group,FR,EUR,Nicolas Colas-Bourdon,finance@fernandezlopessarl-demo.local,large
-16,Marques SA,FR,EUR,Paul Germain,finance@marquessa-demo.local,large
-17,Coulon Lecomte SARL Group,FR,EUR,Jean-Guillaume Godard,finance@coulonlecomtesarlg-demo.local,large
-18,Berthelot Group,FR,EUR,Raymond Aubert,finance@berthelotgroup-demo.local,large
-19,Guillot et Fils SE,FR,EUR,Victoire Berthelot,finance@guillotetfilsse-demo.local,large
-20,Blot Ollivier et Fils SA,FR,EUR,Sophie Durand,finance@blotollivieretfils-demo.local,large
-21,Cousin S.A. Group,FR,EUR,Jacqueline Schneider,finance@cousinsagroup-demo.local,large
-22,Reynaud SE,FR,EUR,Marie Lamy-Vallet,finance@reynaudse-demo.local,large
-23,Benard SE,FR,EUR,Laetitia Schneider,finance@benardse-demo.local,large
-24,Grondin SA,FR,EUR,Étienne Gomes,finance@grondinsa-demo.local,large
-25,Bernier S.A.S. Group,FR,EUR,Étienne Fabre,finance@berniersasgroup-demo.local,large
-26,Baron SE,FR,EUR,Lorraine-Capucine Leclercq,finance@baronse-demo.local,large
-27,Dumas SA,FR,EUR,Dorothée Hernandez,finance@dumassa-demo.local,large
-28,Neveu S.A.S. SA,FR,EUR,Guillaume Lambert,finance@neveusassa-demo.local,large
-29,Lenoir SARL SE,FR,EUR,Timothée Chrétien,finance@lenoirsarlse-demo.local,large
-30,Henry SA,FR,EUR,Sébastien Jacquet,finance@henrysa-demo.local,large
-31,Voisin SE,FR,EUR,Marianne Gonzalez,finance@voisinse-demo.local,mid
-32,Fleury S.A.R.L. SE,FR,EUR,Arthur Maréchal,finance@fleurysarlse-demo.local,mid
-33,Legrand SARL,FR,EUR,Anastasie-Clémence Gérard,finance@legrandsarl-demo.local,mid
-34,Clément SAS,FR,EUR,Charles Pascal-Salmon,finance@clémentsas-demo.local,mid
-35,Seguin SE,FR,EUR,Hélène Diallo du Lebreton,finance@seguinse-demo.local,mid
-36,Léger SE,FR,EUR,Pénélope-Manon Colas,finance@légerse-demo.local,mid
-37,Bourdon et Fils SE,FR,EUR,François Toussaint,finance@bourdonetfilsse-demo.local,mid
-38,Aubry Peltier SA SARL,FR,EUR,Georges Giraud,finance@aubrypeltiersasarl-demo.local,mid
-39,Barbier SA SARL,FR,EUR,Stéphanie Lagarde,finance@barbiersasarl-demo.local,mid
-40,Klein SARL,FR,EUR,Gabriel Hervé,finance@kleinsarl-demo.local,mid
-41,Boutin SE,FR,EUR,Arnaude Torres,finance@boutinse-demo.local,mid
-42,Aubry Toussaint S.A.S. SAS,FR,EUR,Marcel de Devaux,finance@aubrytoussaintsass-demo.local,mid
-43,Jourdan Gérard SARL SARL,FR,EUR,Auguste Lopez,finance@jourdangérardsarls-demo.local,mid
-44,Le Gall Valentin et Fils SAS,FR,EUR,Louise-Sabine Denis,finance@legallvalentinetfi-demo.local,mid
-45,Lagarde SARL,FR,EUR,Luc Maillard du Navarro,finance@lagardesarl-demo.local,mid
-46,Joseph SA SE,FR,EUR,Margot Texier,finance@josephsase-demo.local,mid
-47,Michel SARL,FR,EUR,Gabriel Parent,finance@michelsarl-demo.local,mid
-48,Salmon et Fils SARL,FR,EUR,Sébastien-Alphonse Ledoux,finance@salmonetfilssarl-demo.local,mid
-49,Lelièvre Paul et Fils SE,FR,EUR,Laurence Arnaud,finance@lelièvrepauletfils-demo.local,mid
-50,Bousquet SARL,FR,EUR,Bernadette Lelièvre,finance@bousquetsarl-demo.local,mid
-51,Lejeune SAS,FR,EUR,Margot Leconte,finance@lejeunesas-demo.local,mid
-52,Renard SARL SAS,FR,EUR,Virginie Hervé,finance@renardsarlsas-demo.local,mid
-53,Samson SARL,FR,EUR,Alex De Sousa-Blanc,finance@samsonsarl-demo.local,mid
-54,Fleury SE,FR,EUR,Céline Leleu,finance@fleuryse-demo.local,mid
-55,Buisson SE,FR,EUR,Vincent Allard,finance@buissonse-demo.local,mid
-56,Pasquier SARL,FR,EUR,Étienne Paul,finance@pasquiersarl-demo.local,mid
-57,Loiseau SE,FR,EUR,Simone Samson,finance@loiseause-demo.local,mid
-58,Martins SARL SAS,FR,EUR,Christelle Hervé-Navarro,finance@martinssarlsas-demo.local,mid
-59,Rivière SE,FR,EUR,Thomas Raynaud,finance@rivièrese-demo.local,mid
-60,Lacombe Leroux SARL SE,FR,EUR,Agathe Courtois-Cordier,finance@lacombelerouxsarls-demo.local,mid
-61,Jean SA SE,FR,EUR,Célina Jourdan,finance@jeansase-demo.local,mid
-62,Didier Auger SARL SARL,FR,EUR,Laetitia du Guillet,finance@didieraugersarlsar-demo.local,mid
-63,Berger SE,FR,EUR,Claudine Jacob,finance@bergerse-demo.local,mid
-64,Joseph Grégoire et Fils SE,FR,EUR,Arthur Baron,finance@josephgrégoireetfi-demo.local,mid
-65,Leblanc SE,FR,EUR,Juliette de Carre,finance@leblancse-demo.local,mid
-66,Coste SARL,FR,EUR,Victoire-Clémence Cohen,finance@costesarl-demo.local,mid
-67,Barre SARL,FR,EUR,Michelle Pineau,finance@barresarl-demo.local,mid
-68,Roche SE,FR,EUR,Sébastien Jacob-Rey,finance@rochese-demo.local,mid
-69,Bertrand SE,FR,EUR,Thérèse Munoz,finance@bertrandse-demo.local,mid
-70,Collin SAS,FR,EUR,Paul Da Silva,finance@collinsas-demo.local,mid
-71,Gaudin Maury SARL SARL,FR,EUR,Matthieu Roussel,finance@gaudinmaurysarlsar-demo.local,mid
-72,Garcia SE,FR,EUR,Lucas Bègue,finance@garciase-demo.local,mid
-73,Sanchez Lelièvre SARL SAS,FR,EUR,Nicole Delahaye,finance@sanchezlelièvresar-demo.local,mid
-74,Boulanger et Fils SAS,FR,EUR,Monique Prévost-Toussaint,finance@boulangeretfilssas-demo.local,mid
-75,Allard SAS,FR,EUR,Thierry Muller,finance@allardsas-demo.local,mid
-76,Lefort Pottier SARL SARL,FR,EUR,Benjamin Gay-Perrin,finance@lefortpottiersarls-demo.local,mid
-77,Hebert S.A. SAS,FR,EUR,Alexandre Lambert Le Lefèvre,finance@hebertsasas-demo.local,mid
-78,Pelletier SE,FR,EUR,Philippine Rodrigues,finance@pelletierse-demo.local,mid
-79,Laporte Bouchet S.A.S. SAS,FR,EUR,Émile Roger,finance@laportebouchetsass-demo.local,mid
-80,Bourdon S.A.R.L. SE,FR,EUR,Isabelle Mahe de la Grondin,finance@bourdonsarlse-demo.local,mid
-81,Diaz SAS,FR,EUR,Michel-Gilbert Martineau,finance@diazsas-demo.local,small
-82,Turpin SARL SAS,FR,EUR,Constance Legrand-Pichon,finance@turpinsarlsas-demo.local,small
-83,Coste Studio,FR,EUR,Timothée Lamy Le Pineau,finance@costestudio-demo.local,small
-84,Philippe EURL,FR,EUR,Valérie Gautier,finance@philippeeurl-demo.local,small
-85,Weber Masse SARL EURL,FR,EUR,Lucie-Lucie Simon,finance@webermassesarleurl-demo.local,small
-86,Paris Studio,FR,EUR,Roland Torres,finance@parisstudio-demo.local,small
-87,Seguin et Fils EURL,FR,EUR,Louise Diallo,finance@seguinetfilseurl-demo.local,small
-88,Seguin Benard S.A. EURL,FR,EUR,Thierry Le Potier,finance@seguinbenardsaeurl-demo.local,small
-89,Techer Pereira et Fils Studio,FR,EUR,Honoré Besnard,finance@techerpereiraetfil-demo.local,small
-90,Delorme SARL EURL,FR,EUR,Benjamin Collet,finance@delormesarleurl-demo.local,small
-91,Letellier EURL,FR,EUR,Diane Bourgeois,finance@letelliereurl-demo.local,small
-92,Gimenez Poulain S.A.S. EURL,FR,EUR,Laetitia de la Boucher,finance@gimenezpoulainsase-demo.local,small
-93,Collet Studio,FR,EUR,Céline Bigot,finance@colletstudio-demo.local,small
-94,Blanchard S.A. EURL,FR,EUR,Mathilde Robin,finance@blanchardsaeurl-demo.local,small
-95,Garcia EURL,FR,EUR,René-Charles De Sousa,finance@garciaeurl-demo.local,small
-96,Maillet Studio,FR,EUR,Stéphane-Laurent Diaz,finance@mailletstudio-demo.local,small
-97,Nicolas SAS,FR,EUR,Noël Laurent-Legendre,finance@nicolassas-demo.local,small
-98,Bourdon EURL,FR,EUR,Tristan Andre-Bousquet,finance@bourdoneurl-demo.local,small
-99,Bonnin Studio,FR,EUR,Victor Lejeune de Joly,finance@bonninstudio-demo.local,small
-100,Morel SARL Studio,FR,EUR,Céline Pereira,finance@morelsarlstudio-demo.local,small
-101,Tanguy Dufour S.A.R.L. EURL,FR,EUR,Michèle Leconte,finance@tanguydufoursarleu-demo.local,small
-102,Coste Studio,FR,EUR,Marc Bègue,finance@costestudio-demo.local,small
-103,Camus S.A.S. Studio,FR,EUR,Laurence David,finance@camussasstudio-demo.local,small
-104,Carpentier Studio,FR,EUR,Simone Huet,finance@carpentierstudio-demo.local,small
-105,Perrin EURL,FR,EUR,Martine Bonnet,finance@perrineurl-demo.local,small
-106,Baron EURL,FR,EUR,Charles du Robin,finance@baroneurl-demo.local,small
-107,Clerc Riou S.A.S. SAS,FR,EUR,André Le Roux,finance@clercriousassas-demo.local,small
-108,Marchand Moreno S.A. Studio,FR,EUR,Robert Guillaume,finance@marchandmorenosast-demo.local,small
-109,Rey Boulanger S.A. SAS,FR,EUR,Adélaïde Baron de la Dumont,finance@reyboulangersasas-demo.local,small
-110,Roger EURL,FR,EUR,Vincent Michel,finance@rogereurl-demo.local,small
-111,Garcia Pelletier S.A. EURL,FR,EUR,Margot-Agnès Roger,finance@garciapelletiersae-demo.local,small
-112,Roux EURL,FR,EUR,Marc Laine,finance@rouxeurl-demo.local,small
-113,Vallet SA EURL,FR,EUR,Sophie Merle,finance@valletsaeurl-demo.local,small
-114,Blanchet SAS,FR,EUR,Catherine-Stéphanie Gaudin,finance@blanchetsas-demo.local,small
-115,Bonneau Bertrand et Fils Studio,FR,EUR,Madeleine du Weiss,finance@bonneaubertrandetf-demo.local,small
-116,Bonnet S.A.R.L. EURL,FR,EUR,Pénélope Torres,finance@bonnetsarleurl-demo.local,small
-117,Marin et Fils SAS,FR,EUR,Arnaude Faure,finance@marinetfilssas-demo.local,small
-118,Raynaud EURL,FR,EUR,Arthur Marchand,finance@raynaudeurl-demo.local,small
-119,Ferrand EURL,FR,EUR,Marguerite-Monique Godard,finance@ferrandeurl-demo.local,small
-120,De Sousa Studio,FR,EUR,Philippine de Boutin,finance@desousastudio-demo.local,small
+2,Gillet SA,FR,EUR,Frédérique De Sousa,finance@gilletsa-demo.local,large
+3,Marques Group,FR,EUR,Laurence Chrétien,finance@marquesgroup-demo.local,large
+4,Fleury SE,FR,EUR,Noël Moreau,finance@fleuryse-demo.local,large
+5,Marty S.A. Group,FR,EUR,Victor Fournier,finance@martysagroup-demo.local,large
+6,Hoarau S.A. Group,FR,EUR,Thierry Brunet,finance@hoarausagroup-demo.local,large
+7,Marchand Reynaud et Fils Group,FR,EUR,Roland Carpentier,finance@marchandreynaudetf-demo.local,large
+8,Bonnin Group,FR,EUR,Julien-Émile Seguin,finance@bonningroup-demo.local,large
+9,Merle S.A. SE,FR,EUR,Bernard Delorme de Langlois,finance@merlesase-demo.local,large
+10,Chauvin SE,FR,EUR,Auguste de la Henry,finance@chauvinse-demo.local,large
+11,Pottier SA,FR,EUR,Célina Moreno de Perrot,finance@pottiersa-demo.local,large
+12,Peltier SE,FR,EUR,Antoinette Guillou,finance@peltierse-demo.local,large
+13,Richard SE,FR,EUR,Victoire Gautier,finance@richardse-demo.local,large
+14,Étienne Group,FR,EUR,Colette Gay,finance@étiennegroup-demo.local,large
+15,Peron Barbe et Fils Group,FR,EUR,Thibault-René Becker,finance@peronbarbeetfilsgr-demo.local,large
+16,Turpin SA,FR,EUR,Juliette Breton,finance@turpinsa-demo.local,large
+17,Fernandez Lopes S.A.R.L. Group,FR,EUR,Nicolas Colas-Bourdon,finance@fernandezlopessarl-demo.local,large
+18,Marques Group,FR,EUR,Paul Germain,finance@marquesgroup-demo.local,large
+19,Coulon Lecomte SARL Group,FR,EUR,Jean-Guillaume Godard,finance@coulonlecomtesarlg-demo.local,large
+20,Berthelot SE,FR,EUR,Raymond Aubert,finance@berthelotse-demo.local,large
+21,Guillot et Fils SE,FR,EUR,Victoire Berthelot,finance@guillotetfilsse-demo.local,large
+22,Blot Ollivier et Fils Group,FR,EUR,Sophie Durand,finance@blotollivieretfils-demo.local,large
+23,Cousin S.A. Group,FR,EUR,Jacqueline Schneider,finance@cousinsagroup-demo.local,large
+24,Reynaud SA,FR,EUR,Marie Lamy-Vallet,finance@reynaudsa-demo.local,large
+25,Benard SA,FR,EUR,Laetitia Schneider,finance@benardsa-demo.local,large
+26,Grondin SE,FR,EUR,Étienne Gomes,finance@grondinse-demo.local,large
+27,Bernier S.A.S. SA,FR,EUR,Étienne Fabre,finance@berniersassa-demo.local,large
+28,Baron SE,FR,EUR,Lorraine-Capucine Leclercq,finance@baronse-demo.local,large
+29,Dumas SE,FR,EUR,Dorothée Hernandez,finance@dumasse-demo.local,large
+30,Neveu S.A.S. SE,FR,EUR,Guillaume Lambert,finance@neveusasse-demo.local,large
+31,Lenoir SARL SARL,FR,EUR,Timothée Chrétien,finance@lenoirsarlsarl-demo.local,mid
+32,Henry SAS,FR,EUR,Sébastien Jacquet,finance@henrysas-demo.local,mid
+33,Voisin SE,FR,EUR,Marianne Gonzalez,finance@voisinse-demo.local,mid
+34,Fleury S.A.R.L. SARL,FR,EUR,Arthur Maréchal,finance@fleurysarlsarl-demo.local,mid
+35,Legrand SE,FR,EUR,Anastasie-Clémence Gérard,finance@legrandse-demo.local,mid
+36,Clément SAS,FR,EUR,Charles Pascal-Salmon,finance@clémentsas-demo.local,mid
+37,Seguin SAS,FR,EUR,Hélène Diallo du Lebreton,finance@seguinsas-demo.local,mid
+38,Léger SARL,FR,EUR,Pénélope-Manon Colas,finance@légersarl-demo.local,mid
+39,Bourdon et Fils SARL,FR,EUR,François Toussaint,finance@bourdonetfilssarl-demo.local,mid
+40,Aubry Peltier SA SAS,FR,EUR,Georges Giraud,finance@aubrypeltiersasas-demo.local,mid
+41,Barbier SA SAS,FR,EUR,Stéphanie Lagarde,finance@barbiersasas-demo.local,mid
+42,Klein SARL,FR,EUR,Gabriel Hervé,finance@kleinsarl-demo.local,mid
+43,Boutin SE,FR,EUR,Arnaude Torres,finance@boutinse-demo.local,mid
+44,Aubry Toussaint S.A.S. SAS,FR,EUR,Marcel de Devaux,finance@aubrytoussaintsass-demo.local,mid
+45,Jourdan Gérard SARL SARL,FR,EUR,Auguste Lopez,finance@jourdangérardsarls-demo.local,mid
+46,Le Gall Valentin et Fils SAS,FR,EUR,Louise-Sabine Denis,finance@legallvalentinetfi-demo.local,mid
+47,Lagarde SE,FR,EUR,Luc Maillard du Navarro,finance@lagardese-demo.local,mid
+48,Joseph SA SAS,FR,EUR,Margot Texier,finance@josephsasas-demo.local,mid
+49,Michel SARL,FR,EUR,Gabriel Parent,finance@michelsarl-demo.local,mid
+50,Salmon et Fils SE,FR,EUR,Sébastien-Alphonse Ledoux,finance@salmonetfilsse-demo.local,mid
+51,Lelièvre Paul et Fils SE,FR,EUR,Laurence Arnaud,finance@lelièvrepauletfils-demo.local,mid
+52,Bousquet SE,FR,EUR,Bernadette Lelièvre,finance@bousquetse-demo.local,mid
+53,Lejeune SAS,FR,EUR,Margot Leconte,finance@lejeunesas-demo.local,mid
+54,Renard SARL SARL,FR,EUR,Virginie Hervé,finance@renardsarlsarl-demo.local,mid
+55,Samson SAS,FR,EUR,Alex De Sousa-Blanc,finance@samsonsas-demo.local,mid
+56,Fleury SE,FR,EUR,Céline Leleu,finance@fleuryse-demo.local,mid
+57,Buisson SAS,FR,EUR,Vincent Allard,finance@buissonsas-demo.local,mid
+58,Pasquier SE,FR,EUR,Étienne Paul,finance@pasquierse-demo.local,mid
+59,Loiseau SARL,FR,EUR,Simone Samson,finance@loiseausarl-demo.local,mid
+60,Martins SARL SARL,FR,EUR,Christelle Hervé-Navarro,finance@martinssarlsarl-demo.local,mid
+61,Rivière SE,FR,EUR,Thomas Raynaud,finance@rivièrese-demo.local,mid
+62,Lacombe Leroux SARL SE,FR,EUR,Agathe Courtois-Cordier,finance@lacombelerouxsarls-demo.local,mid
+63,Jean SA SE,FR,EUR,Célina Jourdan,finance@jeansase-demo.local,mid
+64,Didier Auger SARL SAS,FR,EUR,Laetitia du Guillet,finance@didieraugersarlsas-demo.local,mid
+65,Berger SE,FR,EUR,Claudine Jacob,finance@bergerse-demo.local,mid
+66,Joseph Grégoire et Fils SAS,FR,EUR,Arthur Baron,finance@josephgrégoireetfi-demo.local,mid
+67,Leblanc SAS,FR,EUR,Juliette de Carre,finance@leblancsas-demo.local,mid
+68,Coste SARL,FR,EUR,Victoire-Clémence Cohen,finance@costesarl-demo.local,mid
+69,Barre SE,FR,EUR,Michelle Pineau,finance@barrese-demo.local,mid
+70,Roche SAS,FR,EUR,Sébastien Jacob-Rey,finance@rochesas-demo.local,mid
+71,Bertrand SARL,FR,EUR,Thérèse Munoz,finance@bertrandsarl-demo.local,mid
+72,Collin SARL,FR,EUR,Paul Da Silva,finance@collinsarl-demo.local,mid
+73,Gaudin Maury SARL SARL,FR,EUR,Matthieu Roussel,finance@gaudinmaurysarlsar-demo.local,mid
+74,Garcia SE,FR,EUR,Lucas Bègue,finance@garciase-demo.local,mid
+75,Sanchez Lelièvre SARL SE,FR,EUR,Nicole Delahaye,finance@sanchezlelièvresar-demo.local,mid
+76,Boulanger et Fils SARL,FR,EUR,Monique Prévost-Toussaint,finance@boulangeretfilssar-demo.local,mid
+77,Allard SAS,FR,EUR,Thierry Muller,finance@allardsas-demo.local,mid
+78,Lefort Pottier SARL SE,FR,EUR,Benjamin Gay-Perrin,finance@lefortpottiersarls-demo.local,mid
+79,Hebert S.A. SARL,FR,EUR,Alexandre Lambert Le Lefèvre,finance@hebertsasarl-demo.local,mid
+80,Pelletier SAS,FR,EUR,Philippine Rodrigues,finance@pelletiersas-demo.local,mid
+81,Laporte Bouchet S.A.S. EURL,FR,EUR,Émile Roger,finance@laportebouchetsase-demo.local,small
+82,Bourdon S.A.R.L. Studio,FR,EUR,Isabelle Mahe de la Grondin,finance@bourdonsarlstudio-demo.local,small
+83,Diaz EURL,FR,EUR,Michel-Gilbert Martineau,finance@diazeurl-demo.local,small
+84,Turpin SARL EURL,FR,EUR,Constance Legrand-Pichon,finance@turpinsarleurl-demo.local,small
+85,Coste EURL,FR,EUR,Timothée Lamy Le Pineau,finance@costeeurl-demo.local,small
+86,Philippe SAS,FR,EUR,Valérie Gautier,finance@philippesas-demo.local,small
+87,Weber Masse SARL Studio,FR,EUR,Lucie-Lucie Simon,finance@webermassesarlstud-demo.local,small
+88,Paris Studio,FR,EUR,Roland Torres,finance@parisstudio-demo.local,small
+89,Seguin et Fils SAS,FR,EUR,Louise Diallo,finance@seguinetfilssas-demo.local,small
+90,Seguin Benard S.A. EURL,FR,EUR,Thierry Le Potier,finance@seguinbenardsaeurl-demo.local,small
+91,Techer Pereira et Fils SAS,FR,EUR,Honoré Besnard,finance@techerpereiraetfil-demo.local,small
+92,Delorme SARL SAS,FR,EUR,Benjamin Collet,finance@delormesarlsas-demo.local,small
+93,Letellier EURL,FR,EUR,Diane Bourgeois,finance@letelliereurl-demo.local,small
+94,Gimenez Poulain S.A.S. SAS,FR,EUR,Laetitia de la Boucher,finance@gimenezpoulainsass-demo.local,small
+95,Collet Studio,FR,EUR,Céline Bigot,finance@colletstudio-demo.local,small
+96,Blanchard S.A. EURL,FR,EUR,Mathilde Robin,finance@blanchardsaeurl-demo.local,small
+97,Garcia EURL,FR,EUR,René-Charles De Sousa,finance@garciaeurl-demo.local,small
+98,Maillet EURL,FR,EUR,Stéphane-Laurent Diaz,finance@mailleteurl-demo.local,small
+99,Nicolas EURL,FR,EUR,Noël Laurent-Legendre,finance@nicolaseurl-demo.local,small
+100,Bourdon Studio,FR,EUR,Tristan Andre-Bousquet,finance@bourdonstudio-demo.local,small
+101,Bonnin Studio,FR,EUR,Victor Lejeune de Joly,finance@bonninstudio-demo.local,small
+102,Morel SARL Studio,FR,EUR,Céline Pereira,finance@morelsarlstudio-demo.local,small
+103,Tanguy Dufour S.A.R.L. EURL,FR,EUR,Michèle Leconte,finance@tanguydufoursarleu-demo.local,small
+104,Coste SAS,FR,EUR,Marc Bègue,finance@costesas-demo.local,small
+105,Camus S.A.S. Studio,FR,EUR,Laurence David,finance@camussasstudio-demo.local,small
+106,Carpentier Studio,FR,EUR,Simone Huet,finance@carpentierstudio-demo.local,small
+107,Perrin Studio,FR,EUR,Martine Bonnet,finance@perrinstudio-demo.local,small
+108,Baron EURL,FR,EUR,Charles du Robin,finance@baroneurl-demo.local,small
+109,Clerc Riou S.A.S. EURL,FR,EUR,André Le Roux,finance@clercriousaseurl-demo.local,small
+110,Marchand Moreno S.A. EURL,FR,EUR,Robert Guillaume,finance@marchandmorenosaeu-demo.local,small
+111,Rey Boulanger S.A. Studio,FR,EUR,Adélaïde Baron de la Dumont,finance@reyboulangersastud-demo.local,small
+112,Roger SAS,FR,EUR,Vincent Michel,finance@rogersas-demo.local,small
+113,Garcia Pelletier S.A. EURL,FR,EUR,Margot-Agnès Roger,finance@garciapelletiersae-demo.local,small
+114,Roux SAS,FR,EUR,Marc Laine,finance@rouxsas-demo.local,small
+115,Vallet SA EURL,FR,EUR,Sophie Merle,finance@valletsaeurl-demo.local,small
+116,Blanchet Studio,FR,EUR,Catherine-Stéphanie Gaudin,finance@blanchetstudio-demo.local,small
+117,Bonneau Bertrand et Fils EURL,FR,EUR,Madeleine du Weiss,finance@bonneaubertrandetf-demo.local,small
+118,Bonnet S.A.R.L. EURL,FR,EUR,Pénélope Torres,finance@bonnetsarleurl-demo.local,small
+119,Marin et Fils Studio,FR,EUR,Arnaude Faure,finance@marinetfilsstudio-demo.local,small
+120,Raynaud EURL,FR,EUR,Arthur Marchand,finance@raynaudeurl-demo.local,small

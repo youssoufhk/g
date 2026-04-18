@@ -31,7 +31,17 @@ from datetime import date, timedelta
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FIXTURES = REPO_ROOT / "backend" / "fixtures" / "demo"
+# Fixtures path differs between local venv runs (REPO_ROOT/backend/fixtures)
+# and docker dev runs (/app/fixtures, because the backend/ folder is the
+# container WORKDIR). GAMMA_FIXTURES_DIR overrides both; otherwise try the
+# repo path first and fall back to the backend-root path.
+_env_fixtures = os.environ.get("GAMMA_FIXTURES_DIR")
+if _env_fixtures:
+    FIXTURES = Path(_env_fixtures)
+elif (REPO_ROOT / "backend" / "fixtures" / "demo").exists():
+    FIXTURES = REPO_ROOT / "backend" / "fixtures" / "demo"
+else:
+    FIXTURES = REPO_ROOT / "fixtures" / "demo"
 DEFAULT_DATABASE_URL = (
     "postgresql+asyncpg://gamma:gamma_dev_password@localhost:5432/gamma_dev"
 )
@@ -166,12 +176,96 @@ async def seed_clients(
     return mapping
 
 
+async def seed_teams(
+    conn, tenant_id: int, rows: list[dict[str, str]], employee_map: dict[int, int]
+) -> dict[int, int]:
+    """Insert teams. Returns {csv_team_id: db_id}.
+
+    Two-pass to avoid FK issues: first INSERT without lead, then UPDATE
+    lead_employee_id so a CSV-id order that prepends teams before leads
+    still lands.
+    """
+    mapping: dict[int, int] = {}
+    for row in rows:
+        csv_id = int(row["team_id"])
+        db_id = await conn.fetchval(
+            """
+            INSERT INTO public.teams (tenant_id, name)
+            VALUES ($1, $2)
+            ON CONFLICT (tenant_id, name) DO NOTHING
+            RETURNING id
+            """,
+            tenant_id,
+            row["name"],
+        )
+        if db_id is None:
+            db_id = await conn.fetchval(
+                "SELECT id FROM public.teams WHERE tenant_id=$1 AND name=$2",
+                tenant_id,
+                row["name"],
+            )
+        mapping[csv_id] = db_id
+
+    # Backfill lead_employee_id now that both teams and employees exist.
+    for row in rows:
+        csv_lead = _parse_int(row.get("lead_employee_id"))
+        if not csv_lead:
+            continue
+        db_lead = employee_map.get(csv_lead)
+        if db_lead is None:
+            continue
+        await conn.execute(
+            """
+            UPDATE public.teams
+               SET lead_employee_id = $1
+             WHERE id = $2 AND lead_employee_id IS DISTINCT FROM $1
+            """,
+            db_lead,
+            mapping[int(row["team_id"])],
+        )
+
+    return mapping
+
+
+async def backfill_employee_team_ids(
+    conn,
+    tenant_id: int,
+    employee_rows: list[dict[str, str]],
+    employee_map: dict[int, int],
+    team_map: dict[int, int],
+    team_name_map: dict[str, int],
+) -> int:
+    """Populate employees.team_id by looking up team name -> db team id."""
+    updated = 0
+    for row in employee_rows:
+        csv_emp = int(row["employee_id"])
+        team_name = row.get("team")
+        if not team_name:
+            continue
+        db_team = team_name_map.get(team_name)
+        db_emp = employee_map.get(csv_emp)
+        if db_team is None or db_emp is None:
+            continue
+        await conn.execute(
+            """
+            UPDATE public.employees
+               SET team_id = $1
+             WHERE id = $2 AND team_id IS DISTINCT FROM $1
+            """,
+            db_team,
+            db_emp,
+        )
+        updated += 1
+    return updated
+
+
 async def seed_projects(
     conn,
     tenant_id: int,
     rows: list[dict[str, str]],
     client_map: dict[int, int],
     employee_map: dict[int, int],
+    team_map: dict[int, int],
 ) -> dict[int, int]:
     """Insert projects. Returns {csv_project_id: db_id}."""
     mapping: dict[int, int] = {}
@@ -184,14 +278,16 @@ async def seed_projects(
 
         csv_owner = _parse_int(row.get("owner_employee_id"))
         db_owner = employee_map.get(csv_owner or 0) if csv_owner else None
+        csv_team = _parse_int(row.get("team_id"))
+        db_team = team_map.get(csv_team or 0) if csv_team else None
 
         db_id = await conn.fetchval(
             """
             INSERT INTO public.projects (
                 tenant_id, client_id, name, status,
                 budget_minor_units, currency,
-                start_date, end_date, owner_employee_id
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                start_date, end_date, owner_employee_id, team_id
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             ON CONFLICT DO NOTHING
             RETURNING id
             """,
@@ -204,12 +300,24 @@ async def seed_projects(
             _parse_date(row.get("start_date")),
             _parse_date(row.get("end_date")),
             db_owner,
+            db_team,
         )
         if db_id is None:
             db_id = await conn.fetchval(
                 "SELECT id FROM public.projects WHERE tenant_id=$1 AND name=$2",
                 tenant_id, row["name"],
             )
+            # Existing row: backfill team_id if it is null.
+            if db_id is not None and db_team is not None:
+                await conn.execute(
+                    """
+                    UPDATE public.projects
+                       SET team_id = $1
+                     WHERE id = $2 AND team_id IS NULL
+                    """,
+                    db_team,
+                    db_id,
+                )
         mapping[csv_id] = db_id
     return mapping
 
@@ -1147,9 +1255,27 @@ async def main(tenant_schema: str) -> None:
         cli_map = await seed_clients(conn, tenant_id, cli_rows)
         print(f"[seed]   {len(cli_map)} clients ready")
 
+        print("[seed] Seeding teams...")
+        team_rows = _read_csv("teams.csv")
+        team_map = await seed_teams(conn, tenant_id, team_rows, emp_map)
+        team_name_map = {
+            row["name"]: team_map[int(row["team_id"])]
+            for row in team_rows
+            if int(row["team_id"]) in team_map
+        }
+        print(f"[seed]   {len(team_map)} teams ready")
+
+        print("[seed] Backfilling employee team_id...")
+        updated = await backfill_employee_team_ids(
+            conn, tenant_id, emp_rows, emp_map, team_map, team_name_map
+        )
+        print(f"[seed]   {updated} employees linked to teams")
+
         print("[seed] Seeding projects...")
         proj_rows = _read_csv("projects.csv")
-        proj_map = await seed_projects(conn, tenant_id, proj_rows, cli_map, emp_map)
+        proj_map = await seed_projects(
+            conn, tenant_id, proj_rows, cli_map, emp_map, team_map
+        )
         print(f"[seed]   {len(proj_map)} projects ready")
 
         print("[seed] Seeding team allocations...")
@@ -1173,10 +1299,22 @@ async def main(tenant_schema: str) -> None:
             for r in emp_rows
             if r.get("role") != "owner"
         ]
+        # Billable roles are the consultant + PM tracks. "employee" is the
+        # legacy label from an earlier seed generator; the current generator
+        # emits specific role codes, so we match against that set.
+        _BILLABLE_ROLES = {
+            "junior_consultant",
+            "mid_consultant",
+            "senior_consultant",
+            "pm",
+            "senior_pm",
+            "delivery_director",
+            "employee",
+        }
         billable_csv_ids = [
             int(r["employee_id"])
             for r in emp_rows
-            if r.get("role") in ("employee",)
+            if r.get("role") in _BILLABLE_ROLES
         ][:TIMESHEET_BILLABLE_EMPLOYEE_COUNT]
 
         billable_db_ids = [emp_map[c] for c in billable_csv_ids if c in emp_map]

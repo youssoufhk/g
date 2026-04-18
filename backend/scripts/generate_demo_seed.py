@@ -81,6 +81,92 @@ TEAMS: list[str] = [
     "Manufacturing",
 ]
 
+# Role -> candidate teams. Each role is assigned to one of its candidates in a
+# round-robin so team composition reflects role, not random dice rolls. The
+# team lead of each team is later computed as the most senior employee
+# (owner > admin > delivery_director > senior_pm > pm > rest) in that team.
+ROLE_TEAM_CANDIDATES: dict[str, list[str]] = {
+    "owner": ["Finance"],
+    "admin": ["Operations"],
+    "finance": ["Finance"],
+    "delivery_director": ["Strategy", "Tech"],
+    "senior_pm": ["Finance", "Tech", "Digital", "Strategy", "Risk"],
+    "pm": [
+        "Tech",
+        "Digital",
+        "Strategy",
+        "Risk",
+        "Public Sector",
+        "Healthcare",
+        "Manufacturing",
+        "Marketing",
+    ],
+    "hr": ["People"],
+    "recruiting": ["People"],
+    "senior_consultant": [
+        "Strategy",
+        "Tech",
+        "Digital",
+        "Risk",
+        "Legal",
+        "Healthcare",
+    ],
+    "mid_consultant": [
+        "Tech",
+        "Digital",
+        "Strategy",
+        "Risk",
+        "Healthcare",
+        "Manufacturing",
+        "Public Sector",
+        "Marketing",
+    ],
+    "junior_consultant": [
+        "Tech",
+        "Digital",
+        "Strategy",
+        "Risk",
+        "Healthcare",
+        "Manufacturing",
+        "Public Sector",
+        "Marketing",
+    ],
+    "ops_support": ["Operations"],
+    "auditor": ["Legal"],
+    "intern": ["People"],
+}
+
+# Seniority order for picking team leads (higher first).
+TEAM_LEAD_SENIORITY: list[str] = [
+    "owner",
+    "admin",
+    "delivery_director",
+    "senior_pm",
+    "pm",
+    "senior_consultant",
+    "mid_consultant",
+    "finance",
+    "hr",
+    "recruiting",
+    "ops_support",
+    "auditor",
+    "junior_consultant",
+    "intern",
+]
+
+# Project keyword -> team that should own it. Drives owner_employee_id so
+# delivery projects go to the right discipline, not a random PM.
+PROJECT_PREFIX_TEAM: dict[str, str] = {
+    "Finance transformation": "Finance",
+    "Data platform": "Tech",
+    "Cloud migration": "Tech",
+    "Risk review": "Risk",
+    "Compliance audit": "Legal",
+    "Org redesign": "Strategy",
+    "Cost optimization": "Strategy",
+    "Operations uplift": "Operations",
+}
+
 # Client distribution: 30 large * 4 + 50 mid * 2 + 40 small * 1 = 260 projects
 CLIENT_BANDS: list[tuple[str, int, int]] = [
     ("large", 30, 4),
@@ -131,6 +217,7 @@ class Project:
     project_id: int
     name: str
     client_id: int
+    team_id: int
     status: str
     budget_minor_units: int
     currency: str
@@ -159,13 +246,6 @@ def build_context() -> SeedContext:
     return SeedContext(rng=rng, faker_fr=faker_fr, faker_uk=faker_uk)
 
 
-def gen_teams(ctx: SeedContext) -> list[Team]:
-    return [
-        Team(team_id=i + 1, name=name, lead_employee_id=0)
-        for i, name in enumerate(TEAMS)
-    ]
-
-
 def gen_employees(ctx: SeedContext) -> list[Employee]:
     employees: list[Employee] = []
     employee_id = 1
@@ -174,7 +254,12 @@ def gen_employees(ctx: SeedContext) -> list[Employee]:
     manager_roles = {"owner", "admin", "delivery_director", "senior_pm", "pm"}
     managers_so_far: list[int] = []
 
+    # Per-role round-robin cursor across ROLE_TEAM_CANDIDATES so the team
+    # assignment is deterministic and balanced, not random.
+    role_team_cursor: dict[str, int] = {role: 0 for role in ROLE_TEAM_CANDIDATES}
+
     for role, count in ROLE_DISTRIBUTION:
+        candidates = ROLE_TEAM_CANDIDATES.get(role, TEAMS)
         for _ in range(count):
             gender = ctx.rng.choice(["male", "female"])
             if gender == "male":
@@ -190,7 +275,10 @@ def gen_employees(ctx: SeedContext) -> list[Employee]:
                 suffix += 1
             seen_emails.add(email)
 
-            team = ctx.rng.choice(TEAMS)
+            cursor = role_team_cursor.get(role, 0)
+            team = candidates[cursor % len(candidates)]
+            role_team_cursor[role] = cursor + 1
+
             hire_year = ctx.rng.randint(2018, 2025)
             hire_date = ctx.faker_fr.date_between(
                 start_date=date(hire_year, 1, 1),
@@ -217,6 +305,30 @@ def gen_employees(ctx: SeedContext) -> list[Employee]:
 
     assert len(employees) == 201, f"expected 201 employees, got {len(employees)}"
     return employees
+
+
+def gen_teams(ctx: SeedContext) -> list[Team]:
+    """Teams are derived from employee composition.
+
+    Each team's lead is the most senior employee in that team, using
+    TEAM_LEAD_SENIORITY as tie-breaker order. Runs AFTER gen_employees so
+    ctx.employees is populated. If a team has no members (rare), the lead
+    falls back to the owner (employee 1) rather than 0.
+    """
+    teams: list[Team] = []
+    role_rank: dict[str, int] = {
+        role: idx for idx, role in enumerate(TEAM_LEAD_SENIORITY)
+    }
+    owner_id = next((e.employee_id for e in ctx.employees if e.role == "owner"), 1)
+    for i, name in enumerate(TEAMS):
+        members = [e for e in ctx.employees if e.team == name]
+        if members:
+            lead = min(members, key=lambda e: role_rank.get(e.role, 999))
+            lead_id = lead.employee_id
+        else:
+            lead_id = owner_id
+        teams.append(Team(team_id=i + 1, name=name, lead_employee_id=lead_id))
+    return teams
 
 
 def _email_slug(first: str, last: str) -> str:
@@ -289,7 +401,14 @@ def gen_projects(ctx: SeedContext) -> list[Project]:
     ctx.rng.shuffle(status_pool)
 
     idx = 0
-    manager_pool = [e.employee_id for e in ctx.employees if e.role in {"senior_pm", "pm"}]
+    # Manager pool keyed by team so a Finance-theme project is owned by a
+    # Finance-team PM, not a random PM from Marketing.
+    manager_pool_by_team: dict[str, list[int]] = {}
+    for e in ctx.employees:
+        if e.role in {"senior_pm", "pm", "delivery_director"}:
+            manager_pool_by_team.setdefault(e.team, []).append(e.employee_id)
+    all_managers = [e.employee_id for e in ctx.employees if e.role in {"senior_pm", "pm"}]
+    team_by_name = {t.name: t for t in ctx.teams}
 
     for band_name, _, projects_per in CLIENT_BANDS:
         band_clients = [c for c in ctx.clients if c.size_band == band_name]
@@ -297,7 +416,8 @@ def gen_projects(ctx: SeedContext) -> list[Project]:
             for n in range(projects_per):
                 status = status_pool[idx]
                 idx += 1
-                name = f"{client.name} - {_project_name(ctx, n)}"
+                prefix, team_name = _project_prefix_and_team(ctx, n, client)
+                name = f"{client.name} - {prefix} phase {n + 1}"
                 start = ctx.faker_fr.date_between(
                     start_date=date(2024, 1, 1),
                     end_date=date(2026, 3, 31),
@@ -320,17 +440,25 @@ def gen_projects(ctx: SeedContext) -> list[Project]:
                     budget_minor = int(budget_eur * 85)  # ~EUR->GBP rough
                 else:
                     budget_minor = budget_eur * 100
+                team_managers = manager_pool_by_team.get(team_name, [])
+                owner_id = (
+                    ctx.rng.choice(team_managers)
+                    if team_managers
+                    else ctx.rng.choice(all_managers)
+                )
+                team_id = team_by_name[team_name].team_id
                 projects.append(
                     Project(
                         project_id=project_id,
                         name=name,
                         client_id=client.client_id,
+                        team_id=team_id,
                         status=status,
                         budget_minor_units=budget_minor,
                         currency=client.currency,
                         start_date=start.isoformat(),
                         end_date=end,
-                        owner_employee_id=ctx.rng.choice(manager_pool),
+                        owner_employee_id=owner_id,
                     )
                 )
                 project_id += 1
@@ -339,18 +467,27 @@ def gen_projects(ctx: SeedContext) -> list[Project]:
     return projects
 
 
-def _project_name(ctx: SeedContext, index: int) -> str:
-    prefixes = [
-        "Operations uplift",
-        "Finance transformation",
-        "Data platform",
-        "Cloud migration",
-        "Risk review",
-        "Compliance audit",
-        "Org redesign",
-        "Cost optimization",
-    ]
-    return f"{ctx.rng.choice(prefixes)} phase {index + 1}"
+def _project_prefix_and_team(
+    ctx: SeedContext, index: int, client: Client
+) -> tuple[str, str]:
+    """Pick a project prefix and the owning team in one step.
+
+    HSBC UK anchors to the Finance team (primary customer narrative).
+    Every other project picks a prefix from PROJECT_PREFIX_TEAM; the team
+    is the value for that prefix.
+    """
+    if client.name == "HSBC UK":
+        prefixes = [
+            "Finance transformation",
+            "Risk review",
+            "Compliance audit",
+            "Cost optimization",
+        ]
+        prefix = prefixes[index % len(prefixes)]
+    else:
+        prefixes = list(PROJECT_PREFIX_TEAM.keys())
+        prefix = ctx.rng.choice(prefixes)
+    return prefix, PROJECT_PREFIX_TEAM[prefix]
 
 
 def write_csv(path: Path, rows: list[Any]) -> None:
@@ -368,8 +505,10 @@ def write_csv(path: Path, rows: list[Any]) -> None:
 
 def generate() -> SeedContext:
     ctx = build_context()
-    ctx.teams = gen_teams(ctx)
+    # Order matters: teams are derived from employee team composition, and
+    # projects are owned by team-matched PMs, so build employees first.
     ctx.employees = gen_employees(ctx)
+    ctx.teams = gen_teams(ctx)
     ctx.clients = gen_clients(ctx)
     ctx.projects = gen_projects(ctx)
 

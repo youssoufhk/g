@@ -1,261 +1,261 @@
-project_id,name,client_id,status,budget_minor_units,currency,start_date,end_date,owner_employee_id
-1,HSBC UK - Finance transformation phase 1,1,active,42500000,GBP,2024-04-03,,13
-2,HSBC UK - Org redesign phase 2,1,active,21250000,GBP,2025-06-20,,17
-3,HSBC UK - Compliance audit phase 3,1,completed,4250000,GBP,2025-12-20,2026-02-21,15
-4,HSBC UK - Risk review phase 4,1,completed,10200000,GBP,2025-12-10,2026-02-02,22
-5,Moreau Group - Finance transformation phase 1,2,active,2500000,EUR,2025-12-29,,12
-6,Moreau Group - Data platform phase 2,2,active,50000000,EUR,2024-12-05,,10
-7,Moreau Group - Finance transformation phase 3,2,completed,12000000,EUR,2025-11-09,2026-01-10,17
-8,Moreau Group - Org redesign phase 4,2,active,25000000,EUR,2025-08-21,,19
-9,Valette et Fils Group - Cost optimization phase 1,3,active,25000000,EUR,2024-09-13,,14
-10,Valette et Fils Group - Cloud migration phase 2,3,completed,50000000,EUR,2024-09-13,2025-02-07,11
-11,Valette et Fils Group - Compliance audit phase 3,3,completed,25000000,EUR,2026-02-20,2026-03-29,11
-12,Valette et Fils Group - Risk review phase 4,3,active,50000000,EUR,2025-01-23,,17
-13,Lefebvre Loiseau S.A. SE - Risk review phase 1,4,active,2500000,EUR,2024-03-15,,13
-14,Lefebvre Loiseau S.A. SE - Org redesign phase 2,4,active,50000000,EUR,2024-03-10,,10
-15,Lefebvre Loiseau S.A. SE - Operations uplift phase 3,4,completed,5000000,EUR,2024-12-20,2025-12-13,14
-16,Lefebvre Loiseau S.A. SE - Cloud migration phase 4,4,active,5000000,EUR,2024-11-01,,22
-17,Thibault S.A. SE - Risk review phase 1,5,completed,12000000,EUR,2024-04-16,2024-05-29,15
-18,Thibault S.A. SE - Finance transformation phase 2,5,completed,2500000,EUR,2026-02-23,2026-03-23,17
-19,Thibault S.A. SE - Org redesign phase 3,5,active,5000000,EUR,2025-07-03,,12
-20,Thibault S.A. SE - Org redesign phase 4,5,active,50000000,EUR,2024-12-02,,21
-21,Brun Group - Cloud migration phase 1,6,pipeline,50000000,EUR,2026-12-14,,18
-22,Brun Group - Compliance audit phase 2,6,active,2500000,EUR,2024-12-12,,16
-23,Brun Group - Operations uplift phase 3,6,active,25000000,EUR,2026-01-20,,10
-24,Brun Group - Cost optimization phase 4,6,completed,2500000,EUR,2024-02-12,2024-09-27,15
-25,Delorme SA SA - Org redesign phase 1,7,active,50000000,EUR,2024-09-13,,16
-26,Delorme SA SA - Org redesign phase 2,7,active,12000000,EUR,2024-03-25,,11
-27,Delorme SA SA - Org redesign phase 3,7,completed,2500000,EUR,2025-02-20,2025-04-25,15
-28,Delorme SA SA - Data platform phase 4,7,active,50000000,EUR,2025-01-30,,17
-29,Sanchez Allain et Fils SE - Compliance audit phase 1,8,active,2500000,EUR,2025-11-25,,16
-30,Sanchez Allain et Fils SE - Finance transformation phase 2,8,active,5000000,EUR,2024-10-14,,16
-31,Sanchez Allain et Fils SE - Org redesign phase 3,8,completed,50000000,EUR,2025-04-01,2025-05-14,11
-32,Sanchez Allain et Fils SE - Org redesign phase 4,8,completed,12000000,EUR,2024-08-16,2024-12-31,21
-33,Pottier Group - Compliance audit phase 1,9,completed,5000000,EUR,2024-12-17,2025-09-14,15
-34,Pottier Group - Data platform phase 2,9,active,2500000,EUR,2025-09-21,,18
-35,Pottier Group - Finance transformation phase 3,9,completed,50000000,EUR,2025-05-24,2025-12-30,18
-36,Pottier Group - Cloud migration phase 4,9,active,12000000,EUR,2025-04-01,,15
-37,Peltier SA - Data platform phase 1,10,active,5000000,EUR,2025-05-14,,11
-38,Peltier SA - Data platform phase 2,10,active,12000000,EUR,2025-06-23,,13
-39,Peltier SA - Data platform phase 3,10,active,50000000,EUR,2025-07-22,,12
-40,Peltier SA - Finance transformation phase 4,10,pipeline,5000000,EUR,2026-06-14,,22
-41,Richard SE - Cost optimization phase 1,11,completed,25000000,EUR,2025-09-17,2026-03-29,22
-42,Richard SE - Cost optimization phase 2,11,active,50000000,EUR,2024-10-14,,20
-43,Richard SE - Compliance audit phase 3,11,active,12000000,EUR,2024-05-28,,12
-44,Richard SE - Cost optimization phase 4,11,active,2500000,EUR,2024-04-27,,17
-45,Étienne SA - Cost optimization phase 1,12,pipeline,12000000,EUR,2026-04-20,,22
-46,Étienne SA - Risk review phase 2,12,active,50000000,EUR,2025-08-30,,10
-47,Étienne SA - Compliance audit phase 3,12,active,50000000,EUR,2026-03-07,,11
-48,Étienne SA - Risk review phase 4,12,active,25000000,EUR,2024-03-16,,17
-49,Peron Barbe et Fils SE - Operations uplift phase 1,13,completed,2500000,EUR,2025-03-10,2025-08-07,15
-50,Peron Barbe et Fils SE - Risk review phase 2,13,active,2500000,EUR,2025-01-06,,20
-51,Peron Barbe et Fils SE - Finance transformation phase 3,13,active,50000000,EUR,2024-05-09,,19
-52,Peron Barbe et Fils SE - Org redesign phase 4,13,completed,25000000,EUR,2024-09-12,2025-03-19,19
-53,Turpin Group - Operations uplift phase 1,14,active,25000000,EUR,2026-02-10,,22
-54,Turpin Group - Cloud migration phase 2,14,active,12000000,EUR,2025-05-03,,19
-55,Turpin Group - Cost optimization phase 3,14,active,50000000,EUR,2025-12-25,,12
-56,Turpin Group - Operations uplift phase 4,14,active,25000000,EUR,2024-05-07,,11
-57,Fernandez Lopes S.A.R.L. Group - Compliance audit phase 1,15,active,2500000,EUR,2025-09-10,,18
-58,Fernandez Lopes S.A.R.L. Group - Data platform phase 2,15,active,2500000,EUR,2024-02-10,,13
-59,Fernandez Lopes S.A.R.L. Group - Cost optimization phase 3,15,pipeline,25000000,EUR,2026-07-31,,18
-60,Fernandez Lopes S.A.R.L. Group - Data platform phase 4,15,pipeline,12000000,EUR,2026-09-14,,15
-61,Marques SA - Risk review phase 1,16,active,25000000,EUR,2024-12-05,,16
-62,Marques SA - Compliance audit phase 2,16,completed,50000000,EUR,2024-06-25,2025-05-28,10
-63,Marques SA - Compliance audit phase 3,16,completed,2500000,EUR,2024-10-10,2024-12-10,15
-64,Marques SA - Finance transformation phase 4,16,active,50000000,EUR,2025-07-10,,20
-65,Coulon Lecomte SARL Group - Org redesign phase 1,17,active,12000000,EUR,2025-05-01,,14
-66,Coulon Lecomte SARL Group - Data platform phase 2,17,active,12000000,EUR,2025-03-08,,11
-67,Coulon Lecomte SARL Group - Data platform phase 3,17,active,12000000,EUR,2024-09-09,,14
-68,Coulon Lecomte SARL Group - Org redesign phase 4,17,active,5000000,EUR,2024-06-29,,19
-69,Berthelot Group - Finance transformation phase 1,18,pipeline,12000000,EUR,2026-04-16,,18
-70,Berthelot Group - Org redesign phase 2,18,active,12000000,EUR,2024-06-16,,12
-71,Berthelot Group - Finance transformation phase 3,18,active,25000000,EUR,2026-02-14,,18
-72,Berthelot Group - Compliance audit phase 4,18,completed,2500000,EUR,2025-09-21,2026-02-25,15
-73,Guillot et Fils SE - Risk review phase 1,19,active,5000000,EUR,2024-08-25,,13
-74,Guillot et Fils SE - Compliance audit phase 2,19,active,25000000,EUR,2024-04-08,,13
-75,Guillot et Fils SE - Cloud migration phase 3,19,completed,5000000,EUR,2025-02-11,2025-08-14,12
-76,Guillot et Fils SE - Finance transformation phase 4,19,active,12000000,EUR,2024-04-15,,22
-77,Blot Ollivier et Fils SA - Finance transformation phase 1,20,active,50000000,EUR,2025-03-12,,22
-78,Blot Ollivier et Fils SA - Operations uplift phase 2,20,active,12000000,EUR,2024-07-07,,22
-79,Blot Ollivier et Fils SA - Data platform phase 3,20,active,50000000,EUR,2025-04-03,,16
-80,Blot Ollivier et Fils SA - Data platform phase 4,20,completed,5000000,EUR,2025-07-01,2025-10-11,12
-81,Cousin S.A. Group - Data platform phase 1,21,active,25000000,EUR,2024-11-21,,10
-82,Cousin S.A. Group - Org redesign phase 2,21,active,12000000,EUR,2025-08-31,,20
-83,Cousin S.A. Group - Cloud migration phase 3,21,active,25000000,EUR,2024-12-23,,19
-84,Cousin S.A. Group - Risk review phase 4,21,completed,25000000,EUR,2025-01-11,2025-02-15,13
-85,Reynaud SE - Cloud migration phase 1,22,completed,12000000,EUR,2024-09-13,2025-05-19,22
-86,Reynaud SE - Cost optimization phase 2,22,active,5000000,EUR,2024-11-27,,15
-87,Reynaud SE - Cost optimization phase 3,22,completed,25000000,EUR,2025-06-08,2025-09-06,22
-88,Reynaud SE - Risk review phase 4,22,active,25000000,EUR,2024-11-28,,18
-89,Benard SE - Org redesign phase 1,23,completed,5000000,EUR,2026-03-03,2026-03-10,13
-90,Benard SE - Data platform phase 2,23,active,12000000,EUR,2026-02-16,,10
-91,Benard SE - Cost optimization phase 3,23,pipeline,12000000,EUR,2026-10-06,,18
-92,Benard SE - Finance transformation phase 4,23,active,50000000,EUR,2024-10-23,,11
-93,Grondin SA - Risk review phase 1,24,active,2500000,EUR,2024-12-24,,22
-94,Grondin SA - Data platform phase 2,24,completed,12000000,EUR,2024-03-27,2025-02-16,17
-95,Grondin SA - Data platform phase 3,24,pipeline,25000000,EUR,2026-04-22,,11
-96,Grondin SA - Cloud migration phase 4,24,active,25000000,EUR,2025-12-14,,15
-97,Bernier S.A.S. Group - Operations uplift phase 1,25,completed,25000000,EUR,2025-09-03,2025-10-22,10
-98,Bernier S.A.S. Group - Org redesign phase 2,25,active,50000000,EUR,2025-09-30,,15
-99,Bernier S.A.S. Group - Cloud migration phase 3,25,completed,25000000,EUR,2024-03-03,2025-07-05,11
-100,Bernier S.A.S. Group - Compliance audit phase 4,25,active,5000000,EUR,2025-03-11,,10
-101,Baron SE - Compliance audit phase 1,26,active,2500000,EUR,2024-06-08,,21
-102,Baron SE - Compliance audit phase 2,26,completed,5000000,EUR,2025-09-28,2025-12-06,12
-103,Baron SE - Operations uplift phase 3,26,completed,12000000,EUR,2026-02-24,2026-03-28,17
-104,Baron SE - Data platform phase 4,26,pipeline,25000000,EUR,2026-04-29,,17
-105,Dumas SA - Operations uplift phase 1,27,completed,2500000,EUR,2024-07-28,2024-11-13,10
-106,Dumas SA - Risk review phase 2,27,active,5000000,EUR,2024-05-05,,12
-107,Dumas SA - Org redesign phase 3,27,active,2500000,EUR,2025-09-14,,22
-108,Dumas SA - Risk review phase 4,27,active,5000000,EUR,2024-03-02,,14
-109,Neveu S.A.S. SA - Finance transformation phase 1,28,pipeline,2500000,EUR,2026-09-20,,13
-110,Neveu S.A.S. SA - Org redesign phase 2,28,active,50000000,EUR,2025-01-15,,17
-111,Neveu S.A.S. SA - Finance transformation phase 3,28,completed,2500000,EUR,2025-04-07,2025-11-09,17
-112,Neveu S.A.S. SA - Operations uplift phase 4,28,active,50000000,EUR,2025-07-12,,19
-113,Lenoir SARL SE - Cloud migration phase 1,29,active,5000000,EUR,2025-12-24,,14
-114,Lenoir SARL SE - Org redesign phase 2,29,active,2500000,EUR,2025-06-11,,19
-115,Lenoir SARL SE - Compliance audit phase 3,29,active,5000000,EUR,2026-03-19,,19
-116,Lenoir SARL SE - Org redesign phase 4,29,active,5000000,EUR,2024-09-22,,20
-117,Henry SA - Finance transformation phase 1,30,pipeline,50000000,EUR,2026-06-26,,15
-118,Henry SA - Finance transformation phase 2,30,active,50000000,EUR,2024-12-26,,18
-119,Henry SA - Operations uplift phase 3,30,completed,25000000,EUR,2025-01-19,2025-10-30,17
-120,Henry SA - Operations uplift phase 4,30,active,25000000,EUR,2025-10-14,,15
-121,Voisin SE - Risk review phase 1,31,pipeline,2500000,EUR,2026-07-06,,15
-122,Voisin SE - Finance transformation phase 2,31,active,12000000,EUR,2024-03-01,,13
-123,Fleury S.A.R.L. SE - Finance transformation phase 1,32,active,50000000,EUR,2025-01-13,,21
-124,Fleury S.A.R.L. SE - Compliance audit phase 2,32,completed,5000000,EUR,2024-01-31,2024-11-22,10
-125,Legrand SARL - Compliance audit phase 1,33,active,50000000,EUR,2024-08-23,,15
-126,Legrand SARL - Data platform phase 2,33,active,25000000,EUR,2025-06-12,,21
-127,Clément SAS - Cost optimization phase 1,34,active,5000000,EUR,2026-03-12,,22
-128,Clément SAS - Data platform phase 2,34,completed,2500000,EUR,2024-03-15,2025-06-10,21
-129,Seguin SE - Cost optimization phase 1,35,active,2500000,EUR,2024-11-11,,14
-130,Seguin SE - Cloud migration phase 2,35,active,2500000,EUR,2025-04-20,,22
-131,Léger SE - Cloud migration phase 1,36,pipeline,2500000,EUR,2026-10-20,,15
-132,Léger SE - Risk review phase 2,36,pipeline,50000000,EUR,2026-12-06,,16
-133,Bourdon et Fils SE - Cost optimization phase 1,37,pipeline,12000000,EUR,2026-05-22,,10
-134,Bourdon et Fils SE - Cloud migration phase 2,37,active,12000000,EUR,2025-05-11,,15
-135,Aubry Peltier SA SARL - Operations uplift phase 1,38,active,12000000,EUR,2025-02-15,,14
-136,Aubry Peltier SA SARL - Finance transformation phase 2,38,active,12000000,EUR,2026-02-24,,16
-137,Barbier SA SARL - Org redesign phase 1,39,active,25000000,EUR,2025-01-04,,16
-138,Barbier SA SARL - Compliance audit phase 2,39,completed,5000000,EUR,2025-10-26,2026-03-18,17
-139,Klein SARL - Cost optimization phase 1,40,active,12000000,EUR,2026-03-16,,22
-140,Klein SARL - Risk review phase 2,40,active,2500000,EUR,2024-03-10,,21
-141,Boutin SE - Org redesign phase 1,41,pipeline,2500000,EUR,2026-04-11,,16
-142,Boutin SE - Data platform phase 2,41,completed,50000000,EUR,2025-08-03,2026-04-12,14
-143,Aubry Toussaint S.A.S. SAS - Compliance audit phase 1,42,pipeline,2500000,EUR,2026-09-15,,11
-144,Aubry Toussaint S.A.S. SAS - Compliance audit phase 2,42,completed,12000000,EUR,2024-10-25,2026-03-01,14
-145,Jourdan Gérard SARL SARL - Cost optimization phase 1,43,completed,50000000,EUR,2024-11-13,2025-12-19,21
-146,Jourdan Gérard SARL SARL - Org redesign phase 2,43,active,5000000,EUR,2025-07-10,,21
-147,Le Gall Valentin et Fils SAS - Cost optimization phase 1,44,active,12000000,EUR,2024-02-12,,17
-148,Le Gall Valentin et Fils SAS - Operations uplift phase 2,44,pipeline,12000000,EUR,2026-07-01,,19
-149,Lagarde SARL - Org redesign phase 1,45,active,12000000,EUR,2024-09-27,,20
-150,Lagarde SARL - Operations uplift phase 2,45,active,2500000,EUR,2025-04-02,,20
-151,Joseph SA SE - Org redesign phase 1,46,completed,12000000,EUR,2024-11-12,2025-03-22,18
-152,Joseph SA SE - Data platform phase 2,46,completed,2500000,EUR,2025-11-29,2026-04-10,12
-153,Michel SARL - Cost optimization phase 1,47,active,2500000,EUR,2025-05-09,,12
-154,Michel SARL - Finance transformation phase 2,47,active,5000000,EUR,2024-05-03,,22
-155,Salmon et Fils SARL - Compliance audit phase 1,48,pipeline,12000000,EUR,2026-09-29,,16
-156,Salmon et Fils SARL - Operations uplift phase 2,48,active,50000000,EUR,2026-01-21,,12
-157,Lelièvre Paul et Fils SE - Cost optimization phase 1,49,active,12000000,EUR,2024-09-11,,15
-158,Lelièvre Paul et Fils SE - Cost optimization phase 2,49,active,2500000,EUR,2025-06-21,,19
-159,Bousquet SARL - Data platform phase 1,50,completed,50000000,EUR,2025-06-26,2025-08-02,15
-160,Bousquet SARL - Org redesign phase 2,50,active,12000000,EUR,2025-08-04,,20
-161,Lejeune SAS - Risk review phase 1,51,completed,5000000,EUR,2024-03-10,2025-05-12,11
-162,Lejeune SAS - Operations uplift phase 2,51,completed,5000000,EUR,2025-06-11,2025-09-20,17
-163,Renard SARL SAS - Org redesign phase 1,52,active,50000000,EUR,2024-04-14,,11
-164,Renard SARL SAS - Risk review phase 2,52,pipeline,12000000,EUR,2026-12-16,,21
-165,Samson SARL - Cost optimization phase 1,53,active,5000000,EUR,2026-03-28,,19
-166,Samson SARL - Risk review phase 2,53,active,25000000,EUR,2026-01-18,,13
-167,Fleury SE - Finance transformation phase 1,54,active,5000000,EUR,2024-03-17,,11
-168,Fleury SE - Cost optimization phase 2,54,completed,5000000,EUR,2025-07-03,2025-11-25,21
-169,Buisson SE - Cost optimization phase 1,55,completed,2500000,EUR,2024-01-15,2024-09-24,22
-170,Buisson SE - Compliance audit phase 2,55,active,12000000,EUR,2026-02-18,,21
-171,Pasquier SARL - Finance transformation phase 1,56,active,50000000,EUR,2024-10-07,,18
-172,Pasquier SARL - Risk review phase 2,56,active,12000000,EUR,2025-09-20,,12
-173,Loiseau SE - Data platform phase 1,57,active,12000000,EUR,2024-06-06,,18
-174,Loiseau SE - Cloud migration phase 2,57,active,2500000,EUR,2026-03-30,,13
-175,Martins SARL SAS - Data platform phase 1,58,active,5000000,EUR,2024-05-07,,22
-176,Martins SARL SAS - Cost optimization phase 2,58,active,2500000,EUR,2024-08-30,,15
-177,Rivière SE - Compliance audit phase 1,59,active,25000000,EUR,2025-10-08,,22
-178,Rivière SE - Data platform phase 2,59,active,50000000,EUR,2025-02-20,,11
-179,Lacombe Leroux SARL SE - Finance transformation phase 1,60,active,12000000,EUR,2025-03-18,,16
-180,Lacombe Leroux SARL SE - Cost optimization phase 2,60,active,50000000,EUR,2025-08-28,,16
-181,Jean SA SE - Org redesign phase 1,61,completed,50000000,EUR,2025-03-07,2025-11-29,11
-182,Jean SA SE - Data platform phase 2,61,completed,12000000,EUR,2025-12-19,2026-03-01,20
-183,Didier Auger SARL SARL - Finance transformation phase 1,62,active,25000000,EUR,2025-05-04,,17
-184,Didier Auger SARL SARL - Compliance audit phase 2,62,completed,5000000,EUR,2024-05-06,2024-09-11,22
-185,Berger SE - Data platform phase 1,63,active,5000000,EUR,2025-07-22,,16
-186,Berger SE - Operations uplift phase 2,63,completed,2500000,EUR,2025-05-27,2026-03-14,18
-187,Joseph Grégoire et Fils SE - Data platform phase 1,64,active,12000000,EUR,2025-08-14,,12
-188,Joseph Grégoire et Fils SE - Data platform phase 2,64,active,12000000,EUR,2024-02-05,,21
-189,Leblanc SE - Cloud migration phase 1,65,active,12000000,EUR,2024-10-25,,18
-190,Leblanc SE - Risk review phase 2,65,active,2500000,EUR,2025-08-13,,14
-191,Coste SARL - Cloud migration phase 1,66,active,50000000,EUR,2026-03-06,,14
-192,Coste SARL - Data platform phase 2,66,active,12000000,EUR,2025-05-15,,19
-193,Barre SARL - Finance transformation phase 1,67,pipeline,50000000,EUR,2026-11-01,,20
-194,Barre SARL - Data platform phase 2,67,active,50000000,EUR,2024-07-10,,19
-195,Roche SE - Data platform phase 1,68,completed,5000000,EUR,2024-07-15,2026-03-24,20
-196,Roche SE - Compliance audit phase 2,68,completed,50000000,EUR,2025-10-05,2026-03-27,10
-197,Bertrand SE - Operations uplift phase 1,69,completed,2500000,EUR,2024-06-08,2025-09-09,10
-198,Bertrand SE - Risk review phase 2,69,active,5000000,EUR,2025-04-12,,22
-199,Collin SAS - Org redesign phase 1,70,pipeline,50000000,EUR,2026-10-28,,20
-200,Collin SAS - Operations uplift phase 2,70,completed,25000000,EUR,2025-09-30,2026-01-07,20
-201,Gaudin Maury SARL SARL - Risk review phase 1,71,active,12000000,EUR,2024-12-09,,17
-202,Gaudin Maury SARL SARL - Cloud migration phase 2,71,pipeline,25000000,EUR,2026-05-25,,14
-203,Garcia SE - Cost optimization phase 1,72,completed,2500000,EUR,2025-05-10,2026-03-02,21
-204,Garcia SE - Operations uplift phase 2,72,completed,5000000,EUR,2024-02-12,2025-02-27,17
-205,Sanchez Lelièvre SARL SAS - Org redesign phase 1,73,active,25000000,EUR,2024-10-31,,17
-206,Sanchez Lelièvre SARL SAS - Cloud migration phase 2,73,active,12000000,EUR,2026-02-05,,19
-207,Boulanger et Fils SAS - Data platform phase 1,74,pipeline,12000000,EUR,2026-08-20,,21
-208,Boulanger et Fils SAS - Compliance audit phase 2,74,active,12000000,EUR,2024-04-12,,16
-209,Allard SAS - Data platform phase 1,75,active,12000000,EUR,2024-03-09,,18
-210,Allard SAS - Finance transformation phase 2,75,active,12000000,EUR,2024-05-11,,13
-211,Lefort Pottier SARL SARL - Cost optimization phase 1,76,completed,2500000,EUR,2025-01-03,2025-08-30,14
-212,Lefort Pottier SARL SARL - Cost optimization phase 2,76,active,5000000,EUR,2025-11-12,,12
-213,Hebert S.A. SAS - Finance transformation phase 1,77,active,2500000,EUR,2024-03-16,,14
-214,Hebert S.A. SAS - Org redesign phase 2,77,completed,50000000,EUR,2026-01-16,2026-03-29,16
-215,Pelletier SE - Cloud migration phase 1,78,completed,5000000,EUR,2025-12-26,2026-04-07,15
-216,Pelletier SE - Compliance audit phase 2,78,active,5000000,EUR,2024-12-06,,22
-217,Laporte Bouchet S.A.S. SAS - Data platform phase 1,79,active,25000000,EUR,2024-11-21,,18
-218,Laporte Bouchet S.A.S. SAS - Cost optimization phase 2,79,active,25000000,EUR,2024-11-02,,14
-219,Bourdon S.A.R.L. SE - Cost optimization phase 1,80,completed,2500000,EUR,2024-11-12,2024-12-24,11
-220,Bourdon S.A.R.L. SE - Org redesign phase 2,80,pipeline,50000000,EUR,2026-06-27,,17
-221,Diaz SAS - Cloud migration phase 1,81,completed,5000000,EUR,2024-03-22,2025-09-11,19
-222,Turpin SARL SAS - Compliance audit phase 1,82,active,2500000,EUR,2024-10-01,,10
-223,Coste Studio - Risk review phase 1,83,active,25000000,EUR,2024-04-29,,19
-224,Philippe EURL - Cost optimization phase 1,84,active,12000000,EUR,2024-02-01,,18
-225,Weber Masse SARL EURL - Operations uplift phase 1,85,active,2500000,EUR,2026-01-22,,16
-226,Paris Studio - Data platform phase 1,86,active,12000000,EUR,2025-01-22,,21
-227,Seguin et Fils EURL - Compliance audit phase 1,87,active,25000000,EUR,2025-11-12,,15
-228,Seguin Benard S.A. EURL - Operations uplift phase 1,88,active,25000000,EUR,2025-09-14,,10
-229,Techer Pereira et Fils Studio - Cloud migration phase 1,89,pipeline,12000000,EUR,2026-09-16,,18
-230,Delorme SARL EURL - Risk review phase 1,90,active,2500000,EUR,2026-01-12,,16
-231,Letellier EURL - Cost optimization phase 1,91,pipeline,50000000,EUR,2026-05-30,,14
-232,Gimenez Poulain S.A.S. EURL - Finance transformation phase 1,92,active,5000000,EUR,2024-05-02,,11
-233,Collet Studio - Org redesign phase 1,93,active,12000000,EUR,2026-02-09,,22
-234,Blanchard S.A. EURL - Compliance audit phase 1,94,active,50000000,EUR,2025-05-14,,15
-235,Garcia EURL - Data platform phase 1,95,active,5000000,EUR,2024-12-13,,19
-236,Maillet Studio - Org redesign phase 1,96,active,50000000,EUR,2025-09-28,,10
-237,Nicolas SAS - Operations uplift phase 1,97,completed,2500000,EUR,2024-07-13,2024-09-29,12
-238,Bourdon EURL - Compliance audit phase 1,98,active,25000000,EUR,2024-07-14,,18
-239,Bonnin Studio - Cost optimization phase 1,99,completed,5000000,EUR,2025-06-07,2025-12-18,19
-240,Morel SARL Studio - Data platform phase 1,100,pipeline,12000000,EUR,2026-11-16,,19
-241,Tanguy Dufour S.A.R.L. EURL - Compliance audit phase 1,101,active,5000000,EUR,2025-02-13,,16
-242,Coste Studio - Risk review phase 1,102,completed,50000000,EUR,2025-03-15,2025-11-20,15
-243,Camus S.A.S. Studio - Cost optimization phase 1,103,completed,50000000,EUR,2025-04-16,2026-01-02,14
-244,Carpentier Studio - Cost optimization phase 1,104,active,2500000,EUR,2024-08-26,,15
-245,Perrin EURL - Compliance audit phase 1,105,completed,2500000,EUR,2024-01-02,2024-10-22,16
-246,Baron EURL - Risk review phase 1,106,active,2500000,EUR,2025-04-12,,19
-247,Clerc Riou S.A.S. SAS - Cost optimization phase 1,107,active,12000000,EUR,2024-06-02,,20
-248,Marchand Moreno S.A. Studio - Cloud migration phase 1,108,pipeline,2500000,EUR,2026-08-22,,19
-249,Rey Boulanger S.A. SAS - Cost optimization phase 1,109,active,5000000,EUR,2024-10-22,,18
-250,Roger EURL - Org redesign phase 1,110,active,5000000,EUR,2026-02-20,,20
-251,Garcia Pelletier S.A. EURL - Cloud migration phase 1,111,pipeline,2500000,EUR,2026-11-02,,19
-252,Roux EURL - Finance transformation phase 1,112,completed,5000000,EUR,2025-02-20,2025-02-28,10
-253,Vallet SA EURL - Cost optimization phase 1,113,active,12000000,EUR,2025-12-17,,16
-254,Blanchet SAS - Data platform phase 1,114,active,25000000,EUR,2024-02-05,,21
-255,Bonneau Bertrand et Fils Studio - Cloud migration phase 1,115,active,25000000,EUR,2024-11-13,,18
-256,Bonnet S.A.R.L. EURL - Cost optimization phase 1,116,active,2500000,EUR,2024-11-02,,21
-257,Marin et Fils SAS - Data platform phase 1,117,active,50000000,EUR,2025-09-04,,13
-258,Raynaud EURL - Compliance audit phase 1,118,completed,25000000,EUR,2024-10-19,2024-11-24,18
-259,Ferrand EURL - Org redesign phase 1,119,completed,12000000,EUR,2024-07-16,2025-09-08,12
-260,De Sousa Studio - Cost optimization phase 1,120,active,50000000,EUR,2024-03-26,,15
+project_id,name,client_id,team_id,status,budget_minor_units,currency,start_date,end_date,owner_employee_id
+1,HSBC UK - Finance transformation phase 1,1,1,completed,10200000,GBP,2024-08-13,2025-09-03,10
+2,HSBC UK - Risk review phase 2,1,6,active,21250000,GBP,2025-03-25,,18
+3,HSBC UK - Compliance audit phase 3,1,8,active,4250000,GBP,2024-09-23,,15
+4,HSBC UK - Cost optimization phase 4,1,3,completed,2125000,GBP,2026-03-26,2026-04-05,17
+5,Gillet SA - Org redesign phase 1,2,3,active,50000000,EUR,2025-01-07,,17
+6,Gillet SA - Org redesign phase 2,2,3,active,2500000,EUR,2025-05-11,,13
+7,Gillet SA - Compliance audit phase 3,2,8,active,5000000,EUR,2024-03-22,,11
+8,Gillet SA - Operations uplift phase 4,2,7,active,2500000,EUR,2025-07-29,,20
+9,Marques Group - Risk review phase 1,3,6,pipeline,50000000,EUR,2026-09-26,,14
+10,Marques Group - Finance transformation phase 2,3,1,pipeline,12000000,EUR,2026-10-15,,10
+11,Marques Group - Cloud migration phase 3,3,2,active,50000000,EUR,2024-06-25,,9
+12,Marques Group - Data platform phase 4,3,2,active,50000000,EUR,2025-01-05,,9
+13,Fleury SE - Risk review phase 1,4,6,active,5000000,EUR,2024-07-06,,18
+14,Fleury SE - Cloud migration phase 2,4,2,active,50000000,EUR,2024-10-04,,9
+15,Fleury SE - Compliance audit phase 3,4,8,pipeline,5000000,EUR,2026-07-23,,12
+16,Fleury SE - Compliance audit phase 4,4,8,active,5000000,EUR,2024-03-18,,11
+17,Marty S.A. Group - Finance transformation phase 1,5,1,active,5000000,EUR,2024-12-15,,10
+18,Marty S.A. Group - Org redesign phase 2,5,3,active,5000000,EUR,2025-06-29,,17
+19,Marty S.A. Group - Org redesign phase 3,5,3,completed,2500000,EUR,2024-11-02,2025-01-21,8
+20,Marty S.A. Group - Compliance audit phase 4,5,8,active,2500000,EUR,2026-01-26,,12
+21,Hoarau S.A. Group - Cost optimization phase 1,6,3,active,50000000,EUR,2024-02-25,,8
+22,Hoarau S.A. Group - Data platform phase 2,6,2,active,25000000,EUR,2025-11-13,,11
+23,Hoarau S.A. Group - Org redesign phase 3,6,3,active,50000000,EUR,2024-03-17,,17
+24,Hoarau S.A. Group - Data platform phase 4,6,2,completed,25000000,EUR,2024-03-20,2025-09-29,15
+25,Marchand Reynaud et Fils Group - Risk review phase 1,7,6,active,50000000,EUR,2025-10-27,,14
+26,Marchand Reynaud et Fils Group - Compliance audit phase 2,7,8,completed,25000000,EUR,2025-04-01,2025-11-09,20
+27,Marchand Reynaud et Fils Group - Finance transformation phase 3,7,1,active,2500000,EUR,2025-04-05,,10
+28,Marchand Reynaud et Fils Group - Cost optimization phase 4,7,3,active,25000000,EUR,2024-09-27,,17
+29,Bonnin Group - Data platform phase 1,8,2,active,25000000,EUR,2024-04-10,,15
+30,Bonnin Group - Operations uplift phase 2,8,7,active,2500000,EUR,2024-10-16,,11
+31,Bonnin Group - Org redesign phase 3,8,3,active,50000000,EUR,2025-06-29,,8
+32,Bonnin Group - Data platform phase 4,8,2,completed,5000000,EUR,2025-09-07,2026-03-16,11
+33,Merle S.A. SE - Org redesign phase 1,9,3,completed,25000000,EUR,2025-08-14,2026-04-07,17
+34,Merle S.A. SE - Compliance audit phase 2,9,8,active,25000000,EUR,2025-05-07,,18
+35,Merle S.A. SE - Cost optimization phase 3,9,3,completed,2500000,EUR,2024-10-15,2025-08-27,17
+36,Merle S.A. SE - Data platform phase 4,9,2,pipeline,50000000,EUR,2026-09-27,,15
+37,Chauvin SE - Risk review phase 1,10,6,active,25000000,EUR,2024-07-02,,18
+38,Chauvin SE - Risk review phase 2,10,6,active,25000000,EUR,2024-03-29,,18
+39,Chauvin SE - Operations uplift phase 3,10,7,completed,25000000,EUR,2025-11-24,2026-01-15,16
+40,Chauvin SE - Data platform phase 4,10,2,active,12000000,EUR,2025-09-17,,11
+41,Pottier SA - Org redesign phase 1,11,3,pipeline,12000000,EUR,2026-11-08,,13
+42,Pottier SA - Cloud migration phase 2,11,2,completed,25000000,EUR,2025-11-24,2026-04-11,9
+43,Pottier SA - Data platform phase 3,11,2,active,2500000,EUR,2025-11-02,,9
+44,Pottier SA - Cost optimization phase 4,11,3,completed,2500000,EUR,2025-05-18,2025-12-17,17
+45,Peltier SE - Org redesign phase 1,12,3,active,5000000,EUR,2024-01-22,,17
+46,Peltier SE - Finance transformation phase 2,12,1,active,50000000,EUR,2026-01-31,,10
+47,Peltier SE - Data platform phase 3,12,2,completed,25000000,EUR,2025-11-11,2025-12-22,11
+48,Peltier SE - Cost optimization phase 4,12,3,completed,2500000,EUR,2024-05-27,2025-09-22,13
+49,Richard SE - Compliance audit phase 1,13,8,completed,12000000,EUR,2024-09-10,2025-03-26,11
+50,Richard SE - Risk review phase 2,13,6,active,5000000,EUR,2024-01-06,,18
+51,Richard SE - Risk review phase 3,13,6,active,2500000,EUR,2025-12-14,,18
+52,Richard SE - Org redesign phase 4,13,3,completed,2500000,EUR,2025-04-09,2025-09-04,13
+53,Étienne Group - Risk review phase 1,14,6,completed,25000000,EUR,2024-04-26,2025-07-25,14
+54,Étienne Group - Compliance audit phase 2,14,8,active,2500000,EUR,2024-01-26,,12
+55,Étienne Group - Compliance audit phase 3,14,8,pipeline,12000000,EUR,2026-05-29,,15
+56,Étienne Group - Org redesign phase 4,14,3,active,2500000,EUR,2024-12-10,,8
+57,Peron Barbe et Fils Group - Cloud migration phase 1,15,2,active,50000000,EUR,2024-10-06,,15
+58,Peron Barbe et Fils Group - Cost optimization phase 2,15,3,active,2500000,EUR,2024-10-30,,8
+59,Peron Barbe et Fils Group - Finance transformation phase 3,15,1,pipeline,2500000,EUR,2026-10-30,,10
+60,Peron Barbe et Fils Group - Cost optimization phase 4,15,3,completed,25000000,EUR,2025-04-10,2025-05-11,13
+61,Turpin SA - Org redesign phase 1,16,3,active,5000000,EUR,2024-02-13,,13
+62,Turpin SA - Compliance audit phase 2,16,8,active,12000000,EUR,2024-05-09,,22
+63,Turpin SA - Data platform phase 3,16,2,active,2500000,EUR,2025-05-21,,9
+64,Turpin SA - Cloud migration phase 4,16,2,active,50000000,EUR,2025-07-06,,9
+65,Fernandez Lopes S.A.R.L. Group - Data platform phase 1,17,2,active,12000000,EUR,2024-08-11,,11
+66,Fernandez Lopes S.A.R.L. Group - Cost optimization phase 2,17,3,completed,25000000,EUR,2025-06-26,2025-11-15,17
+67,Fernandez Lopes S.A.R.L. Group - Operations uplift phase 3,17,7,completed,25000000,EUR,2024-12-28,2025-05-06,14
+68,Fernandez Lopes S.A.R.L. Group - Risk review phase 4,17,6,completed,50000000,EUR,2025-09-11,2025-10-05,14
+69,Marques Group - Org redesign phase 1,18,3,completed,25000000,EUR,2024-12-18,2025-05-03,8
+70,Marques Group - Compliance audit phase 2,18,8,completed,50000000,EUR,2025-07-10,2025-11-22,17
+71,Marques Group - Compliance audit phase 3,18,8,completed,2500000,EUR,2025-07-01,2025-07-14,13
+72,Marques Group - Cost optimization phase 4,18,3,active,50000000,EUR,2024-11-20,,8
+73,Coulon Lecomte SARL Group - Finance transformation phase 1,19,1,active,5000000,EUR,2025-05-06,,10
+74,Coulon Lecomte SARL Group - Risk review phase 2,19,6,active,5000000,EUR,2024-01-07,,18
+75,Coulon Lecomte SARL Group - Compliance audit phase 3,19,8,active,12000000,EUR,2024-09-04,,11
+76,Coulon Lecomte SARL Group - Finance transformation phase 4,19,1,pipeline,25000000,EUR,2026-05-08,,10
+77,Berthelot SE - Cloud migration phase 1,20,2,active,5000000,EUR,2024-07-28,,11
+78,Berthelot SE - Risk review phase 2,20,6,active,50000000,EUR,2024-09-26,,18
+79,Berthelot SE - Data platform phase 3,20,2,active,25000000,EUR,2024-01-07,,15
+80,Berthelot SE - Finance transformation phase 4,20,1,completed,25000000,EUR,2025-09-04,2025-10-13,10
+81,Guillot et Fils SE - Operations uplift phase 1,21,7,active,2500000,EUR,2024-11-07,,15
+82,Guillot et Fils SE - Cost optimization phase 2,21,3,active,50000000,EUR,2025-07-31,,13
+83,Guillot et Fils SE - Cost optimization phase 3,21,3,active,12000000,EUR,2025-02-14,,8
+84,Guillot et Fils SE - Cost optimization phase 4,21,3,completed,2500000,EUR,2025-11-14,2026-03-16,13
+85,Blot Ollivier et Fils Group - Cloud migration phase 1,22,2,completed,50000000,EUR,2024-02-29,2025-12-28,11
+86,Blot Ollivier et Fils Group - Org redesign phase 2,22,3,active,2500000,EUR,2024-02-04,,13
+87,Blot Ollivier et Fils Group - Data platform phase 3,22,2,completed,5000000,EUR,2024-01-16,2026-02-09,11
+88,Blot Ollivier et Fils Group - Cost optimization phase 4,22,3,active,50000000,EUR,2025-12-07,,8
+89,Cousin S.A. Group - Cost optimization phase 1,23,3,active,12000000,EUR,2025-04-17,,17
+90,Cousin S.A. Group - Org redesign phase 2,23,3,active,5000000,EUR,2025-04-15,,13
+91,Cousin S.A. Group - Cloud migration phase 3,23,2,completed,2500000,EUR,2025-08-04,2025-11-18,15
+92,Cousin S.A. Group - Data platform phase 4,23,2,active,50000000,EUR,2024-04-04,,15
+93,Reynaud SA - Risk review phase 1,24,6,active,12000000,EUR,2024-01-18,,18
+94,Reynaud SA - Cloud migration phase 2,24,2,active,5000000,EUR,2024-09-23,,9
+95,Reynaud SA - Cloud migration phase 3,24,2,active,12000000,EUR,2025-10-19,,9
+96,Reynaud SA - Cloud migration phase 4,24,2,active,50000000,EUR,2025-05-21,,9
+97,Benard SA - Data platform phase 1,25,2,completed,5000000,EUR,2025-11-13,2026-04-02,15
+98,Benard SA - Operations uplift phase 2,25,7,pipeline,25000000,EUR,2026-11-18,,22
+99,Benard SA - Operations uplift phase 3,25,7,completed,50000000,EUR,2024-07-18,2025-07-27,20
+100,Benard SA - Org redesign phase 4,25,3,active,12000000,EUR,2025-03-05,,8
+101,Grondin SE - Operations uplift phase 1,26,7,active,2500000,EUR,2024-11-20,,17
+102,Grondin SE - Operations uplift phase 2,26,7,pipeline,12000000,EUR,2026-07-03,,22
+103,Grondin SE - Compliance audit phase 3,26,8,completed,50000000,EUR,2024-09-30,2025-01-02,10
+104,Grondin SE - Org redesign phase 4,26,3,pipeline,50000000,EUR,2026-05-02,,8
+105,Bernier S.A.S. SA - Compliance audit phase 1,27,8,active,25000000,EUR,2025-02-22,,17
+106,Bernier S.A.S. SA - Finance transformation phase 2,27,1,active,2500000,EUR,2026-01-12,,10
+107,Bernier S.A.S. SA - Compliance audit phase 3,27,8,completed,2500000,EUR,2024-10-13,2025-11-16,20
+108,Bernier S.A.S. SA - Data platform phase 4,27,2,active,50000000,EUR,2025-11-02,,15
+109,Baron SE - Cost optimization phase 1,28,3,active,25000000,EUR,2025-10-30,,17
+110,Baron SE - Finance transformation phase 2,28,1,pipeline,25000000,EUR,2026-05-11,,10
+111,Baron SE - Org redesign phase 3,28,3,active,50000000,EUR,2024-06-10,,13
+112,Baron SE - Cloud migration phase 4,28,2,active,2500000,EUR,2025-05-08,,11
+113,Dumas SE - Data platform phase 1,29,2,active,12000000,EUR,2025-09-15,,15
+114,Dumas SE - Data platform phase 2,29,2,pipeline,50000000,EUR,2026-05-19,,15
+115,Dumas SE - Cloud migration phase 3,29,2,active,2500000,EUR,2025-09-25,,9
+116,Dumas SE - Operations uplift phase 4,29,7,active,25000000,EUR,2025-02-09,,18
+117,Neveu S.A.S. SE - Cloud migration phase 1,30,2,active,12000000,EUR,2025-09-10,,11
+118,Neveu S.A.S. SE - Compliance audit phase 2,30,8,pipeline,25000000,EUR,2026-08-02,,16
+119,Neveu S.A.S. SE - Org redesign phase 3,30,3,active,50000000,EUR,2026-01-27,,8
+120,Neveu S.A.S. SE - Org redesign phase 4,30,3,active,2500000,EUR,2025-04-07,,13
+121,Lenoir SARL SARL - Data platform phase 1,31,2,active,50000000,EUR,2025-06-04,,15
+122,Lenoir SARL SARL - Cost optimization phase 2,31,3,completed,12000000,EUR,2025-05-27,2026-03-02,13
+123,Henry SAS - Cloud migration phase 1,32,2,active,12000000,EUR,2025-05-29,,9
+124,Henry SAS - Cloud migration phase 2,32,2,active,12000000,EUR,2024-05-03,,11
+125,Voisin SE - Cost optimization phase 1,33,3,completed,5000000,EUR,2024-02-25,2025-02-03,17
+126,Voisin SE - Data platform phase 2,33,2,active,12000000,EUR,2024-09-05,,15
+127,Fleury S.A.R.L. SARL - Cost optimization phase 1,34,3,active,12000000,EUR,2024-08-13,,8
+128,Fleury S.A.R.L. SARL - Data platform phase 2,34,2,active,25000000,EUR,2024-02-16,,15
+129,Legrand SE - Org redesign phase 1,35,3,completed,2500000,EUR,2025-02-20,2025-06-30,13
+130,Legrand SE - Compliance audit phase 2,35,8,active,5000000,EUR,2025-01-05,,13
+131,Clément SAS - Org redesign phase 1,36,3,active,25000000,EUR,2024-02-16,,8
+132,Clément SAS - Risk review phase 2,36,6,completed,5000000,EUR,2025-11-12,2025-11-23,14
+133,Seguin SAS - Data platform phase 1,37,2,pipeline,12000000,EUR,2026-11-21,,9
+134,Seguin SAS - Finance transformation phase 2,37,1,completed,12000000,EUR,2025-05-19,2025-11-02,10
+135,Léger SARL - Cost optimization phase 1,38,3,pipeline,5000000,EUR,2026-08-30,,8
+136,Léger SARL - Cloud migration phase 2,38,2,active,50000000,EUR,2025-10-11,,9
+137,Bourdon et Fils SARL - Operations uplift phase 1,39,7,active,2500000,EUR,2026-01-04,,16
+138,Bourdon et Fils SARL - Org redesign phase 2,39,3,pipeline,5000000,EUR,2026-11-08,,13
+139,Aubry Peltier SA SAS - Compliance audit phase 1,40,8,active,25000000,EUR,2025-06-18,,13
+140,Aubry Peltier SA SAS - Risk review phase 2,40,6,active,12000000,EUR,2024-09-20,,18
+141,Barbier SA SAS - Risk review phase 1,41,6,completed,12000000,EUR,2025-01-25,2025-04-02,18
+142,Barbier SA SAS - Operations uplift phase 2,41,7,active,12000000,EUR,2024-02-20,,22
+143,Klein SARL - Cost optimization phase 1,42,3,active,50000000,EUR,2024-03-25,,17
+144,Klein SARL - Cost optimization phase 2,42,3,completed,5000000,EUR,2026-01-07,2026-02-09,8
+145,Boutin SE - Cloud migration phase 1,43,2,active,12000000,EUR,2025-08-08,,9
+146,Boutin SE - Operations uplift phase 2,43,7,completed,12000000,EUR,2025-02-17,2025-04-30,18
+147,Aubry Toussaint S.A.S. SAS - Data platform phase 1,44,2,active,50000000,EUR,2024-07-22,,9
+148,Aubry Toussaint S.A.S. SAS - Compliance audit phase 2,44,8,active,2500000,EUR,2024-12-24,,22
+149,Jourdan Gérard SARL SARL - Cloud migration phase 1,45,2,active,12000000,EUR,2024-12-26,,11
+150,Jourdan Gérard SARL SARL - Cloud migration phase 2,45,2,completed,25000000,EUR,2025-03-04,2025-05-07,9
+151,Le Gall Valentin et Fils SAS - Risk review phase 1,46,6,pipeline,25000000,EUR,2026-06-17,,18
+152,Le Gall Valentin et Fils SAS - Finance transformation phase 2,46,1,active,25000000,EUR,2024-12-01,,10
+153,Lagarde SE - Cost optimization phase 1,47,3,active,50000000,EUR,2024-10-04,,13
+154,Lagarde SE - Risk review phase 2,47,6,active,25000000,EUR,2025-05-05,,14
+155,Joseph SA SAS - Org redesign phase 1,48,3,active,5000000,EUR,2025-10-09,,8
+156,Joseph SA SAS - Org redesign phase 2,48,3,active,2500000,EUR,2025-06-14,,17
+157,Michel SARL - Org redesign phase 1,49,3,active,5000000,EUR,2024-02-24,,8
+158,Michel SARL - Finance transformation phase 2,49,1,completed,12000000,EUR,2024-03-18,2025-08-14,10
+159,Salmon et Fils SE - Cloud migration phase 1,50,2,active,25000000,EUR,2024-08-21,,11
+160,Salmon et Fils SE - Finance transformation phase 2,50,1,active,2500000,EUR,2025-08-16,,10
+161,Lelièvre Paul et Fils SE - Compliance audit phase 1,51,8,active,5000000,EUR,2025-06-22,,12
+162,Lelièvre Paul et Fils SE - Cost optimization phase 2,51,3,completed,2500000,EUR,2026-01-13,2026-04-03,13
+163,Bousquet SE - Risk review phase 1,52,6,completed,12000000,EUR,2024-09-30,2025-08-23,14
+164,Bousquet SE - Finance transformation phase 2,52,1,active,5000000,EUR,2024-04-25,,10
+165,Lejeune SAS - Operations uplift phase 1,53,7,pipeline,2500000,EUR,2026-12-22,,11
+166,Lejeune SAS - Operations uplift phase 2,53,7,active,50000000,EUR,2025-07-26,,18
+167,Renard SARL SARL - Finance transformation phase 1,54,1,active,50000000,EUR,2024-11-17,,10
+168,Renard SARL SARL - Cloud migration phase 2,54,2,active,12000000,EUR,2025-05-02,,11
+169,Samson SAS - Finance transformation phase 1,55,1,active,50000000,EUR,2026-02-08,,10
+170,Samson SAS - Risk review phase 2,55,6,active,50000000,EUR,2024-09-10,,18
+171,Fleury SE - Cloud migration phase 1,56,2,active,2500000,EUR,2024-11-04,,15
+172,Fleury SE - Org redesign phase 2,56,3,active,2500000,EUR,2025-10-11,,17
+173,Buisson SAS - Finance transformation phase 1,57,1,active,25000000,EUR,2025-10-28,,10
+174,Buisson SAS - Finance transformation phase 2,57,1,active,25000000,EUR,2025-07-03,,10
+175,Pasquier SE - Compliance audit phase 1,58,8,active,2500000,EUR,2025-11-10,,15
+176,Pasquier SE - Data platform phase 2,58,2,active,12000000,EUR,2025-08-28,,9
+177,Loiseau SARL - Data platform phase 1,59,2,active,50000000,EUR,2025-07-16,,15
+178,Loiseau SARL - Org redesign phase 2,59,3,active,5000000,EUR,2025-03-07,,8
+179,Martins SARL SARL - Org redesign phase 1,60,3,active,50000000,EUR,2025-06-13,,13
+180,Martins SARL SARL - Cloud migration phase 2,60,2,pipeline,25000000,EUR,2026-07-09,,15
+181,Rivière SE - Operations uplift phase 1,61,7,active,5000000,EUR,2024-10-24,,22
+182,Rivière SE - Cloud migration phase 2,61,2,active,2500000,EUR,2024-05-27,,15
+183,Lacombe Leroux SARL SE - Operations uplift phase 1,62,7,completed,2500000,EUR,2024-06-24,2026-03-11,14
+184,Lacombe Leroux SARL SE - Risk review phase 2,62,6,active,2500000,EUR,2025-02-02,,14
+185,Jean SA SE - Finance transformation phase 1,63,1,active,12000000,EUR,2024-07-04,,10
+186,Jean SA SE - Cost optimization phase 2,63,3,completed,50000000,EUR,2024-04-22,2024-06-16,13
+187,Didier Auger SARL SAS - Compliance audit phase 1,64,8,pipeline,2500000,EUR,2026-04-28,,22
+188,Didier Auger SARL SAS - Risk review phase 2,64,6,completed,12000000,EUR,2025-09-24,2026-03-12,18
+189,Berger SE - Finance transformation phase 1,65,1,completed,12000000,EUR,2025-12-25,2025-12-29,10
+190,Berger SE - Data platform phase 2,65,2,active,12000000,EUR,2024-10-03,,11
+191,Joseph Grégoire et Fils SAS - Cost optimization phase 1,66,3,active,25000000,EUR,2025-09-20,,13
+192,Joseph Grégoire et Fils SAS - Org redesign phase 2,66,3,completed,5000000,EUR,2024-04-17,2025-01-16,13
+193,Leblanc SAS - Operations uplift phase 1,67,7,active,12000000,EUR,2024-05-13,,22
+194,Leblanc SAS - Compliance audit phase 2,67,8,active,2500000,EUR,2025-11-12,,21
+195,Coste SARL - Cost optimization phase 1,68,3,completed,2500000,EUR,2025-09-24,2026-03-07,13
+196,Coste SARL - Cloud migration phase 2,68,2,completed,50000000,EUR,2024-05-15,2025-03-17,11
+197,Barre SE - Org redesign phase 1,69,3,active,2500000,EUR,2024-12-02,,8
+198,Barre SE - Org redesign phase 2,69,3,active,12000000,EUR,2025-07-08,,13
+199,Roche SAS - Operations uplift phase 1,70,7,active,50000000,EUR,2024-07-13,,21
+200,Roche SAS - Cost optimization phase 2,70,3,pipeline,5000000,EUR,2026-06-18,,17
+201,Bertrand SARL - Operations uplift phase 1,71,7,active,12000000,EUR,2025-09-05,,17
+202,Bertrand SARL - Finance transformation phase 2,71,1,active,12000000,EUR,2025-01-03,,10
+203,Collin SARL - Compliance audit phase 1,72,8,completed,2500000,EUR,2025-03-13,2025-07-14,11
+204,Collin SARL - Cost optimization phase 2,72,3,completed,12000000,EUR,2025-10-25,2026-01-13,17
+205,Gaudin Maury SARL SARL - Cloud migration phase 1,73,2,completed,2500000,EUR,2025-11-15,2026-01-09,9
+206,Gaudin Maury SARL SARL - Operations uplift phase 2,73,7,pipeline,2500000,EUR,2026-12-26,,12
+207,Garcia SE - Data platform phase 1,74,2,pipeline,5000000,EUR,2026-06-17,,15
+208,Garcia SE - Org redesign phase 2,74,3,active,12000000,EUR,2024-11-09,,13
+209,Sanchez Lelièvre SARL SE - Finance transformation phase 1,75,1,completed,50000000,EUR,2025-03-08,2026-04-01,10
+210,Sanchez Lelièvre SARL SE - Operations uplift phase 2,75,7,pipeline,12000000,EUR,2026-11-06,,15
+211,Boulanger et Fils SARL - Operations uplift phase 1,76,7,active,2500000,EUR,2024-04-23,,19
+212,Boulanger et Fils SARL - Cloud migration phase 2,76,2,pipeline,50000000,EUR,2026-09-23,,11
+213,Allard SAS - Cost optimization phase 1,77,3,active,12000000,EUR,2025-12-17,,17
+214,Allard SAS - Compliance audit phase 2,77,8,completed,5000000,EUR,2025-03-30,2025-05-08,11
+215,Lefort Pottier SARL SE - Finance transformation phase 1,78,1,active,5000000,EUR,2025-11-24,,10
+216,Lefort Pottier SARL SE - Cost optimization phase 2,78,3,active,50000000,EUR,2025-11-28,,8
+217,Hebert S.A. SARL - Compliance audit phase 1,79,8,active,12000000,EUR,2024-08-21,,21
+218,Hebert S.A. SARL - Operations uplift phase 2,79,7,completed,5000000,EUR,2025-09-17,2025-11-13,19
+219,Pelletier SAS - Compliance audit phase 1,80,8,active,25000000,EUR,2026-01-12,,13
+220,Pelletier SAS - Data platform phase 2,80,2,active,5000000,EUR,2024-04-30,,9
+221,Laporte Bouchet S.A.S. EURL - Operations uplift phase 1,81,7,active,5000000,EUR,2024-12-24,,21
+222,Bourdon S.A.R.L. Studio - Operations uplift phase 1,82,7,completed,2500000,EUR,2026-02-15,2026-02-28,22
+223,Diaz EURL - Org redesign phase 1,83,3,pipeline,12000000,EUR,2026-07-05,,17
+224,Turpin SARL EURL - Data platform phase 1,84,2,active,50000000,EUR,2024-01-22,,15
+225,Coste EURL - Compliance audit phase 1,85,8,active,12000000,EUR,2024-02-13,,12
+226,Philippe SAS - Cloud migration phase 1,86,2,completed,12000000,EUR,2025-02-15,2025-05-25,15
+227,Weber Masse SARL Studio - Risk review phase 1,87,6,active,2500000,EUR,2026-03-26,,14
+228,Paris Studio - Cloud migration phase 1,88,2,active,5000000,EUR,2024-11-03,,11
+229,Seguin et Fils SAS - Finance transformation phase 1,89,1,active,12000000,EUR,2024-01-24,,10
+230,Seguin Benard S.A. EURL - Operations uplift phase 1,90,7,pipeline,50000000,EUR,2026-11-16,,12
+231,Techer Pereira et Fils SAS - Data platform phase 1,91,2,active,2500000,EUR,2025-06-16,,11
+232,Delorme SARL SAS - Cost optimization phase 1,92,3,completed,25000000,EUR,2025-10-10,2025-11-04,17
+233,Letellier EURL - Cost optimization phase 1,93,3,completed,25000000,EUR,2024-08-23,2026-01-02,17
+234,Gimenez Poulain S.A.S. SAS - Data platform phase 1,94,2,active,5000000,EUR,2025-07-24,,11
+235,Collet Studio - Data platform phase 1,95,2,completed,25000000,EUR,2024-04-23,2025-09-14,11
+236,Blanchard S.A. EURL - Org redesign phase 1,96,3,active,5000000,EUR,2025-01-02,,17
+237,Garcia EURL - Cloud migration phase 1,97,2,active,5000000,EUR,2024-01-05,,11
+238,Maillet EURL - Finance transformation phase 1,98,1,active,2500000,EUR,2024-03-05,,10
+239,Nicolas EURL - Compliance audit phase 1,99,8,active,5000000,EUR,2024-07-28,,12
+240,Bourdon Studio - Org redesign phase 1,100,3,active,5000000,EUR,2025-11-15,,13
+241,Bonnin Studio - Compliance audit phase 1,101,8,active,2500000,EUR,2025-03-26,,14
+242,Morel SARL Studio - Risk review phase 1,102,6,active,50000000,EUR,2025-08-19,,18
+243,Tanguy Dufour S.A.R.L. EURL - Cloud migration phase 1,103,2,completed,12000000,EUR,2025-03-08,2025-04-21,15
+244,Coste SAS - Data platform phase 1,104,2,pipeline,50000000,EUR,2026-06-22,,15
+245,Camus S.A.S. Studio - Cloud migration phase 1,105,2,completed,50000000,EUR,2024-02-09,2025-01-08,15
+246,Carpentier Studio - Cloud migration phase 1,106,2,completed,5000000,EUR,2025-10-12,2026-01-04,15
+247,Perrin Studio - Org redesign phase 1,107,3,active,50000000,EUR,2024-03-31,,8
+248,Baron EURL - Finance transformation phase 1,108,1,active,2500000,EUR,2026-01-12,,10
+249,Clerc Riou S.A.S. EURL - Compliance audit phase 1,109,8,completed,5000000,EUR,2025-05-04,2025-05-09,22
+250,Marchand Moreno S.A. EURL - Cost optimization phase 1,110,3,pipeline,50000000,EUR,2026-06-06,,17
+251,Rey Boulanger S.A. Studio - Finance transformation phase 1,111,1,completed,25000000,EUR,2024-04-27,2025-03-01,10
+252,Roger SAS - Compliance audit phase 1,112,8,active,25000000,EUR,2025-05-19,,13
+253,Garcia Pelletier S.A. EURL - Cost optimization phase 1,113,3,completed,12000000,EUR,2024-07-16,2025-04-07,13
+254,Roux SAS - Data platform phase 1,114,2,active,2500000,EUR,2025-06-28,,9
+255,Vallet SA EURL - Operations uplift phase 1,115,7,active,25000000,EUR,2024-03-11,,17
+256,Blanchet Studio - Operations uplift phase 1,116,7,completed,5000000,EUR,2026-03-10,2026-03-12,15
+257,Bonneau Bertrand et Fils EURL - Cloud migration phase 1,117,2,active,12000000,EUR,2025-03-07,,15
+258,Bonnet S.A.R.L. EURL - Org redesign phase 1,118,3,completed,12000000,EUR,2025-02-20,2026-04-10,13
+259,Marin et Fils Studio - Cloud migration phase 1,119,2,active,12000000,EUR,2025-03-30,,15
+260,Raynaud EURL - Data platform phase 1,120,2,active,12000000,EUR,2024-11-16,,9

@@ -1,13 +1,13 @@
 team_id,name,lead_employee_id
-1,Finance,0
-2,Tech,0
-3,Strategy,0
-4,Digital,0
-5,People,0
-6,Risk,0
-7,Operations,0
-8,Legal,0
-9,Marketing,0
-10,Public Sector,0
-11,Healthcare,0
-12,Manufacturing,0
+1,Finance,1
+2,Tech,9
+3,Strategy,8
+4,Digital,12
+5,People,23
+6,Risk,14
+7,Operations,2
+8,Legal,32
+9,Marketing,22
+10,Public Sector,19
+11,Healthcare,20
+12,Manufacturing,21
