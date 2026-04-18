@@ -95,6 +95,22 @@ repos:
             frontend/components/design-system/.*
           )$
 
+      - id: no-hex-or-rgba-in-tsx
+        name: Ban hardcoded hex/rgba colours in frontend code (use var(--color-*))
+        language: system
+        entry: python3 scripts/hooks/no_hex_or_rgba_in_tsx.py
+        # Design tokens live in CSS (styles/tokens.css mirrors prototype),
+        # so this hook is TSX/TS/JSX/JS-only. CSS files have legitimate
+        # rgba() uses for shadows, overlays, and glass surfaces.
+        files: '^frontend/.*\.(tsx|jsx|ts|js)$'
+        exclude: |
+          (?x)^(
+            frontend/styles/.*|
+            frontend/tests/.*|
+            frontend/node_modules/.*|
+            frontend/scripts/.*
+          )$
+
       - id: no-utilisation
         name: Ban the word utilisation
         language: system

@@ -83,7 +83,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
               justifyContent: "center",
               fontSize: "var(--text-caption)",
               fontWeight: "var(--weight-semibold)",
-              color: "#fff",
+              color: "var(--color-text-on-primary)",
               flexShrink: 0,
             }}
           >
