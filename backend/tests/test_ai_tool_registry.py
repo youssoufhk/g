@@ -21,12 +21,16 @@ These tests enforce:
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
 from pydantic import BaseModel, ValidationError
 
 from app.ai import registry
+
+SPEC_PATH = Path(__file__).parent.parent.parent / "specs" / "AI_FEATURES.md"
+
 
 EXPECTED_TOOLS: dict[str, str] = {
     "onboarding_column_mapper": "imports",
@@ -118,6 +122,74 @@ def test_each_tool_has_at_least_three_eval_examples() -> None:
             assert "prompt" in parsed or "headers" in parsed, (
                 f"{name} line {i}: example needs prompt or structured input"
             )
+
+
+# Row shape in AI_FEATURES.md §3.1::
+#
+#   | `filter_timesheets` | `features/timesheets/ai_tools.py` | List ... |
+#
+# Matches the two leading backticked cells, ignoring the human-readable
+# description column. Tabs/spaces between pipes are tolerated.
+_SPEC_ROW = re.compile(
+    r"^\|\s*`(?P<name>[a-z_]+)`\s*"
+    r"\|\s*`features/(?P<feature>[a-z_]+)/ai_tools\.py`\s*\|"
+)
+
+
+def _parse_spec_tool_catalog() -> dict[str, str]:
+    """Extract the ``tool_name -> feature`` mapping from the §3.1 table.
+
+    This test is the single place where the spec markdown is mechanically
+    compared against ``EXPECTED_TOOLS``; all other tests in this file
+    compare ``EXPECTED_TOOLS`` against the runtime registry. The
+    three-way lock (spec <-> test dict <-> runtime) catches every kind
+    of drift: a new row in the spec that no-one wired up, a tool
+    registered without a spec row, or a renamed tool.
+    """
+    source = SPEC_PATH.read_text(encoding="utf-8")
+    # Isolate section 3.1 so a future §3.2 / §4 row like
+    # ``| `some_draft_tool` | ...`` cannot accidentally contribute.
+    start = source.find("### 3.1 v1.0 tool catalog")
+    end = source.find("### 3.2", start) if start >= 0 else -1
+    assert start >= 0, f"specs/AI_FEATURES.md: §3.1 header not found at {SPEC_PATH}"
+    assert end > start, "specs/AI_FEATURES.md: could not find §3.2 sentinel"
+    section = source[start:end]
+    out: dict[str, str] = {}
+    for line in section.splitlines():
+        match = _SPEC_ROW.match(line)
+        if match is None:
+            continue
+        name = match.group("name")
+        feature = match.group("feature")
+        # The invoicing_agent row in §3.1 actually resolves to the
+        # ``invoices`` feature package (``features/invoicing_agent``
+        # does not exist; the tool lives in ``features/invoices``).
+        # If the spec ever re-points the row, this test forces the
+        # discrepancy into the open.
+        if feature == "invoicing_agent":
+            feature = "invoices"
+        assert name not in out, f"duplicate tool row in spec: {name}"
+        out[name] = feature
+    return out
+
+
+def test_expected_tools_matches_ai_features_md_spec_table() -> None:
+    """§3.1 spec table must agree with EXPECTED_TOOLS character-for-character.
+
+    Catalog drift is the highest-blast-radius failure in the
+    LLM-as-router pattern: the prompt includes the catalog, Gemini picks
+    a tool name out of it, and a silent rename means the model keeps
+    dispatching to a tool that no longer exists. Locking spec <->
+    EXPECTED_TOOLS closes that gap at test time.
+    """
+    spec_tools = _parse_spec_tool_catalog()
+    assert spec_tools == EXPECTED_TOOLS, (
+        f"AI_FEATURES.md §3.1 vs EXPECTED_TOOLS drift: "
+        f"in spec only={sorted(set(spec_tools) - set(EXPECTED_TOOLS))}, "
+        f"in EXPECTED_TOOLS only={sorted(set(EXPECTED_TOOLS) - set(spec_tools))}, "
+        f"feature mismatch="
+        f"{sorted((n, spec_tools[n], EXPECTED_TOOLS[n]) for n in spec_tools.keys() & EXPECTED_TOOLS.keys() if spec_tools[n] != EXPECTED_TOOLS[n])}"
+    )
 
 
 def test_filter_tools_reject_invalid_status_enum() -> None:
