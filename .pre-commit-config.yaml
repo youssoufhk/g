@@ -110,6 +110,7 @@ repos:
             scripts/setup/bootstrap-dev\.sh|
             PROMPT\.md|
             OPUS_CRITICS\.md|
+            OPUS_CRITICS_V2\.md|
             HAIKU_CRITICS\.md|
             \.claude/skills/.*|
             \.claude/agents/.*

@@ -234,29 +234,15 @@ Full list with CI enforcement matrix: `docs/MODULARITY.md`.
 
 ---
 
-## 7. Quality gate (the 15 that actually matter)
+## 7. Quality gate (the unified 70)
 
-The full list is in `docs/FLAWLESS_GATE.md`. If you only have time for 15, run these:
+The single authoritative gate is `docs/FLAWLESS_GATE.md` - 70 items, organized into six domains (visual + craft, IA + interconnection, trust + recovery, backend, tests, a11y + mobile, i18n + linting, critic gates, V2 delta). Authorized by `docs/decisions/ADR-012-unified-quality-gate.md`.
 
-1. Matches `prototype/<page>.html` visually at 1440px
-2. No horizontal scroll at 320px width
-3. Dark mode and light mode both look polished
-4. Empty state, loading state, and error state are all designed
-5. Every interactive element is keyboard reachable with a visible focus ring
-6. Cmd+K command palette opens from this page
-7. Every employee, client, and project reference is a link
-8. No hardcoded strings (all via next-intl, EN and FR)
-9. Every mutation is audited
-10. Every API call goes through RBAC and tenant scoping
-11. Every query has an index; no N+1
-12. Playwright E2E covers the golden path
-13. No new atoms introduced (use `components/ui/` as-is)
-14. No em dashes, no "utilisation", no decorative flourishes
-15. The founder can look at it and say "this feels like Gamma"
+**A feature either passes all 70 items or it does not ship.** No partial gate. No "minor". No "we will fix it later". This replaces the older 15-item list that used to live in this section; the 15 items are preserved inline as cross-references (`(was §7.N)`) inside the unified gate so nothing implicit is lost.
 
-If any of 1-14 fails, you stop and fix. If 15 fails, you go back and think about why.
+The unified gate is complemented by two CI-enforced structural documents: `docs/MODULARITY.md` (M1-M10 rules for architectural discipline) and `docs/TESTING_STRATEGY.md` (the six testing layers that make quality regressions visible on every commit). A feature passes the gate only if it also passes these checks.
 
-The quality gate is complemented by two structural documents: `docs/MODULARITY.md` (M1-M10 rules enforced in CI for architectural discipline) and `docs/TESTING_STRATEGY.md` (the six testing layers that make quality regressions visible on every commit). A feature can pass the 15-item gate only if it also passes the CI-enforced modularity and testing checks.
+Prior audit documents (`OPUS_CRITICS.md §12`, `OPUS_CRITICS_V2.md §18`) are superseded for gating purposes; their items have been folded into the unified 70. Do not self-certify against those files.
 
 ---
 

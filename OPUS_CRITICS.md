@@ -1,8 +1,12 @@
 # OPUS_CRITICS.md
 
-> The new quality floor. HAIKU_CRITICS.md is preserved as the minimum surface; OPUS goes underneath it and finds the bedrock issues HAIKU did not name. **If a single item in this file fails, the page is not done.** Period. No "we will fix it later". No "minor polish item". No "demo is fine without it".
+> **SUPERSEDED for gating purposes (2026-04-18).** The §12 "OPUS bar" (57 items) was merged into `docs/FLAWLESS_GATE.md` under `docs/decisions/ADR-012-unified-quality-gate.md`. The unified 70-item gate is now the single authoritative bar. This file is retained as an audit-findings record; its prose still documents *why* the 70 items exist, but the items inside §12 are no longer a standalone gate.
 >
-> **Date:** 2026-04-17
+> **Do not self-certify against this file.** Run the unified gate in `docs/FLAWLESS_GATE.md`.
+
+> The original quality-floor voice is preserved below for historical context. HAIKU_CRITICS.md is preserved as the minimum surface; OPUS goes underneath it and finds the bedrock issues HAIKU did not name. **If a single item in the unified gate fails, the page is not done.** Period. No "we will fix it later". No "minor polish item". No "demo is fine without it".
+>
+> **Date:** 2026-04-17 (superseded 2026-04-18)
 > **Methodology:** Direct code audit of `frontend/`, `backend/`, mock data, skills, and tests at HEAD `2c149ce`, cross-referenced against every spec, ADR, runbook, FLAWLESS_GATE.md, MODULARITY.md, TESTING_STRATEGY.md, and the 16-tool/4-AI-surface promise in AI_FEATURES.md.
 > **Voice:** Senior UI critic + Senior UX critic + Senior product critic + Senior compliance critic, all in one document. The kind of review a Series A lead would do at hour 3 of due diligence.
 
