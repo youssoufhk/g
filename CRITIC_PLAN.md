@@ -9,11 +9,11 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 ## Progress at a glance
 
 - Part A (UX reds, highest-visibility): 3/8
-- Part B (UI reds, atom lock-down): 9/12
+- Part B (UI reds, atom lock-down): 10/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 25/35
+Overall in-session: 26/35
 
 ---
 
@@ -73,7 +73,7 @@ Overall in-session: 25/35
 
 16. [x] **B8 [G31/G32]** Split `EmptyState` into `EmptyData` (no rows) vs `EmptyFiltered` (rows exist, filter matches none - adds clear-filter action).
 
-17. [ ] **B9 [B9 WCAG]** Add `@axe-core/playwright` to the visual test pipeline; fail build on AA violation. Report runs in `tests/a11y.spec.ts`.
+17. [x] **B9 [B9 WCAG]** Add `@axe-core/playwright` to the visual test pipeline; fail build on AA violation. Report runs in `tests/a11y.spec.ts`.
 
 18. [x] **B10 [G30]** Skeleton fidelity: skeleton rows and cells must mirror real column widths and KPI strip above. Fix `invoices/page.tsx:75` skeleton + add dashboard skeleton.
 
