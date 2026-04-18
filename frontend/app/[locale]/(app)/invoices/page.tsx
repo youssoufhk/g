@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
+import { AiDegradedBanner } from "@/components/patterns/ai-degraded-banner";
 import { ResourcesFilterBar, type FilterGroup } from "@/components/patterns/resources-filter-bar";
 import { EmptyState } from "@/components/patterns/empty-state";
 import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
@@ -482,6 +483,7 @@ export default function InvoicesPage() {
       </div>
 
       <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <AiDegradedBanner surface="invoices" />
         <PageHeader
           title={t("page_title")}
           count={total}

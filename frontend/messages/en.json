@@ -859,6 +859,11 @@
   "patterns": {
     "empty_clear_filters": "Clear filters"
   },
+  "degraded": {
+    "ai_off_dashboard": "AI insights are paused. Cards below show deterministic signals only. Drafts, explanations, and recommendations resume when the kill switch clears.",
+    "ai_off_expenses": "AI receipt parsing is paused. New receipts upload as blank drafts; fill fields manually until the kill switch clears.",
+    "ai_off_invoices": "The monthly close agent is paused. Drafts are not generated automatically; existing drafts remain editable."
+  },
   "approvals": {
     "page_title": "Approvals",
     "urgent": "Urgent",

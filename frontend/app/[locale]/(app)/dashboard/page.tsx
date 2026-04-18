@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
+import { AiDegradedBanner } from "@/components/patterns/ai-degraded-banner";
 import { ActivityTable } from "@/features/dashboard/activity-table";
 import { InsightBanner } from "@/features/dashboard/insight-banner";
 import { KpiStrip } from "@/features/dashboard/kpi-strip";
@@ -29,6 +30,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="flex flex-col" style={{ gap: "var(--space-8)" }}>
+        <AiDegradedBanner surface="dashboard" />
         <InsightBanner />
         <QuickActions />
         <KpiStrip />

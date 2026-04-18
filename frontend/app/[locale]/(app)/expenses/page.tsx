@@ -23,6 +23,7 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { ResourcesFilterBar, type FilterGroup } from "@/components/patterns/resources-filter-bar";
 import { EmptyState } from "@/components/patterns/empty-state";
 import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
+import { AiDegradedBanner } from "@/components/patterns/ai-degraded-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1085,6 +1086,7 @@ export default function ExpensesPage() {
         <div className="app-aura-accent" />
       </div>
       <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <AiDegradedBanner surface="expenses" />
         <PageHeader
           title={t("page_title")}
           actions={

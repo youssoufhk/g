@@ -859,6 +859,11 @@
   "patterns": {
     "empty_clear_filters": "Effacer les filtres"
   },
+  "degraded": {
+    "ai_off_dashboard": "Les insights IA sont en pause. Les cartes ci-dessous n'affichent que les signaux déterministes. Les brouillons, explications et recommandations reprendront dès que le coupe-circuit sera levé.",
+    "ai_off_expenses": "L'analyse IA des reçus est en pause. Les nouveaux reçus sont importés en brouillon vide; complétez les champs manuellement jusqu'au rétablissement.",
+    "ai_off_invoices": "L'agent de clôture mensuelle est en pause. Aucun brouillon n'est généré automatiquement; les brouillons existants restent modifiables."
+  },
   "approvals": {
     "page_title": "Approbations",
     "urgent": "Urgent",

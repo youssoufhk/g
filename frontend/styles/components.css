@@ -2873,6 +2873,7 @@ svg circle[data-animate].chart-animate-in {
 .degraded-banner {
   display: flex;
   align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   background: var(--color-warning-muted);
   color: var(--color-warning);
@@ -2881,6 +2882,8 @@ svg circle[data-animate].chart-animate-in {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
 }
+
+.degraded-banner-text { flex: 1; }
 
 
 /* ============================================================
