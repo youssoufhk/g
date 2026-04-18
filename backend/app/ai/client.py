@@ -14,9 +14,11 @@ Dev stack ships with two concrete clients:
   so the backend container can see the host's ollama daemon.
 
 Real ``VertexGeminiClient`` ships only in §16 Deploy Track when the
-founder calls for production deployment.
+founder calls for production deployment. See
+``docs/decisions/ADR-011-ai-vendor-ollama.md`` for the tier policy.
 """
 
+import json
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -85,10 +87,11 @@ class OllamaAIClient:
 
     Ollama runs outside the container on the host and exposes an HTTP
     API at ``http://host:11434``. The ``/api/chat`` endpoint returns the
-    model's reply; Gemma-family models do not support tool calling, so
-    the ``tools`` argument is ignored and the caller is expected to run
-    deterministic analyzers (Phase 5a) before asking Ollama to explain
-    results in natural language.
+    model's reply. Gemma-family models do not support native function
+    calling, so ``tools`` are composed into the prompt as a JSON schema
+    block; callers still run deterministic analyzers (Phase 5a) before
+    asking Ollama to rank or explain results in natural language. Tool
+    calls the model emits inline are parsed out of the response.
 
     Setup: install Ollama on the host, pull the model, and make sure
     the daemon listens on 0.0.0.0 so the container can reach it::
@@ -100,6 +103,13 @@ class OllamaAIClient:
     ``OLLAMA_MODEL`` (see ``backend/.env.example``).
     """
 
+    _TOOL_PREAMBLE = (
+        "You have access to the following tools. If a tool applies, "
+        'reply ONLY with a JSON object of the shape '
+        '{"tool": "<name>", "arguments": {...}}. Otherwise reply with '
+        "plain text.\n\nTools:\n"
+    )
+
     def __init__(
         self,
         host: str,
@@ -110,6 +120,29 @@ class OllamaAIClient:
         self._model = model
         self._timeout = timeout_seconds
 
+    def _compose_prompt(
+        self, prompt: str, tools: list[dict[str, Any]]
+    ) -> str:
+        if not tools:
+            return prompt
+        tool_block = self._TOOL_PREAMBLE + json.dumps(tools, indent=2)
+        return f"{tool_block}\n\nUser:\n{prompt}"
+
+    @staticmethod
+    def _parse_tool_calls(content: str) -> list[ToolCall]:
+        stripped = content.strip()
+        if not stripped.startswith("{"):
+            return []
+        try:
+            parsed = json.loads(stripped)
+        except json.JSONDecodeError:
+            return []
+        name = parsed.get("tool")
+        arguments = parsed.get("arguments")
+        if not isinstance(name, str) or not isinstance(arguments, dict):
+            return []
+        return [ToolCall(name=name, arguments=arguments)]
+
     async def run_tool(
         self,
         *,
@@ -118,12 +151,13 @@ class OllamaAIClient:
         tenant_schema: str | None,
         budget_tokens: int = 4_000,
     ) -> AIResponse:
+        composed = self._compose_prompt(prompt, tools)
         async with httpx.AsyncClient(timeout=self._timeout) as client:
             response = await client.post(
                 f"{self._host}/api/chat",
                 json={
                     "model": self._model,
-                    "messages": [{"role": "user", "content": prompt}],
+                    "messages": [{"role": "user", "content": composed}],
                     "stream": False,
                     "options": {"num_predict": budget_tokens},
                 },
@@ -133,9 +167,10 @@ class OllamaAIClient:
 
         message = data.get("message", {}) or {}
         content = message.get("content", "") or ""
+        tool_calls = self._parse_tool_calls(content)
         return AIResponse(
             text=content,
-            tool_calls=[],
+            tool_calls=tool_calls,
             tokens_in=int(data.get("prompt_eval_count", 0) or 0),
             tokens_out=int(data.get("eval_count", 0) or 0),
         )

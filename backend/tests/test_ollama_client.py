@@ -65,6 +65,63 @@ async def test_ollama_client_handles_empty_message_safely() -> None:
 
 
 @pytest.mark.asyncio
+async def test_ollama_client_composes_tool_schema_into_prompt() -> None:
+    client = OllamaAIClient(host="http://fake:11434", model="gemma3")
+    fake_response = _fake_response(
+        200,
+        json={"model": "gemma3", "message": {"content": "ok"}, "done": True},
+    )
+    captured: dict[str, object] = {}
+
+    async def fake_post(self: httpx.AsyncClient, url: str, *, json: dict[str, object]) -> httpx.Response:
+        captured["url"] = url
+        captured["json"] = json
+        return fake_response
+
+    tools = [
+        {
+            "name": "filter_employees",
+            "description": "Filter employees by role",
+            "parameters": {"type": "object", "properties": {"role": {"type": "string"}}},
+        }
+    ]
+    with patch("httpx.AsyncClient.post", new=fake_post):
+        await client.run_tool(prompt="find managers", tools=tools, tenant_schema="t_acme")
+
+    payload = captured["json"]
+    assert isinstance(payload, dict)
+    sent_content = payload["messages"][0]["content"]
+    assert "filter_employees" in sent_content
+    assert "Filter employees by role" in sent_content
+    assert "find managers" in sent_content
+
+
+@pytest.mark.asyncio
+async def test_ollama_client_parses_inline_tool_call() -> None:
+    client = OllamaAIClient(host="http://fake:11434", model="gemma3")
+    fake_response = _fake_response(
+        200,
+        json={
+            "model": "gemma3",
+            "message": {
+                "role": "assistant",
+                "content": '{"tool": "filter_employees", "arguments": {"role": "manager"}}',
+            },
+            "done": True,
+        },
+    )
+    with patch("httpx.AsyncClient.post", new=AsyncMock(return_value=fake_response)):
+        out = await client.run_tool(
+            prompt="find managers",
+            tools=[{"name": "filter_employees"}],
+            tenant_schema="t_acme",
+        )
+    assert len(out.tool_calls) == 1
+    assert out.tool_calls[0].name == "filter_employees"
+    assert out.tool_calls[0].arguments == {"role": "manager"}
+
+
+@pytest.mark.asyncio
 async def test_ollama_client_raises_on_http_error() -> None:
     client = OllamaAIClient(host="http://fake:11434", model="gemma3")
     fake_response = _fake_response(500, text="boom")

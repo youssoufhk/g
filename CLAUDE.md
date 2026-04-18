@@ -14,7 +14,7 @@ Category: operations platform for modern consulting firms. Tagline: "The operati
 
 Team: two founders from day 0. Founder (non-technical product owner, native C++ background, very demanding quality bar, 20 h/week available) leads product + design + frontend. Co-founder leads backend + infra + AI. Both on customer calls.
 
-Tech stack (locked): Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) + Celery on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. Vertex AI Gemini (EU-resident, LLM-as-router pattern with deterministic per-feature tools) for AI. Hosted on GCP `europe-west9` (Paris) with Cloudflare in front for DNS, WAF, CDN, and Access, and GitHub for repo and CI.
+Tech stack (locked): Python 3.12 + FastAPI + PostgreSQL 16 (schema-per-tenant) + Celery on the backend. Next.js 15 + React 19 + Tailwind 4 + TanStack Query + Zustand on the frontend. PWA for mobile. AI runs through the `AIClient` abstraction in `backend/app/ai/client.py`: **Vertex AI Gemini** in production (EU-resident, `europe-west9`), **Ollama (self-hosted Gemma3)** in dev, **MockAIClient** in CI/test. LLM-as-router pattern with deterministic per-feature tools applies to every backend. See `docs/decisions/ADR-011-ai-vendor-ollama.md`. Hosted on GCP `europe-west9` (Paris) with Cloudflare in front for DNS, WAF, CDN, and Access, and GitHub for repo and CI.
 
 First customer target: ~201 employees, ~120 clients, EU-based consulting firm. See `specs/DATA_ARCHITECTURE.md` section 12.10 for the canonical seed data breakdown (1 owner, 2 admins, 4 finance, 15 managers, 177 employees, 2 readonly; 260 projects, 52 weeks of timesheets, 700 leaves, ~8,400 expenses, 900 invoices/year; HSBC UK as a GBP-billing client).
 
