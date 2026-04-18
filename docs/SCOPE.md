@@ -40,17 +40,20 @@ Every Tier 1 feature's flawless-gate run verifies the S-items it uses, in-line. 
 
 ---
 
-## Tier 1.1 (reserved for v1.1, positioned in v1.0)
+## Tier 1.1 (committed for v1.1, positioned in v1.0)
 
-These features are promised on the Gamma landing page and in sales conversations but NOT built in v1.0. They are reserved in the domain model (`specs/DATA_ARCHITECTURE.md` §14) so v1.1 can ship them without a schema rewrite. Triggering a v1.1 build starts after v1.0 launch + customer 3 signs.
+These features are promised on the Gamma landing page and in sales conversations but NOT built in v1.0. They are reserved in the domain model (`specs/DATA_ARCHITECTURE.md` §14) so v1.1 can ship them without a schema rewrite. The three enterprise-gate rows (SCIM, SAML, multi-rate VAT) are **committed** for v1.1 rather than demand-triggered, because the COO/CFO teardown established that enterprise procurement cannot sign without them; they are the trigger for the year-2 price step-up in `docs/GO_TO_MARKET.md §2`. Prior DEF-024 (SCIM), DEF-025 (SAML), and DEF-007 (multi-rate VAT) are marked resolved in `docs/DEFERRED_DECISIONS.md` and lifted into this table.
 
-| Feature | Why reserved, not built |
-|---|---|
-| Recruitment / Applicant Tracking (ATS) | A full recruitment module is its own product category (Greenhouse, Lever, Ashby, Workable, Recruitee). Shipping it half-baked in v1.0 would hurt the Gamma brand more than deferring. Consulting firms hire in cycles, not continuously; the urgency asymmetry favors shipping timesheets, invoicing, and resource planning first. Triggers v1.1 build when: (a) 3 paying customers live, AND (b) at least 2 customers explicitly ask for it in writing, AND (c) v1.0 is stable for 90 days. |
-| Performance reviews + 1:1s | Same reasoning. Reserve `employee_reviews` + `one_on_ones` tables in v1.1. |
-| Expense policy engine (rules-based auto-approval) | v1.0 ships manual approval only. Rule engine is v1.1 once we see real approval patterns. |
+| Feature | Why reserved, not built | Trigger |
+|---|---|---|
+| **SCIM provisioning** from Google Workspace and Microsoft Entra directories | Enterprise procurement gate. Lifted from DEF-024. | Committed for v1.1. Ship before first enterprise-tier renewal. |
+| **SAML federation** beyond OIDC | Enterprise procurement gate. Lifted from DEF-025. | Committed for v1.1. Ship before first enterprise-tier renewal. |
+| **Multi-rate VAT** (different tax rates per invoice line, regional splits, goods + services on one invoice) | Enterprise procurement gate for cross-border and goods-and-services buyers. Lifted from DEF-007. | Committed for v1.1. Ship before first enterprise-tier renewal. |
+| Recruitment / Applicant Tracking (ATS) | A full recruitment module is its own product category (Greenhouse, Lever, Ashby, Workable, Recruitee). Shipping it half-baked in v1.0 would hurt the Gamma brand more than deferring. Consulting firms hire in cycles, not continuously; the urgency asymmetry favors shipping timesheets, invoicing, and resource planning first. | Demand-triggered: (a) 3 paying customers live, AND (b) at least 2 customers explicitly ask for it in writing, AND (c) v1.0 is stable for 90 days. |
+| Performance reviews + 1:1s | Same reasoning. Reserve `employee_reviews` + `one_on_ones` tables in v1.1. | Demand-triggered. |
+| Expense policy engine (rules-based auto-approval) | v1.0 ships manual approval only. Rule engine is v1.1 once we see real approval patterns. | Demand-triggered. |
 
-**Positioning rule:** these features are promised in marketing copy ("Gamma runs your entire consulting firm: time, projects, billing, people, hiring, reviews") but the landing page feature matrix marks each with "v1.1 - Q3 2027" (placeholder date; update when Phase 7 ends). Buyers who need them now are filtered out in the first discovery call.
+**Positioning rule:** these features are promised in marketing copy ("Gamma runs your entire consulting firm: time, projects, billing, people, hiring, reviews, enterprise SSO, multi-rate VAT") but the landing page feature matrix marks each with "v1.1 - Q3 2027" (placeholder date; update when Phase 7 ends). Buyers who need the non-committed rows now are filtered out in the first discovery call. Buyers who need the three committed rows for v1.1 are told "committed, ships before year-2 renewal", on the record.
 
 ---
 

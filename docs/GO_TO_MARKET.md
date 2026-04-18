@@ -18,26 +18,42 @@
 
 ---
 
-## 2. Pricing (per-seat with two volume bands, locked)
+## 2. Pricing (pilot + per-seat annual, rebased 2026-04-18)
 
-**Per-seat volume-band pricing.** One plan, one product, two volume bands, one Enterprise tier. Seat = active user in last 30 days. Reference users who appear in data but never log in are NOT billable. Prices are ex-VAT, EUR only (multi-currency subscription billing deferred, DEF-030).
+**Two-stage pricing.** A fixed-price pilot buys trust; per-seat annual buys the year. Seat = active user in last 30 days. Reference users who appear in data but never log in are NOT billable. Prices are ex-VAT, EUR only (multi-currency subscription billing deferred, DEF-030).
+
+The prior rate card (€35/€26 per seat/month, €70,260 ACV for the canonical buyer) was rebased on 2026-04-18 after the COO/CFO teardown in `OPUS_CRITICS_V2.md §15`. The old number assumed value that had not shipped (month-end close agent, SOC 2 Type 2, SCIM, multi-rate VAT). The rebased bar reflects what the canonical 200-person EU consulting buyer would actually pay at v1.0 quality, with an explicit path to the premium number once the audit + enterprise-tier items land.
 
 ### Published list pricing
 
-| Plan | <200 seats | ≥200 seats | Enterprise |
-|---|---:|---:|---:|
-| **Gamma** | €35/seat/mo | €26/seat/mo | custom |
+| Stage | Price | What it buys |
+|---|---:|---|
+| **Pilot** | **€8,000 flat** | 10-seat / 90-day pilot. Real data, real users, no production commitment. Pilot contract names the success criteria and either converts to an annual contract or closes out with the founder's help. No auto-conversion. |
+| **Annual (year 1)** | **€140 - €170 / seat / year** | Per-seat list price, ex-VAT, EUR. Band depends on seat count and enterprise feature attach. Canonical 201-seat buyer lands in the €28k - €34k ACV range. |
+| **Annual renewal** | negotiated | Year 2 pricing is set at the v1.0 renewal; no published number. |
+| **Enterprise attach** | custom | Optional adds on top of annual: dedicated Technical Account Manager (DEF-078), third-party penetration test report (DEF-077), source-code escrow (DEF-076), uptime SLA, negotiated DPA. |
 
-### Why these numbers
+### Why the rebase
 
-These are **charm prices** (digits sum to 8, a pattern the founder wanted). They also happen to land in the premium-B2B-SaaS sweet spot: numbers ending in 5 or 6 signal "serious tool", not "retail discount". €35 anchors sub-200 firms well above the "budget HR tool" ceiling (Factorial, BambooHR, Personio Starter all live below €20). €26 gives ≥200 firms a real volume win (~26% discount) without undercutting the anchor. Enterprise is custom because you negotiate down from "talk to us", never up from a published number.
+1. **The month-end close agent is not yet shipped.** The prior ACV priced in its value; until the agent is real on the buyer's data, the premium is fiction. Repricing to €140-€170/seat is the honest v1.0 bar.
+2. **SOC 2 Type 2 + pen-test report + escrow are enterprise-procurement gates.** A 200-person EU buyer signs a €70k contract only after those three clear. None ship in v1.0. They are the trigger for a renewal price step-up (see "Year 2 step-up" below).
+3. **Pilot price anchors on procurement-negligible.** €8k sits below the typical €10k sign-off ceiling for a COO without finance / legal sign-off. It buys a 90-day window to demonstrate the close agent and to de-risk renewal economics.
 
 ### What's in the plan
 
 | Plan | Includes |
 |---|---|
-| **Gamma** | All Tier 1 features: time, clients, projects, invoices, expenses, leaves, approvals, admin, account, dashboard. Shell infrastructure: Cmd+K AI palette, notifications, conflict resolver, entitlement lock. AI surfaces: palette + receipt OCR + insight cards + **month-end close agent** (drafts monthly invoices from approved timesheets and expenses, user confirms). Resource planning. Custom fields. Advanced reports. PWA with offline timesheets. Priority email support. |
-| **Enterprise** | Everything in Gamma + SSO/SAML/SCIM (post-DEF-024) + audit exports + negotiated DPA + dedicated support engineer + uptime SLA + early access to v1.1 agentic features (predictive staffing, auto-timesheet drafting). |
+| **Gamma (pilot + annual)** | All Tier 1 features: time, clients, projects, invoices, expenses, leaves, approvals, admin, account, dashboard. Shell infrastructure: Cmd+K AI palette, notifications, conflict resolver, entitlement lock. AI surfaces: palette + receipt OCR + insight cards + **month-end close agent** (drafts monthly invoices from approved timesheets and expenses, user confirms). PWA with offline timesheets. Priority email support. SCIM + SAML + multi-rate VAT land in v1.1 (committed, see `docs/SCOPE.md` Tier 1.1). |
+| **Enterprise attach** | Dedicated Technical Account Manager (DEF-078), pen-test report (DEF-077), source-code escrow (DEF-076), uptime SLA, negotiated DPA, early access to v1.1 agentic features (predictive staffing, auto-timesheet drafting). |
+
+### Year 2 step-up
+
+The €140-€170 band is the v1.0 floor. Renewal pricing lifts to the €170-€220 band once all three of the following clear:
+1. SOC 2 Type 2 audit report available (≥6-month observation window complete).
+2. SCIM + SAML + multi-rate VAT in production (lifted from DEF-024, DEF-025, DEF-007 into Tier 1.1).
+3. Month-end close agent has run for ≥3 monthly closes at the customer and the customer has confirmed it in writing.
+
+This is the honest path back toward the original premium number. It is gated on shipped value, not on positioning.
 
 ### Monthly vs annual
 
@@ -45,27 +61,25 @@ These are **charm prices** (digits sum to 8, a pattern the founder wanted). They
 
 ### Currency and VAT
 
-All prices ex-VAT, EUR only. Multi-currency subscription billing (GBP, USD) deferred (DEF-030). EU intra-community B2B invoices emit zero-VAT lines with the reverse-charge legal mention (single VAT rate per tenant + reverse-charge boolean on client, multi-rate VAT deferred in DEF-007). Non-EU billing not in v1.0 scope.
+All prices ex-VAT, EUR only. Multi-currency subscription billing (GBP, USD) deferred (DEF-030). EU intra-community B2B invoices emit zero-VAT lines with the reverse-charge legal mention. Multi-rate VAT (prior DEF-007) is committed to Tier 1.1; v1.0 still ships single-rate + reverse-charge. Non-EU billing not in v1.0 scope.
 
 ### Grandfathered pricing for pilots
 
-First 5 paying customers get grandfathered at the Phase 2 rate card for 3 years, regardless of seat count growth. Written into their custom contract.
+First 5 paying customers that convert from the €8k pilot to annual get grandfathered at their pilot-year rate card for 3 years, regardless of seat count growth. Written into their custom contract.
 
 ### Worked example: the canonical first customer
 
 The canonical first customer in `CLAUDE.md` and `specs/DATA_ARCHITECTURE.md` section 12.10 has 201 employees, all active in the canonical seed, so seat count for billing is **201**.
 
-| Volume bands | Monthly | Annual list (× 12) | **Annual at the 10/12 discount** |
-|---|---:|---:|---:|
-| 200 × €35 + 1 × €26 | €7,026 | €84,312 | **€70,260** |
+| Stage | Seats | Price | **Total (year 1)** |
+|---|---:|---|---:|
+| Pilot (90 days, 10 seats) | 10 | €8,000 flat | **€8,000** |
+| Annual conversion (remaining 275 days) | 201 | €140/seat/yr (floor) | **€28,140** |
+| Annual conversion (remaining 275 days) | 201 | €170/seat/yr (ceiling) | **€34,170** |
 
-Grandfathered for 3 years = **~€210,780 of locked revenue** if they renew through year 3 with no seat changes.
+The pilot fee is **not** credited against the annual. Pilot buys trust; annual buys the year.
 
-If they grow from 201 to 250 during the grandfathered window, the volume tier stays at ≥200 for all seats beyond 200 (charged at the ≥200 rate). Growth revenue: 49 × €26 × 12 × (10/12) = ~€12,740 additional annual.
-
-**This is the number to quote off in any sales call.** Do not re-derive it under pressure.
-
-Compared with the prior Pro-tier plan (~€25,110 ACV), this pricing is **2.8x the first-deal revenue**, which funds the co-founder equity story and the SOC 2 Type 1 audit window.
+**This is the number to quote off in any sales call.** Do not re-derive it under pressure. Year 2 step-up is a separate conversation, gated on the three criteria above.
 
 ---
 
