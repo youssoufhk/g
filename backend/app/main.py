@@ -51,6 +51,8 @@ from app.features.dashboard.routes import router as dashboard_router
 from app.features.employees import models as _employees_models  # noqa: F401
 from app.features.employees.routes import router as employees_router
 from app.features.imports.routes import router as imports_router
+from app.features.invoices import models as _invoices_models  # noqa: F401
+from app.features.invoices.routes import router as invoices_router
 from app.features.projects import models as _projects_models  # noqa: F401
 from app.features.projects.routes import router as projects_router
 from app.features.search.routes import router as search_router
@@ -111,5 +113,6 @@ app.include_router(imports_router, prefix="/api/v1/imports", tags=["imports"])
 app.include_router(employees_router, prefix="/api/v1/employees", tags=["employees"])
 app.include_router(clients_router, prefix="/api/v1/clients", tags=["clients"])
 app.include_router(projects_router, prefix="/api/v1/projects", tags=["projects"])
+app.include_router(invoices_router, prefix="/api/v1/invoices", tags=["invoices"])
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["dashboard"])
 app.include_router(search_router, prefix="/api/v1/search", tags=["search"])

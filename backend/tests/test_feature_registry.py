@@ -132,10 +132,14 @@ AI_HANDLER_NO_SERVICE_EXEMPT = frozenset({"core"})
 AI_HANDLER_NO_SERVICE_CASCADE = frozenset({
     "approvals",
     "expenses",
-    "invoices",
     "leaves",
     "timesheets",
 })
+# 2026-04-18: ``invoices`` closed. service.py + routes.py + models.py
+# landed in a follow-up commit that wires the list endpoint to the
+# Phase 5a invoice tables (migration 20260418_1300). The AI handler
+# in features/invoices/ai_tools.py can now delegate to
+# features/invoices/service.py instead of stubbing.
 
 
 def _features_with_ai_tools_but_no_service() -> set[str]:
