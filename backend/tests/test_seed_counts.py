@@ -13,7 +13,9 @@ test in the same commit.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
+from pathlib import Path
 
 from scripts.seed_demo_tenant import (
     EXPENSE_CATEGORY_CATALOGUE,
@@ -448,3 +450,132 @@ def test_generate_invoice_rows_rejects_empty_inputs() -> None:
     invoices = generate_invoice_rows(client_ids=_client_ids())
     with pytest.raises(ValueError):
         generate_invoice_line_rows(invoice_rows=invoices, project_ids=[])
+
+
+# ---------------------------------------------------------------------------
+# Spec <-> runtime alignment (DATA_ARCHITECTURE.md section 12, bullet 10
+# "Build the seed data"). The seed-count constants above already lock
+# the *runtime* generator to fixed numbers; this test closes the last
+# gap by parsing the spec markdown itself and asserting the numbers in
+# the prose agree with the Python constants.
+#
+# Without this, the spec can drift independently of the code: someone
+# updates "~8,400 expenses" to "~10,000" in the markdown, the code
+# still emits 8,400 rows, every existing test passes green, and the
+# docs ship a lie to the first customer. Same shape as the
+# test_expected_tools_matches_ai_features_md_spec_table metatest in
+# test_ai_tool_registry.py.
+#
+# The anchors are verbatim sentences from §12 today. Any edit that
+# changes the wording trips the parser with a clear "spec anchor
+# missing" message so the test update is forced into the same commit
+# as the spec edit.
+# ---------------------------------------------------------------------------
+
+SPEC_PATH = Path(__file__).parent.parent.parent / "specs" / "DATA_ARCHITECTURE.md"
+
+
+def _parse_spec_seed_numbers() -> dict[str, int]:
+    """Extract the headline seed counts from §12 bullet 10.
+
+    Bounded by ``10. **Build the seed data**`` and ``## 12.11`` so a
+    future §12.12 bullet cannot accidentally contribute.
+    """
+    source = SPEC_PATH.read_text(encoding="utf-8")
+    start = source.find("10. **Build the seed data**")
+    end = source.find("## 12.11", start) if start >= 0 else -1
+    assert start >= 0, (
+        f"DATA_ARCHITECTURE.md: §12 bullet 10 anchor "
+        f"'10. **Build the seed data**' not found at {SPEC_PATH}"
+    )
+    assert end > start, (
+        "DATA_ARCHITECTURE.md: could not find §12.11 sentinel after §12 bullet 10"
+    )
+    section = source[start:end]
+
+    out: dict[str, int] = {}
+
+    m = re.search(r"(?P<n>\d+) weeks of timesheet data", section)
+    assert m, "spec anchor missing: '<N> weeks of timesheet data'"
+    out["timesheet_weeks_sentence"] = int(m.group("n"))
+
+    m = re.search(
+        r"(?P<billable>\d+) billable employees x "
+        r"(?P<days>\d+) days x "
+        r"(?P<weeks>\d+) weeks",
+        section,
+    )
+    assert m, (
+        "spec anchor missing: '<N> billable employees x <N> days x "
+        "<N> weeks' formula"
+    )
+    out["timesheet_billable"] = int(m.group("billable"))
+    out["timesheet_days"] = int(m.group("days"))
+    out["timesheet_weeks_formula"] = int(m.group("weeks"))
+
+    m = re.search(r"(?P<n>\d+) leaves \(", section)
+    assert m, "spec anchor missing: '<N> leaves ('"
+    out["leaves"] = int(m.group("n"))
+
+    m = re.search(r"\*\*Expenses \(~(?P<n>[\d,]+) total\)", section)
+    assert m, "spec anchor missing: '**Expenses (~<N> total)**'"
+    out["expenses"] = int(m.group("n").replace(",", ""))
+
+    m = re.search(
+        r"(?P<year>\d+)/year \((?P<month>\d+)/month\)", section
+    )
+    assert m, "spec anchor missing: '<N>/year (<N>/month)'"
+    out["invoices_year"] = int(m.group("year"))
+    out["invoices_month"] = int(m.group("month"))
+
+    return out
+
+
+def test_spec_internal_consistency_timesheet_weeks() -> None:
+    """The spec states '52 weeks of timesheet data' AND '... x 52 weeks'
+    in the formula line. Those two numbers must agree or the prose
+    contradicts itself before any code is even consulted."""
+    spec = _parse_spec_seed_numbers()
+    assert spec["timesheet_weeks_sentence"] == spec["timesheet_weeks_formula"], (
+        "DATA_ARCHITECTURE.md §12: 'N weeks of timesheet data' "
+        f"({spec['timesheet_weeks_sentence']}) disagrees with 'x N weeks' "
+        f"({spec['timesheet_weeks_formula']}) in the formula line. "
+        "Fix the spec first; the seed generator cannot match two values."
+    )
+
+
+def test_seed_constants_match_data_architecture_spec() -> None:
+    """Every canonical seed number from §12 agrees with its Python
+    constant in seed_demo_tenant.py. Both directions are locked: a spec
+    edit without a constant update fails here, and a constant change
+    without a spec update also fails here."""
+    spec = _parse_spec_seed_numbers()
+    pairs = [
+        ("timesheet weeks per employee (sentence)",
+         spec["timesheet_weeks_sentence"], TIMESHEET_WEEKS_PER_EMPLOYEE),
+        ("timesheet weeks per employee (formula)",
+         spec["timesheet_weeks_formula"], TIMESHEET_WEEKS_PER_EMPLOYEE),
+        ("timesheet entries per billable week (formula 'days')",
+         spec["timesheet_days"], TIMESHEET_ENTRIES_PER_BILLABLE_WEEK),
+        ("timesheet billable employee count",
+         spec["timesheet_billable"], TIMESHEET_BILLABLE_EMPLOYEE_COUNT),
+        ("leave total",
+         spec["leaves"], LEAVE_TOTAL),
+        ("expense total",
+         spec["expenses"], EXPENSE_TOTAL),
+        ("invoices per year",
+         spec["invoices_year"], INVOICES_PER_YEAR),
+        ("invoices per month",
+         spec["invoices_month"], INVOICES_PER_MONTH),
+    ]
+    mismatches = [
+        f"  {label}: spec={spec_val} vs constant={code_val}"
+        for label, spec_val, code_val in pairs
+        if spec_val != code_val
+    ]
+    assert not mismatches, (
+        "DATA_ARCHITECTURE.md §12 seed numbers drifted from "
+        "seed_demo_tenant.py constants:\n"
+        + "\n".join(mismatches)
+        + "\nFix the spec or the constant, in the same commit."
+    )
