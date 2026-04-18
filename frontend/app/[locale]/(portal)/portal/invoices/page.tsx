@@ -89,8 +89,7 @@ function amountColor(status: InvoiceStatus): string {
 
 export default function PortalInvoicesPage() {
   function handleDownload(invoiceNumber: string): void {
-    // eslint-disable-next-line no-console
-    console.log("Download PDF:", invoiceNumber);
+    void invoiceNumber;
   }
 
   return (
@@ -344,10 +343,9 @@ export default function PortalInvoicesPage() {
                             textDecoration: "underline",
                             textUnderlineOffset: "2px",
                           }}
-                          onClick={() =>
-                            // eslint-disable-next-line no-console
-                            console.log("Contact us about:", invoice.number)
-                          }
+                          onClick={() => {
+                            void invoice.number;
+                          }}
                         >
                           Contact us
                         </button>
