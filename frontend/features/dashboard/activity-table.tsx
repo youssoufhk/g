@@ -123,7 +123,7 @@ export function ActivityTable() {
               <li key={row.id} className="activity-row">
                 <Link href={row.href} className="activity-type">
                   <span className="activity-type-icon" aria-hidden>
-                    <Icon size={14} />
+                    <Icon size={16} />
                   </span>
                   <span className="activity-type-text">
                     <span className="activity-type-kind">{kindLabel[row.kind]}</span>

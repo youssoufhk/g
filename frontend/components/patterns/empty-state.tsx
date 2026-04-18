@@ -16,7 +16,7 @@ function EmptyShell({ icon: Icon, title, description, action }: EmptyStateProps)
       {Icon && (
         <div className="empty-icon">
           {/* @ts-expect-error Lucide icons accept size prop at runtime */}
-          <Icon aria-hidden size={28} />
+          <Icon aria-hidden size={32} />
         </div>
       )}
       <h3 className="empty-title">{title}</h3>

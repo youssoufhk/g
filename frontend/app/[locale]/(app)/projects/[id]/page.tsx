@@ -253,7 +253,7 @@ export default function ProjectDetailPage({
               </Badge>
               <div className="separator" />
               <div className="detail-badge">
-                <CalendarDays size={14} aria-hidden="true" />
+                <CalendarDays size={16} aria-hidden="true" />
                 <span style={numStyle}>
                   {formatDate(project.start_date)}
                   {" - "}
@@ -264,7 +264,7 @@ export default function ProjectDetailPage({
           </div>
 
           <div style={{ display: "flex", gap: "var(--space-2)" }}>
-            <Button variant="secondary" size="sm" leadingIcon={<Pencil size={14} />} onClick={openEditModal}>
+            <Button variant="secondary" size="sm" leadingIcon={<Pencil size={16} />} onClick={openEditModal}>
               {t("detail_edit")}
             </Button>
             <Dropdown
@@ -275,9 +275,9 @@ export default function ProjectDetailPage({
                 </Button>
               )}
             >
-              <DropdownItem icon={<UserPlus size={14} />}>{t("detail_add_team_member")}</DropdownItem>
+              <DropdownItem icon={<UserPlus size={16} />}>{t("detail_add_team_member")}</DropdownItem>
               <DropdownDivider />
-              <DropdownItem icon={<FileText size={14} />} onClick={handleExport}>
+              <DropdownItem icon={<FileText size={16} />} onClick={handleExport}>
                 {exportLoading ? t("detail_exporting") : t("detail_export")}
               </DropdownItem>
             </Dropdown>
@@ -368,7 +368,7 @@ export default function ProjectDetailPage({
                     setTimeout(() => addInputRef.current?.focus(), 0);
                   }}
                 >
-                  <Plus size={14} />
+                  <Plus size={16} />
                   {t("detail_add")}
                 </Button>
               </div>
@@ -459,7 +459,7 @@ export default function ProjectDetailPage({
                             }
                           }}
                         >
-                          <Check size={14} />
+                          <Check size={16} />
                         </Button>
                       </div>
                     )}
@@ -517,7 +517,7 @@ export default function ProjectDetailPage({
                         }
                       }}
                     >
-                      <Check size={14} />
+                      <Check size={16} />
                     </Button>
                   </div>
                 ) : (

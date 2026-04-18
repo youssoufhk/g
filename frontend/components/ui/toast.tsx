@@ -86,7 +86,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               className={clsx("toast", `toast-${toast.tone}`)}
             >
               <div className="toast-icon">
-                <Icon size={18} aria-hidden />
+                <Icon size={20} aria-hidden />
               </div>
               <div className="toast-content">
                 <div className="toast-title">{toast.title}</div>
@@ -112,7 +112,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 onClick={() => dismiss(toast.id)}
                 aria-label={t("dismiss")}
               >
-                <X size={14} aria-hidden />
+                <X size={16} aria-hidden />
               </button>
             </div>
           );

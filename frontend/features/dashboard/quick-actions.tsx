@@ -61,7 +61,7 @@ export function QuickActions() {
               data-emphasis={a.emphasis ? "true" : undefined}
             >
               <span className="quick-action-pill-icon" aria-hidden>
-                <Icon size={18} />
+                <Icon size={20} />
               </span>
               <span className="quick-action-pill-text">
                 <span className="quick-action-pill-label">{a.label}</span>

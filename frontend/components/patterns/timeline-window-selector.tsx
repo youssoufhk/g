@@ -68,7 +68,7 @@ export function TimelineWindowSelector({ value, onChange, label = "Window" }: Pr
       >
         <span className="tw-selector-pill-label">{label}</span>
         <span className="tw-selector-pill-value">{current.label}</span>
-        <ChevronDown size={14} />
+        <ChevronDown size={16} />
       </button>
 
       {open && (

@@ -59,7 +59,7 @@ export function Drawer({
               onClick={onClose}
               aria-label={t("close")}
             >
-              <X size={18} aria-hidden />
+              <X size={20} aria-hidden />
             </button>
           </div>
           <div className="drawer-body">{children}</div>

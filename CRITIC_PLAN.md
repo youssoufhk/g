@@ -9,11 +9,11 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 ## Progress at a glance
 
 - Part A (UX reds, highest-visibility): 3/8
-- Part B (UI reds, atom lock-down): 10/12
+- Part B (UI reds, atom lock-down): 11/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 26/35
+Overall in-session: 27/35
 
 ---
 
@@ -67,7 +67,7 @@ Overall in-session: 26/35
 
 13. [x] **B5 [C13]** Enforce tabular numerals globally: add `font-feature-settings: "tnum"` to `.data-table td`, `.kpi-value`, `.stat-pill` in `styles/components.css`.
 
-14. [ ] **B6 [E23+E24]** Single `<Icon>` wrapper in `components/ui/icon.tsx` that enforces stroke-width 1.5 and accepts only `xs|sm|md|lg|xl` sizes mapped to 12/16/20/24/32. Ban raw `size={14|18}` via an ESLint rule.
+14. [x] **B6 [E23+E24]** Single `<Icon>` wrapper in `components/ui/icon.tsx` that enforces stroke-width 1.5 and accepts only `xs|sm|md|lg|xl` sizes mapped to 12/16/20/24/32. Raw non-canonical sizes (10/11/14/15/18/22/28/40) banned via the `no-raw-icon-size` pre-commit hook.
 
 15. [x] **B7 [B8]** Accent overuse: remove accent from KPI icons and preview chips; keep accent only for one primary action per region (dashboard AI-invoice card stays; nav selected indicator and insight banner lose it).
 

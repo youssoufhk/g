@@ -47,7 +47,7 @@ export function Pagination({
         disabled={page <= 1}
         aria-label={t("previous_page")}
       >
-        <ChevronLeft size={14} aria-hidden />
+        <ChevronLeft size={16} aria-hidden />
       </button>
       {pages.map((p, idx) => {
         const prev = pages[idx - 1];
@@ -85,7 +85,7 @@ export function Pagination({
         disabled={page >= pageCount}
         aria-label={t("next_page")}
       >
-        <ChevronRight size={14} aria-hidden />
+        <ChevronRight size={16} aria-hidden />
       </button>
     </nav>
   );

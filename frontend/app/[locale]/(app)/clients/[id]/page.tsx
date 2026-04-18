@@ -176,7 +176,7 @@ function OverviewTab({ client }: { client: Client }) {
                     href={`mailto:${contact.email}`}
                     style={{ color: "var(--color-primary)", fontSize: "var(--text-body-sm)", textDecoration: "none", display: "flex", alignItems: "center", gap: "var(--space-1)" }}
                   >
-                    <Mail size={14} aria-hidden />
+                    <Mail size={16} aria-hidden />
                     {contact.email}
                   </a>
                 </div>
@@ -420,7 +420,7 @@ export default function ClientProfilePage({
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >
-                    <Users size={14} aria-hidden />
+                    <Users size={16} aria-hidden />
                     {t("detail_team_members", { count: client.team_size })}
                   </span>
                 )}
@@ -430,7 +430,7 @@ export default function ClientProfilePage({
             {/* Actions */}
             <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0 }}>
               <Button variant="secondary" size="sm" onClick={openEdit}>{t("detail_edit")}</Button>
-              <Button variant="primary" size="sm" leadingIcon={<Receipt size={14} aria-hidden />} onClick={() => setShowInvoiceModal(true)}>
+              <Button variant="primary" size="sm" leadingIcon={<Receipt size={16} aria-hidden />} onClick={() => setShowInvoiceModal(true)}>
                 {t("detail_new_invoice")}
               </Button>
             </div>

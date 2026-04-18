@@ -50,7 +50,7 @@ export function InsightBanner({ firstName }: { firstName?: string }) {
         </div>
         <Link href="/timesheets" className="insight-card-action">
           {t("insight_cta_review")}
-          <ArrowUpRight size={14} aria-hidden />
+          <ArrowUpRight size={16} aria-hidden />
         </Link>
       </div>
     </section>

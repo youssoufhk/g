@@ -119,7 +119,7 @@ function RangeComposer({
         </div>
       </div>
       <div className="range-composer-row" style={{ justifyContent: "flex-end" }}>
-        <Button variant="ghost" size="sm" type="button" leadingIcon={<X size={14} aria-hidden />} onClick={onCancel}>
+        <Button variant="ghost" size="sm" type="button" leadingIcon={<X size={16} aria-hidden />} onClick={onCancel}>
           {t("composer_cancel")}
         </Button>
         <Button variant="primary" size="sm" type="submit" loading={submitting} disabled={!type}>

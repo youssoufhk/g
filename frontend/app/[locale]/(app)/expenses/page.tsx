@@ -312,7 +312,7 @@ function ExpenseItem({
             marginLeft: "calc(44px + var(--space-4) + var(--space-4))",
           }}
         >
-          <AlertCircle size={14} aria-hidden />
+          <AlertCircle size={16} aria-hidden />
           <span>{expense.rejection_reason}</span>
         </div>
       )}
@@ -820,7 +820,7 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
           aria-label={t("upload_receipt_aria")}
         >
           <UploadCloud
-            size={40}
+            size={32}
             aria-hidden
             style={{ color: isOcrProcessing ? "var(--color-info)" : "var(--color-text-3)" }}
           />
@@ -870,7 +870,7 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
             borderRadius: "var(--radius-md)",
           }}
         >
-          <Sparkles size={14} aria-hidden />
+          <Sparkles size={16} aria-hidden />
           <span>{t("ocr_prefill_hint")}</span>
         </div>
       </div>

@@ -291,13 +291,13 @@ function InvoiceActions({
       )}
     >
       <DropdownItem
-        icon={<FileText size={14} aria-hidden />}
+        icon={<FileText size={16} aria-hidden />}
         onClick={() => router.push(`/invoices/${invoice.id}`)}
       >
         {t("action_view")}
       </DropdownItem>
       <DropdownItem
-        icon={<Download size={14} aria-hidden />}
+        icon={<Download size={16} aria-hidden />}
         onClick={() => onDownload(invoice.id)}
       >
         {t("action_download")}
@@ -306,7 +306,7 @@ function InvoiceActions({
         <>
           <DropdownDivider />
           <DropdownItem
-            icon={<Send size={14} aria-hidden />}
+            icon={<Send size={16} aria-hidden />}
             onClick={() => onStatusChange(invoice.id, "sent")}
           >
             {t("action_send")}
@@ -317,7 +317,7 @@ function InvoiceActions({
         <>
           <DropdownDivider />
           <DropdownItem
-            icon={<CheckCircle size={14} aria-hidden />}
+            icon={<CheckCircle size={16} aria-hidden />}
             onClick={() => onStatusChange(invoice.id, "paid")}
           >
             {t("action_mark_paid")}
@@ -328,7 +328,7 @@ function InvoiceActions({
         <>
           <DropdownDivider />
           <DropdownItem
-            icon={<Ban size={14} aria-hidden />}
+            icon={<Ban size={16} aria-hidden />}
             destructive
             onClick={() => onStatusChange(invoice.id, "void")}
           >
@@ -544,7 +544,7 @@ export default function InvoicesPage() {
               gap: "var(--space-2)",
             }}
           >
-            <Download size={14} aria-hidden />
+            <Download size={16} aria-hidden />
             {t("preparing_pdf")}
           </div>
         )}
@@ -604,7 +604,7 @@ export default function InvoicesPage() {
                               <Button
                                 variant="primary"
                                 size="sm"
-                                leadingIcon={<Plus size={14} aria-hidden />}
+                                leadingIcon={<Plus size={16} aria-hidden />}
                                 onClick={() => setShowNewModal(true)}
                               >
                                 {t("new_invoice")}

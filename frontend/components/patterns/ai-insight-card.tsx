@@ -59,7 +59,7 @@ export function AIInsightCard({
             onClick={onDismiss}
             aria-label={t("dismiss_insight")}
           >
-            <X size={14} aria-hidden />
+            <X size={16} aria-hidden />
           </button>
         )}
       </div>

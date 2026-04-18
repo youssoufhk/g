@@ -42,7 +42,7 @@ export function ResourcesFilterBar({
   return (
     <div className="resources-filter-bar" role="search">
       <div className="resources-filter-search">
-        <Search size={14} className="resources-filter-search-icon" aria-hidden />
+        <Search size={16} className="resources-filter-search-icon" aria-hidden />
         <input
           type="search"
           value={search}

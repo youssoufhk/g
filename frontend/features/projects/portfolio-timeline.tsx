@@ -122,7 +122,7 @@ export function PortfolioTimeline({ projects, weekCount, todayWeekIndex = 1 }: P
                             className="capacity-timeline-over-chip"
                             aria-label={t("status_at_risk")}
                           >
-                            <AlertTriangle size={10} />
+                            <AlertTriangle size={12} />
                           </span>
                         ) : null}
                       </div>
@@ -148,7 +148,7 @@ export function PortfolioTimeline({ projects, weekCount, todayWeekIndex = 1 }: P
                         </span>
                       </div>
                     </div>
-                    <ArrowUpRight size={14} className="capacity-timeline-person-arrow" />
+                    <ArrowUpRight size={16} className="capacity-timeline-person-arrow" />
                   </Link>
 
                   <div

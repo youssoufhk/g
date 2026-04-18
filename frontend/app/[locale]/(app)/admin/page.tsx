@@ -235,7 +235,7 @@ function CardHeader({
             onClick={onToggle}
             aria-label={expanded ? toggleLabels?.collapse ?? "" : toggleLabels?.expand ?? ""}
           >
-            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </Button>
         )}
       </div>
@@ -500,7 +500,7 @@ function UsersCard({
             <Button
               variant="secondary"
               size="sm"
-              leadingIcon={<Plus size={14} />}
+              leadingIcon={<Plus size={16} />}
               onClick={() => setInviteOpen(true)}
             >
               {t("invite_user")}
@@ -579,20 +579,20 @@ function UsersCard({
                         aria-expanded={open}
                         onClick={toggle}
                       >
-                        <MoreHorizontal size={14} />
+                        <MoreHorizontal size={16} />
                       </Button>
                     )}
                   >
-                    <DropdownItem icon={<Settings size={14} />} onClick={() => setEditRoleUser(user)}>
+                    <DropdownItem icon={<Settings size={16} />} onClick={() => setEditRoleUser(user)}>
                       {t("action_edit_role")}
                     </DropdownItem>
                     {user.status === "active" && (
-                      <DropdownItem icon={<Shield size={14} />} destructive onClick={() => handleDeactivate(user.id)}>
+                      <DropdownItem icon={<Shield size={16} />} destructive onClick={() => handleDeactivate(user.id)}>
                         {t("action_deactivate")}
                       </DropdownItem>
                     )}
                     {user.status === "pending" && (
-                      <DropdownItem icon={<Mail size={14} />} onClick={() => {}}>
+                      <DropdownItem icon={<Mail size={16} />} onClick={() => {}}>
                         {t("action_resend_invite")}
                       </DropdownItem>
                     )}
@@ -722,7 +722,7 @@ function AuditLogCard() {
         icon={<ClipboardList size={16} />}
         title={t("card_audit_title")}
         action={
-          <Button variant="secondary" size="sm" leadingIcon={<Download size={14} />} onClick={handleExport} disabled={exporting} aria-busy={exporting}>
+          <Button variant="secondary" size="sm" leadingIcon={<Download size={16} />} onClick={handleExport} disabled={exporting} aria-busy={exporting}>
             {exporting ? t("audit_exporting") : t("audit_export")}
           </Button>
         }

@@ -37,6 +37,7 @@ export { Drawer, type DrawerProps } from "./drawer";
 export { ToastProvider, useToast } from "./toast";
 export { Tooltip } from "./tooltip";
 export { SearchInput, type SearchInputProps } from "./search-input";
+export { Icon, type IconProps, type IconSize } from "./icon";
 
 // New in Phase 4 design review.
 export {

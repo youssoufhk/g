@@ -308,7 +308,7 @@ export default function EmployeeProfilePage({
               <Button
                 variant="secondary"
                 size="sm"
-                leadingIcon={<Pencil size={14} />}
+                leadingIcon={<Pencil size={16} />}
                 onClick={openEditModal}
               >
                 {t("detail_edit_profile")}
@@ -328,14 +328,14 @@ export default function EmployeeProfilePage({
                   </Button>
                 )}
               >
-                <DropdownItem icon={<Receipt size={14} />} onClick={() => setActiveTab("expenses")}>
+                <DropdownItem icon={<Receipt size={16} />} onClick={() => setActiveTab("expenses")}>
                   {t("detail_view_expenses")}
                 </DropdownItem>
-                <DropdownItem icon={<Umbrella size={14} />} onClick={() => setActiveTab("leaves")}>
+                <DropdownItem icon={<Umbrella size={16} />} onClick={() => setActiveTab("leaves")}>
                   {t("detail_view_leaves")}
                 </DropdownItem>
                 <DropdownDivider />
-                <DropdownItem icon={<FileText size={14} />} onClick={handleExport}>
+                <DropdownItem icon={<FileText size={16} />} onClick={handleExport}>
                   {exportLoading ? t("detail_exporting") : t("detail_export_profile")}
                 </DropdownItem>
               </Dropdown>

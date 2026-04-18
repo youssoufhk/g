@@ -43,7 +43,7 @@ export function AiRecommendations({
     <section className="ai-recs" aria-labelledby="ai-recs-title">
       <header className="ai-recs-header">
         <span className="ai-recs-icon" aria-hidden>
-          <Sparkles size={14} />
+          <Sparkles size={16} />
         </span>
         <div className="ai-recs-title-group">
           <span className="ai-recs-overline">{resolvedOverline}</span>
@@ -58,7 +58,7 @@ export function AiRecommendations({
             <li key={it.id} className="ai-recs-card" data-tone={it.tone ?? "primary"}>
               {Icon && (
                 <span className="ai-recs-card-icon" aria-hidden>
-                  <Icon size={14} />
+                  <Icon size={16} />
                 </span>
               )}
               <div className="ai-recs-card-body">

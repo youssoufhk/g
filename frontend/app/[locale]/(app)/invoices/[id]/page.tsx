@@ -364,7 +364,7 @@ export default function InvoiceDetailPage({
             <Button
               variant="secondary"
               size="sm"
-              leadingIcon={<Download size={14} aria-hidden />}
+              leadingIcon={<Download size={16} aria-hidden />}
               loading={isDownloading}
               onClick={handleDownload}
             >
@@ -374,7 +374,7 @@ export default function InvoiceDetailPage({
               <Button
                 variant="primary"
                 size="sm"
-                leadingIcon={<CheckCircle size={14} aria-hidden />}
+                leadingIcon={<CheckCircle size={16} aria-hidden />}
                 onClick={handleMarkPaid}
               >
                 {t("action_mark_paid")}
@@ -384,7 +384,7 @@ export default function InvoiceDetailPage({
               <Button
                 variant="ghost"
                 size="sm"
-                leadingIcon={<Ban size={14} aria-hidden />}
+                leadingIcon={<Ban size={16} aria-hidden />}
                 onClick={handleVoid}
               >
                 {t("action_void")}

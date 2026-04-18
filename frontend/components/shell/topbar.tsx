@@ -90,7 +90,7 @@ export function Topbar({
           onClick={onOpenNotifications}
           aria-label={t("notifications")}
         >
-          <Bell size={18} aria-hidden />
+          <Bell size={20} aria-hidden />
           <span className="notif-dot" aria-hidden />
         </button>
 

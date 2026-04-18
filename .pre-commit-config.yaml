@@ -95,6 +95,17 @@ repos:
             frontend/components/design-system/.*
           )$
 
+      - id: no-raw-icon-size
+        name: Icons must use canonical sizes (12/16/20/24/32) (CRITIC_PLAN B6)
+        language: system
+        entry: python3 scripts/hooks/no_raw_icon_size.py
+        files: '^frontend/(components|features|app|lib|hooks|stores)/.*\.(tsx|jsx|ts|js)$'
+        exclude: |
+          (?x)^(
+            frontend/tests/.*|
+            frontend/components/design-system/.*
+          )$
+
       - id: no-icon-only-button-without-aria-label
         name: Icon-only buttons must carry an aria-label (CRITIC_PLAN C15)
         language: system

@@ -453,7 +453,7 @@ export default function CalendarPage() {
             openAddModal(date);
           }}
         >
-          <Plus size={14} />
+          <Plus size={16} />
           {t("add_event")}
         </Button>
       </div>
@@ -704,7 +704,7 @@ export default function CalendarPage() {
                     cursor: "pointer",
                   }}
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </button>
               </div>
 
@@ -786,7 +786,7 @@ export default function CalendarPage() {
                   size="sm"
                   onClick={() => openAddModal(selectedDate)}
                 >
-                  <Plus size={14} />
+                  <Plus size={16} />
                   {t("add_event")}
                 </Button>
               </div>

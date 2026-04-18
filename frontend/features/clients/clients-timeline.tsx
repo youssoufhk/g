@@ -144,7 +144,7 @@ export function ClientsTimeline({ clients, weekCount, todayWeekIndex = 1 }: Prop
                             className="capacity-timeline-over-chip"
                             aria-label={t("status_at_risk")}
                           >
-                            <AlertTriangle size={10} />
+                            <AlertTriangle size={12} />
                           </span>
                         ) : null}
                         {renewalChip ? (
@@ -175,7 +175,7 @@ export function ClientsTimeline({ clients, weekCount, todayWeekIndex = 1 }: Prop
                         </span>
                       </div>
                     </div>
-                    <ArrowUpRight size={14} className="capacity-timeline-person-arrow" />
+                    <ArrowUpRight size={16} className="capacity-timeline-person-arrow" />
                   </Link>
 
                   <div

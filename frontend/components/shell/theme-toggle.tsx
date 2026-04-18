@@ -47,9 +47,9 @@ export function ThemeToggle() {
       suppressHydrationWarning
     >
       {mounted && theme === "dark" ? (
-        <Sun size={18} aria-hidden />
+        <Sun size={20} aria-hidden />
       ) : (
-        <Moon size={18} aria-hidden />
+        <Moon size={20} aria-hidden />
       )}
     </button>
   );

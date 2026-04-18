@@ -111,14 +111,14 @@ export function MultiSelectPill({
             <X size={12} />
           </span>
         ) : (
-          <ChevronDown size={14} className="ms-pill-chevron" />
+          <ChevronDown size={16} className="ms-pill-chevron" />
         )}
       </button>
 
       {open && (
         <div className="ms-pill-panel" role="listbox" aria-label={label}>
           <div className="ms-pill-panel-search">
-            <Search size={14} className="ms-pill-panel-search-icon" aria-hidden />
+            <Search size={16} className="ms-pill-panel-search-icon" aria-hidden />
             <input
               type="text"
               value={query}

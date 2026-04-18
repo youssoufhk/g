@@ -635,7 +635,7 @@ export default function TimesheetsPage() {
             size="sm"
             disabled={!canSubmit}
             loading={isSubmitting}
-            leadingIcon={isSubmitted ? <CheckCircle size={14} aria-hidden /> : <Send size={14} aria-hidden />}
+            leadingIcon={isSubmitted ? <CheckCircle size={16} aria-hidden /> : <Send size={16} aria-hidden />}
             onClick={handleSubmit}
           >
             {isSubmitting ? t("submitting") : isSubmitted ? t("submitted_label") : t("submit_week")}
@@ -833,7 +833,7 @@ export default function TimesheetsPage() {
             <Button
               variant="ghost"
               size="sm"
-              leadingIcon={<Plus size={14} aria-hidden />}
+              leadingIcon={<Plus size={16} aria-hidden />}
               onClick={() => setAddRowOpen(true)}
             >
               {t("add_row")}

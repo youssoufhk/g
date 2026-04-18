@@ -52,11 +52,11 @@ export default function AppError({
             className="btn btn-primary"
             onClick={() => reset()}
           >
-            <RotateCw size={14} aria-hidden />
+            <RotateCw size={16} aria-hidden />
             {t("retry")}
           </button>
           <Link href="/dashboard" className="btn btn-secondary">
-            <Home size={14} aria-hidden />
+            <Home size={16} aria-hidden />
             {t("back_home")}
           </Link>
         </div>

@@ -284,7 +284,7 @@ export default function AccountPage() {
                     cursor: "pointer", color: "var(--color-text-2)",
                   }}
                 >
-                  <Camera size={11} aria-hidden />
+                  <Camera size={12} aria-hidden />
                 </button>
               </div>
 
@@ -323,7 +323,7 @@ export default function AccountPage() {
           {/* Profile card - full width */}
           <div className="card" style={{ gridColumn: "1 / -1" }}>
             <div className="card-body" aria-busy={profileSaving} aria-live="polite">
-              <SectionHeading icon={<User size={15} aria-hidden />} title={t("profile_title")} description={t("profile_desc")} />
+              <SectionHeading icon={<User size={16} aria-hidden />} title={t("profile_title")} description={t("profile_desc")} />
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--space-4)" }} className="profile-form-grid">
                 <div>
                   {label(t("field_name"), "profile-name")}
@@ -370,7 +370,7 @@ export default function AccountPage() {
           {/* Security card */}
           <div className="card">
             <div className="card-body" aria-busy={mfaToggling} aria-live="polite">
-              <SectionHeading icon={<Key size={15} aria-hidden />} title={t("security_title")} description={t("security_desc")} />
+              <SectionHeading icon={<Key size={16} aria-hidden />} title={t("security_title")} description={t("security_desc")} />
 
               {/* Password row */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "var(--space-4)", borderBottom: "1px solid var(--color-border)", gap: "var(--space-4)" }}>
@@ -385,7 +385,7 @@ export default function AccountPage() {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "var(--space-4)", gap: "var(--space-4)" }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-                    <Shield size={14} style={{ color: "var(--color-text-3)" }} aria-hidden />
+                    <Shield size={16} style={{ color: "var(--color-text-3)" }} aria-hidden />
                     <span style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-1)" }}>{t("security_mfa")}</span>
                     <Badge tone={mfaEnabled ? "success" : "default"}>{mfaEnabled ? t("security_mfa_on") : t("security_mfa_off")}</Badge>
                   </div>
@@ -403,7 +403,7 @@ export default function AccountPage() {
           {/* Active sessions card (preferences slot: sessions) */}
           <div className="card">
             <div className="card-body" style={{ paddingBottom: 0 }}>
-              <SectionHeading icon={<Settings size={15} aria-hidden />} title={t("sessions_title")} description={t("sessions_desc")} />
+              <SectionHeading icon={<Settings size={16} aria-hidden />} title={t("sessions_title")} description={t("sessions_desc")} />
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               {sessions.map((session, i) => (
@@ -421,7 +421,7 @@ export default function AccountPage() {
                         {session.isCurrent && <Badge tone="success" dot>{t("session_now")}</Badge>}
                       </div>
                       <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", display: "flex", alignItems: "center", gap: "var(--space-1)", fontVariantNumeric: "tabular-nums" }}>
-                        <Globe size={10} aria-hidden />
+                        <Globe size={12} aria-hidden />
                         {session.browser} &middot; {session.location}
                         {!session.isCurrent && session.lastActiveIso && (
                           <span style={{ marginLeft: "var(--space-1)" }}>&middot; {formatDate(session.lastActiveIso)}</span>
@@ -447,7 +447,7 @@ export default function AccountPage() {
           {/* Notifications card - full width */}
           <div className="card" style={{ gridColumn: "1 / -1" }}>
             <div className="card-body" style={{ paddingBottom: "var(--space-4)" }}>
-              <SectionHeading icon={<Bell size={15} aria-hidden />} title={t("notifications_title")} description={t("notifications_desc")} />
+              <SectionHeading icon={<Bell size={16} aria-hidden />} title={t("notifications_title")} description={t("notifications_desc")} />
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 0, borderTop: "1px solid var(--color-border)" }} className="notif-grid">
               {prefs.map((pref, i) => (

@@ -128,7 +128,7 @@ function ApprovalCard({ item, showActions, selected, onToggleSelect, onApprove, 
         </div>
         {item.urgency === "high" && (
           <Badge tone="error">
-            <AlertCircle size={11} aria-hidden style={{ marginRight: 3 }} />
+            <AlertCircle size={12} aria-hidden style={{ marginRight: 3 }} />
             {t("urgent")}
           </Badge>
         )}
@@ -250,7 +250,7 @@ function SearchBar({ value, onChange, placeholder }: { value: string; onChange: 
         padding: "var(--space-2) var(--space-3)",
       }}
     >
-      <Search size={14} style={{ color: "var(--color-text-3)", flexShrink: 0 }} aria-hidden />
+      <Search size={16} style={{ color: "var(--color-text-3)", flexShrink: 0 }} aria-hidden />
       <input
         type="search"
         placeholder={placeholder}
@@ -518,7 +518,7 @@ export default function ApprovalsPage() {
                     <Button variant="ghost" size="sm" style={{ color: "var(--color-error)" }} onClick={bulkReject}>
                       {t("bulk_reject", { count: selected.size })}
                     </Button>
-                    <Button variant="primary" size="sm" leadingIcon={<CheckCircle2 size={14} aria-hidden />} onClick={bulkApprove}>
+                    <Button variant="primary" size="sm" leadingIcon={<CheckCircle2 size={16} aria-hidden />} onClick={bulkApprove}>
                       {t("bulk_approve", { count: selected.size })}
                     </Button>
                   </div>

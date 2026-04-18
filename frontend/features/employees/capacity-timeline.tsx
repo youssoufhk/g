@@ -234,7 +234,7 @@ export function CapacityTimeline({ people, weekCount, todayWeekIndex = 1 }: Prop
                         <span className="capacity-timeline-person-name">{person.name}</span>
                         {isOver ? (
                           <span className="capacity-timeline-over-chip" aria-label={t("over_capacity")}>
-                            <AlertTriangle size={10} />
+                            <AlertTriangle size={12} />
                           </span>
                         ) : null}
                       </div>
@@ -253,7 +253,7 @@ export function CapacityTimeline({ people, weekCount, todayWeekIndex = 1 }: Prop
                         </span>
                       </div>
                     </div>
-                    <ArrowUpRight size={14} className="capacity-timeline-person-arrow" />
+                    <ArrowUpRight size={16} className="capacity-timeline-person-arrow" />
                   </Link>
 
                   <div
