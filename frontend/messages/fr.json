@@ -936,6 +936,7 @@
   },
   "timesheets": {
     "page_title": "Feuilles de temps",
+    "builder_degraded_notice": "Les cellules de la grille sont des donnees de demonstration. L'enregistrement arrive a la prochaine release.",
     "status_draft": "Brouillon",
     "status_submitted": "Soumise",
     "status_approved": "Approuvee",

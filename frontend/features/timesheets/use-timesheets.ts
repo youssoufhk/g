@@ -1,5 +1,9 @@
 "use client";
 import { useQuery, useMutation } from "@tanstack/react-query";
+
+import { apiFetch } from "@/lib/api-client";
+import { USE_API } from "@/lib/api-mode";
+
 import type { TimesheetWeek } from "./types";
 
 /**
@@ -14,6 +18,22 @@ export function getWeekDates(weekStart: string): string[] {
     dates.push(d.toISOString().slice(0, 10));
   }
   return dates;
+}
+
+/**
+ * ISO-8601 week number for a given YYYY-MM-DD Monday.
+ * The backend keys weeks by (iso_year, iso_week), so we compute both
+ * to look up the matching envelope from /timesheets/weeks.
+ */
+function isoYearWeek(mondayIso: string): { iso_year: number; iso_week: number } {
+  const d = new Date(mondayIso + "T00:00:00Z");
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const iso_week = Math.ceil(
+    ((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7,
+  );
+  return { iso_year: d.getUTCFullYear(), iso_week };
 }
 
 function buildMockWeek(weekStart: string): TimesheetWeek {
@@ -81,12 +101,58 @@ function buildMockWeek(weekStart: string): TimesheetWeek {
   };
 }
 
+type TimesheetWeekEnvelopeDto = {
+  id: number;
+  employee_id: number;
+  iso_year: number;
+  iso_week: number;
+  status: "draft" | "submitted" | "approved" | string;
+  submitted_at: string | null;
+  approved_at: string | null;
+  created_at: string;
+};
+
+type TimesheetWeeksListDto = {
+  items: TimesheetWeekEnvelopeDto[];
+  total: number;
+};
+
+/**
+ * One-off feature flag for the timesheet grid: even in USE_API mode the
+ * grid cells (entries + daily totals) are generated client-side because
+ * the backend only exposes the week envelope today. Pages consume this
+ * so they can surface a "mock data" degraded banner until the write
+ * endpoints land. See CRITIC_PLAN A2 and D5.
+ */
+export const TIMESHEET_BUILDER_MODE: "mock" | "api" = "mock";
+
 export function useTimesheetWeek(weekStart: string) {
   return useQuery<TimesheetWeek>({
-    queryKey: ["timesheet-week", weekStart],
+    queryKey: ["timesheet-week", USE_API ? "api" : "mock", weekStart],
     queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 200));
-      return buildMockWeek(weekStart);
+      const base = buildMockWeek(weekStart);
+      if (!USE_API) {
+        await new Promise((r) => setTimeout(r, 200));
+        return base;
+      }
+      // Live arm: read the week envelope list and overlay status onto
+      // the mock-built grid. Entries + daily totals stay mock until the
+      // write endpoint lands (CRITIC_PLAN D5).
+      const { iso_year, iso_week } = isoYearWeek(weekStart);
+      const data = await apiFetch<TimesheetWeeksListDto>(
+        `/timesheets/weeks?limit=500&offset=0`,
+      );
+      const envelope = data.items.find(
+        (w) => w.iso_year === iso_year && w.iso_week === iso_week,
+      );
+      if (!envelope) return base;
+      const status: TimesheetWeek["status"] =
+        envelope.status === "submitted" ||
+        envelope.status === "approved" ||
+        envelope.status === "draft"
+          ? envelope.status
+          : "draft";
+      return { ...base, status };
     },
     staleTime: 30_000,
   });
@@ -95,6 +161,9 @@ export function useTimesheetWeek(weekStart: string) {
 export function useSubmitTimesheet() {
   return useMutation({
     mutationFn: async (_weekStart: string) => {
+      // Write path is mock-only: the backend /timesheets/weeks endpoint
+      // is read-only today. Flipping this arm to apiFetch is a one-line
+      // change once the submit endpoint lands (CRITIC_PLAN D5).
       await new Promise((r) => setTimeout(r, 200));
       return { success: true };
     },

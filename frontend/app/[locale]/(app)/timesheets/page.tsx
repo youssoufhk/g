@@ -34,6 +34,7 @@ import {
 import {
   useTimesheetWeek,
   getWeekDates,
+  TIMESHEET_BUILDER_MODE,
 } from "@/features/timesheets/use-timesheets";
 import { TimesheetsKpis } from "@/features/timesheets/timesheets-kpis";
 import type { TimesheetEntry } from "@/features/timesheets/types";
@@ -522,6 +523,13 @@ export default function TimesheetsPage() {
           title={t("page_title")}
           actions={week ? <StatusBadge status={weekStatus} /> : undefined}
         />
+
+        {TIMESHEET_BUILDER_MODE === "mock" ? (
+          <div role="status" aria-live="polite" className="degraded-banner" data-testid="timesheets-degraded">
+            <AlertTriangle size={16} aria-hidden />
+            <span className="degraded-banner-text">{t("builder_degraded_notice")}</span>
+          </div>
+        ) : null}
 
         <AiRecommendations
           items={recommendations}

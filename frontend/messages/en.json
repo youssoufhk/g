@@ -936,6 +936,7 @@
   },
   "timesheets": {
     "page_title": "Timesheets",
+    "builder_degraded_notice": "Grid cells are sample data for now. Submit is wired but write endpoints ship with the next release.",
     "status_draft": "Draft",
     "status_submitted": "Submitted",
     "status_approved": "Approved",

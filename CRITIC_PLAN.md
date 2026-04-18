@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 6/8
+- Part A (UX reds, highest-visibility): 7/8
 - Part B (UI reds, atom lock-down): 11/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 30/35
+Overall in-session: 31/35
 
 ---
 
@@ -27,7 +27,7 @@ Overall in-session: 30/35
    - `features/invoices/use-invoices.ts:48`
    - `features/employees/use-employees.ts` (audit - likely clean)
 
-2. [ ] **A2 [Timesheets mock-only]** Wire `features/timesheets/use-timesheets.ts` to backend with USE_API dual arm. Verify backend `/api/v1/timesheets/weeks` list works; keep week-builder on mock until write flow lands, but label it degraded.
+2. [x] **A2 [Timesheets mock-only]** `use-timesheets.ts` now dual-arms via USE_API. Live arm calls `/api/v1/timesheets/weeks`, looks up the envelope by (iso_year, iso_week), and overlays status onto the client-side builder. `TIMESHEET_BUILDER_MODE` export drives a degraded banner on the timesheets page until the write endpoints land (D5).
 
 3. [ ] **A3 [C18]** Retrofit `lib/optimistic.ts::useOptimisticMutation` into approvals + leaves + expenses + invoices mutation paths. Currently dead code.
 
