@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 3/8
+- Part A (UX reds, highest-visibility): 4/8
 - Part B (UI reds, atom lock-down): 11/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 27/35
+Overall in-session: 28/35
 
 ---
 
@@ -48,7 +48,7 @@ Overall in-session: 27/35
    - `app/[locale]/(app)/projects/[id]/page.tsx`
    - `app/[locale]/(app)/invoices/[id]/page.tsx`
 
-8. [ ] **A8 [E34/E35]** AI insight cards: add "Why this insight?" expandable signal chips traceable to the analyzer on dashboard insight banner.
+8. [x] **A8 [E34/E35]** AI insight cards: "Why this insight?" toggle on the dashboard banner expands a chip row with three traceable signals (pending_count, iso_week(last), timesheet_submit_deadline). Keyboard accessible via aria-expanded/aria-controls.
 
 ---
 

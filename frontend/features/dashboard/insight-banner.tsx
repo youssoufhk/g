@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, ChevronDown, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -14,10 +15,35 @@ function useGreeting() {
   return t("greeting_evening");
 }
 
+type InsightSignal = {
+  key: string;
+  label: string;
+  source: string;
+};
+
 export function InsightBanner({ firstName }: { firstName?: string }) {
   const locale = useLocale();
   const t = useTranslations("dashboard");
   const greeting = useGreeting();
+  const [showWhy, setShowWhy] = useState(false);
+
+  const signals: InsightSignal[] = [
+    {
+      key: "count",
+      label: t("insight_signal_count", { count: 2 }),
+      source: "timesheets.pending_count",
+    },
+    {
+      key: "window",
+      label: t("insight_signal_window"),
+      source: "timesheets.iso_week(last)",
+    },
+    {
+      key: "deadline",
+      label: t("insight_signal_deadline"),
+      source: "policy.timesheet_submit_deadline",
+    },
+  ];
 
   return (
     <section aria-labelledby="insight-greeting" className="flex flex-col gap-5">
@@ -48,11 +74,42 @@ export function InsightBanner({ firstName }: { firstName?: string }) {
             })}
           </p>
         </div>
+        <button
+          type="button"
+          className="insight-card-why"
+          aria-expanded={showWhy}
+          aria-controls="insight-signals"
+          onClick={() => setShowWhy((v) => !v)}
+        >
+          {t("insight_why")}
+          <ChevronDown
+            size={12}
+            aria-hidden
+            style={{
+              transform: showWhy ? "rotate(180deg)" : undefined,
+              transition: "transform var(--motion-fast) var(--ease-out)",
+            }}
+          />
+        </button>
         <Link href="/timesheets" className="insight-card-action">
           {t("insight_cta_review")}
           <ArrowUpRight size={16} aria-hidden />
         </Link>
       </div>
+      {showWhy ? (
+        <ul
+          id="insight-signals"
+          className="insight-signals"
+          aria-label={t("insight_signals_label")}
+        >
+          {signals.map((signal) => (
+            <li key={signal.key} className="insight-signal-chip">
+              <span className="insight-signal-label">{signal.label}</span>
+              <code className="insight-signal-source">{signal.source}</code>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </section>
   );
 }
