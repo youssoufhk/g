@@ -149,6 +149,9 @@ export default function OnboardingPage() {
 
   return (
     <ErrorBoundary fallback={errorFallback}>
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
+      </div>
       <div
         style={{
           display: "flex",
@@ -160,7 +163,51 @@ export default function OnboardingPage() {
       >
         <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
-        <Stepper current={step} steps={STEPS} />
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            background: "var(--color-surface-0)",
+            paddingTop: "var(--space-2)",
+            paddingBottom: "var(--space-2)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-2)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              gap: "var(--space-3)",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "var(--text-overline)",
+                fontWeight: "var(--weight-semibold)",
+                color: "var(--color-text-3)",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {t("progress_label", { current: step, total: STEPS.length })}
+            </span>
+            <span
+              style={{
+                fontSize: "var(--text-body-sm)",
+                fontWeight: "var(--weight-semibold)",
+                color: "var(--color-text-1)",
+              }}
+            >
+              {currentStepLabel}
+            </span>
+          </div>
+          <Stepper current={step} steps={STEPS} />
+        </div>
 
         {/* Announces step transitions to screen readers */}
         <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -169,35 +216,41 @@ export default function OnboardingPage() {
 
         {step === 1 && <WelcomeStep t={t} onNext={() => setStep(2)} />}
 
-        {step === 2 && !previewMutation.isPending && (
-          <UploadStep
-            t={t}
-            entityType={entityType}
-            onEntityChange={(et) => { setEntityType(et); previewMutation.reset(); }}
-            file={file}
-            onFileChange={handleFileChange}
-            fileError={fileError}
-            onBack={() => setStep(1)}
-            onPreview={runPreview}
-            pending={previewMutation.isPending}
-            error={previewMutation.error ? humanizePreviewError(previewMutation.error) : null}
-          />
+        {step === 2 && (
+          <div aria-busy={previewMutation.isPending} aria-live="polite">
+            {previewMutation.isPending ? (
+              <PreviewSkeleton t={t} />
+            ) : (
+              <UploadStep
+                t={t}
+                entityType={entityType}
+                onEntityChange={(et) => { setEntityType(et); previewMutation.reset(); }}
+                file={file}
+                onFileChange={handleFileChange}
+                fileError={fileError}
+                onBack={() => setStep(1)}
+                onPreview={runPreview}
+                pending={previewMutation.isPending}
+                error={previewMutation.error ? humanizePreviewError(previewMutation.error) : null}
+              />
+            )}
+          </div>
         )}
 
-        {step === 2 && previewMutation.isPending && <PreviewSkeleton t={t} />}
-
         {step === 3 && preview && (
-          <PreviewStep
-            t={t}
-            preview={preview}
-            entityType={entityType}
-            editedMapping={editedMapping}
-            onMappingChange={setEditedMapping}
-            onBack={() => setStep(2)}
-            onConfirm={runCommit}
-            pending={commitMutation.isPending}
-            error={commitMutation.error ? humanizeCommitError(commitMutation.error) : null}
-          />
+          <div aria-busy={commitMutation.isPending} aria-live="polite">
+            <PreviewStep
+              t={t}
+              preview={preview}
+              entityType={entityType}
+              editedMapping={editedMapping}
+              onMappingChange={setEditedMapping}
+              onBack={() => setStep(2)}
+              onConfirm={runCommit}
+              pending={commitMutation.isPending}
+              error={commitMutation.error ? humanizeCommitError(commitMutation.error) : null}
+            />
+          </div>
         )}
 
         {step === 4 && (
