@@ -647,5 +647,6 @@ Append one line per completed pass. Do not delete past entries.
 - 2026-04-18: D12a apply @audited + @gated_feature to mutating routes in auth, admin, imports (7 routes, 5 `z2-lint: ok` deferrals removed); stub AsyncSession autouse fixture added to conftest so unit tests no longer require a live DB (138 tests pass).
 - 2026-04-18: D12b Idempotency-Key middleware + idempotency_keys migration (20260418_1400) + 6 integration tests (audit row written, 402 on killed feature, 200->200 replay, body-mismatch 409, missing-header passthrough, non-mutating passthrough). §8.5 decorator sweep complete (144 tests pass).
 - 2026-04-18: D13 confidential-tier migration (20260418_1500) adds employee_compensation, employee_banking, employees.protected_status_encrypted; pgcrypto-stub `core/crypto.py` with swappable backend per M1 + 5 tests lock the Phase 7 CMEK contract (149 tests pass).
+- 2026-04-18: D14 Celery beat schedule wired in `app/tasks/schedules.py` (nightly 04:00 analyzer, monthly 02:00 retention, nightly 03:15 invoice gap check, nightly 03:30 approval cycle check); 4 task stub modules + 6 beat-schedule lock tests (155 tests pass).
 
 End of plan.
