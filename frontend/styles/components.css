@@ -373,11 +373,11 @@
 .stat-card[data-accent="gold"]::before    { background: var(--color-gold); }
 /* (hover rule consolidated below) */
 .stat-card .stat-label {
-  font-size: var(--text-caption);
-  font-weight: var(--weight-medium);
+  font-size: 12px;
+  font-weight: var(--weight-semibold);
   color: var(--color-text-2);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-1);
 }
 .stat-card .stat-value {
@@ -436,8 +436,10 @@
   padding: var(--space-0-5) var(--space-2);
   border-radius: var(--radius-full);
   font-size: var(--text-caption);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -2668,11 +2670,11 @@ svg circle[data-animate].chart-animate-in {
   box-shadow: var(--shadow-2);
 }
 .kpi-card .stat-label {
-  font-size: var(--text-caption);
-  font-weight: var(--weight-medium);
+  font-size: 12px;
+  font-weight: var(--weight-semibold);
   color: var(--color-text-2);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-1);
 }
 .kpi-card .stat-value {

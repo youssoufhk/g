@@ -856,6 +856,9 @@
     "commit_failed_title": "Action failed",
     "commit_failed_body": "We could not save your change. Please try again."
   },
+  "patterns": {
+    "empty_clear_filters": "Clear filters"
+  },
   "approvals": {
     "page_title": "Approvals",
     "urgent": "Urgent",

@@ -9,11 +9,11 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 ## Progress at a glance
 
 - Part A (UX reds, highest-visibility): 2/8
-- Part B (UI reds, atom lock-down): 5/12
-- Part C (yellow polish): 3/15
+- Part B (UI reds, atom lock-down): 6/12
+- Part C (yellow polish): 5/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 10/35
+Overall in-session: 13/35
 
 ---
 
@@ -71,7 +71,7 @@ Overall in-session: 10/35
 
 15. [ ] **B7 [B8]** Accent overuse: remove accent from KPI icons and preview chips; keep accent only for one primary action per region (dashboard AI-invoice card stays; nav selected indicator and insight banner lose it).
 
-16. [ ] **B8 [G31/G32]** Split `EmptyState` into `EmptyData` (no rows) vs `EmptyFiltered` (rows exist, filter matches none - adds clear-filter action).
+16. [x] **B8 [G31/G32]** Split `EmptyState` into `EmptyData` (no rows) vs `EmptyFiltered` (rows exist, filter matches none - adds clear-filter action).
 
 17. [ ] **B9 [B9 WCAG]** Add `@axe-core/playwright` to the visual test pipeline; fail build on AA violation. Report runs in `tests/a11y.spec.ts`.
 
@@ -87,8 +87,8 @@ Overall in-session: 10/35
 
 21. [x] **C1 [A2]** Move `style={{flexDirection:"column"}}` from `topbar.tsx:105` to CSS.
 22. [x] **C2 [B10]** Focus ring: add `outline-offset: 2px` to `tokens.css` focus rule.
-23. [ ] **C3 [C15]** Status badges: tracked-out small-caps style in `Badge` atom.
-24. [ ] **C4 [C14]** KPI label: tracked-out caps at 12px in `.kpi-label`.
+23. [x] **C3 [C15]** Status badges: tracked-out small-caps style in `Badge` atom.
+24. [x] **C4 [C14]** KPI label: tracked-out caps at 12px in `.kpi-label`.
 25. [ ] **C5 [D21]** Filter-bar shape unification: one `FilterBar` pattern across expenses/invoices/approvals/resources.
 26. [ ] **C6 [D22]** Sidebar selected state: verify 3px primary left-border on `.nav-item.active`.
 27. [ ] **C7 [G33]** Per-page route error boundaries: add `error.tsx` to every list page segment.

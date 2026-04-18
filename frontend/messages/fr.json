@@ -856,6 +856,9 @@
     "commit_failed_title": "Action echouee",
     "commit_failed_body": "Impossible d'enregistrer votre modification. Veuillez reessayer."
   },
+  "patterns": {
+    "empty_clear_filters": "Effacer les filtres"
+  },
   "approvals": {
     "page_title": "Approbations",
     "urgent": "Urgent",
