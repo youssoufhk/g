@@ -1,5 +1,5 @@
 employee_id,first_name,last_name,email,role,team,hire_date,manager_id,base_currency
-1,Timothée,Marie,timothée.marie@gamma-demo.local,owner,Finance,2022-01-10,,EUR
+1,Youssouf,Kerzika,youssouf.kerzika@gamma-demo.local,owner,Finance,2022-01-10,,EUR
 2,Guillaume,Moulin,guillaume.moulin@gamma-demo.local,admin,Digital,2020-03-22,1,EUR
 3,Bernard,Labbé,bernard.labbé@gamma-demo.local,admin,Public Sector,2024-09-27,1,EUR
 4,Richard,Fernandez,richard.fernandez@gamma-demo.local,finance,Tech,2021-08-03,1,EUR
