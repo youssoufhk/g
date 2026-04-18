@@ -277,7 +277,6 @@ function InviteModal({
       onClose={onClose}
       title={t("invite_title")}
       description={t("invite_desc")}
-      size="sm"
       footer={
         <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -360,7 +359,6 @@ function EditRoleModal({
       open={!!user}
       onClose={onClose}
       title={t("edit_role_title")}
-      size="sm"
       footer={
         <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="sm" onClick={onClose}>

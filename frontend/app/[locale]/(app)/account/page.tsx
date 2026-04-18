@@ -127,7 +127,7 @@ function ChangePasswordModal({ open, onClose }: { open: boolean; onClose: () => 
   );
 
   return (
-    <Modal open={open} onClose={onClose} title={t("pwd_modal_title")} size="sm"
+    <Modal open={open} onClose={onClose} title={t("pwd_modal_title")}
       footer={
         <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="sm" onClick={onClose}>{t("action_cancel")}</Button>

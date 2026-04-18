@@ -834,7 +834,6 @@ export default function CalendarPage() {
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
         title={t("add_event")}
-        size="sm"
         footer={
           <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
             <Button variant="ghost" size="sm" onClick={() => setShowAddModal(false)}>

@@ -288,7 +288,6 @@ function AddRowModal({
       onClose={onClose}
       title={t("add_modal_title")}
       description={t("add_modal_desc")}
-      size="sm"
       footer={
         <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="md" onClick={onClose}>{t("add_modal_cancel")}</Button>

@@ -102,7 +102,7 @@ export function Topbar({
             colorIndex={user.colorIndex}
             size="sm"
           />
-          <div className="hidden xl:flex" style={{ flexDirection: "column" }}>
+          <div className="hidden xl:flex flex-col">
             <span className="user-name">{user.name}</span>
             <span className="user-role">{user.role}</span>
           </div>

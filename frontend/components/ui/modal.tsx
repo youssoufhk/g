@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 
 /**
- * Wraps the prototype's `.modal-backdrop.active` + `.modal` + `.modal-sm/lg/xl`
- * pattern. Sizes map to the three widths in _components.css.
+ * Wraps the prototype's `.modal-backdrop.active` + `.modal` pattern.
+ * Single 560px desktop width, 100% mobile (max-width: calc(100vw - 32px)).
  *
  * Accessibility:
  *  - Esc closes.
@@ -23,7 +23,6 @@ export type ModalProps = {
   description?: string;
   children: ReactNode;
   footer?: ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
   /**
    * Extra class on the dialog element for pattern-scoped sizing (e.g.
    * `ConflictResolver` sets `conflict-resolver` to hit its 640px spec).
@@ -54,7 +53,6 @@ export function Modal({
   description,
   children,
   footer,
-  size = "md",
   className,
   labelledBy,
 }: ModalProps) {
@@ -143,13 +141,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={labelledBy ?? "modal-title"}
         aria-describedby={description ? "modal-description" : undefined}
-        className={clsx(
-          "modal",
-          size === "sm" && "modal-sm",
-          size === "lg" && "modal-lg",
-          size === "xl" && "modal-xl",
-          className,
-        )}
+        className={clsx("modal", className)}
       >
         <div className="modal-header">
           <div>

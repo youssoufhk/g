@@ -210,7 +210,6 @@ function NewInvoiceModal({
       onClose={onClose}
       title={t("modal_title")}
       description={t("modal_description")}
-      size="md"
       footer={
         <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="md" onClick={onClose}>{t("modal_cancel")}</Button>
