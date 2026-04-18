@@ -50,3 +50,31 @@
 - Retention jobs run nightly per-schema per-entity.
 
 See `specs/DATA_ARCHITECTURE.md` sections 1, 10, and 11 for the operational details.
+
+## Correction 2026-04-18
+
+Phase 4 migrations (`20260416_1000_phase4_core_data.py` through `20260418_1500_confidential_tier.py`) shipped a transitional shape: business tables live in the `public` schema with a `tenant_id` column, rather than under a `t_<slug>` schema per this ADR. This deviation was taken under time pressure during the Phase 4 MVP sprint without an explicit ADR amendment; this section ratifies the current state and fixes the forward path.
+
+**What the deviation means in practice:**
+
+- Isolation is still enforced: every query goes through the FastAPI `TenancyMiddleware` which sets `request.state.tenant_id`, and the SQLAlchemy session layer injects `WHERE tenant_id = :tenant_id` via event hooks. A missed hook in code review is visible in diff.
+- The leak-risk the ADR rejects ("one missed `WHERE` leaks everything") is not eliminated, only deferred. CI carries an explicit test that asserts a cross-tenant read fails, and the mutation-decorator lint (`scripts/hooks/check_mutation_decorators.py`) forces `@audited` on every write so an accidental leak shows up in the audit stream.
+- Per-tenant backup via `pg_dump -n` is not available yet. GDPR tenant deletion via `DROP SCHEMA` is not available yet either; deletion is `DELETE FROM <table> WHERE tenant_id = ?` followed by an `VACUUM` pass.
+
+**Forward path (Phase 5 cutover, tracked as DEF-014):**
+
+1. The Alembic env (`backend/migrations/env.py`) already supports schema-per-tenant via the `-x tenant=<schema>` flag. New migrations from Phase 5 onward target `t_<slug>` schemas directly.
+2. `backend/migrations/runner.py` (landed 2026-04-18) fans a revision out to every active tenant schema via Celery, tracked in `public.alembic_runs`. This is the deploy-time entry point; the existing single-schema `alembic upgrade head` path remains for shared `public` migrations (tenants, audit_log, country_holidays, idempotency_keys, alembic_runs, feature_flags).
+3. A one-shot cutover migration (to be authored before the first Phase 5 tenant-scoped feature lands) moves existing business rows from `public` into newly created `t_<slug>` schemas, one per tenant, using the tenant list in `public.tenants`. The migration is reversible and idempotent: re-running it is a no-op if the `t_<slug>` schema already holds the rows.
+4. Post-cutover, the `tenant_id` columns are dropped in a follow-up migration once every read path has been confirmed to rely on `search_path` instead of the column filter.
+
+**Why ratify rather than rewrite now:**
+
+Rewriting the six Phase 4 migrations that already landed would force the team to squash them and force a full reset across every dev DB + the seed pipeline. The cutover migration is cheaper, reversible, and the runner scaffolding it needs (this commit) is the piece that was actually missing from the original ADR's "follow-ups".
+
+**Invariants that still hold through the correction:**
+
+- One Postgres cluster. One logical database per environment. Not revisiting sharding.
+- Strict user-tenant binding remains: `public.users` is (email, tenant_id) keyed and survives the cutover unchanged.
+- `public` is still the home for identity, billing, audit, and operational plumbing. Only business entities move.
+- The CI cross-tenant-leak test stays on through the cutover: it covers both the current `tenant_id`-column shape and the post-cutover `search_path` shape via a parameterized fixture.
