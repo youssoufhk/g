@@ -111,6 +111,23 @@ repos:
             frontend/scripts/.*
           )$
 
+      - id: no-console-log-in-shipped
+        name: Ban console.log/debug/info/warn in shipped frontend code
+        language: system
+        entry: python3 scripts/hooks/no_console_log_in_shipped.py
+        # Opus plan section 12.1 rubric: no console.log in shipped code.
+        # Scope covers the shipped directories; scripts/tests/styles
+        # and vendor code are excluded. console.error is allowed
+        # inside the Next.js error boundary convention (error.tsx /
+        # global-error.tsx) where the platform expects the boundary
+        # to forward the caught error to devtools.
+        files: '^frontend/(components|features|app|lib|hooks|stores)/.*\.(tsx|jsx|ts|js)$'
+        exclude: |
+          (?x)^(
+            frontend/tests/.*|
+            frontend/node_modules/.*
+          )$
+
       - id: no-utilisation
         name: Ban the word utilisation
         language: system
