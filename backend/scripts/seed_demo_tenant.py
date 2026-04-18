@@ -654,6 +654,232 @@ async def seed_timesheet_entries(
 
 
 # ---------------------------------------------------------------------------
+# Expenses (Phase 5a, stage 3)
+# ---------------------------------------------------------------------------
+
+# Canonical volume per DATA_ARCHITECTURE.md section 12.10:
+#   - 2,412 food/lunch  (201 employees * 12 months)
+#   - 2,412 transport   (201 employees * 12 months)
+#   - 2,412 overhead    (201 employees * 12 months)
+#   - 690 client travel       (46 senior/manager * ~15/year)
+#   - 368 client meals        (46 senior/manager * 8/year)
+#   - 138 client gifts/misc   (46 senior/manager * 3/year)
+# Total: 8,432 -> trimmed to 8,400 with a deterministic drop of
+# 32 rows from the gifts bucket (138 -> 106). The published figure
+# 8,400 is the contract; 8,432 was section 12.10's raw arithmetic.
+EXPENSE_CATEGORY_CATALOGUE: tuple[dict[str, object], ...] = (
+    {"code": "FOOD", "name": "Food & Lunch Allowance", "tax_rate": 0.1},
+    {"code": "TRANSPORT", "name": "Transport (50%)", "tax_rate": 0.2},
+    {"code": "OVERHEAD", "name": "Operator Overhead Share", "tax_rate": 0.2},
+    {"code": "CLIENT_TRAVEL", "name": "Client Travel", "tax_rate": 0.2},
+    {"code": "CLIENT_MEALS", "name": "Client Meals & Entertainment", "tax_rate": 0.1},
+    {"code": "CLIENT_GIFTS", "name": "Client Gifts & Misc", "tax_rate": 0.2},
+)
+
+EXPENSE_YEAR = 2026
+EXPENSE_MONTHLY_PER_EMPLOYEE = 12  # 12 months per year
+EXPENSE_SENIOR_TRAVEL_PER_YEAR = 15
+EXPENSE_SENIOR_MEALS_PER_YEAR = 8
+EXPENSE_SENIOR_GIFTS_PER_YEAR = 3
+EXPENSE_TOTAL = 8_400
+
+# Status mix per section 12.10: 60% approved, 25% pending (=submitted),
+# 10% reimbursed (=approved + reimbursement_status=paid), 5% rejected.
+EXPENSE_STATUS_MIX: tuple[tuple[str, str, float], ...] = (
+    ("approved", "pending", 0.60),
+    ("submitted", "pending", 0.25),
+    ("approved", "paid", 0.10),
+    ("rejected", "pending", 0.05),
+)
+
+
+def generate_expense_rows(
+    all_employee_ids: list[int],
+    senior_employee_ids: list[int],
+    category_codes: list[str],
+    *,
+    year: int = EXPENSE_YEAR,
+    seed: int = 31,
+) -> list[dict[str, object]]:
+    """Pure deterministic generator for the 8,400 demo expenses.
+
+    Returns a list of row-shaped dicts with no DB dependency. Counts
+    are pinned by test_seed_counts.py.
+    """
+    if not all_employee_ids:
+        raise ValueError("all_employee_ids must not be empty")
+    if not senior_employee_ids:
+        raise ValueError("senior_employee_ids must not be empty")
+    required_codes = {
+        "FOOD",
+        "TRANSPORT",
+        "OVERHEAD",
+        "CLIENT_TRAVEL",
+        "CLIENT_MEALS",
+        "CLIENT_GIFTS",
+    }
+    if not required_codes.issubset(category_codes):
+        raise ValueError(
+            f"category_codes missing required entries: "
+            f"{required_codes - set(category_codes)}"
+        )
+
+    rng = random.Random(seed)
+    rows: list[dict[str, object]] = []
+
+    # ---- Monthly buckets (FOOD / TRANSPORT / OVERHEAD) --------------------
+    monthly_codes = ("FOOD", "TRANSPORT", "OVERHEAD")
+    monthly_amounts = {"FOOD": 15_00, "TRANSPORT": 45_00, "OVERHEAD": 80_00}
+    for code in monthly_codes:
+        for emp_id in sorted(all_employee_ids):
+            for month in range(1, EXPENSE_MONTHLY_PER_EMPLOYEE + 1):
+                day = min(28, 1 + rng.randint(0, 27))
+                rows.append(
+                    {
+                        "employee_id": emp_id,
+                        "category_code": code,
+                        "expense_date": date(year, month, day),
+                        "amount_cents": monthly_amounts[code],
+                        "merchant": f"{code.lower()}-vendor",
+                    }
+                )
+
+    # ---- Senior buckets (CLIENT_*) ---------------------------------------
+    for emp_id in sorted(senior_employee_ids):
+        for _ in range(EXPENSE_SENIOR_TRAVEL_PER_YEAR):
+            rows.append(_senior_row(emp_id, "CLIENT_TRAVEL", 180_00, year, rng))
+        for _ in range(EXPENSE_SENIOR_MEALS_PER_YEAR):
+            rows.append(_senior_row(emp_id, "CLIENT_MEALS", 75_00, year, rng))
+        for _ in range(EXPENSE_SENIOR_GIFTS_PER_YEAR):
+            rows.append(_senior_row(emp_id, "CLIENT_GIFTS", 40_00, year, rng))
+
+    # ---- Trim to the canonical 8,400 -------------------------------------
+    # Drop the tail of CLIENT_GIFTS rows deterministically; they are the
+    # smallest bucket and the published figure rounds the published 8,400.
+    if len(rows) > EXPENSE_TOTAL:
+        overflow = len(rows) - EXPENSE_TOTAL
+        # Find indices of CLIENT_GIFTS rows from the end and drop them.
+        drop_indices: list[int] = []
+        for idx in range(len(rows) - 1, -1, -1):
+            if rows[idx]["category_code"] == "CLIENT_GIFTS":
+                drop_indices.append(idx)
+                if len(drop_indices) == overflow:
+                    break
+        for idx in sorted(drop_indices, reverse=True):
+            rows.pop(idx)
+
+    # ---- Status + reimbursement assignment -------------------------------
+    cum_mix: list[tuple[str, str, float]] = []
+    running = 0.0
+    for status, reimb, weight in EXPENSE_STATUS_MIX:
+        running += weight
+        cum_mix.append((status, reimb, running))
+
+    for row in rows:
+        roll = rng.random()
+        chosen_status = cum_mix[-1][0]
+        chosen_reimb = cum_mix[-1][1]
+        for status, reimb, cutoff in cum_mix:
+            if roll <= cutoff:
+                chosen_status = status
+                chosen_reimb = reimb
+                break
+        row["status"] = chosen_status
+        row["reimbursement_status"] = chosen_reimb
+
+    return rows
+
+
+def _senior_row(
+    emp_id: int,
+    code: str,
+    amount_cents: int,
+    year: int,
+    rng: random.Random,
+) -> dict[str, object]:
+    month = rng.randint(1, 12)
+    day = min(28, 1 + rng.randint(0, 27))
+    return {
+        "employee_id": emp_id,
+        "category_code": code,
+        "expense_date": date(year, month, day),
+        "amount_cents": amount_cents,
+        "merchant": f"{code.lower()}-vendor",
+    }
+
+
+async def seed_expense_categories(conn, tenant_id: int) -> dict[str, int]:
+    """Insert canonical expense categories. Returns {code: db_id}."""
+    mapping: dict[str, int] = {}
+    for spec in EXPENSE_CATEGORY_CATALOGUE:
+        db_id = await conn.fetchval(
+            """
+            INSERT INTO public.expense_categories (
+                tenant_id, name, code, tax_rate
+            ) VALUES ($1, $2, $3, $4)
+            ON CONFLICT (tenant_id, code) DO NOTHING
+            RETURNING id
+            """,
+            tenant_id,
+            spec["name"],
+            spec["code"],
+            spec["tax_rate"],
+        )
+        if db_id is None:
+            db_id = await conn.fetchval(
+                "SELECT id FROM public.expense_categories WHERE tenant_id=$1 AND code=$2",
+                tenant_id,
+                spec["code"],
+            )
+        mapping[str(spec["code"])] = db_id
+    return mapping
+
+
+async def seed_expenses(
+    conn,
+    tenant_id: int,
+    employee_map: dict[int, int],
+    category_map: dict[str, int],
+    *,
+    senior_csv_ids: list[int],
+) -> int:
+    """Insert the 8,400 deterministic demo expenses. Returns row count."""
+    if not employee_map or not category_map:
+        return 0
+
+    all_db_ids = sorted(employee_map.values())
+    senior_db_ids = sorted(employee_map[c] for c in senior_csv_ids if c in employee_map)
+    rows = generate_expense_rows(
+        all_employee_ids=all_db_ids,
+        senior_employee_ids=senior_db_ids,
+        category_codes=sorted(category_map.keys()),
+    )
+
+    inserted = 0
+    for row in rows:
+        cat_id = category_map[str(row["category_code"])]
+        await conn.execute(
+            """
+            INSERT INTO public.expenses (
+                tenant_id, employee_id, category_id,
+                expense_date, merchant, amount_cents, currency,
+                status, reimbursement_status, version
+            ) VALUES ($1, $2, $3, $4, $5, $6, 'EUR', $7, $8, 0)
+            """,
+            tenant_id,
+            row["employee_id"],
+            cat_id,
+            row["expense_date"],
+            row["merchant"],
+            row["amount_cents"],
+            row["status"],
+            row["reimbursement_status"],
+        )
+        inserted += 1
+    return inserted
+
+
+# ---------------------------------------------------------------------------
 # Parse helpers
 # ---------------------------------------------------------------------------
 
@@ -758,12 +984,33 @@ async def main(tenant_schema: str) -> None:
         )
         print(f"[seed]   {entries_count} timesheet entries inserted")
 
+        # Expenses: monthly per-employee buckets + senior-only client buckets.
+        senior_csv_ids = [
+            int(r["employee_id"])
+            for r in emp_rows
+            if r.get("role") in ("manager", "admin", "owner")
+        ]
+
+        print("[seed] Seeding expense categories...")
+        cat_map = await seed_expense_categories(conn, tenant_id)
+        print(f"[seed]   {len(cat_map)} expense categories ready")
+
+        print("[seed] Seeding expenses (8,400 deterministic rows)...")
+        exp_count = await seed_expenses(
+            conn,
+            tenant_id,
+            emp_map,
+            cat_map,
+            senior_csv_ids=senior_csv_ids,
+        )
+        print(f"[seed]   {exp_count} expenses inserted")
+
     finally:
         await conn.close()
 
     print("[seed] Done.")
     print(
-        "[seed] Expenses + invoices seed in later Phase 5a stages."
+        "[seed] Invoices seed in later Phase 5a stages."
     )
 
 

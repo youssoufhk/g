@@ -16,6 +16,8 @@ from __future__ import annotations
 from collections import Counter
 
 from scripts.seed_demo_tenant import (
+    EXPENSE_CATEGORY_CATALOGUE,
+    EXPENSE_TOTAL,
     LEAVE_STATUS_MIX,
     LEAVE_TOTAL,
     LEAVE_TYPE_CATALOGUE,
@@ -23,6 +25,7 @@ from scripts.seed_demo_tenant import (
     TIMESHEET_ENTRIES_PER_BILLABLE_WEEK,
     TIMESHEET_WEEKS_PER_EMPLOYEE,
     TIMESHEET_YEAR,
+    generate_expense_rows,
     generate_leave_rows,
     generate_timesheet_entry_rows,
     generate_timesheet_week_rows,
@@ -216,4 +219,127 @@ def test_generate_timesheet_rows_reject_empty_inputs() -> None:
     with pytest.raises(ValueError):
         generate_timesheet_entry_rows(
             billable_employee_ids=_billable_employee_ids()[:5], project_ids=[]
+        )
+
+
+# ---------------------------------------------------------------------------
+# Expenses (DATA_ARCHITECTURE section 12.10)
+#   - 8,400 expenses total (published figure; raw arithmetic is 8,432)
+#   - Monthly buckets: 201 employees * 12 months * 3 categories = 7,236
+#   - Senior buckets: 46 senior/manager * (15+8+3) = 1,196
+#   - Trim: 32 rows dropped from CLIENT_GIFTS tail -> 138 becomes 106
+# Status mix: 60 approved / 25 submitted / 10 approved+paid / 5 rejected
+# ---------------------------------------------------------------------------
+
+ALL_EMP_COUNT = 201
+SENIOR_EMP_COUNT = 46
+
+
+def _all_employee_ids() -> list[int]:
+    return list(range(1, ALL_EMP_COUNT + 1))
+
+
+def _senior_employee_ids() -> list[int]:
+    # 46 seniors (15 managers + 25 senior consultants + 4 finance + 2 admin = 46).
+    return list(range(1, SENIOR_EMP_COUNT + 1))
+
+
+def _expense_category_codes() -> list[str]:
+    return sorted(str(c["code"]) for c in EXPENSE_CATEGORY_CATALOGUE)
+
+
+def test_expense_constants_match_canonical_spec() -> None:
+    assert EXPENSE_TOTAL == 8_400
+    codes = {str(c["code"]) for c in EXPENSE_CATEGORY_CATALOGUE}
+    assert codes == {
+        "FOOD",
+        "TRANSPORT",
+        "OVERHEAD",
+        "CLIENT_TRAVEL",
+        "CLIENT_MEALS",
+        "CLIENT_GIFTS",
+    }
+
+
+def test_generate_expense_rows_produces_8400() -> None:
+    rows = generate_expense_rows(
+        all_employee_ids=_all_employee_ids(),
+        senior_employee_ids=_senior_employee_ids(),
+        category_codes=_expense_category_codes(),
+    )
+    assert len(rows) == 8_400
+
+
+def test_generate_expense_rows_is_deterministic() -> None:
+    first = generate_expense_rows(
+        all_employee_ids=_all_employee_ids(),
+        senior_employee_ids=_senior_employee_ids(),
+        category_codes=_expense_category_codes(),
+    )
+    second = generate_expense_rows(
+        all_employee_ids=_all_employee_ids(),
+        senior_employee_ids=_senior_employee_ids(),
+        category_codes=_expense_category_codes(),
+    )
+    assert first == second
+
+
+def test_generate_expense_rows_category_mix_matches_spec() -> None:
+    rows = generate_expense_rows(
+        all_employee_ids=_all_employee_ids(),
+        senior_employee_ids=_senior_employee_ids(),
+        category_codes=_expense_category_codes(),
+    )
+    by_cat = Counter(str(r["category_code"]) for r in rows)
+    assert by_cat["FOOD"] == 2_412
+    assert by_cat["TRANSPORT"] == 2_412
+    assert by_cat["OVERHEAD"] == 2_412
+    assert by_cat["CLIENT_TRAVEL"] == 690
+    assert by_cat["CLIENT_MEALS"] == 368
+    # 138 raw - 32 trimmed = 106 for the gifts tail.
+    assert by_cat["CLIENT_GIFTS"] == 106
+
+
+def test_generate_expense_rows_status_values_are_valid() -> None:
+    rows = generate_expense_rows(
+        all_employee_ids=_all_employee_ids(),
+        senior_employee_ids=_senior_employee_ids(),
+        category_codes=_expense_category_codes(),
+    )
+    statuses = {str(r["status"]) for r in rows}
+    reimbs = {str(r["reimbursement_status"]) for r in rows}
+    assert statuses <= {"draft", "submitted", "approved", "rejected"}
+    assert reimbs <= {"pending", "paid", "na"}
+
+
+def test_generate_expense_rows_dates_land_in_canonical_year() -> None:
+    rows = generate_expense_rows(
+        all_employee_ids=_all_employee_ids(),
+        senior_employee_ids=_senior_employee_ids(),
+        category_codes=_expense_category_codes(),
+    )
+    years = {r["expense_date"].year for r in rows}  # type: ignore[union-attr]
+    assert years == {2026}
+
+
+def test_generate_expense_rows_rejects_empty_or_missing_categories() -> None:
+    import pytest
+
+    with pytest.raises(ValueError):
+        generate_expense_rows(
+            all_employee_ids=[],
+            senior_employee_ids=_senior_employee_ids(),
+            category_codes=_expense_category_codes(),
+        )
+    with pytest.raises(ValueError):
+        generate_expense_rows(
+            all_employee_ids=_all_employee_ids(),
+            senior_employee_ids=[],
+            category_codes=_expense_category_codes(),
+        )
+    with pytest.raises(ValueError):
+        generate_expense_rows(
+            all_employee_ids=_all_employee_ids(),
+            senior_employee_ids=_senior_employee_ids(),
+            category_codes=["FOOD", "TRANSPORT"],
         )
