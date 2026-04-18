@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Clock, Briefcase, Coffee, AlertTriangle } from "lucide-react";
+import { Clock, Briefcase, AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { TrendBadge, type Trend } from "@/features/dashboard/trend-badge";
@@ -25,7 +25,6 @@ type Props = {
   totalHours: number;
   targetHours: number;
   billableHours: number;
-  nonBillableHours: number;
   overtimeHours: number;
 };
 
@@ -33,7 +32,6 @@ export function TimesheetsKpis({
   totalHours,
   targetHours,
   billableHours,
-  nonBillableHours,
   overtimeHours,
 }: Props) {
   const t = useTranslations("timesheets");
@@ -59,17 +57,6 @@ export function TimesheetsKpis({
       trend: "up",
       trendLabel: t("kpi_trend_track"),
       icon: Briefcase,
-      tone: "accent",
-    },
-    {
-      key: "nonbillable",
-      label: t("kpi_nonbillable_label"),
-      value: String(nonBillableHours),
-      unit: t("kpi_nonbillable_unit"),
-      hint: t("kpi_nonbillable_hint"),
-      trend: "flat",
-      trendLabel: t("kpi_trend_week"),
-      icon: Coffee,
       tone: "accent",
     },
     {

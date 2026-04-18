@@ -534,7 +534,6 @@ export default function TimesheetsPage() {
           totalHours={effectiveWeekTotal}
           targetHours={targetHours}
           billableHours={billableHours}
-          nonBillableHours={nonBillableHours}
           overtimeHours={overtimeHours}
         />
 

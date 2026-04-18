@@ -42,7 +42,7 @@ function daysSince(iso: string): number {
 // ── type config ────────────────────────────────────────────────────────────
 
 type BadgeTone = "default" | "primary" | "success" | "warning" | "error" | "info" | "accent" | "gold" | "ghost" | "ghost-primary" | "neutral";
-type KpiKey = "timesheet" | "expense" | "leave" | "invoice";
+type KpiKey = "timesheet" | "expense" | "leave";
 
 const TYPE_ICON: Record<ApprovalType, React.ComponentType<{ size?: number; "aria-hidden"?: boolean }>> = {
   timesheet: Clock,
@@ -303,7 +303,6 @@ export default function ApprovalsPage() {
   const timesheetCount = pendingItems.filter((i) => i.type === "timesheet").length;
   const expenseCount = pendingItems.filter((i) => i.type === "expense").length;
   const leaveCount = pendingItems.filter((i) => i.type === "leave").length;
-  const invoiceCount = 0; // No invoice approvals in current data contract; tile shown for parity.
 
   const activeKpi: KpiKey | undefined =
     typeSel.length === 1 && (["timesheet", "expense", "leave"] as const).includes(typeSel[0] as ApprovalType)
@@ -472,7 +471,6 @@ export default function ApprovalsPage() {
           timesheetCount={timesheetCount}
           expenseCount={expenseCount}
           leaveCount={leaveCount}
-          invoiceCount={invoiceCount}
           activeType={activeKpi}
           onSelectTimesheet={() => selectKpi("timesheet")}
           onSelectExpense={() => selectKpi("expense")}

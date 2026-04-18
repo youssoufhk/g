@@ -1,14 +1,14 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Users, ToggleLeft, CreditCard, ClipboardList } from "lucide-react";
+import { Users, ToggleLeft, ClipboardList } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { TrendBadge, type Trend } from "@/features/dashboard/trend-badge";
 
 type Tone = "primary" | "accent" | "gold";
 
-type KpiKey = "users" | "flags" | "billing" | "audit";
+type KpiKey = "users" | "flags" | "audit";
 
 type KPI = {
   key: KpiKey;
@@ -28,13 +28,10 @@ type Props = {
   pendingInvites: number;
   flagsEnabled: number;
   flagsTotal: number;
-  billingStatus: string;
-  billingHint: string;
   auditToday: number;
   activeKey?: KpiKey;
   onSelectUsers?: () => void;
   onSelectFlags?: () => void;
-  onSelectBilling?: () => void;
   onSelectAudit?: () => void;
 };
 
@@ -43,13 +40,10 @@ export function AdminKpis({
   pendingInvites,
   flagsEnabled,
   flagsTotal,
-  billingStatus,
-  billingHint,
   auditToday,
   activeKey,
   onSelectUsers,
   onSelectFlags,
-  onSelectBilling,
   onSelectAudit,
 }: Props) {
   const t = useTranslations("admin");
@@ -57,7 +51,6 @@ export function AdminKpis({
   const handlers: Record<KpiKey, (() => void) | undefined> = {
     users: onSelectUsers,
     flags: onSelectFlags,
-    billing: onSelectBilling,
     audit: onSelectAudit,
   };
 
@@ -84,17 +77,6 @@ export function AdminKpis({
       trendLabel: t("kpi_trend_config"),
       icon: ToggleLeft,
       tone: "accent",
-    },
-    {
-      key: "billing",
-      label: t("kpi_billing_label"),
-      value: billingStatus,
-      unit: "",
-      hint: billingHint,
-      trend: "flat",
-      trendLabel: t("kpi_trend_view"),
-      icon: CreditCard,
-      tone: "primary",
     },
     {
       key: "audit",

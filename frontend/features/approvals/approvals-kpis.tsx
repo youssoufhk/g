@@ -1,14 +1,14 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Clock, Receipt, Umbrella, FileText } from "lucide-react";
+import { Clock, Receipt, Umbrella } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { TrendBadge, type Trend } from "@/features/dashboard/trend-badge";
 
 type Tone = "primary" | "accent" | "gold";
 
-type KpiKey = "timesheet" | "expense" | "leave" | "invoice";
+type KpiKey = "timesheet" | "expense" | "leave";
 
 type KPI = {
   key: KpiKey;
@@ -28,24 +28,20 @@ type Props = {
   timesheetCount: number;
   expenseCount: number;
   leaveCount: number;
-  invoiceCount: number;
   activeType?: KpiKey;
   onSelectTimesheet?: () => void;
   onSelectExpense?: () => void;
   onSelectLeave?: () => void;
-  onSelectInvoice?: () => void;
 };
 
 export function ApprovalsKpis({
   timesheetCount,
   expenseCount,
   leaveCount,
-  invoiceCount,
   activeType,
   onSelectTimesheet,
   onSelectExpense,
   onSelectLeave,
-  onSelectInvoice,
 }: Props) {
   const t = useTranslations("approvals");
 
@@ -53,7 +49,6 @@ export function ApprovalsKpis({
     timesheet: onSelectTimesheet,
     expense: onSelectExpense,
     leave: onSelectLeave,
-    invoice: onSelectInvoice,
   };
 
   const kpis: KPI[] = [
@@ -92,17 +87,6 @@ export function ApprovalsKpis({
       icon: Umbrella,
       tone: "accent",
       highlight: leaveCount > 0,
-    },
-    {
-      key: "invoice",
-      label: t("kpi_invoice_label"),
-      value: String(invoiceCount),
-      unit: t("kpi_pending_unit", { count: invoiceCount }),
-      hint: t("kpi_invoice_hint"),
-      trend: "flat",
-      trendLabel: t("kpi_trend_review"),
-      icon: FileText,
-      tone: "primary",
     },
   ];
 

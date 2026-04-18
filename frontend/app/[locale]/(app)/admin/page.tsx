@@ -862,7 +862,7 @@ export default function AdminPage() {
   const t = useTranslations("admin");
   const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS);
   const [flags, setFlags] = useState<FeatureFlag[]>(INITIAL_FLAGS);
-  const [activeKpi, setActiveKpi] = useState<"users" | "flags" | "billing" | "audit" | undefined>();
+  const [activeKpi, setActiveKpi] = useState<"users" | "flags" | "audit" | undefined>();
   const [userFilter, setUserFilter] = useState<"all" | "pending">("all");
 
   const pendingInvites = users.filter((u) => u.status === "pending").length;
@@ -930,7 +930,7 @@ export default function AdminPage() {
       : []),
   ];
 
-  function handleSelectKpi(key: "users" | "flags" | "billing" | "audit") {
+  function handleSelectKpi(key: "users" | "flags" | "audit") {
     const next = activeKpi === key ? undefined : key;
     setActiveKpi(next);
     if (key === "users" && next) setUserFilter("all");
@@ -939,8 +939,6 @@ export default function AdminPage() {
         ? "admin-users-card"
         : key === "flags"
         ? "admin-flags-card"
-        : key === "billing"
-        ? "admin-billing-card"
         : "admin-audit-card";
     if (next) document.getElementById(targetId)?.scrollIntoView({ block: "start", behavior: "auto" });
   }
@@ -964,13 +962,10 @@ export default function AdminPage() {
           pendingInvites={pendingInvites}
           flagsEnabled={flagsEnabled}
           flagsTotal={flags.length}
-          billingStatus={t("kpi_billing_value")}
-          billingHint={t("kpi_billing_hint")}
           auditToday={auditToday}
           activeKey={activeKpi}
           onSelectUsers={() => handleSelectKpi("users")}
           onSelectFlags={() => handleSelectKpi("flags")}
-          onSelectBilling={() => handleSelectKpi("billing")}
           onSelectAudit={() => handleSelectKpi("audit")}
         />
 
