@@ -21,11 +21,11 @@ import {
 
 import { PageHeader } from "@/components/patterns/page-header";
 import { EmptyState } from "@/components/patterns/empty-state";
-import { FilterBar } from "@/components/patterns/filter-bar";
+import { ResourcesFilterBar } from "@/components/patterns/resources-filter-bar";
 import { StatPill } from "@/components/patterns/stat-pill";
+import { AIInsightCard } from "@/components/patterns/ai-insight-card";
+import { AIInvoiceExplanation } from "@/components/patterns/ai-invoice-explanation";
 import {
-  AIInsightCard,
-  AIInvoiceExplanation,
   Accordion,
   AccordionItem,
   Avatar,
@@ -396,34 +396,38 @@ export default function DesignSystemPage() {
 
       <Section title="Data table" description="Prototype .data-table wrapped in .data-table-wrapper.">
         <DataTableWrapper>
-          <FilterBar
-            embedded
-            actions={
-              <>
-                <Button variant="ghost" size="sm" iconOnly aria-label="Filter">
-                  <Filter size={16} aria-hidden />
-                </Button>
-                <SegControl
-                  value={view}
-                  onChange={(v) => setView(v)}
-                  options={[
-                    { value: "grid", label: "Grid view", icon: <LayoutGrid size={16} aria-hidden /> },
-                    { value: "list", label: "List view", icon: <List size={16} aria-hidden /> },
-                    { value: "org", label: "Org chart", icon: <Network size={16} aria-hidden /> },
-                  ]}
-                />
-              </>
-            }
-          >
-            <div style={{ flex: 1, minWidth: 220 }}>
-              <SearchInput placeholder="Search..." />
-            </div>
-            <Select defaultValue="">
-              <option value="">All departments</option>
-              <option value="eng">Engineering</option>
-              <option value="ops">Operations</option>
-            </Select>
-          </FilterBar>
+          <ResourcesFilterBar
+            search=""
+            onSearchChange={() => {}}
+            searchPlaceholder="Search..."
+            groups={[
+              {
+                key: "department",
+                label: "Department",
+                options: [
+                  { value: "eng", label: "Engineering" },
+                  { value: "ops", label: "Operations" },
+                ],
+                selected: [],
+                onChange: () => {},
+                searchPlaceholder: "Search departments",
+              },
+            ]}
+            onClearAll={() => {}}
+            resultCount={4}
+            resultLabel="employees"
+          />
+          <div style={{ display: "flex", justifyContent: "flex-end", padding: "var(--space-2) var(--space-3)" }}>
+            <SegControl
+              value={view}
+              onChange={(v) => setView(v)}
+              options={[
+                { value: "grid", label: "Grid view", icon: <LayoutGrid size={16} aria-hidden /> },
+                { value: "list", label: "List view", icon: <List size={16} aria-hidden /> },
+                { value: "org", label: "Org chart", icon: <Network size={16} aria-hidden /> },
+              ]}
+            />
+          </div>
           <Table>
             <THead>
               <TR>

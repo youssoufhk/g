@@ -37,15 +37,6 @@ export { Drawer, type DrawerProps } from "./drawer";
 export { ToastProvider, useToast } from "./toast";
 export { Tooltip } from "./tooltip";
 export { SearchInput, type SearchInputProps } from "./search-input";
-export {
-  AIInsightCard,
-  type AIInsightCardProps,
-} from "./ai-insight-card";
-export {
-  AIInvoiceExplanation,
-  type AIInvoiceExplanationProps,
-  type AIInvoiceExplanationSeverity,
-} from "./ai-invoice-explanation";
 
 // New in Phase 4 design review.
 export {
