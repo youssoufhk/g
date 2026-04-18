@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 4/8
+- Part A (UX reds, highest-visibility): 5/8
 - Part B (UI reds, atom lock-down): 11/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 28/35
+Overall in-session: 29/35
 
 ---
 
@@ -31,7 +31,7 @@ Overall in-session: 28/35
 
 3. [ ] **A3 [C18]** Retrofit `lib/optimistic.ts::useOptimisticMutation` into approvals + leaves + expenses + invoices mutation paths. Currently dead code.
 
-4. [ ] **A4 [E36]** OCR two-stage UX: add "Detected: merchant - amount - confidence XX%" confirmation row above auto-filled fields, editable, before user submits.
+4. [x] **A4 [E36]** OCR two-stage UX: confirmation row above the auto-filled fields shows detected merchant, amount, and tone-coloured confidence chip, with a Dismiss affordance. Fields below remain editable so the row is a summary, not a gate.
    - `app/[locale]/(app)/expenses/page.tsx` (OCR handler)
 
 5. [ ] **A5 [G50/G57]** OCR "Take photo" mobile path: add `<input type="file" accept="image/*" capture="environment">` so the camera opens on 375px devices.

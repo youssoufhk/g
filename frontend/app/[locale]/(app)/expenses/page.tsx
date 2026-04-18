@@ -708,6 +708,15 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [ocrDetection, setOcrDetection] = useState<
+    | {
+        merchant: string;
+        amount: string;
+        currency: string;
+        confidence: number;
+      }
+    | null
+  >(null);
 
   const PROJECT_OPTIONS = [
     { value: "", label: t("project_none") },
@@ -740,6 +749,12 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
         category: "meals",
         billable: true,
       }));
+      setOcrDetection({
+        merchant: t("ocr_sample_merchant"),
+        amount: "142.50",
+        currency: "EUR",
+        confidence: 94,
+      });
       setIsOcrProcessing(false);
     }, 1800);
   }
@@ -780,6 +795,7 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
         project_id: "",
         billable: false,
       });
+      setOcrDetection(null);
       if (onSubmitted) setTimeout(() => onSubmitted(newExpense), 600);
     }, 800);
   }
@@ -880,6 +896,32 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}
       >
+        {ocrDetection ? (
+          <div className="ocr-detected" role="status" aria-live="polite">
+            <span className="ocr-detected-label">{t("ocr_detected_label")}</span>
+            <span className="ocr-detected-value">{ocrDetection.merchant}</span>
+            <span className="ocr-detected-sep" aria-hidden>·</span>
+            <span className="ocr-detected-value">
+              {ocrDetection.amount} {ocrDetection.currency}
+            </span>
+            <span className="ocr-detected-sep" aria-hidden>·</span>
+            <span
+              className="ocr-detected-confidence"
+              data-tone={ocrDetection.confidence >= 90 ? "high" : ocrDetection.confidence >= 70 ? "mid" : "low"}
+            >
+              {t("ocr_detected_confidence", { pct: ocrDetection.confidence })}
+            </span>
+            <span className="ocr-detected-hint">{t("ocr_detected_edit_hint")}</span>
+            <button
+              type="button"
+              className="ocr-detected-clear"
+              onClick={() => setOcrDetection(null)}
+              aria-label={t("ocr_detected_dismiss_aria")}
+            >
+              {t("ocr_detected_dismiss")}
+            </button>
+          </div>
+        ) : null}
         {/* Description */}
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
           <label
