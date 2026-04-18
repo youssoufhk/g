@@ -311,6 +311,35 @@ error-boundary override modifiers, use-undoable-action durationMs)
 that are unrelated to the hook commit; typecheck-gating should be
 scoped to files touched, not the whole tree, until those land.
 
+2026-04-18 continuation: `81a2ed4` persists
+`features/dashboard/trend-badge.tsx` (imported by all 9 `*-kpis.tsx`
+modules, was untracked). `a5a9a17` extends the `Toast` atom with
+optional `durationMs` + `action` so `lib/use-undoable-action.ts`
+compiles (both fields already in the prototype CSS as
+`.toast-action`). `npx tsc --noEmit` on the full tree is now
+**clean**, so the next agent can re-enable whole-tree typecheck
+gating. Remaining untracked load-bearing modules (see
+`git ls-files --others --exclude-standard frontend/`):
+`components/patterns/ai-recommendations.tsx`,
+`components/patterns/detail-header-bar.tsx`,
+`components/patterns/range-calendar.tsx`,
+`components/patterns/resources-filter-bar.tsx`,
+`components/patterns/timeline-window-selector.tsx`,
+`components/shell/theme-toggle.tsx`, and the entire
+`features/clients/*`, `features/dashboard/{activity-table,
+kpi-strip, quick-actions}`, `features/employees/*`,
+`features/expenses/expenses-kpis.tsx`,
+`features/invoices/invoices-kpis.tsx`,
+`features/leaves/leaves-kpis.tsx`,
+`features/projects/{mock-projects-timeline, portfolio-kpis,
+portfolio-timeline, portfolio-view}`,
+`hooks/use-url-list-state.ts`, `lib/use-undoable-action.ts`.
+These are all referenced by tracked pages, so a clean checkout
+fails to build until they are persisted. Next red-item batch: one
+commit per logical module group (e.g. "persist portfolio
+composition", "persist dashboard compositions", "persist employee
+resources shell") to keep diffs reviewable.
+
 ---
 
 ## 8. Founder answers to OPUS_CRITICS_V2 follow-ups (received 2026-04-18, acted on overnight)
