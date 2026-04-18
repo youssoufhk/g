@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -717,6 +717,14 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
       }
     | null
   >(null);
+  const browseInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  function handleFilePicked(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files?.length) return;
+    handleOcrUpload();
+    e.target.value = "";
+  }
 
   const PROJECT_OPTIONS = [
     { value: "", label: t("project_none") },
@@ -857,8 +865,39 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
                 style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", justifyContent: "center" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <Button variant="secondary" size="sm" onClick={handleOcrUpload}>{t("ocr_browse")}</Button>
-                <Button variant="ghost" size="sm" onClick={handleOcrUpload}>{t("ocr_take_photo")}</Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => browseInputRef.current?.click()}
+                >
+                  {t("ocr_browse")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  {t("ocr_take_photo")}
+                </Button>
+                <input
+                  ref={browseInputRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleFilePicked}
+                  style={{ display: "none" }}
+                  aria-hidden
+                  tabIndex={-1}
+                />
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFilePicked}
+                  style={{ display: "none" }}
+                  aria-hidden
+                  tabIndex={-1}
+                />
               </div>
             </>
           )}

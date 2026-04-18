@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 5/8
+- Part A (UX reds, highest-visibility): 6/8
 - Part B (UI reds, atom lock-down): 11/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 29/35
+Overall in-session: 30/35
 
 ---
 
@@ -34,7 +34,7 @@ Overall in-session: 29/35
 4. [x] **A4 [E36]** OCR two-stage UX: confirmation row above the auto-filled fields shows detected merchant, amount, and tone-coloured confidence chip, with a Dismiss affordance. Fields below remain editable so the row is a summary, not a gate.
    - `app/[locale]/(app)/expenses/page.tsx` (OCR handler)
 
-5. [ ] **A5 [G50/G57]** OCR "Take photo" mobile path: add `<input type="file" accept="image/*" capture="environment">` so the camera opens on 375px devices.
+5. [x] **A5 [G50/G57]** OCR "Take photo" mobile path: hidden `<input type="file" accept="image/*" capture="environment">` paired to the Take photo button, so mobile browsers open the rear camera. Browse button uses a second hidden input without capture so desktops get the file picker.
 
 6. [x] **A6 [B7]** Add `useUrlListState` on 4 list pages that lose state on reload:
    - `app/[locale]/(app)/employees/page.tsx`
