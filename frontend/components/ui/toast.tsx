@@ -24,11 +24,18 @@ import {
  */
 type ToastTone = "info" | "success" | "warning" | "error";
 
+type ToastAction = {
+  label: string;
+  onAction: () => void;
+};
+
 type Toast = {
   id: string;
   tone: ToastTone;
   title: string;
   description?: string;
+  durationMs?: number;
+  action?: ToastAction;
 };
 
 type ToastContextValue = {
@@ -59,7 +66,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => [...prev, { id, ...toast }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 5000);
+    }, toast.durationMs ?? 5000);
   }, []);
 
   const dismiss = (id: string) => {
@@ -87,6 +94,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   <div className="toast-message">{toast.description}</div>
                 )}
               </div>
+              {toast.action && (
+                <button
+                  type="button"
+                  className="toast-action"
+                  onClick={() => {
+                    toast.action?.onAction();
+                    dismiss(toast.id);
+                  }}
+                >
+                  {toast.action.label}
+                </button>
+              )}
               <button
                 type="button"
                 className="toast-close"
