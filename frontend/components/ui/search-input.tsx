@@ -1,5 +1,6 @@
 import { forwardRef, type InputHTMLAttributes } from "react";
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import clsx from "clsx";
 
 /**
@@ -13,7 +14,9 @@ export type SearchInputProps = Omit<
 >;
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  function SearchInput({ className, placeholder = "Search", ...rest }, ref) {
+  function SearchInput({ className, placeholder, ...rest }, ref) {
+    const t = useTranslations();
+    const resolvedPlaceholder = placeholder ?? t("search");
     return (
       <div className="form-input-icon" style={{ flex: 1, minWidth: 200 }}>
         <Search
@@ -24,7 +27,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <input
           ref={ref}
           type="search"
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           className={clsx("form-input", className)}
           {...rest}
         />
