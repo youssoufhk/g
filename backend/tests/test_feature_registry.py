@@ -131,7 +131,6 @@ AI_HANDLER_NO_SERVICE_EXEMPT = frozenset({"core"})
 # delete this constant and the matching assertion.
 AI_HANDLER_NO_SERVICE_CASCADE = frozenset({
     "approvals",
-    "leaves",
     "timesheets",
 })
 # 2026-04-18: ``invoices`` closed. service.py + routes.py + models.py
