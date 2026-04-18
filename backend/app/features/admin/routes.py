@@ -1,11 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.audit import audited
 from app.core.database import get_session
 from app.core.errors import Conflict, NotFound
 from app.core.feature_registry import registry
+from app.core.rbac import gated_feature
 from app.features.admin import service
 from app.features.admin.schemas import (
     CreateTenantRequest,
@@ -34,9 +36,10 @@ async def list_tenants(
     response_model=TenantOut,
     status_code=status.HTTP_201_CREATED,
 )
-# z2-lint: ok -- TODO Phase 7 operator-console rebuild apply
-# @audited(action="ops.tenant.create") + @gated_feature("ops.tenants").
+@gated_feature("admin")
+@audited("ops.tenant.create", "tenants")
 async def create_tenant(
+    request: Request,
     body: CreateTenantRequest,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> TenantOut:
@@ -59,9 +62,14 @@ async def list_features() -> list[FeatureFlagOut]:
 
 
 @router.post("/features/{key}/kill-switch", response_model=FeatureFlagOut)
-# z2-lint: ok -- TODO Phase 7 operator-console rebuild apply
-# @audited(action="ops.flag.kill") + @gated_feature("ops.flags").
-async def set_kill_switch(key: str, body: SetKillSwitchRequest) -> FeatureFlagOut:
+@gated_feature("admin")
+@audited("ops.flag.kill", "feature_flags", entity_id_arg="key")
+async def set_kill_switch(
+    request: Request,
+    key: str,
+    body: SetKillSwitchRequest,
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> FeatureFlagOut:
     try:
         service.set_kill_switch(key, killed=body.killed)
     except NotFound as exc:
@@ -72,10 +80,13 @@ async def set_kill_switch(key: str, body: SetKillSwitchRequest) -> FeatureFlagOu
 
 
 @router.post("/features/{key}/overrides", response_model=FeatureFlagOut)
-# z2-lint: ok -- TODO Phase 7 operator-console rebuild apply
-# @audited(action="ops.flag.override") + @gated_feature("ops.flags").
+@gated_feature("admin")
+@audited("ops.flag.override", "feature_flags", entity_id_arg="key")
 async def set_override(
-    key: str, body: SetFeatureOverrideRequest
+    request: Request,
+    key: str,
+    body: SetFeatureOverrideRequest,
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> FeatureFlagOut:
     try:
         service.set_feature_override(

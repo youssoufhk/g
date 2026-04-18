@@ -1,10 +1,12 @@
 import json
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.audit import audited
 from app.core.database import get_session
+from app.core.rbac import gated_feature
 from app.core.tenancy import get_current_tenant
 from app.features.admin import service as admin_service
 from app.features.imports import service
@@ -21,11 +23,13 @@ MAX_CSV_BYTES = 10 * 1024 * 1024  # 10 MiB
 
 
 @router.post("/preview", response_model=PreviewResponse)
-# z2-lint: ok -- TODO Phase 5a apply @audited(action="import.preview")
-# + @gated_feature("imports.csv") once entitlement layer ships.
+@gated_feature("imports")
+@audited("import.preview", "imports")
 async def preview(
+    request: Request,
     entity_type: Annotated[EntityType, Form()],
     file: UploadFile,
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> PreviewResponse:
     raw_bytes = await file.read()
     if len(raw_bytes) > MAX_CSV_BYTES:
@@ -49,9 +53,10 @@ async def preview(
 
 
 @router.post("/commit", response_model=CommitResponse)
-# z2-lint: ok -- TODO Phase 5a apply @audited(action="import.commit")
-# + @gated_feature("imports.csv") once entitlement layer ships.
+@gated_feature("imports")
+@audited("import.commit", "imports")
 async def commit(
+    request: Request,
     entity_type: Annotated[EntityType, Form()],
     file: UploadFile,
     confirmed_mapping: Annotated[str, Form()],

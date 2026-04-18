@@ -1,12 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, status
+from fastapi import APIRouter, Depends, Header, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.audit import audited
 from app.core.database import get_session
 from app.core.errors import Unauthorized
+from app.core.rbac import gated_feature
 from app.features.admin import service as admin_service
 from app.features.auth import service
 from app.features.auth.models import AppUser
@@ -27,10 +29,10 @@ router = APIRouter()
     response_model=TokenPair,
     status_code=status.HTTP_201_CREATED,
 )
-# z2-lint: ok -- TODO Phase 3a.2 apply @audited(action="auth.register") once
-# actor_id can be resolved post-registration. @gated_feature skipped on
-# register endpoint itself (bootstrap).
+@gated_feature("auth")
+@audited("auth.register", "app_users")
 async def register(
+    request: Request,
     body: RegisterRequest,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> TokenPair:
@@ -54,9 +56,10 @@ async def register(
 
 
 @router.post("/login", response_model=TokenPair)
-# z2-lint: ok -- TODO Phase 3a.2 apply @audited(action="auth.login.succeed").
-# @gated_feature skipped on login endpoint itself (bootstrap).
+@gated_feature("auth")
+@audited("auth.login.succeed", "app_users")
 async def login(
+    request: Request,
     body: LoginRequest,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> TokenPair:
