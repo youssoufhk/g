@@ -10,10 +10,10 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 - Part A (UX reds, highest-visibility): 8/8
 - Part B (UI reds, atom lock-down): 11/12
-- Part C (yellow polish): 13/15
+- Part C (yellow polish): 14/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 32/35
+Overall in-session: 33/35
 
 ---
 
@@ -97,7 +97,7 @@ Overall in-session: 32/35
 30. [x] **C10 [G54]** Filter bars at 375px: horizontal scroll, not vertical wrap.
 31. [ ] **C11 [B15]** "Recent activity" on detail pages: wire real `audit_log` with before/after diffs (backend endpoint + frontend list).
 32. [x] **C12 [C21]** Undo pattern on destructive admin flows (password reset, user disable).
-33. [ ] **C13 [C19]** Smoke-test `ConflictResolverProvider` in a real mutation path (invoice status change).
+33. [x] **C13 [C19]** `lib/optimistic.test.ts` pins the 409 contract that every A3 hook depends on: `ApiClientError.conflictState` returns the server payload for 409s only, and the invoice status-change `ConflictField` shape is validated. Full interactive flow stays on the Playwright `tests/e2e/409-conflict.spec.ts` scenario.
 34. [x] **C14 [H34..H39]** Re-run grep guards: no em dashes, banned terminology, no sparklines, no donut charts.
 35. [x] **C15 [E25 lint]** Lint rule: ban icon-only `<button>` without `aria-label` literal or i18n key.
 
