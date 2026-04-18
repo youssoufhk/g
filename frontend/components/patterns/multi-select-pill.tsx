@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, ChevronDown, Search, X } from "lucide-react";
 
 export type MultiSelectOption = {
@@ -31,10 +32,13 @@ export function MultiSelectPill({
   options,
   selected,
   onChange,
-  searchPlaceholder = "Search",
-  emptyLabel = "No results",
+  searchPlaceholder,
+  emptyLabel,
   onClear,
 }: Props) {
+  const t = useTranslations("a11y");
+  const resolvedSearchPlaceholder = searchPlaceholder ?? t("search");
+  const resolvedEmptyLabel = emptyLabel ?? t("no_results");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -85,7 +89,7 @@ export function MultiSelectPill({
       >
         <span className="ms-pill-label">{label}</span>
         {active && (
-          <span className="ms-pill-count" aria-label={`${selected.length} selected`}>
+          <span className="ms-pill-count" aria-label={t("n_selected", { count: selected.length })}>
             {selected.length}
           </span>
         )}
@@ -93,7 +97,7 @@ export function MultiSelectPill({
           <span
             role="button"
             tabIndex={0}
-            aria-label={`Clear ${label}`}
+            aria-label={t("clear_label", { label })}
             className="ms-pill-clear"
             onClick={clearAll}
             onKeyDown={(e) => {
@@ -119,14 +123,14 @@ export function MultiSelectPill({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={searchPlaceholder}
+              placeholder={resolvedSearchPlaceholder}
               className="ms-pill-panel-input"
               autoFocus
             />
           </div>
           <div className="ms-pill-panel-options" role="group">
             {filtered.length === 0 ? (
-              <div className="ms-pill-panel-empty">{emptyLabel}</div>
+              <div className="ms-pill-panel-empty">{resolvedEmptyLabel}</div>
             ) : (
               filtered.map((opt) => {
                 const isSelected = selected.includes(opt.value);
@@ -157,7 +161,7 @@ export function MultiSelectPill({
                 className="ms-pill-panel-clear"
                 onClick={() => onChange([])}
               >
-                Clear selection
+                {t("clear_selection")}
               </button>
             </div>
           )}

@@ -1230,6 +1230,10 @@
     "result": "result",
     "results": "results",
     "clear_all": "Clear all",
-    "calendar": "Calendar"
+    "calendar": "Calendar",
+    "n_selected": "{count} selected",
+    "clear_label": "Clear {label}",
+    "no_results": "No results",
+    "clear_selection": "Clear selection"
   }
 }
