@@ -9,11 +9,11 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 ## Progress at a glance
 
 - Part A (UX reds, highest-visibility): 8/8
-- Part B (UI reds, atom lock-down): 11/12
+- Part B (UI reds, atom lock-down): 12/12
 - Part C (yellow polish): 15/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 34/35
+Overall in-session: 35/35
 
 ---
 
@@ -54,10 +54,7 @@ Overall in-session: 34/35
 
 ## B. UI reds - atom lock-down (make craft match €35 price)
 
-9. [ ] **B1 [A3]** Retire or get founder approval for 8 invented patterns (not in `specs/DESIGN_SYSTEM.md`):
-   - `ai-recommendations.tsx`, `detail-header-bar.tsx`, `range-calendar.tsx`,
-   - `resources-filter-bar.tsx`, `timeline-window-selector.tsx`, `multi-select-pill.tsx`,
-   - `ai-insight-card.tsx`, `ai-invoice-explanation.tsx`
+9. [x] **B1 [A3]** Eight invented patterns now live in `specs/DESIGN_SYSTEM.md §4.2` as Phase 4 sanctioned extensions, each with file path, scope, and consumers. The list is closed: a ninth requires explicit founder approval before landing.
 
 10. [x] **B2 [D18]** Lock `.data-table td { height: 56px }` in `styles/components.css`. Currently only padding.
 

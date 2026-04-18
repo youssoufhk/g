@@ -276,16 +276,94 @@ Every page uses exactly one of five patterns. Structure is fixed; content varies
 
 | Pattern | Stacked components (top to bottom) | Used by |
 |---------|------------------------------------|---------|
-| **List** | PageHeader (64px) → FilterBar (52px) → StatStrip (96px, optional, 4 cards) → DataTable (desktop) / CardGrid (mobile) | Employees, Timesheets, Leaves, Expenses, Projects, Clients, Invoices |
+| **PortfolioTimeline** (canonical) | AIRecommendations → PageHeader (overline + serif title + window selector) → KPIStripClickable (3 cards) → FilterBar (search + multi-select pills + result count + clear-all) → Timeline (rows x weeks, adaptive cell width, max 10 rows then scroll) | Employees, Projects, Clients |
+| **List** (legacy, being phased out) | PageHeader (64px) → FilterBar (52px) → StatStrip (96px, optional, 4 cards) → DataTable (desktop) / CardGrid (mobile) | Timesheets, Leaves, Expenses, Invoices |
 | **Detail** | BackBreadcrumb (40px) → EntityHeader (120px) → TabBar (48px) → Tab content | Employee, Project, Client, Invoice detail |
-| **Board** | PageHeader (64px) → Toolbar (52px) → VisualCanvas (full width, scrolls horizontally) | Gantt, Planning, Calendar, HR Kanban |
+| **Board** | PageHeader (64px) → Toolbar (52px) → VisualCanvas (full width, scrolls horizontally) | Calendar, HR Kanban |
 | **Dashboard** | GreetingHeader (80px) → KPIStrip (exactly 4 cards, 96px) → DashboardSection x N | Dashboard, Insights, Approvals |
 | **Settings** | PageHeader (64px) → SectionNav (220px left) + FormContent (720px max) | Auth wizard, Onboarding, Account, Admin |
 
 Rules:
-- KPIStrip has exactly 4 cards. Extras go in an "Overview" section below.
+- **PortfolioTimeline is the canonical operational view.** Employees, Projects, Clients use it 1:1 so the user learns the page shell once and reuses the mental model everywhere.
+- Legacy KPIStrip has exactly 4 cards. PortfolioTimeline KPIs are 3, always clickable (each applies a status filter).
 - Settings wizards replace SectionNav with a top StepIndicator.
 - Content max-width: 1400px (data pages), 720px (forms/settings).
+
+### 4.1 PortfolioTimeline pattern (LOCKED)
+
+The unified operational view for Employees (`/employees`), Projects (`/projects`), Clients (`/clients`). Standardization is the point: one shell, three contents.
+
+**Stack order (top to bottom, fixed):**
+
+1. **AIRecommendations banner** - 3 cards max, each dismissible, each with a single `Apply` CTA that mutates a filter on the page (not a new route). Tones: `gold` for risk, `primary` for opportunity, `accent` for time-sensitive. Icons from Lucide. Never more than 3 visible; dismissed cards hide for the session.
+2. **PageHeader** - overline in uppercase tracking (`Resources` / `Delivery` / `Clients`) + serif H1 (`Team capacity` / `Project portfolio` / `Client portfolio`) on the left; **TimelineWindowSelector** on the right. No period nav pill - the window selector is the only time control.
+3. **KPIStrip (3 clickable cards)** - each card is a `<button>` with `aria-pressed`. Clicking applies the corresponding status filter. Cards: one `gold` highlighted risk card, one `accent` time-sensitive, one `primary` opportunity. No decorative 4th card.
+4. **FilterBar (ResourcesFilterBar)** - rounded search input on the left, row of **MultiSelectPill** filter controls (each searchable + multi-select), right-aligned result count + clear-all button. Minimum filter groups: 3 (status, plus two domain-specific). Maximum visible: 6.
+5. **Timeline** - left identity column (260-300px) + right week grid. Adaptive cell width: `clamp(40, floor((containerWidth - leftCol) / weekCount), 200)` so the timeline fits the chosen window. Body caps at 10 rows then scrolls vertically; horizontal scroll only when cells hit min width. Each row: avatar/code chip, name, one meta line, one booked/progress line. Bars use lane stacking when allocations overlap (no bar hides another). A subtle `Now` column wash on `todayWeekIndex`.
+
+**TimelineWindowSelector presets (fixed):**
+`1w` (1 week), `2w` (2), `1m` (4), `3m` (13, default), `6m` (26), `9m` (39), `12m` (52), `18m` (78). Labeled "Window: 3 months".
+
+**KPIStripClickable rules:**
+- Exactly 3 cards.
+- Each card sets exactly one status filter (single-selection mutation, not additive).
+- `data-active="true"` applies a 1px primary ring so the user sees which KPI is driving the filter.
+- `data-highlight="true"` on the risk card (gold ring).
+- Cards are `<button type="button">` with `aria-pressed`; never `<a>` or `<article>` on this pattern.
+
+**MultiSelectPill rules:**
+- Pill = selected-count badge on the right when non-empty.
+- Floating panel opens below with a Search input, scrollable checkbox list, and `Clear selection` footer.
+- Closes on outside click or `Escape`.
+- Panel must float above the timeline sibling (z-index 60; parent filter bar z-index 40 to defeat backdrop-filter stacking contexts).
+
+**AIRecommendations rules:**
+- Never recommends something the user cannot act on from the page.
+- `onApply` mutates local filter state; it does not navigate.
+- Dismissal is session-scoped; recs come back next visit unless the backend suppresses them.
+
+**What this pattern forbids:**
+- No Timeline/Board toggle. The timeline is the view; alternate views only ship when they add information the timeline cannot express.
+- No legend of project/client colors. At 260 projects / 100+ clients the color dictionary is useless. Bars carry their own labels.
+- No raw percentages without a word next to them (`85% booked`, `62% progress`, `58% budget`). A bare `85%` is forbidden.
+- No timeline bars that visually overlap. Use lane stacking.
+- No period navigation pill when a window selector is present. Exactly one time-scope control.
+- No non-clickable KPIs on this pattern. If a KPI does not correspond to a filter, it does not belong here.
+
+**What makes this pattern useful (the why, not the what):**
+- Standardization teaches the shell once and the user reuses it on every operational page.
+- AI recommendations at the top set the day's agenda before the user scrolls.
+- KPIs are verbs, not vanity: each one is a filter the user can act on.
+- The window is a zoom control, not a navigation control - the user never loses their place.
+- 10 rows visible by default keeps the scroll cost predictable regardless of tenant size.
+
+**Reference implementations (do not diverge):**
+- `frontend/features/employees/resources-view.tsx`
+- `frontend/features/projects/portfolio-view.tsx`
+- `frontend/features/clients/clients-view.tsx`
+
+**Shared patterns (reuse, do not duplicate):**
+- `frontend/components/patterns/ai-recommendations.tsx`
+- `frontend/components/patterns/resources-filter-bar.tsx`
+- `frontend/components/patterns/multi-select-pill.tsx`
+- `frontend/components/patterns/timeline-window-selector.tsx`
+
+### 4.2 Phase 4 sanctioned extensions
+
+Eight composite patterns introduced during the Phase 4 design review and kept after the CRITIC_PLAN B1 audit. Each one solves a shared flow across two or more Tier 1 pages; duplicating any of them into a page file is forbidden. Treat this list as closed: before adding a ninth, stop and ask the founder.
+
+| Pattern | File | Scope | Used on |
+|---------|------|-------|---------|
+| `AiRecommendations` | `ai-recommendations.tsx` | Inline card surfacing AI suggestions with apply + dismiss | timesheets, expenses, approvals |
+| `DetailHeaderBar` | `detail-header-bar.tsx` | Sticky back + prev/next keyboard nav for detail pages | employees/[id], clients/[id], projects/[id], invoices/[id] |
+| `RangeCalendar` | `range-calendar.tsx` | Two-month range picker used by leave request + filter bars | leaves, expenses, invoices filters |
+| `ResourcesFilterBar` | `resources-filter-bar.tsx` | Horizontally-scrolling filter strip (status + owner + search) | expenses, invoices, approvals, projects |
+| `TimelineWindowSelector` | `timeline-window-selector.tsx` | 4-week / 12-week / YTD window pill row for portfolio timelines | employees portfolio, projects portfolio, timesheets |
+| `MultiSelectPill` | `multi-select-pill.tsx` | Multi-select pill with search + checkbox list | resources filters, approvals filters |
+| `AiInsightCard` | `ai-insight-card.tsx` | Dismissible one-line AI insight with confidence | dashboard, invoices list |
+| `AiInvoiceExplanation` | `ai-invoice-explanation.tsx` | Expandable block explaining how AI drafted an invoice | invoices/[id] |
+
+Add-time contract: every sanctioned extension must re-use the tokens in `prototype/_tokens.css`, import atoms from `components/ui/`, and ship with at least one real consumer. If a pattern appears only in a Storybook preview, it does not count as sanctioned.
 
 ---
 
