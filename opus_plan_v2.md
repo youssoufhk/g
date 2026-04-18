@@ -641,5 +641,6 @@ Append one line per completed pass. Do not delete past entries.
 - 2026-04-18: D8 ADR-011 Ollama + tool-schema wiring in `ai/client.py` (8 ollama-client tests pass).
 - 2026-04-18: D9 pricing rebase + Tier 1.1 lift for SCIM / SAML / multi-rate VAT (DEF-024, DEF-025, DEF-007 resolved).
 - 2026-04-18: D10 stage 1 of §8.4 seed coverage: leave_types + leave_requests + leave_balances migration (20260418_1000) + 700 deterministic leave-request generator + pinned counts test (9 tests pass).
+- 2026-04-18: D10 stage 2 of §8.4: timesheet_weeks + timesheet_entries migration (20260418_1100) + 10,400 week + 39,000 entry deterministic generators + pinned count tests (19 tests pass).
 
 End of plan.

@@ -455,6 +455,205 @@ async def seed_leaves(
 
 
 # ---------------------------------------------------------------------------
+# Timesheets (Phase 5a, stage 2)
+# ---------------------------------------------------------------------------
+
+# Canonical volume per DATA_ARCHITECTURE.md section 12.10:
+#   - 10,400 timesheet_weeks = 52 weeks x 200 active employees
+#   - 39,000 timesheet_entries = 150 billable x 5 workdays x 52 weeks
+# The 201-seat tenant has 1 owner who does not log hours, leaving 200
+# active employees. Of those, 150 are billable consultants
+# (25 senior + 80 mid + 60 junior - a handful of readonly/admins).
+TIMESHEET_YEAR = 2026
+TIMESHEET_WEEKS_PER_EMPLOYEE = 52
+TIMESHEET_ENTRIES_PER_BILLABLE_WEEK = 5  # Mon-Fri
+TIMESHEET_BILLABLE_EMPLOYEE_COUNT = 150
+TIMESHEET_WEEK_STATUS_MIX: tuple[tuple[str, float], ...] = (
+    ("approved", 0.75),
+    ("submitted", 0.15),
+    ("draft", 0.07),
+    ("rejected", 0.03),
+)
+
+
+def generate_timesheet_week_rows(
+    employee_ids: list[int],
+    *,
+    year: int = TIMESHEET_YEAR,
+    seed: int = 17,
+) -> list[dict[str, object]]:
+    """Emit one timesheet_week per (employee, iso_week) for the given year.
+
+    Pure. No DB dependency. Deterministic status assignment so repeated
+    runs produce the exact same counts. Returns 52 rows per employee.
+    """
+    if not employee_ids:
+        raise ValueError("generate_timesheet_week_rows requires at least one employee")
+    if year < 2000 or year > 2100:
+        raise ValueError(f"year out of range: {year}")
+
+    rng = random.Random(seed)
+    rows: list[dict[str, object]] = []
+    for emp_id in sorted(employee_ids):
+        for iso_week in range(1, TIMESHEET_WEEKS_PER_EMPLOYEE + 1):
+            roll = rng.random()
+            cumulative = 0.0
+            status = TIMESHEET_WEEK_STATUS_MIX[0][0]
+            for candidate, weight in TIMESHEET_WEEK_STATUS_MIX:
+                cumulative += weight
+                if roll <= cumulative:
+                    status = candidate
+                    break
+            rows.append(
+                {
+                    "employee_id": emp_id,
+                    "iso_year": year,
+                    "iso_week": iso_week,
+                    "status": status,
+                }
+            )
+    return rows
+
+
+def generate_timesheet_entry_rows(
+    billable_employee_ids: list[int],
+    project_ids: list[int],
+    *,
+    year: int = TIMESHEET_YEAR,
+    seed: int = 23,
+) -> list[dict[str, object]]:
+    """Emit 5 entries per (billable_employee, iso_week) for the given year.
+
+    Pure. Each entry is a full workday (480 minutes = 8 hours). The
+    project rotation is deterministic so repeat runs produce identical
+    data, and the function raises if the input lists are empty.
+    """
+    if not billable_employee_ids:
+        raise ValueError("billable_employee_ids must not be empty")
+    if not project_ids:
+        raise ValueError("project_ids must not be empty")
+
+    rng = random.Random(seed)
+    emps = sorted(billable_employee_ids)
+    projs = sorted(project_ids)
+    rows: list[dict[str, object]] = []
+
+    # ISO week 1 Monday for any year: use date.fromisocalendar.
+    for emp_id in emps:
+        # Each billable employee has 1-3 "home" projects. Deterministic.
+        home_projects = rng.sample(projs, k=min(3, len(projs)))
+        for iso_week in range(1, TIMESHEET_WEEKS_PER_EMPLOYEE + 1):
+            try:
+                monday = date.fromisocalendar(year, iso_week, 1)
+            except ValueError:
+                # Year has no ISO week 53; skip gracefully.
+                continue
+            for day_offset in range(TIMESHEET_ENTRIES_PER_BILLABLE_WEEK):
+                work_date = monday + timedelta(days=day_offset)
+                project_id = home_projects[day_offset % len(home_projects)]
+                rows.append(
+                    {
+                        "employee_id": emp_id,
+                        "project_id": project_id,
+                        "work_date": work_date,
+                        "duration_minutes": 480,  # 8h standard workday
+                        "billable": True,
+                        "iso_year": year,
+                        "iso_week": iso_week,
+                    }
+                )
+    return rows
+
+
+async def seed_timesheet_weeks(
+    conn,
+    tenant_id: int,
+    employee_map: dict[int, int],
+    *,
+    active_csv_ids: list[int] | None = None,
+    year: int = TIMESHEET_YEAR,
+) -> dict[tuple[int, int, int], int]:
+    """Insert 52 weeks per active employee. Returns {(emp_db_id, year, week): week_db_id}."""
+    if active_csv_ids is None:
+        employee_ids = sorted(employee_map.values())
+    else:
+        employee_ids = sorted(
+            employee_map[c] for c in active_csv_ids if c in employee_map
+        )
+
+    rows = generate_timesheet_week_rows(employee_ids=employee_ids, year=year)
+    mapping: dict[tuple[int, int, int], int] = {}
+    for row in rows:
+        db_id = await conn.fetchval(
+            """
+            INSERT INTO public.timesheet_weeks (
+                tenant_id, employee_id, iso_year, iso_week, status, version
+            ) VALUES ($1, $2, $3, $4, $5, 0)
+            ON CONFLICT (employee_id, iso_year, iso_week) DO NOTHING
+            RETURNING id
+            """,
+            tenant_id,
+            row["employee_id"],
+            row["iso_year"],
+            row["iso_week"],
+            row["status"],
+        )
+        if db_id is None:
+            db_id = await conn.fetchval(
+                """
+                SELECT id FROM public.timesheet_weeks
+                 WHERE employee_id=$1 AND iso_year=$2 AND iso_week=$3
+                """,
+                row["employee_id"],
+                row["iso_year"],
+                row["iso_week"],
+            )
+        mapping[(int(row["employee_id"]), int(row["iso_year"]), int(row["iso_week"]))] = db_id
+    return mapping
+
+
+async def seed_timesheet_entries(
+    conn,
+    tenant_id: int,
+    week_map: dict[tuple[int, int, int], int],
+    billable_employee_ids: list[int],
+    project_ids: list[int],
+    *,
+    year: int = TIMESHEET_YEAR,
+) -> int:
+    """Insert 39,000 deterministic entries. Returns row count."""
+    rows = generate_timesheet_entry_rows(
+        billable_employee_ids=billable_employee_ids,
+        project_ids=project_ids,
+        year=year,
+    )
+    inserted = 0
+    for row in rows:
+        week_id = week_map.get(
+            (int(row["employee_id"]), int(row["iso_year"]), int(row["iso_week"]))
+        )
+        if week_id is None:
+            continue
+        await conn.execute(
+            """
+            INSERT INTO public.timesheet_entries (
+                tenant_id, timesheet_week_id, employee_id, project_id,
+                work_date, duration_minutes, billable, version
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 0)
+            """,
+            tenant_id,
+            week_id,
+            row["employee_id"],
+            row["project_id"],
+            row["work_date"],
+            row["duration_minutes"],
+            row["billable"],
+        )
+        inserted += 1
+    return inserted
+
+
+# ---------------------------------------------------------------------------
 # Parse helpers
 # ---------------------------------------------------------------------------
 
@@ -528,12 +727,43 @@ async def main(tenant_schema: str) -> None:
         leave_count = await seed_leaves(conn, tenant_id, emp_map, type_map)
         print(f"[seed]   {leave_count} leave requests inserted")
 
+        # Timesheets: 52 weeks for 200 active employees (skip the owner),
+        # plus 5 daily entries for the 150 billable employees.
+        active_csv_ids = [
+            int(r["employee_id"])
+            for r in emp_rows
+            if r.get("role") != "owner"
+        ]
+        billable_csv_ids = [
+            int(r["employee_id"])
+            for r in emp_rows
+            if r.get("role") in ("employee",)
+        ][:TIMESHEET_BILLABLE_EMPLOYEE_COUNT]
+
+        billable_db_ids = [emp_map[c] for c in billable_csv_ids if c in emp_map]
+
+        print("[seed] Seeding timesheet weeks (52 weeks x active employees)...")
+        week_map = await seed_timesheet_weeks(
+            conn, tenant_id, emp_map, active_csv_ids=active_csv_ids
+        )
+        print(f"[seed]   {len(week_map)} timesheet weeks inserted")
+
+        print("[seed] Seeding timesheet entries (5 per billable week)...")
+        entries_count = await seed_timesheet_entries(
+            conn,
+            tenant_id,
+            week_map,
+            billable_employee_ids=billable_db_ids,
+            project_ids=sorted(proj_map.values()),
+        )
+        print(f"[seed]   {entries_count} timesheet entries inserted")
+
     finally:
         await conn.close()
 
     print("[seed] Done.")
     print(
-        "[seed] Timesheets, expenses, invoices seed in later Phase 5a stages."
+        "[seed] Expenses + invoices seed in later Phase 5a stages."
     )
 
 
