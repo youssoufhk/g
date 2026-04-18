@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
 import clsx from "clsx";
 
 /**
@@ -22,12 +22,14 @@ import clsx from "clsx";
 
 export function DataTableWrapper({
   className,
+  style,
   children,
 }: {
   className?: string;
+  style?: CSSProperties;
   children: ReactNode;
 }) {
-  return <div className={clsx("data-table-wrapper", className)}>{children}</div>;
+  return <div className={clsx("data-table-wrapper", className)} style={style}>{children}</div>;
 }
 
 export function Table({ className, ...rest }: HTMLAttributes<HTMLTableElement>) {

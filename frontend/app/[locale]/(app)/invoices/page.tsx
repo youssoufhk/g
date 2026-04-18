@@ -3,57 +3,46 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, FileText, MoreHorizontal, Download, CheckCircle, Ban, Send } from "lucide-react";
+import { useTranslations } from "next-intl";
+import {
+  Plus,
+  FileText,
+  MoreHorizontal,
+  Download,
+  CheckCircle,
+  Ban,
+  Send,
+  AlertTriangle,
+  Sparkles,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
-import { FilterBar } from "@/components/patterns/filter-bar";
-import { StatPill } from "@/components/patterns/stat-pill";
+import { ResourcesFilterBar, type FilterGroup } from "@/components/patterns/resources-filter-bar";
 import { EmptyState } from "@/components/patterns/empty-state";
+import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SearchInput } from "@/components/ui/search-input";
 import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Modal } from "@/components/ui/modal";
-import {
-  DataTableWrapper,
-  Table,
-  THead,
-  TBody,
-  TR,
-  TH,
-  TD,
-} from "@/components/ui/table";
+import { THead, TBody, TR, TH, TD } from "@/components/ui/table";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
 import { useInvoices } from "@/features/invoices/use-invoices";
+import { InvoicesKpis } from "@/features/invoices/invoices-kpis";
+import { useUrlListState } from "@/hooks/use-url-list-state";
 import type { Invoice, InvoiceStatus } from "@/features/invoices/types";
+import { formatCurrency, formatCurrencyCompact, formatDate } from "@/lib/format";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const CURRENCY_SYMBOL: Record<Invoice["currency"], string> = {
-  GBP: "£",
-  EUR: "€",
-  USD: "$",
-};
-
 function formatAmount(amount: number, currency: Invoice["currency"]): string {
   if (amount === 0) return "-";
-  const symbol = CURRENCY_SYMBOL[currency];
-  const formatted = new Intl.NumberFormat("en-GB", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-  return `${symbol}${formatted}`;
+  return formatCurrency(amount, currency, { fractionDigits: 0 });
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function formatBigAmount(amount: number, currency: Invoice["currency"]): string {
+  return formatCurrencyCompact(amount, currency);
 }
 
 function statusTone(status: InvoiceStatus): "default" | "info" | "success" | "error" | "warning" {
@@ -67,16 +56,19 @@ function statusTone(status: InvoiceStatus): "default" | "info" | "success" | "er
   }
 }
 
-function statusLabel(status: InvoiceStatus): string {
-  switch (status) {
-    case "draft": return "Draft";
-    case "sent": return "Sent";
-    case "viewed": return "Viewed";
-    case "paid": return "Paid";
-    case "overdue": return "Overdue";
-    case "void": return "Void";
-  }
-}
+const STATUS_KEYS = ["draft", "sent", "viewed", "paid", "overdue", "void"] as const;
+const CLIENT_OPTIONS_STATIC = [
+  { value: "c1", label: "HSBC UK" },
+  { value: "c2", label: "BNP Paribas" },
+  { value: "c3", label: "TotalEnergies" },
+  { value: "c4", label: "Renault" },
+];
+const CLIENT_NAMES: Record<string, string> = {
+  c1: "HSBC UK",
+  c2: "BNP Paribas",
+  c3: "TotalEnergies",
+  c4: "Renault",
+};
 
 // ── Skeleton rows ─────────────────────────────────────────────────────────────
 
@@ -103,6 +95,7 @@ function SkeletonRows() {
 // ── Mobile card ───────────────────────────────────────────────────────────────
 
 function InvoiceMobileCard({ invoice }: { invoice: Invoice }) {
+  const t = useTranslations("invoices");
   const isOverdue = invoice.status === "overdue";
   return (
     <Link
@@ -127,7 +120,7 @@ function InvoiceMobileCard({ invoice }: { invoice: Invoice }) {
           {invoice.client_name}
         </div>
         <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-          Due {formatDate(invoice.due_date)}
+          {t("due_label", { date: formatDate(invoice.due_date) })}
         </div>
       </div>
       <div style={{ textAlign: "right", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "var(--space-1)" }}>
@@ -142,7 +135,7 @@ function InvoiceMobileCard({ invoice }: { invoice: Invoice }) {
           {formatAmount(invoice.total, invoice.currency)}
         </div>
         <Badge tone={statusTone(invoice.status)} dot={invoice.status === "viewed"}>
-          {statusLabel(invoice.status)}
+          {t(`status_${invoice.status}`)}
         </Badge>
       </div>
     </Link>
@@ -169,6 +162,7 @@ function NewInvoiceModal({
   onClose: () => void;
   onSave: (inv: Invoice) => void;
 }) {
+  const t = useTranslations("invoices");
   const [form, setForm] = useState<NewInvoiceFormState>({
     client_id: "c1",
     project_id: "p1",
@@ -178,19 +172,12 @@ function NewInvoiceModal({
     amount: "",
   });
 
-  const CLIENT_OPTIONS = [
-    { value: "c1", label: "HSBC UK" },
-    { value: "c2", label: "BNP Paribas" },
-    { value: "c3", label: "TotalEnergies" },
-    { value: "c4", label: "Renault" },
-  ];
   const PROJECT_OPTIONS = [
     { value: "p1", label: "HSBC Digital Transformation" },
     { value: "p2", label: "BNP Risk Model" },
     { value: "p3", label: "TotalEnergies ESG Strategy" },
     { value: "p4", label: "Renault Lean Analytics" },
   ];
-  const CLIENT_NAMES: Record<string, string> = { c1: "HSBC UK", c2: "BNP Paribas", c3: "TotalEnergies", c4: "Renault" };
   const PROJECT_NAMES: Record<string, string> = { p1: "HSBC Digital Transformation", p2: "BNP Risk Model", p3: "TotalEnergies ESG Strategy", p4: "Renault Lean Analytics" };
 
   function handleSave() {
@@ -221,37 +208,37 @@ function NewInvoiceModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="New invoice"
-      description="Create a draft invoice to review before sending."
+      title={t("modal_title")}
+      description={t("modal_description")}
       size="md"
       footer={
         <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-          <Button variant="ghost" size="md" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" size="md" onClick={handleSave}>Create invoice</Button>
+          <Button variant="ghost" size="md" onClick={onClose}>{t("modal_cancel")}</Button>
+          <Button variant="primary" size="md" onClick={handleSave}>{t("modal_create")}</Button>
         </div>
       }
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-          <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Client</label>
+          <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>{t("modal_client")}</label>
           <Select value={form.client_id} onChange={(e) => setForm((f) => ({ ...f, client_id: e.target.value }))}>
-            {CLIENT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {CLIENT_OPTIONS_STATIC.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-          <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Project (optional)</label>
+          <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>{t("modal_project")}</label>
           <Select value={form.project_id} onChange={(e) => setForm((f) => ({ ...f, project_id: e.target.value }))}>
-            <option value="">No project</option>
+            <option value="">{t("modal_no_project")}</option>
             {PROJECT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </Select>
         </div>
         <div style={{ display: "flex", gap: "var(--space-3)" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: 1 }}>
-            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Amount (excl. VAT)</label>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>{t("modal_amount")}</label>
             <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", width: 100 }}>
-            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Currency</label>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>{t("modal_currency")}</label>
             <Select value={form.currency} onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value as Invoice["currency"] }))}>
               <option value="GBP">GBP</option>
               <option value="EUR">EUR</option>
@@ -261,11 +248,11 @@ function NewInvoiceModal({
         </div>
         <div style={{ display: "flex", gap: "var(--space-3)" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: 1 }}>
-            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Issue date</label>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>{t("modal_issue_date")}</label>
             <Input type="date" value={form.issue_date} onChange={(e) => setForm((f) => ({ ...f, issue_date: e.target.value }))} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: 1 }}>
-            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>Due date</label>
+            <label style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>{t("modal_due_date")}</label>
             <Input type="date" value={form.due_date} onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))} />
           </div>
         </div>
@@ -285,6 +272,7 @@ function InvoiceActions({
   onStatusChange: (id: string, status: InvoiceStatus) => void;
   onDownload: (id: string) => void;
 }) {
+  const t = useTranslations("invoices");
   const router = useRouter();
   const canMarkPaid = invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "viewed";
   const canSend = invoice.status === "draft";
@@ -294,7 +282,7 @@ function InvoiceActions({
     <Dropdown
       align="right"
       trigger={({ toggle }) => (
-        <Button variant="ghost" size="xs" iconOnly aria-label={`Actions for ${invoice.number}`} onClick={toggle}>
+        <Button variant="ghost" size="xs" iconOnly aria-label={t("actions_for", { number: invoice.number })} onClick={toggle}>
           <MoreHorizontal size={16} aria-hidden />
         </Button>
       )}
@@ -303,13 +291,13 @@ function InvoiceActions({
         icon={<FileText size={14} aria-hidden />}
         onClick={() => router.push(`/invoices/${invoice.id}`)}
       >
-        View
+        {t("action_view")}
       </DropdownItem>
       <DropdownItem
         icon={<Download size={14} aria-hidden />}
         onClick={() => onDownload(invoice.id)}
       >
-        Download PDF
+        {t("action_download")}
       </DropdownItem>
       {canSend && (
         <>
@@ -318,7 +306,7 @@ function InvoiceActions({
             icon={<Send size={14} aria-hidden />}
             onClick={() => onStatusChange(invoice.id, "sent")}
           >
-            Send to client
+            {t("action_send")}
           </DropdownItem>
         </>
       )}
@@ -329,7 +317,7 @@ function InvoiceActions({
             icon={<CheckCircle size={14} aria-hidden />}
             onClick={() => onStatusChange(invoice.id, "paid")}
           >
-            Mark as paid
+            {t("action_mark_paid")}
           </DropdownItem>
         </>
       )}
@@ -341,7 +329,7 @@ function InvoiceActions({
             destructive
             onClick={() => onStatusChange(invoice.id, "void")}
           >
-            Void
+            {t("action_void")}
           </DropdownItem>
         </>
       )}
@@ -351,10 +339,15 @@ function InvoiceActions({
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+type MultiKey = "status" | "client";
+
 export default function InvoicesPage() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [clientFilter, setClientFilter] = useState("all");
+  const t = useTranslations("invoices");
+  const url = useUrlListState<MultiKey>({ multiKeys: ["status", "client"] });
+  const search = url.search;
+  const statusSel = url.multi.status;
+  const clientSel = url.multi.client;
+
   const [showNewModal, setShowNewModal] = useState(false);
   const [localOverrides, setLocalOverrides] = useState<Record<string, InvoiceStatus>>({});
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -362,38 +355,32 @@ export default function InvoicesPage() {
 
   const { data, isLoading, error } = useInvoices({
     search: search || undefined,
-    status: statusFilter !== "all" ? (statusFilter as InvoiceStatus) : undefined,
-    client_id: clientFilter !== "all" ? clientFilter : undefined,
+    status: statusSel.length === 1 ? (statusSel[0] as InvoiceStatus) : undefined,
+    client_id: clientSel.length === 1 ? clientSel[0] : undefined,
   });
 
-  // Apply local status overrides and prepend locally created invoices
   const rawInvoices = data?.items ?? [];
-  const invoicesWithOverrides = rawInvoices.map((inv) =>
-    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv,
-  );
+  const applyOverride = (inv: Invoice): Invoice =>
+    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv;
 
-  // Filter locally-created invoices through filters too
-  const filteredLocalNew = localNew.filter((inv) => {
+  const matchesMulti = (inv: Invoice): boolean => {
+    if (statusSel.length > 0 && !statusSel.includes(inv.status)) return false;
+    if (clientSel.length > 0 && !clientSel.includes(inv.client_id)) return false;
     if (search) {
       const q = search.toLowerCase();
       if (!inv.number.toLowerCase().includes(q) && !inv.client_name.toLowerCase().includes(q)) return false;
     }
-    if (statusFilter !== "all" && inv.status !== statusFilter) return false;
-    if (clientFilter !== "all" && inv.client_id !== clientFilter) return false;
     return true;
-  }).map((inv) =>
-    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv,
-  );
+  };
 
-  const invoices = [...filteredLocalNew, ...invoicesWithOverrides];
+  const filteredLocalNew = localNew.map(applyOverride).filter(matchesMulti);
+  const remoteFiltered = rawInvoices.map(applyOverride).filter(matchesMulti);
+  const invoices = [...filteredLocalNew, ...remoteFiltered];
   const total = invoices.length;
 
-  // KPI calculations from full unfiltered list
   const { data: allData } = useInvoices({});
   const allInvoicesRaw = allData?.items ?? [];
-  const allInvoices = [...localNew, ...allInvoicesRaw].map((inv) =>
-    inv.id in localOverrides ? { ...inv, status: localOverrides[inv.id] as InvoiceStatus } : inv,
-  );
+  const allInvoices = [...localNew, ...allInvoicesRaw].map(applyOverride);
 
   function handleStatusChange(id: string, status: InvoiceStatus) {
     setLocalOverrides((prev) => ({ ...prev, [id]: status }));
@@ -408,353 +395,361 @@ export default function InvoicesPage() {
     setLocalNew((prev) => [inv, ...prev]);
   }
 
-  const outstanding = allInvoices
-    .filter((inv) => ["sent", "viewed", "overdue"].includes(inv.status))
-    .reduce((acc, inv) => acc + inv.total, 0);
-
-  const overdueTotal = allInvoices
-    .filter((inv) => inv.status === "overdue")
-    .reduce((acc, inv) => acc + inv.total, 0);
-
+  const overdueList = allInvoices.filter((inv) => inv.status === "overdue");
+  const overdueAmount = overdueList.reduce((acc, inv) => acc + inv.total, 0);
+  const overdueCount = overdueList.length;
   const paidYTD = allInvoices
     .filter((inv) => inv.status === "paid")
     .reduce((acc, inv) => acc + inv.total, 0);
-
   const draftsCount = allInvoices.filter((inv) => inv.status === "draft").length;
+  const fmtCurrency = (n: number) => formatBigAmount(n, "GBP");
 
-  const hasFilters = search || statusFilter !== "all" || clientFilter !== "all";
+  const activeKpi: string | undefined =
+    statusSel.length === 1
+      ? statusSel[0] === "draft"
+        ? "draft"
+        : statusSel[0] === "paid"
+        ? "paid"
+        : statusSel[0] === "overdue"
+        ? "overdue"
+        : undefined
+      : undefined;
+
+  function selectKpi(target: string) {
+    url.setMulti("status", activeKpi === target ? [] : [target]);
+  }
+
+  const recommendations: AiRecommendation[] = [
+    ...(overdueCount > 0
+      ? [
+          {
+            id: "rec-overdue",
+            icon: AlertTriangle,
+            tone: "gold" as const,
+            title: t("rec_overdue_title"),
+            detail: t("rec_overdue_detail"),
+            applyLabel: t("rec_review"),
+            onApply: () => url.setMulti("status", ["overdue"]),
+          },
+        ]
+      : []),
+    ...(draftsCount > 0
+      ? [
+          {
+            id: "rec-drafts",
+            icon: Send,
+            tone: "primary" as const,
+            title: t("rec_drafts_title"),
+            detail: t("rec_drafts_detail"),
+            applyLabel: t("rec_review"),
+            onApply: () => url.setMulti("status", ["draft"]),
+          },
+        ]
+      : []),
+    {
+      id: "rec-collect",
+      icon: Sparkles,
+      tone: "accent",
+      title: t("rec_collect_title"),
+      detail: t("rec_collect_detail"),
+    },
+  ];
+
+  const filterGroups: FilterGroup[] = [
+    {
+      key: "status",
+      label: t("filter_status"),
+      options: STATUS_KEYS.map((key) => ({ value: key, label: t(`status_${key}`) })),
+      selected: statusSel,
+      onChange: (v) => url.setMulti("status", v),
+      searchPlaceholder: t("search_status"),
+    },
+    {
+      key: "client",
+      label: t("filter_client"),
+      options: CLIENT_OPTIONS_STATIC,
+      selected: clientSel,
+      onChange: (v) => url.setMulti("client", v),
+      searchPlaceholder: t("search_client"),
+    },
+  ];
+
+  const hasFilters = !!search || statusSel.length > 0 || clientSel.length > 0;
 
   return (
     <>
-      <PageHeader
-        title="Invoices"
-        count={total}
-        actions={
-          <Button
-            variant="primary"
-            size="md"
-            leadingIcon={<Plus size={16} aria-hidden />}
-            onClick={() => setShowNewModal(true)}
-          >
-            New invoice
-          </Button>
-        }
-      />
-
-      {/* KPI strip */}
-      <div
-        className="kpi-strip"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "var(--space-4)",
-          marginBottom: "var(--space-2)",
-        }}
-      >
-        <StatPill
-          label="Total outstanding"
-          value={outstanding > 0 ? `£${new Intl.NumberFormat("en-GB").format(outstanding)}` : "-"}
-          accent="warning"
-        />
-        <StatPill
-          label="Overdue"
-          value={overdueTotal > 0 ? `€${new Intl.NumberFormat("en-GB").format(overdueTotal)}` : "-"}
-          accent="error"
-        />
-        <StatPill
-          label="Paid YTD"
-          value={paidYTD > 0 ? `€${new Intl.NumberFormat("en-GB").format(paidYTD)}` : "-"}
-          accent="success"
-        />
-        <StatPill
-          label="Drafts"
-          value={draftsCount}
-        />
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
       </div>
 
-      <FilterBar
-        actions={undefined}
-      >
-        <SearchInput
-          placeholder="Search invoices..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <PageHeader
+          title={t("page_title")}
+          count={total}
+          actions={
+            <Button
+              variant="primary"
+              size="md"
+              leadingIcon={<Plus size={16} aria-hidden />}
+              onClick={() => setShowNewModal(true)}
+            >
+              {t("new_invoice")}
+            </Button>
+          }
         />
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ minWidth: 150 }}
-        >
-          <option value="all">All statuses</option>
-          <option value="draft">Draft</option>
-          <option value="sent">Sent</option>
-          <option value="viewed">Viewed</option>
-          <option value="paid">Paid</option>
-          <option value="overdue">Overdue</option>
-          <option value="void">Void</option>
-        </Select>
-        <Select
-          value={clientFilter}
-          onChange={(e) => setClientFilter(e.target.value)}
-          style={{ minWidth: 160 }}
-        >
-          <option value="all">All clients</option>
-          <option value="c1">HSBC UK</option>
-          <option value="c2">BNP Paribas</option>
-          <option value="c3">TotalEnergies</option>
-          <option value="c4">Renault</option>
-        </Select>
-      </FilterBar>
 
-      {/* Downloading feedback */}
-      {downloadingId && (
-        <div
-          style={{
-            padding: "var(--space-2) var(--space-4)",
-            background: "var(--color-info-muted)",
-            borderRadius: "var(--radius-md)",
-            color: "var(--color-info)",
-            fontSize: "var(--text-body-sm)",
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-2)",
-            marginTop: "var(--space-2)",
-          }}
-        >
-          <Download size={14} aria-hidden />
-          Preparing PDF...
-        </div>
-      )}
+        <AiRecommendations
+          items={recommendations}
+          title={t("ai_recs_title")}
+          overline={t("ai_recs_overline")}
+        />
 
-      {/* Error state */}
-      {error && (
-        <div
-          style={{
-            padding: "var(--space-4)",
-            background: "var(--color-error-muted)",
-            borderRadius: "var(--radius-md)",
-            color: "var(--color-error)",
-            fontSize: "var(--text-body-sm)",
-            marginTop: "var(--space-4)",
-          }}
-        >
-          Failed to load invoices. {(error as Error).message}
-        </div>
-      )}
+        <InvoicesKpis
+          overdueAmount={fmtCurrency(overdueAmount)}
+          overdueCount={overdueCount}
+          paidYtd={fmtCurrency(paidYTD)}
+          draftsCount={draftsCount}
+          activeStatus={activeKpi}
+          onSelectOverdue={() => selectKpi("overdue")}
+          onSelectPaid={() => selectKpi("paid")}
+          onSelectDrafts={() => selectKpi("draft")}
+        />
 
-      {/* Desktop table */}
-      {!error && (
-        <DataTableWrapper>
-          <Table>
-            <THead>
-              <TR>
-                <TH style={{ width: 40 }} />
-                <TH style={{ minWidth: 150 }}>Invoice #</TH>
-                <TH style={{ minWidth: 120 }}>Client</TH>
-                <TH style={{ minWidth: 160 }}>Project</TH>
-                <TH style={{ minWidth: 110 }}>Issue date</TH>
-                <TH style={{ minWidth: 110 }}>Due date</TH>
-                <TH numeric sorted sortDirection="desc" style={{ minWidth: 130 }}>Amount</TH>
-                <TH style={{ minWidth: 90 }}>Status</TH>
-                <TH style={{ width: 44 }} />
-              </TR>
-            </THead>
-            <TBody>
-              {isLoading && <SkeletonRows />}
+        <ResourcesFilterBar
+          search={search}
+          onSearchChange={url.setSearch}
+          searchPlaceholder={t("search_placeholder")}
+          groups={filterGroups}
+          onClearAll={url.clearAll}
+          resultCount={total}
+          resultLabel={total === 1 ? t("result_invoice") : t("result_invoices")}
+        />
 
-              {!isLoading && invoices.length === 0 && (
-                <TR>
-                  <TD colSpan={9} style={{ textAlign: "center", padding: "var(--space-16) var(--space-6)" }}>
-                    <EmptyState
-                      icon={FileText}
-                      title={hasFilters ? "No invoices match your filters" : "No invoices yet"}
-                      description={
-                        hasFilters
-                          ? "Try adjusting your search or filters."
-                          : "Create your first invoice to start tracking payments."
-                      }
-                      action={
-                        hasFilters ? (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => {
-                              setSearch("");
-                              setStatusFilter("all");
-                              setClientFilter("all");
+        {downloadingId && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              padding: "var(--space-2) var(--space-4)",
+              background: "var(--color-info-muted)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--color-info)",
+              fontSize: "var(--text-body-sm)",
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-2)",
+            }}
+          >
+            <Download size={14} aria-hidden />
+            {t("preparing_pdf")}
+          </div>
+        )}
+
+        {error && (
+          <div
+            role="alert"
+            style={{
+              padding: "var(--space-4)",
+              background: "var(--color-error-muted)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--color-error)",
+              fontSize: "var(--text-body-sm)",
+            }}
+          >
+            {t("load_error")} {(error as Error).message}
+          </div>
+        )}
+
+        {!error && (
+          <div
+            aria-busy={isLoading}
+            aria-live="polite"
+            className="data-table-wrapper"
+            style={{ maxHeight: "calc(12 * 48px + 56px)", overflow: "auto" }}
+          >
+            <table className="data-table">
+                <THead>
+                  <TR>
+                    <TH style={{ width: 40 }} />
+                    <TH style={{ minWidth: 150 }}>{t("col_invoice")}</TH>
+                    <TH style={{ minWidth: 120 }}>{t("col_client")}</TH>
+                    <TH style={{ minWidth: 160 }}>{t("col_project")}</TH>
+                    <TH style={{ minWidth: 110 }}>{t("col_issue_date")}</TH>
+                    <TH style={{ minWidth: 110 }}>{t("col_due_date")}</TH>
+                    <TH numeric sorted sortDirection="desc" style={{ minWidth: 130 }}>{t("col_amount")}</TH>
+                    <TH style={{ minWidth: 90 }}>{t("col_status")}</TH>
+                    <TH style={{ width: 44 }} aria-label={t("col_actions_aria")} />
+                  </TR>
+                </THead>
+                <TBody>
+                  {isLoading && <SkeletonRows />}
+
+                  {!isLoading && invoices.length === 0 && (
+                    <TR>
+                      <TD colSpan={9} style={{ textAlign: "center", padding: "var(--space-16) var(--space-6)" }}>
+                        <EmptyState
+                          icon={FileText}
+                          title={hasFilters ? t("empty_filtered_title") : t("empty_title")}
+                          description={hasFilters ? t("empty_filtered_desc") : t("empty_desc")}
+                          action={
+                            hasFilters ? (
+                              <Button variant="secondary" size="sm" onClick={() => url.clearAll()}>
+                                {t("empty_clear")}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                leadingIcon={<Plus size={14} aria-hidden />}
+                                onClick={() => setShowNewModal(true)}
+                              >
+                                {t("new_invoice")}
+                              </Button>
+                            )
+                          }
+                        />
+                      </TD>
+                    </TR>
+                  )}
+
+                  {!isLoading && invoices.map((invoice) => {
+                    const isOverdue = invoice.status === "overdue";
+                    return (
+                      <TR key={invoice.id}>
+                        <TD>
+                          {invoice.ai_generated && (
+                            <span
+                              title={t("ai_drafted")}
+                              aria-label={t("ai_drafted")}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: 20,
+                                height: 20,
+                                borderRadius: "var(--radius-sm)",
+                                background: "var(--color-ai-muted, color-mix(in srgb, var(--color-primary) 15%, transparent))",
+                                color: "var(--color-primary)",
+                              }}
+                            >
+                              <Sparkles size={12} aria-hidden />
+                            </span>
+                          )}
+                        </TD>
+                        <TD>
+                          <Link
+                            href={`/invoices/${invoice.id}`}
+                            style={{
+                              fontFamily: "var(--font-mono)",
+                              fontWeight: "var(--weight-semibold)",
+                              color: "var(--color-primary)",
+                              textDecoration: "none",
+                              fontSize: "var(--text-body-sm)",
                             }}
+                            className="hover-primary"
                           >
-                            Clear filters
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            leadingIcon={<Plus size={14} aria-hidden />}
-                            onClick={() => setShowNewModal(true)}
+                            {invoice.number}
+                          </Link>
+                        </TD>
+                        <TD>
+                          <Link
+                            href={`/clients/${invoice.client_id}`}
+                            style={{ color: "var(--color-text-1)", textDecoration: "none", fontWeight: "var(--weight-medium)" }}
+                            className="hover-primary"
                           >
-                            New invoice
-                          </Button>
-                        )
-                      }
-                    />
-                  </TD>
-                </TR>
-              )}
-
-              {!isLoading && invoices.map((invoice) => {
-                const isOverdue = invoice.status === "overdue";
-                return (
-                  <TR key={invoice.id}>
-                    <TD>
-                      {invoice.ai_generated && (
-                        <span
-                          title="AI drafted"
+                            {invoice.client_name}
+                          </Link>
+                        </TD>
+                        <TD muted>
+                          {invoice.project_name && invoice.project_id ? (
+                            <Link
+                              href={`/projects/${invoice.project_id}`}
+                              style={{ color: "var(--color-text-2)", textDecoration: "none" }}
+                              className="hover-primary"
+                            >
+                              {invoice.project_name}
+                            </Link>
+                          ) : (
+                            <span style={{ color: "var(--color-text-3)" }}>{t("no_project")}</span>
+                          )}
+                        </TD>
+                        <TD muted>{formatDate(invoice.issue_date)}</TD>
+                        <TD
                           style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 20,
-                            height: 20,
-                            borderRadius: "var(--radius-sm)",
-                            background: "var(--color-ai-muted, color-mix(in srgb, var(--color-primary) 15%, transparent))",
-                            color: "var(--color-primary)",
+                            color: isOverdue ? "var(--color-error)" : undefined,
+                            fontWeight: isOverdue ? "var(--weight-medium)" : undefined,
                           }}
                         >
-                          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-                            <path d="M8 1l1.5 4.5L14 7l-4.5 1.5L8 13l-1.5-4.5L2 7l4.5-1.5L8 1z" />
-                          </svg>
-                        </span>
-                      )}
-                    </TD>
-                    <TD>
-                      <Link
-                        href={`/invoices/${invoice.id}`}
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          fontWeight: "var(--weight-semibold)",
-                          color: "var(--color-primary)",
-                          textDecoration: "none",
-                          fontSize: "var(--text-body-sm)",
-                        }}
-                        className="hover-primary"
-                      >
-                        {invoice.number}
-                      </Link>
-                    </TD>
-                    <TD>
-                      <Link
-                        href={`/clients/${invoice.client_id}`}
-                        style={{ color: "var(--color-text-1)", textDecoration: "none", fontWeight: "var(--weight-medium)" }}
-                        className="hover-primary"
-                      >
-                        {invoice.client_name}
-                      </Link>
-                    </TD>
-                    <TD muted>
-                      {invoice.project_name ? (
-                        <Link
-                          href={`/projects/${invoice.project_id}`}
-                          style={{ color: "var(--color-text-2)", textDecoration: "none" }}
-                          className="hover-primary"
-                        >
-                          {invoice.project_name}
-                        </Link>
-                      ) : (
-                        <span style={{ color: "var(--color-text-3)" }}>-</span>
-                      )}
-                    </TD>
-                    <TD muted>{formatDate(invoice.issue_date)}</TD>
-                    <TD
-                      style={{
-                        color: isOverdue ? "var(--color-error)" : undefined,
-                        fontWeight: isOverdue ? "var(--weight-medium)" : undefined,
-                      }}
-                    >
-                      {formatDate(invoice.due_date)}
-                    </TD>
-                    <TD numeric>
-                      <span
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          fontWeight: "var(--weight-semibold)",
-                          color: isOverdue ? "var(--color-error)" : "var(--color-gold)",
-                        }}
-                      >
-                        {formatAmount(invoice.total, invoice.currency)}
-                      </span>
-                    </TD>
-                    <TD>
-                      <Badge tone={statusTone(invoice.status)} dot={invoice.status === "viewed"}>
-                        {statusLabel(invoice.status)}
-                      </Badge>
-                    </TD>
-                    <TD>
-                      <InvoiceActions
-                        invoice={invoice}
-                        onStatusChange={handleStatusChange}
-                        onDownload={handleDownload}
-                      />
-                    </TD>
-                  </TR>
-                );
-              })}
-            </TBody>
-          </Table>
-        </DataTableWrapper>
-      )}
+                          {formatDate(invoice.due_date)}
+                        </TD>
+                        <TD numeric>
+                          <span
+                            style={{
+                              fontFamily: "var(--font-mono)",
+                              fontWeight: "var(--weight-semibold)",
+                              color: isOverdue ? "var(--color-error)" : "var(--color-gold)",
+                            }}
+                          >
+                            {formatAmount(invoice.total, invoice.currency)}
+                          </span>
+                        </TD>
+                        <TD>
+                          <Badge tone={statusTone(invoice.status)} dot={invoice.status === "viewed"}>
+                            {t(`status_${invoice.status}`)}
+                          </Badge>
+                        </TD>
+                        <TD>
+                          <InvoiceActions
+                            invoice={invoice}
+                            onStatusChange={handleStatusChange}
+                            onDownload={handleDownload}
+                          />
+                        </TD>
+                      </TR>
+                    );
+                  })}
+                </TBody>
+            </table>
+          </div>
+        )}
 
-      {/* Mobile cards */}
-      {!error && !isLoading && invoices.length > 0 && (
-        <div className="md:hidden" style={{ marginTop: "var(--space-4)" }}>
-          {invoices.map((invoice) => (
-            <InvoiceMobileCard key={invoice.id} invoice={invoice} />
-          ))}
-        </div>
-      )}
+        {!error && !isLoading && invoices.length > 0 && (
+          <div className="md:hidden">
+            {invoices.map((invoice) => (
+              <InvoiceMobileCard key={invoice.id} invoice={invoice} />
+            ))}
+          </div>
+        )}
 
-      {/* Summary row */}
-      {!isLoading && invoices.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--space-4)",
-            padding: "var(--space-3) 0",
-            fontSize: "var(--text-body-sm)",
-            color: "var(--color-text-3)",
-            borderTop: "1px solid var(--color-border-subtle)",
-            marginTop: "var(--space-2)",
-          }}
-        >
-          <span>{total} invoices</span>
-          <span>{invoices.filter((i) => i.status === "paid").length} paid</span>
-          {invoices.filter((i) => i.status === "overdue").length > 0 && (
-            <span style={{ color: "var(--color-error)" }}>
-              {invoices.filter((i) => i.status === "overdue").length} overdue
-            </span>
-          )}
-        </div>
-      )}
+        {!isLoading && invoices.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-4)",
+              padding: "var(--space-3) 0",
+              fontSize: "var(--text-body-sm)",
+              color: "var(--color-text-3)",
+              borderTop: "1px solid var(--color-border-subtle)",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            <span>{t("summary_invoices", { total })}</span>
+            <span>{t("summary_paid", { count: invoices.filter((i) => i.status === "paid").length })}</span>
+            {invoices.filter((i) => i.status === "overdue").length > 0 && (
+              <span style={{ color: "var(--color-error)" }}>
+                {t("summary_overdue", { count: invoices.filter((i) => i.status === "overdue").length })}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
       <NewInvoiceModal
         open={showNewModal}
         onClose={() => setShowNewModal(false)}
         onSave={handleNewInvoiceSave}
       />
-
-      <style>{`
-        @media (max-width: 767px) {
-          .kpi-strip {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-        @media (max-width: 479px) {
-          .kpi-strip {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

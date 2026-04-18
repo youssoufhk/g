@@ -383,12 +383,8 @@ body.dev-mode .state-toggle { display: flex; }
 
 /* ── RESPONSIVE ── */
 
-/* Wide (1440+) */
+/* Wide (1440+) - sidebar locked at 224px at all viewports per CLAUDE.md rule 3 */
 @media (min-width: 1440px) {
-  .sidebar { width: var(--sidebar-wide); }
-  .sidebar.collapsed { width: var(--sidebar-collapsed); }
-  .main-wrapper { margin-left: var(--sidebar-wide); }
-  .sidebar.collapsed ~ .main-wrapper { margin-left: var(--sidebar-collapsed); }
   .grid-4 { grid-template-columns: repeat(4, 1fr); }
 }
 

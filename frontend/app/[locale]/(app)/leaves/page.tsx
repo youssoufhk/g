@@ -1,47 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { Umbrella, Calendar } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Umbrella, Sparkles, Send, X } from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
-import { StatPill } from "@/components/patterns/stat-pill";
+import { ResourcesFilterBar, type FilterGroup } from "@/components/patterns/resources-filter-bar";
 import { EmptyState } from "@/components/patterns/empty-state";
+import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
+import {
+  TimelineWindowSelector,
+  weeksFor,
+  type WindowPresetValue,
+} from "@/components/patterns/timeline-window-selector";
+import { RangeCalendar, type RangeEvent } from "@/components/patterns/range-calendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Modal } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useLeaveRequests, useLeaveBalance } from "@/features/leaves/use-leaves";
+import { LeavesKpis } from "@/features/leaves/leaves-kpis";
+import { useUrlListState } from "@/hooks/use-url-list-state";
 import type { LeaveRequest, LeaveType, LeaveStatus } from "@/features/leaves/types";
+import { formatDate, formatPeriod, daysBetween as diffDays } from "@/lib/format";
+import { useUndoableAction } from "@/lib/use-undoable-action";
 
-// ── helpers ────────────────────────────────────────────────────────────────
+const CURRENT_USER_ID = "e1";
+const CURRENT_USER_NAME = "Youssouf Kerzika";
 
-function formatPeriod(start: string, end: string): string {
-  const s = new Date(start);
-  const e = new Date(end);
-  const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
-  if (start === end) {
-    return new Date(start).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }
-  return `${s.toLocaleDateString("en-GB", opts)} - ${e.toLocaleDateString("en-GB", { ...opts, year: "numeric" })}`;
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-// ── type config ────────────────────────────────────────────────────────────
+const TYPE_KEYS: LeaveType[] = ["annual", "sick", "parental", "unpaid", "public_holiday", "compassionate"];
+const STATUS_KEYS: LeaveStatus[] = ["pending", "approved", "rejected", "cancelled"];
 
 type BadgeTone = "default" | "primary" | "success" | "warning" | "error" | "info" | "accent" | "gold" | "ghost" | "ghost-primary" | "neutral";
 
@@ -54,15 +43,6 @@ const TYPE_BADGE_TONE: Record<LeaveType, BadgeTone> = {
   compassionate: "error",
 };
 
-const TYPE_LABEL: Record<LeaveType, string> = {
-  annual: "Annual",
-  sick: "Sick",
-  parental: "Parental",
-  unpaid: "Unpaid",
-  public_holiday: "Public holiday",
-  compassionate: "Compassionate",
-};
-
 const STATUS_BADGE_TONE: Record<LeaveStatus, BadgeTone> = {
   pending: "warning",
   approved: "success",
@@ -70,591 +50,428 @@ const STATUS_BADGE_TONE: Record<LeaveStatus, BadgeTone> = {
   cancelled: "default",
 };
 
-// ── request leave modal ────────────────────────────────────────────────────
-
-type RequestLeaveFormState = {
-  type: LeaveType | "";
-  start_date: string;
-  end_date: string;
-  reason: string;
+const STATUS_TO_EVENT_TONE: Record<LeaveStatus, "primary" | "gold" | "default" | "error"> = {
+  approved: "primary",
+  pending: "gold",
+  cancelled: "default",
+  rejected: "error",
 };
 
-function RequestLeaveModal({
-  open,
-  onClose,
+// ── Inline range composer ─────────────────────────────────────────────────
+
+function RangeComposer({
+  range,
+  onCancel,
   onSubmit,
 }: {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (form: RequestLeaveFormState) => void;
+  range: { start: string; end: string };
+  onCancel: () => void;
+  onSubmit: (type: LeaveType, reason: string) => void;
 }) {
-  const [form, setForm] = useState<RequestLeaveFormState>({
-    type: "",
-    start_date: "",
-    end_date: "",
-    reason: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const t = useTranslations("leaves");
+  const [type, setType] = useState<LeaveType | "">("");
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit() {
-    if (!form.type || !form.start_date || !form.end_date) return;
-    setIsSubmitting(true);
+  const days = diffDays(range.start, range.end);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!type) return;
+    setSubmitting(true);
     setTimeout(() => {
-      setIsSubmitting(false);
-      onSubmit(form);
-      setForm({ type: "", start_date: "", end_date: "", reason: "" });
-      onClose();
-    }, 600);
+      onSubmit(type as LeaveType, reason);
+      setSubmitting(false);
+    }, 350);
   }
 
-  const LEAVE_TYPE_OPTIONS: Array<{ value: LeaveType | ""; label: string }> = [
-    { value: "", label: "Select type" },
-    { value: "annual", label: "Annual leave" },
-    { value: "sick", label: "Sick leave" },
-    { value: "parental", label: "Parental leave" },
-    { value: "unpaid", label: "Unpaid leave" },
-    { value: "compassionate", label: "Compassionate leave" },
-  ];
-
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Request leave"
-      description="Submit a new leave request for approval."
-      size="sm"
-      footer={
-        <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-          <Button variant="ghost" size="md" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            size="md"
-            loading={isSubmitting}
-            onClick={handleSubmit}
-          >
-            {isSubmitting ? "Submitting..." : "Submit request"}
-          </Button>
-        </div>
-      }
-    >
-      <form
-        onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
-        style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}
-      >
-        {/* Leave type */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-          <label
-            style={{
-              fontSize: "var(--text-body-sm)",
-              fontWeight: "var(--weight-medium)",
-              color: "var(--color-text-2)",
-            }}
-          >
-            Leave type
+    <form className="range-composer" onSubmit={handleSubmit} aria-label={t("composer_aria")}>
+      <div className="range-composer-summary">
+        {t("composer_summary", { period: formatPeriod(range.start, range.end), days })}
+      </div>
+      <div className="range-composer-row">
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: "1 1 200px" }}>
+          <label style={{ fontSize: "var(--text-caption)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>
+            {t("form_type")}
           </label>
           <Select
-            value={form.type}
-            onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as LeaveType | "" }))}
+            value={type}
+            onChange={(e) => setType(e.target.value as LeaveType | "")}
+            required
           >
-            {LEAVE_TYPE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
+            <option value="">{t("form_type_placeholder")}</option>
+            {TYPE_KEYS.filter((k) => k !== "public_holiday").map((k) => (
+              <option key={k} value={k}>{t(`type_${k}`)}</option>
             ))}
           </Select>
         </div>
-
-        {/* Start date */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-          <label
-            style={{
-              fontSize: "var(--text-body-sm)",
-              fontWeight: "var(--weight-medium)",
-              color: "var(--color-text-2)",
-            }}
-          >
-            Start date
-          </label>
-          <Input
-            type="date"
-            value={form.start_date}
-            onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
-          />
-        </div>
-
-        {/* End date */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-          <label
-            style={{
-              fontSize: "var(--text-body-sm)",
-              fontWeight: "var(--weight-medium)",
-              color: "var(--color-text-2)",
-            }}
-          >
-            End date
-          </label>
-          <Input
-            type="date"
-            value={form.end_date}
-            onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))}
-          />
-        </div>
-
-        {/* Reason */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-          <label
-            style={{
-              fontSize: "var(--text-body-sm)",
-              fontWeight: "var(--weight-medium)",
-              color: "var(--color-text-2)",
-            }}
-          >
-            Reason (optional)
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", flex: "2 1 320px" }}>
+          <label style={{ fontSize: "var(--text-caption)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}>
+            {t("form_reason")}
           </label>
           <Textarea
-            placeholder="Add a note for your manager..."
-            value={form.reason}
-            onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))}
-            rows={3}
+            placeholder={t("form_reason_placeholder")}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            rows={1}
           />
         </div>
-      </form>
-    </Modal>
+      </div>
+      <div className="range-composer-row" style={{ justifyContent: "flex-end" }}>
+        <Button variant="ghost" size="sm" type="button" leadingIcon={<X size={14} aria-hidden />} onClick={onCancel}>
+          {t("composer_cancel")}
+        </Button>
+        <Button variant="primary" size="sm" type="submit" loading={submitting} disabled={!type}>
+          {submitting ? t("form_submitting") : t("form_submit")}
+        </Button>
+      </div>
+    </form>
   );
 }
 
-// ── my leaves table ────────────────────────────────────────────────────────
+// ── My leaves view ────────────────────────────────────────────────────────
 
-function MyLeavesTab({ extraLeaves }: { extraLeaves: LeaveRequest[] }) {
-  const { data: rawLeaves, isLoading } = useLeaveRequests({});
+type LeaveMultiKey = "status" | "type";
+
+function MyLeavesView({
+  localNew,
+  onSubmitLeave,
+}: {
+  localNew: LeaveRequest[];
+  onSubmitLeave: (l: LeaveRequest) => void;
+}) {
+  const t = useTranslations("leaves");
+  const url = useUrlListState<LeaveMultiKey, WindowPresetValue>({
+    multiKeys: ["status", "type"],
+    windowKey: "window",
+    windowDefault: "12m",
+  });
+  const search = url.search;
+  const statusSel = url.multi.status;
+  const typeSel = url.multi.type;
+  const windowValue: WindowPresetValue = url.windowValue || "12m";
+  const windowWeeks = weeksFor(windowValue);
+
+  const { data: rawLeaves, isLoading, error } = useLeaveRequests({});
+  const { data: balance } = useLeaveBalance();
   const [localStatuses, setLocalStatuses] = useState<Record<string, LeaveStatus>>({});
-  const [statusFilter, setStatusFilter] = useState<LeaveStatus | "all">("all");
+  const [pendingRange, setPendingRange] = useState<{ start: string; end: string } | null>(null);
 
-  const allLeaves: LeaveRequest[] = [
-    ...extraLeaves,
-    ...(rawLeaves ?? []),
-  ].map((l) => (l.id in localStatuses ? { ...l, status: localStatuses[l.id] as LeaveStatus } : l));
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - windowWeeks * 7);
 
-  const filtered = statusFilter === "all" ? allLeaves : allLeaves.filter((l) => l.status === statusFilter);
+  const myLeaves: LeaveRequest[] = useMemo(
+    () =>
+      [...localNew, ...(rawLeaves ?? [])]
+        .filter((l) => l.employee_id === CURRENT_USER_ID || l.id.startsWith("leave-new-"))
+        .map((l) => (l.id in localStatuses ? { ...l, status: localStatuses[l.id] as LeaveStatus } : l)),
+    [localNew, rawLeaves, localStatuses],
+  );
 
-  function handleCancel(id: string) {
-    setLocalStatuses((prev) => ({ ...prev, [id]: "cancelled" }));
+  const allLeaves: LeaveRequest[] = myLeaves.filter((l) => new Date(l.start_date) >= cutoff);
+
+  const matchesFilters = (l: LeaveRequest): boolean => {
+    if (statusSel.length > 0 && !statusSel.includes(l.status)) return false;
+    if (typeSel.length > 0 && !typeSel.includes(l.type)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !(l.reason ?? "").toLowerCase().includes(q) &&
+        !t(`type_${l.type}`).toLowerCase().includes(q)
+      )
+        return false;
+    }
+    return true;
+  };
+
+  const leaves = allLeaves.filter(matchesFilters);
+  const total = leaves.length;
+
+  const handleCancel = useUndoableAction<{ id: string; prev: LeaveStatus }>({
+    apply: ({ id }) => setLocalStatuses((prev) => ({ ...prev, [id]: "cancelled" })),
+    revert: ({ id, prev: prevStatus }) =>
+      setLocalStatuses((prev) => {
+        const next = { ...prev };
+        if (prevStatus) next[id] = prevStatus;
+        else delete next[id];
+        return next;
+      }),
+    successTitle: t("cancel_toast_title"),
+    successDescription: t("cancel_toast_body"),
+    tone: "warning",
+  });
+
+  const pendingCount = allLeaves.filter((l) => l.status === "pending").length;
+  const approvedDays = allLeaves
+    .filter((l) => l.status === "approved")
+    .reduce((s, l) => s + l.days, 0);
+
+  const activeKpi: string | undefined =
+    statusSel.length === 1
+      ? statusSel[0] === "pending"
+        ? "pending"
+        : statusSel[0] === "approved"
+        ? "approved"
+        : undefined
+      : undefined;
+
+  function selectKpi(target: string) {
+    url.setMulti("status", activeKpi === target ? [] : [target]);
   }
 
-  if (isLoading) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} variant="card" style={{ height: 56, borderRadius: "var(--radius-lg)" }} />
-        ))}
-      </div>
-    );
+  // Calendar events: show ALL my leaves (not window-filtered)
+  const calendarEvents: RangeEvent[] = useMemo(
+    () =>
+      myLeaves
+        .filter((l) => l.status !== "cancelled" && l.status !== "rejected")
+        .map((l) => ({
+          id: l.id,
+          start: l.start_date,
+          end: l.end_date,
+          tone: STATUS_TO_EVENT_TONE[l.status],
+          label: `${t(`type_${l.type}`)} (${t(`status_${l.status}`)})`,
+        })),
+    [myLeaves, t],
+  );
+
+  function handleRangeSelect(start: string, end: string) {
+    setPendingRange({ start, end });
   }
 
-  if (allLeaves.length === 0) {
-    return (
-      <EmptyState
-        icon={Umbrella}
-        title="No leave requests"
-        description="You have not submitted any leave requests yet."
-      />
-    );
+  function handleComposerSubmit(type: LeaveType, reason: string) {
+    if (!pendingRange) return;
+    const newLeave: LeaveRequest = {
+      id: `leave-new-${Date.now()}`,
+      employee_id: CURRENT_USER_ID,
+      employee_name: CURRENT_USER_NAME,
+      type,
+      start_date: pendingRange.start,
+      end_date: pendingRange.end,
+      days: diffDays(pendingRange.start, pendingRange.end),
+      status: "pending",
+      reason: reason || undefined,
+      submitted_at: new Date().toISOString(),
+    };
+    onSubmitLeave(newLeave);
+    setPendingRange(null);
   }
 
-  const STATUS_FILTER_OPTIONS: Array<{ value: LeaveStatus | "all"; label: string }> = [
-    { value: "all", label: "All" },
-    { value: "pending", label: "Pending" },
-    { value: "approved", label: "Approved" },
-    { value: "rejected", label: "Rejected" },
-    { value: "cancelled", label: "Cancelled" },
+  const recommendations: AiRecommendation[] = [
+    ...(pendingCount > 0
+      ? [
+          {
+            id: "rec-pending",
+            icon: Send,
+            tone: "gold" as const,
+            title: t("rec_pending_title"),
+            detail: t("rec_pending_detail", { count: pendingCount }),
+            applyLabel: t("rec_review"),
+            onApply: () => url.setMulti("status", ["pending"]),
+          },
+        ]
+      : []),
+    ...((balance?.annual_remaining ?? 0) > 10
+      ? [
+          {
+            id: "rec-balance",
+            icon: Sparkles,
+            tone: "accent" as const,
+            title: t("rec_balance_title"),
+            detail: t("rec_balance_detail", { days: balance?.annual_remaining ?? 0 }),
+          },
+        ]
+      : []),
   ];
 
+  const filterGroups: FilterGroup[] = [
+    {
+      key: "status",
+      label: t("filter_status"),
+      options: STATUS_KEYS.map((k) => ({ value: k, label: t(`status_${k}`) })),
+      selected: statusSel,
+      onChange: (v) => url.setMulti("status", v),
+      searchPlaceholder: t("search_status"),
+    },
+    {
+      key: "type",
+      label: t("filter_type"),
+      options: TYPE_KEYS.map((k) => ({ value: k, label: t(`type_${k}`) })),
+      selected: typeSel,
+      onChange: (v) => url.setMulti("type", v),
+      searchPlaceholder: t("search_type"),
+    },
+  ];
+
+  const hasFilters = !!search || statusSel.length > 0 || typeSel.length > 0;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-      {/* Status filter tabs */}
-      <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
-        {STATUS_FILTER_OPTIONS.map((opt) => {
-          const isActive = statusFilter === opt.value;
-          const count = opt.value === "all" ? allLeaves.length : allLeaves.filter((l) => l.status === opt.value).length;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setStatusFilter(opt.value)}
-              style={{
-                padding: "var(--space-1) var(--space-3)",
-                borderRadius: "var(--radius-full)",
-                border: `1px solid ${isActive ? "var(--color-primary)" : "var(--color-border)"}`,
-                background: isActive ? "var(--color-primary-muted)" : "transparent",
-                color: isActive ? "var(--color-primary)" : "var(--color-text-2)",
-                fontSize: "var(--text-body-sm)",
-                fontWeight: isActive ? "var(--weight-semibold)" : "var(--weight-regular)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "var(--space-1)",
-              }}
-            >
-              {opt.label}
-              {count > 0 && (
-                <span
-                  style={{
-                    fontSize: "var(--text-caption)",
-                    fontFamily: "var(--font-mono)",
-                    opacity: 0.7,
-                  }}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+      <AiRecommendations
+        items={recommendations}
+        title={t("ai_recs_title")}
+        overline={t("ai_recs_overline")}
+      />
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-2)" }}>
+          {t("scope_me")}
+        </span>
+        <TimelineWindowSelector
+          value={windowValue}
+          onChange={url.setWindow}
+          label={t("window_label")}
+        />
       </div>
 
-      {filtered.length === 0 ? (
-        <EmptyState
-          icon={Umbrella}
-          title="No leaves match this filter"
-          description="Try a different status filter."
+      <LeavesKpis
+        remainingDays={balance?.annual_remaining ?? 0}
+        totalDays={balance?.annual_total ?? 0}
+        pendingCount={pendingCount}
+        approvedDays={approvedDays}
+        activeStatus={activeKpi}
+        onSelectPending={() => selectKpi("pending")}
+        onSelectApproved={() => selectKpi("approved")}
+      />
+
+      <section aria-labelledby="leaves-calendar-heading">
+        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "var(--space-2)", gap: "var(--space-3)", flexWrap: "wrap" }}>
+          <h2 id="leaves-calendar-heading" style={{ fontSize: "var(--text-body)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)", margin: 0 }}>
+            {t("calendar_title")}
+          </h2>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
+            {t("calendar_hint")}
+          </span>
+        </header>
+        <RangeCalendar
+          monthsVisible={2}
+          events={calendarEvents}
+          selectedRange={pendingRange}
+          onRangeSelect={handleRangeSelect}
+          minDate={new Date().toISOString().slice(0, 10)}
+          ariaLabel={t("calendar_aria")}
         />
-      ) : (
-        <div className="data-table-wrapper">
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                {["Type", "Period", "Days", "Status", "Submitted", "Actions"].map((col) => (
-                  <th
-                    key={col}
-                    style={{
-                      padding: "var(--space-2) var(--space-4)",
-                      textAlign: "left",
-                      fontSize: "var(--text-caption)",
-                      fontWeight: "var(--weight-semibold)",
-                      color: "var(--color-text-3)",
-                      borderBottom: "1px solid var(--color-border)",
-                      whiteSpace: "nowrap",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((leave) => (
-                <tr
-                  key={leave.id}
-                  style={{ borderBottom: "1px solid var(--color-border-subtle)" }}
-                >
-                  <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                    <Badge tone={TYPE_BADGE_TONE[leave.type]}>{TYPE_LABEL[leave.type]}</Badge>
-                  </td>
-                  <td
-                    style={{
-                      padding: "var(--space-3) var(--space-4)",
-                      fontSize: "var(--text-body-sm)",
-                      color: "var(--color-text-1)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {formatPeriod(leave.start_date, leave.end_date)}
-                  </td>
-                  <td
-                    style={{
-                      padding: "var(--space-3) var(--space-4)",
-                      fontSize: "var(--text-body-sm)",
-                      color: "var(--color-text-2)",
-                      fontFamily: "var(--font-mono)",
-                    }}
-                  >
-                    {leave.days}d
-                  </td>
-                  <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                    <Badge tone={STATUS_BADGE_TONE[leave.status]} dot={leave.status === "pending"}>
-                      {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
-                    </Badge>
-                  </td>
-                  <td
-                    style={{
-                      padding: "var(--space-3) var(--space-4)",
-                      fontSize: "var(--text-caption)",
-                      color: "var(--color-text-3)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {formatDate(leave.submitted_at)}
-                  </td>
-                  <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                    <div style={{ display: "flex", gap: "var(--space-1)" }}>
+        {pendingRange && (
+          <RangeComposer
+            range={pendingRange}
+            onCancel={() => setPendingRange(null)}
+            onSubmit={handleComposerSubmit}
+          />
+        )}
+      </section>
+
+      <ResourcesFilterBar
+        search={search}
+        onSearchChange={url.setSearch}
+        searchPlaceholder={t("search_placeholder")}
+        groups={filterGroups}
+        onClearAll={url.clearAll}
+        resultCount={total}
+        resultLabel={total === 1 ? t("result_leave") : t("result_leaves")}
+      />
+
+      {error && (
+        <div role="alert" style={{ padding: "var(--space-4)", background: "var(--color-error-muted)", borderRadius: "var(--radius-md)", color: "var(--color-error)", fontSize: "var(--text-body-sm)" }}>
+          {t("load_error")} {(error as Error).message}
+        </div>
+      )}
+
+      {!error && (
+        <div
+          aria-busy={isLoading}
+          aria-live="polite"
+          className="data-table-wrapper"
+          style={{ maxHeight: "calc(12 * 48px + 56px)", overflow: "auto" }}
+        >
+          {isLoading ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", padding: "var(--space-3)" }}>
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} variant="card" style={{ height: 48, borderRadius: "var(--radius-md)" }} />
+              ))}
+            </div>
+          ) : leaves.length === 0 ? (
+            <div style={{ padding: "var(--space-12) var(--space-6)" }}>
+              <EmptyState
+                icon={Umbrella}
+                title={hasFilters ? t("empty_filtered_title") : t("empty_title")}
+                description={hasFilters ? t("empty_filtered_desc") : t("empty_desc")}
+                action={
+                  hasFilters ? (
+                    <Button variant="secondary" size="sm" onClick={() => url.clearAll()}>
+                      {t("empty_clear")}
+                    </Button>
+                  ) : undefined
+                }
+              />
+            </div>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th style={{ minWidth: 110 }}>{t("col_type")}</th>
+                  <th style={{ minWidth: 160 }}>{t("col_period")}</th>
+                  <th style={{ minWidth: 70 }}>{t("col_days")}</th>
+                  <th style={{ minWidth: 100 }}>{t("col_status")}</th>
+                  <th style={{ minWidth: 110 }}>{t("col_submitted")}</th>
+                  <th style={{ width: 80 }} aria-label={t("col_actions_aria")} />
+                </tr>
+              </thead>
+              <tbody>
+                {leaves.map((leave) => (
+                  <tr key={leave.id}>
+                    <td>
+                      <Badge tone={TYPE_BADGE_TONE[leave.type]}>{t(`type_${leave.type}`)}</Badge>
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>{formatPeriod(leave.start_date, leave.end_date)}</td>
+                    <td style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums", color: "var(--color-text-2)" }}>
+                      {leave.days}d
+                    </td>
+                    <td>
+                      <Badge tone={STATUS_BADGE_TONE[leave.status]} dot={leave.status === "pending"}>
+                        {t(`status_${leave.status}`)}
+                      </Badge>
+                    </td>
+                    <td style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", whiteSpace: "nowrap" }}>
+                      {formatDate(leave.submitted_at)}
+                    </td>
+                    <td>
                       {leave.status === "pending" && (
                         <Button
                           variant="ghost"
                           size="sm"
                           style={{ color: "var(--color-error)" }}
-                          onClick={() => handleCancel(leave.id)}
+                          onClick={() => handleCancel({ id: leave.id, prev: leave.status })}
                         >
-                          Cancel
+                          {t("action_cancel")}
                         </Button>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-// ── team calendar ──────────────────────────────────────────────────────────
-
-// Map of which employees are on leave per day in April 2026
-// Lucas Ferreira: Apr 10-11 (sick), Omar Hassan: Apr 14 (sick)
-const APRIL_LEAVE_MAP: Record<number, Array<{ initials: string; color: string }>> = {
-  10: [{ initials: "LF", color: "var(--color-warning)" }],
-  11: [{ initials: "LF", color: "var(--color-warning)" }],
-  14: [{ initials: "OH", color: "var(--color-warning)" }],
-};
-
-function TeamCalendarTab() {
-  const MONTH_YEAR = "April 2026";
-  const DAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  // April 2026: April 1 is a Wednesday (day index 3)
-  const FIRST_DAY_OF_WEEK = 3; // Wednesday
-  const DAYS_IN_MONTH = 30;
-
-  const cells: Array<number | null> = [
-    ...Array(FIRST_DAY_OF_WEEK).fill(null),
-    ...Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1),
-  ];
-
-  // Pad to full weeks
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-2)",
-          paddingBottom: "var(--space-2)",
-        }}
-      >
-        <Calendar size={16} aria-hidden style={{ color: "var(--color-text-3)" }} />
-        <span
-          style={{
-            fontWeight: "var(--weight-semibold)",
-            fontSize: "var(--text-body-sm)",
-            color: "var(--color-text-1)",
-          }}
-        >
-          {MONTH_YEAR}
-        </span>
-      </div>
-
-      {/* Day headers */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: 0,
-        }}
-      >
-        {DAY_HEADERS.map((d) => (
-          <div
-            key={d}
-            style={{
-              padding: "var(--space-1) var(--space-2)",
-              fontSize: "var(--text-caption)",
-              fontWeight: "var(--weight-semibold)",
-              color: "var(--color-text-3)",
-              textAlign: "center",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-            }}
-          >
-            {d}
-          </div>
-        ))}
-      </div>
-
-      {/* Day grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          border: "1px solid var(--color-border-subtle)",
-          borderRadius: "var(--radius-lg)",
-          overflow: "hidden",
-        }}
-      >
-        {cells.map((day, idx) => {
-          const onLeave = day ? APRIL_LEAVE_MAP[day] ?? [] : [];
-          const isToday = day === 16; // April 16, 2026
-
-          return (
-            <div
-              key={idx}
-              style={{
-                minHeight: 40,
-                padding: "var(--space-1) var(--space-2)",
-                background: isToday
-                  ? "var(--color-primary-muted)"
-                  : "var(--color-surface-0)",
-                borderRight: (idx + 1) % 7 !== 0 ? "0.5px solid var(--color-border-subtle)" : undefined,
-                borderBottom:
-                  idx < cells.length - 7
-                    ? "0.5px solid var(--color-border-subtle)"
-                    : undefined,
-                display: "flex",
-                flexDirection: "column",
-                gap: "var(--space-1)",
-              }}
-            >
-              {day !== null && (
-                <>
-                  <span
-                    style={{
-                      fontSize: "var(--text-caption)",
-                      color: isToday ? "var(--color-primary)" : "var(--color-text-3)",
-                      fontWeight: isToday ? "var(--weight-semibold)" : "var(--weight-regular)",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {day}
-                  </span>
-                  {onLeave.map((entry, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        fontSize: 9,
-                        fontWeight: "var(--weight-semibold)",
-                        color: "#fff",
-                        background: entry.color,
-                        borderRadius: "var(--radius-full)",
-                        padding: "1px 4px",
-                        lineHeight: 1.5,
-                        whiteSpace: "nowrap",
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      {entry.initials}
-                    </span>
-                  ))}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      <p
-        style={{
-          fontSize: "var(--text-caption)",
-          color: "var(--color-text-3)",
-          margin: 0,
-        }}
-      >
-        Showing approved leave for your team in April 2026. Lucas Ferreira (Apr 10 - 11), Omar Hassan (Apr 14).
-      </p>
-    </div>
-  );
-}
-
-// ── page ────────────────────────────────────────────────────────────────────
+// ── Page ──────────────────────────────────────────────────────────────────
 
 export default function LeavesPage() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [extraLeaves, setExtraLeaves] = useState<LeaveRequest[]>([]);
-  const { data: balance } = useLeaveBalance();
-
-  function handleLeaveSubmit(form: RequestLeaveFormState) {
-    const start = new Date(form.start_date);
-    const end = new Date(form.end_date);
-    const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
-    const newLeave: LeaveRequest = {
-      id: `new-${Date.now()}`,
-      employee_id: "emp-me",
-      employee_name: "Me",
-      type: form.type as LeaveType,
-      start_date: form.start_date,
-      end_date: form.end_date,
-      days,
-      status: "pending",
-      reason: form.reason || undefined,
-      submitted_at: new Date().toISOString(),
-    };
-    setExtraLeaves((prev) => [newLeave, ...prev]);
-  }
+  const t = useTranslations("leaves");
+  const [localNew, setLocalNew] = useState<LeaveRequest[]>([]);
 
   return (
     <>
-      <PageHeader
-        title="Leaves"
-        actions={
-          <Button variant="primary" size="md" onClick={() => setModalOpen(true)}>
-            Request leave
-          </Button>
-        }
-      />
-
-      <div className="kpi-grid" style={{ marginBottom: "var(--space-6)" }}>
-        <StatPill
-          label="Annual balance"
-          value={`${balance?.annual_remaining ?? "-"} days`}
-          secondary={`/ ${balance?.annual_total ?? "-"} total`}
-          accent="info"
-        />
-        <StatPill
-          label="Taken this year"
-          value={`${balance?.annual_taken ?? "-"} days`}
-          secondary={`annual + ${balance?.sick_taken ?? "-"} sick`}
-        />
-        <StatPill
-          label="Pending approval"
-          value={balance?.pending_requests ?? "-"}
-          accent="warning"
-        />
-        <StatPill
-          label="Team on leave today"
-          value="1"
-          secondary="Omar Hassan"
-        />
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
       </div>
-
-      <Tabs defaultValue="my-leaves">
-        <TabsList>
-          <TabsTrigger value="my-leaves">My leaves</TabsTrigger>
-          <TabsTrigger value="team-calendar">Team calendar</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="my-leaves">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <MyLeavesTab extraLeaves={extraLeaves} />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="team-calendar">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <TeamCalendarTab />
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      <RequestLeaveModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleLeaveSubmit}
-      />
+      <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <PageHeader title={t("page_title")} />
+        <MyLeavesView localNew={localNew} onSubmitLeave={(l) => setLocalNew((prev) => [l, ...prev])} />
+      </div>
     </>
   );
 }

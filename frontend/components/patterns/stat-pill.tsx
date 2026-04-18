@@ -19,6 +19,11 @@ export type StatPillProps = {
   deltaDirection?: "up" | "down" | "flat";
   accent?: Accent;
   /**
+   * Visual variant. `display` uses a glass surface and a serif numeral
+   * for the dashboard hero row. Default keeps the classic stat-card look.
+   */
+  variant?: "default" | "display";
+  /**
    * Optional click-through target. When set, the entire pill becomes a
    * keyboard-focusable link. The visible styling is unchanged; hover and
    * focus states are added by the shared `.stat-card[data-interactive]`
@@ -43,9 +48,11 @@ export function StatPill({
   delta,
   deltaDirection = "flat",
   accent,
+  variant,
   href,
   ariaLabel,
 }: StatPillProps) {
+  const variantAttr = variant === "display" ? "display" : undefined;
   const inner = (
     <>
       <div className="stat-label">{label}</div>
@@ -75,6 +82,7 @@ export function StatPill({
         href={href}
         className="stat-card"
         data-accent={accent}
+        data-variant={variantAttr}
         data-interactive="true"
         aria-label={ariaLabel}
       >
@@ -84,7 +92,7 @@ export function StatPill({
   }
 
   return (
-    <div className="stat-card" data-accent={accent}>
+    <div className="stat-card" data-accent={accent} data-variant={variantAttr}>
       {inner}
     </div>
   );

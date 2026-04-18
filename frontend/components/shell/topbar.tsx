@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Bell, Menu, Search } from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/shell/theme-toggle";
 
 /**
  * Topbar wraps the prototype's `.top-header` row. Structure mirrors
@@ -80,6 +81,8 @@ export function Topbar({
         >
           <Search size={20} aria-hidden />
         </button>
+
+        <ThemeToggle />
 
         <button
           type="button"

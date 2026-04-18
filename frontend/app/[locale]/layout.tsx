@@ -28,7 +28,14 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} data-theme="dark">
+    <html lang={locale} data-theme="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('gamma-theme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="font-sans bg-bg text-1 antialiased">
         <NextIntlClientProvider messages={messages}>
           {children}

@@ -1,6 +1,6 @@
 /* ============================================================
-   GammaHR v2 "Quantum" — Design Tokens
-   Earth & Sage palette — LOCKED. Do not modify colors.
+   GammaHR v2 "Quantum" - Design Tokens
+   Earth & Sage palette - LOCKED. Do not modify colors.
    ============================================================ */
 
 
@@ -13,13 +13,13 @@
   --color-surface-2:      hsl(35, 9%, 15%);
   --color-surface-3:      hsl(35, 7%, 19%);
 
-  /* ── Primary — Soft Sage ── */
+  /* ── Primary - Soft Sage ── */
   --color-primary:        hsl(155, 26%, 46%);
   --color-primary-hover:  hsl(155, 26%, 52%);
   --color-primary-active: hsl(155, 26%, 40%);
   --color-primary-muted:  hsla(155, 26%, 46%, 0.14);
 
-  /* ── Accent — Terracotta ── */
+  /* ── Accent - Terracotta ── */
   --color-accent:         hsl(30, 58%, 50%);
   --color-accent-hover:   hsl(30, 58%, 56%);
   --color-accent-active:  hsl(30, 58%, 44%);
@@ -83,8 +83,11 @@
   /* ── Typography ── */
   --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono:  'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-serif: 'Fraunces', 'Source Serif 4', Georgia, serif;
 
   /* Type Scale */
+  --text-display-3xl: 3.25rem;   /* 52px - hero greeting (serif display) */
+  --text-display-2xl: 2.75rem;   /* 44px - KPI display numeral (serif) */
   --text-display-xl:  2.25rem;   /* 36px */
   --text-display-lg:  1.875rem;  /* 30px */
   --text-heading-1:   1.5rem;    /* 24px */
@@ -125,7 +128,8 @@
   --space-20:  80px;
 
   /* ── Typography Extras ── */
-  --letter-spacing-caps: 0.05em;
+  --letter-spacing-caps:     0.05em;
+  --letter-spacing-overline: 0.14em;
 
   /* ── Border Radius ── */
   --radius-none: 0px;
@@ -150,9 +154,16 @@
   --overlay-bg-soft: rgba(0,0,0,0.5);
 
   /* ── Glassmorphism ── */
-  --glass-bg:     rgba(23, 21, 18, 0.75);
-  --glass-border: rgba(255, 248, 235, 0.06);
-  --glass-blur:   blur(20px) saturate(1.2);
+  --glass-bg:          rgba(23, 21, 18, 0.75);
+  --glass-bg-strong:   rgba(30, 27, 22, 0.85);
+  --glass-border:      rgba(255, 248, 235, 0.06);
+  --glass-blur:        blur(20px) saturate(1.2);
+  --glass-blur-strong: blur(24px) saturate(1.6);
+
+  /* ── Ambient aura blobs ── */
+  --aura-1: radial-gradient(closest-side, hsla(155, 26%, 46%, 0.35), transparent 70%);
+  --aura-2: radial-gradient(closest-side, hsla(140, 18%, 60%, 0.22), transparent 70%);
+  --aura-3: radial-gradient(closest-side, hsla(38, 60%, 48%, 0.20), transparent 70%);
 
   /* ── Motion ── */
   --motion-instant: 0ms;
@@ -164,11 +175,13 @@
   --ease-in-out:    ease-in-out;
   --ease-gentle:    cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* ── Hover Lift (capped at 1px; never exceed) ── */
+  --lift-sm: translateY(-1px);
+
   /* ── Layout ── */
   --sidebar-width:      224px;
   --sidebar-collapsed:  56px;
   --header-height:      56px;
-  --sidebar-wide:       256px;
   --drawer-width:       480px;
 }
 
@@ -181,13 +194,13 @@
   --color-surface-2:      hsl(40, 10%, 94%);
   --color-surface-3:      hsl(40, 8%, 90%);
 
-  /* Primary — Deeper Sage for light bg */
+  /* Primary - Deeper Sage for light bg */
   --color-primary:        hsl(155, 30%, 34%);
   --color-primary-hover:  hsl(155, 30%, 28%);
   --color-primary-active: hsl(155, 30%, 24%);
   --color-primary-muted:  hsla(155, 30%, 34%, 0.10);
 
-  /* Accent — Deeper Terracotta */
+  /* Accent - Deeper Terracotta */
   --color-accent:         hsl(30, 60%, 42%);
   --color-accent-hover:   hsl(30, 60%, 36%);
   --color-accent-active:  hsl(30, 60%, 32%);
@@ -209,7 +222,7 @@
   --color-gold-hover:     hsl(38, 65%, 34%);
   --color-gold-muted:     hsla(38, 65%, 40%, 0.12);
 
-  /* Text — dark on light */
+  /* Text - dark on light */
   --color-text-1:         hsl(35, 12%, 10%);
   --color-text-2:         hsl(35, 8%, 38%);
   --color-text-3:         hsl(35, 5%, 55%);
@@ -249,9 +262,16 @@
   --overlay-bg-soft: rgba(0,0,0,0.3);
 
   /* Glassmorphism */
-  --glass-bg:     rgba(255, 253, 248, 0.85);
-  --glass-border: rgba(35, 30, 20, 0.08);
-  --glass-blur:   blur(20px) saturate(1.2);
+  --glass-bg:          rgba(255, 253, 248, 0.85);
+  --glass-bg-strong:   rgba(255, 253, 248, 0.92);
+  --glass-border:      rgba(35, 30, 20, 0.08);
+  --glass-blur:        blur(20px) saturate(1.2);
+  --glass-blur-strong: blur(24px) saturate(1.6);
+
+  /* Ambient aura blobs */
+  --aura-1: radial-gradient(closest-side, hsla(155, 26%, 46%, 0.22), transparent 70%);
+  --aura-2: radial-gradient(closest-side, hsla(140, 20%, 72%, 0.35), transparent 70%);
+  --aura-3: radial-gradient(closest-side, hsla(38, 60%, 58%, 0.28), transparent 70%);
 }
 
 /* ── Global Reset & Base ── */
@@ -315,7 +335,8 @@ a:hover {
 }
 
 /* ── Utility Classes ── */
-.font-mono { font-family: var(--font-mono); }
+.font-mono  { font-family: var(--font-mono); }
+.font-serif { font-family: var(--font-serif); }
 .text-1 { color: var(--color-text-1); }
 .text-2 { color: var(--color-text-2); }
 .text-3 { color: var(--color-text-3); }
@@ -326,7 +347,7 @@ a:hover {
 .text-error { color: var(--color-error); }
 .text-gold { color: var(--color-gold); }
 
-/* Reduced motion — broad base; decorative overrides are in _components.css */
+/* Reduced motion - broad base; decorative overrides are in _components.css */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
