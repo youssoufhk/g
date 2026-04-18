@@ -57,6 +57,8 @@ from app.features.invoices import models as _invoices_models  # noqa: F401
 from app.features.invoices.routes import router as invoices_router
 from app.features.leaves import models as _leaves_models  # noqa: F401
 from app.features.leaves.routes import router as leaves_router
+from app.features.timesheets import models as _timesheets_models  # noqa: F401
+from app.features.timesheets.routes import router as timesheets_router
 from app.features.projects import models as _projects_models  # noqa: F401
 from app.features.projects.routes import router as projects_router
 from app.features.search.routes import router as search_router
@@ -120,5 +122,6 @@ app.include_router(projects_router, prefix="/api/v1/projects", tags=["projects"]
 app.include_router(invoices_router, prefix="/api/v1/invoices", tags=["invoices"])
 app.include_router(expenses_router, prefix="/api/v1/expenses", tags=["expenses"])
 app.include_router(leaves_router, prefix="/api/v1/leaves", tags=["leaves"])
+app.include_router(timesheets_router, prefix="/api/v1/timesheets", tags=["timesheets"])
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["dashboard"])
 app.include_router(search_router, prefix="/api/v1/search", tags=["search"])
