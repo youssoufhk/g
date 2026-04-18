@@ -465,11 +465,11 @@ For each feature, the standard checklist is:
 
 **Feature order (strict; follows dependency order):**
 
-- [x] 🤝 🤖 **Timesheets** (week-as-entity, grid UX, inline submit/approve/reject, `useOptimisticMutation` + three-layer 409 conflict resolver, offline queue stub). (2026-04-16, frontend done)
-- [x] 🤝 🤖 **Invoices** (list + draft-from-approved-timesheets + real `WeasyPrintRenderer` swap behind the PDFRenderer interface, sequential per-tenant numbering with `UNIQUE (tenant_id, number)`, EU reverse charge for intra-EU B2B) (2026-04-16, frontend done)
+- [~] 🤝 🤖 **Timesheets** (week-as-entity, grid UX, inline submit/approve/reject, `useOptimisticMutation` + three-layer 409 conflict resolver, offline queue stub). (2026-04-16, frontend done) - downgraded 2026-04-18: backend features/timesheets has only rules/, no routes/service/models/schemas; no E2E spec; no audit writer.
+- [~] 🤝 🤖 **Invoices** (list + draft-from-approved-timesheets + real `WeasyPrintRenderer` swap behind the PDFRenderer interface, sequential per-tenant numbering with `UNIQUE (tenant_id, number)`, EU reverse charge for intra-EU B2B) (2026-04-16, frontend done) - downgraded 2026-04-18: backend features/invoices is empty (no routes/service/models); no E2E spec; no audit writer.
 - [ ] 🤝 🤖 **Month-end close agent** (THE v1.0 agentic feature: deterministic analyzers from the 24-analyzer library + AI explanation through `AIClient` + review queue + batch confirm; uses `MockAIClient` for CI, real local LLM for demo per DEF-074)
-- [x] 🤝 🤖 **Expenses** (submission + `MockVisionOCR` auto-fill + inline approval + reimbursable state machine) (2026-04-16, frontend done)
-- [x] 🤝 🤖 **Dashboard pass 1.5** (4 KPI cards with real data from the seeded tenant + 3 AI insight cards drawn from the analyzer library) (2026-04-16, frontend done)
+- [~] 🤝 🤖 **Expenses** (submission + `MockVisionOCR` auto-fill + inline approval + reimbursable state machine) (2026-04-16, frontend done) - downgraded 2026-04-18: backend features/expenses is empty (no routes/service/models); no E2E spec; no audit writer.
+- [~] 🤝 🤖 **Dashboard pass 1.5** (4 KPI cards with real data from the seeded tenant + 3 AI insight cards drawn from the analyzer library) (2026-04-16, frontend done) - downgraded 2026-04-18: backend dashboard has routes+service but no models, no E2E spec, values still mock-fed on the frontend.
 
 Each feature follows the 10-step quality chain in §1.1. Test-first is non-negotiable (property tests caught a real regex-anchor bug in Phase 2 tenancy; keep the discipline).
 
@@ -485,11 +485,11 @@ Each feature follows the 10-step quality chain in §1.1. Test-first is non-negot
 
 ### 6.3 Phase 5b: Pilot completeness (founder-triggered)
 
-- [x] 🤝 🤖 **Unified approvals hub** (cross-feature queue, bulk actions, delegation, undo window, idempotency) (2026-04-16, frontend done)
-- [x] 🤝 🤖 **Leaves** (accrual job, calendar view, request flow, manager approval, balance invariant enforced at DB) (2026-04-16, frontend done)
-- [x] 🤝 🤖 **Admin console** (users, roles, custom fields, feature flags, audit exports) (2026-04-16, frontend done)
-- [x] 🤝 🤖 **Account settings** (profile, password change, recovery codes, active sessions, notification preferences) (2026-04-16, frontend done)
-- [x] 🤝 🤖 **Dashboard pass 2** (full KPI strip + expanded AI insight cards + ranked signals + degraded-mode banner) (2026-04-16, frontend done)
+- [~] 🤝 🤖 **Unified approvals hub** (cross-feature queue, bulk actions, delegation, undo window, idempotency) (2026-04-16, frontend done) - downgraded 2026-04-18: backend features/approvals is empty (no routes/service/models); no E2E spec; no audit writer; Idempotency-Key middleware not applied.
+- [~] 🤝 🤖 **Leaves** (accrual job, calendar view, request flow, manager approval, balance invariant enforced at DB) (2026-04-16, frontend done) - downgraded 2026-04-18: backend features/leaves has only rules/, no routes/service/models; no E2E spec; DB balance invariant not enforced.
+- [~] 🤝 🤖 **Admin console** (users, roles, custom fields, feature flags, audit exports) (2026-04-16, frontend done) - downgraded 2026-04-18: backend features/admin has routes/service/models but no schemas; no E2E spec; audit exports route not wired.
+- [~] 🤝 🤖 **Account settings** (profile, password change, recovery codes, active sessions, notification preferences) (2026-04-16, frontend done) - downgraded 2026-04-18: no backend feature folder (features/account does not exist); no E2E spec; no audit writer.
+- [~] 🤝 🤖 **Dashboard pass 2** (full KPI strip + expanded AI insight cards + ranked signals + degraded-mode banner) (2026-04-16, frontend done) - downgraded 2026-04-18: backend dashboard lacks models; ranked signals + degraded-mode banner not wired to real data.
 - [ ] 🤝 🤖 **Payroll export** (first adapter for the first pilot's provider, CSV format + snapshot test)
 - [ ] 🤝 🤖 **Ongoing imports** (scheduled CSV, change tracking, admin import page sharing the onboarding pipeline)
 - [ ] 🧑 🤖 Bulk row actions across approvals, expenses, leaves, invoices, timesheets lists
