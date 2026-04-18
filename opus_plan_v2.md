@@ -645,5 +645,6 @@ Append one line per completed pass. Do not delete past entries.
 - 2026-04-18: D10 stage 3 of §8.4: expense_categories + expenses migration (20260418_1200) + 8,400 deterministic expense generator (monthly + senior-only buckets, category mix pinned) + tests (26 tests pass).
 - 2026-04-18: D10 stage 4 of §8.4: invoices + invoice_lines + invoice_payments + invoice_sequences migration (20260418_1300) + 900 invoice + 9,000 line deterministic generators + tests (37 tests pass). §8.4 seed coverage complete.
 - 2026-04-18: D12a apply @audited + @gated_feature to mutating routes in auth, admin, imports (7 routes, 5 `z2-lint: ok` deferrals removed); stub AsyncSession autouse fixture added to conftest so unit tests no longer require a live DB (138 tests pass).
+- 2026-04-18: D12b Idempotency-Key middleware + idempotency_keys migration (20260418_1400) + 6 integration tests (audit row written, 402 on killed feature, 200->200 replay, body-mismatch 409, missing-header passthrough, non-mutating passthrough). §8.5 decorator sweep complete (144 tests pass).
 
 End of plan.

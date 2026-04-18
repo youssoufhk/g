@@ -35,11 +35,15 @@ async def _stub_session() -> AsyncIterator[_StubAsyncSession]:
     yield _StubAsyncSession()
 
 
-@pytest.fixture(autouse=True, scope="session")
+@pytest.fixture(autouse=True)
 def _install_stub_session_override() -> Iterator[None]:
+    previous = app.dependency_overrides.get(get_session)
     app.dependency_overrides[get_session] = _stub_session
     yield
-    app.dependency_overrides.pop(get_session, None)
+    if previous is None:
+        app.dependency_overrides.pop(get_session, None)
+    else:
+        app.dependency_overrides[get_session] = previous
 
 
 @pytest.fixture

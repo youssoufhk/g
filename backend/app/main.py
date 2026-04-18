@@ -20,6 +20,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.errors import GammaError
+from app.core.idempotency import IdempotencyMiddleware
 from app.core.logging import configure_logging, get_logger
 from app.core.tenancy import TenancyMiddleware
 
@@ -81,6 +82,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(TenancyMiddleware)
+app.add_middleware(IdempotencyMiddleware)
 
 
 @app.exception_handler(GammaError)
