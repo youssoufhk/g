@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/patterns/empty-state";
 import { MultiSelectPill } from "@/components/patterns/multi-select-pill";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { intlLocale as toIntlLocale } from "@/lib/format";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -194,7 +195,7 @@ type AddEventForm = {
 export default function CalendarPage() {
   const t = useTranslations("calendar");
   const locale = useLocale();
-  const intlLocale = locale === "fr" ? "fr-FR" : "en-GB";
+  const intlLocale = toIntlLocale(locale);
 
   const [currentYM, setCurrentYM] = useState("2026-04");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);

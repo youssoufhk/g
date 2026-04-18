@@ -128,6 +128,22 @@ repos:
             frontend/node_modules/.*
           )$
 
+      - id: no-unscoped-date-locale
+        name: Ban toLocaleDateString() / toLocaleDateString(undefined) in shipped frontend code
+        language: system
+        entry: python3 scripts/hooks/no_unscoped_date_locale.py
+        # Opus plan section 1 rule: dates go through lib/format.ts, not
+        # inline Intl calls. This hook catches the specific bug class
+        # where a locale argument is omitted or explicitly undefined,
+        # which silently renders dates in the browser's default locale
+        # rather than the user's Gamma locale.
+        files: '^frontend/(components|features|app|lib|hooks|stores)/.*\.(tsx|jsx|ts|js)$'
+        exclude: |
+          (?x)^(
+            frontend/tests/.*|
+            frontend/node_modules/.*
+          )$
+
       - id: no-utilisation
         name: Ban the word utilisation
         language: system
