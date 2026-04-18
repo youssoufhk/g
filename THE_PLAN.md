@@ -1,594 +1,810 @@
 # THE PLAN
 
-> **Read this file before every work session. No exceptions.**
-> This is the founders' stick-to-it plan. The planning is done. No more "let me think about it." Execute in order.
-> If reality disagrees with this plan, update this file explicitly, do not silently drift.
-> Last updated: 2026-04-15 (after the 15-round data architecture planning session locked 102 decisions + the spec rewrite, then the harsh-review pass added the realistic schedule, the bandwidth math, the customer-validation gate, and the post-launch playbook; then the Gamma repositioning + co-founder pass recalibrated the team, the realistic column, SOC 2 timing, DR drill cadence, and the month-end close agent scaffolding).
+> **Read this file before every session. It is the only roadmap that matters.**
+> Last rewrite: 2026-04-18. Supersedes: `CRITIC_PLAN.md`, `SELLABILITY_PLAN.md`, `opus_plan.md`, `opus_plan_v2.md`, `OPUS_CRITICS.md`, `OPUS_CRITICS_V2.md`, `HAIKU_CRITICS.md`, `EXECUTION_CHECKLIST.md`, `PROMPT.md`, `FOUNDER_CHECKLIST.md §non-build items`, and `docs/DEFERRED_DECISIONS.md`. All 75 deferred decisions are folded inline here (§6). Those files are deleted in a follow-up commit so git revert remains clean.
+> One plan. Tiered pricing (€17 / €29 / €45 + €8k pilot). Brutal priorities. Agent-executable detail.
+>
+> **How agents use this file.** Every task in §4 and §5 has a file path, an acceptance criterion, and a test to add. Every deferred decision in §6 has a trigger. Agents never "interpret" this plan: they pick the next unchecked task in §4, read the referenced spec + prototype, run the 70-item `docs/FLAWLESS_GATE.md`, commit, and tick the box.
 
 ---
 
-## Why this file exists
+## 0. The 30-second summary
 
-You spent a planning session locking every architectural decision you need to ship v1.0. The outcome lives in six permanent spec files:
+Gamma is a PSA for 50-500 seat EU consulting firms with an agentic month-end close layered on top. Two founders, zero paying customers, Phase 2 foundation is shipped, most of the frontend reads mock data, and the one feature that justifies premium pricing (the month-end close agent) does not exist yet. **Everything in this plan is ordered by distance to €1 of revenue.**
 
-- `specs/DATA_ARCHITECTURE.md` - the data model
-- `specs/APP_BLUEPRINT.md` - every page
-- `specs/AI_FEATURES.md` - how AI is wired (Vertex AI Gemini, LLM-as-router pattern)
-- `docs/DATA_INGESTION.md` - how customer data gets INTO the app (CSV imports, OCR, payroll export)
-- `docs/DEFERRED_DECISIONS.md` - the 64 items you consciously deferred, with triggers to revisit
-- `docs/decisions/ADR-001` through `ADR-010` - architecture rationale
+The honest state, summarized for agents:
+- Backend: 14 feature modules scaffolded, 189 tests pass, 15 of 16 AI tools built, schema-per-tenant runner live, Ollama wired, idempotency + audit + kill-switch + GDPR encryption stubs applied.
+- Frontend: 19 pages built, all on the design bar, i18n EN+FR in lock-step, but **still reads `lib/mock-data.ts`**. Nothing is wired to the live API end-to-end.
+- Product: zero customers. Zero pilots. Zero measured value.
 
-You are **done planning**. This file tells you what to do each week to ship v1.0. It ends when you have one paying customer live in production and no P0 bugs for 30 consecutive days.
+**What we are shipping next is not features. It is revenue.**
 
----
-
-## The five commandments (read before every work session)
-
-See `CLAUDE.md` section 2 for the full 11 hard rules. The commandments below are planning-specific additions, not duplicates. Break any of these and you are re-planning, which is the thing you promised yourself not to do.
-
-1. **Do not re-open locked decisions.** The 102 decisions in the spec files are closed. If you think one is wrong, open a PR that updates the spec file with explicit reasoning, then refer back to it. No silent drift.
-2. **Work one Tier 1 feature at a time.** Finish it to the flawless gate before starting the next. Parallel work on Tier 1 features is how quality slips.
-3. **Defer means defer.** Every item in `docs/DEFERRED_DECISIONS.md` has a trigger. Do not revisit it before the trigger fires. Write the DEF-NNN in code comments so future-you can find the context.
-4. **Match the prototype.** `prototype/*.html` is the visual spec. No inventing new atoms. If a new atom is needed, stop and ask before building it.
+Full honest state in §3. Per-task execution in §4. Quarterly roadmap in §5. Every deferred decision inline in §6.
 
 ---
 
-## Where you are right now
+## 1. The CEO/COO reality check (read in full, once per week)
 
-**Phase 1 (Foundation docs) is DONE** as of 2026-04-15. All specs, ADRs, and the deferred decisions registry are final. The data-architecture planning progress file has been deleted; its content migrated into the permanent files above.
+### 1.1 Who pays €35/seat for what?
 
-**Phase 2 (Foundation build track) is DONE** as of 2026-04-15. Local dev stack, backend skeleton, tenancy middleware, 9 vendor wrappers M1 with stubs, multi-country scaffolding (FR+UK), frontend shell (sidebar 224, topbar, bottom nav), 20 atoms + 3 patterns, testing infrastructure (45 backend tests pass, property + contract, AI eval harness skeleton, Playwright config, CI workflow), operator console minimum. Nine commits landed on `main`; see `git log --oneline -- backend/ frontend/ infra/docker/ Makefile`.
+Nobody, at v1.0. The current published floor was €140-170/seat/year (`docs/GO_TO_MARKET.md §2`), roughly €11.67-14.17/month. The step to €35/month (€420/year) is conditional on five things clearing, in this order:
 
-**Phase 2 deploy track is deferred to post-MVP.** GCP provisioning, vendor-wrapper swap to real implementations, first staging deploy, and DR drill all moved to `EXECUTION_CHECKLIST.md` §16 Deploy Track, founder-triggered after Phase 5a MVP is demo-ready.
+1. A working month-end close agent measured on a real customer's data with a video they let us publish.
+2. SOC 2 Type 2.
+3. SCIM + SAML (procurement gate for any 200+ seat buyer).
+4. Third-party pen-test report.
+5. A signed case study with a named hero number (e.g. "closed in 2 hours instead of 3 days").
 
-**Phase 3a (MVP onboarding critical path) is NEXT for the agent.** JWT claim wiring into the tenancy middleware, onboarding wizard, CSV import module, AI column mapper, password + Google OIDC login, operator console live wiring. See `EXECUTION_CHECKLIST.md` §4.1.
+None of the five have shipped. Pricing follows value, not ambition. Until then the list price is tiered (§2).
 
----
+### 1.2 Competitive reality
 
-## Target weeks per phase
+| Tool | €/seat/month | What they sell |
+|---|---:|---|
+| Factorial | 8 | EU HR + light time tracking |
+| BambooHR | 10 | HR-first, light PSA |
+| Pleo | 14-25 | Expense cards + OCR |
+| Float | 7.50 | Resource planning |
+| Harvest + Float | 18-26 | Time + capacity |
+| Kantata | 25-39 | Full PSA + AI forecasting |
+| Notion Business + AI | 24 | Docs + AI Q&A |
+| **Gamma Essential (target)** | **17** | PSA core, no agents |
+| **Gamma Business (target)** | **29** | PSA + OCR + close agent + SSO |
+| **Gamma Enterprise (target)** | **45** | Business + autopilot agents + SOC 2 + TAM |
 
-**Week 0 = production build kickoff** (not prototype start). All week numbers are **targets**, not guarantees.
+€17 beats Factorial for a consulting firm that wants projects + invoicing (Factorial is HR-first). €29 is defendable if and only if the close agent is real. €45 is defendable only once the enterprise gates clear.
 
-There are **two columns** below: an *optimistic* one (the original plan's wishful estimate) and a *realistic* one derived from the team bandwidth math in the next section. The realistic column is the one to plan against. The optimistic column stays in the table only because it is what every prior version of this file used; do not delete it, but do not believe it either.
+### 1.3 What would a cynical COO do this quarter?
 
-**Realistic weeks assume two founders, ~12 h/week each productive after all-in overhead and coordination. Solo-founder ceilings (the original realistic column from the 2026-04-15 harsh review) are retained below the table so we remember the cost of losing a founder. Two founders do NOT halve the schedule; coordination and review overhead eat ~35-40% of the theoretical speedup.**
+1. **Pick one pilot target.** One named consulting firm CFO or COO, 50-200 seats, EU, warm intro. Not ten. One.
+2. **Wire the frontend to the backend on three pages only:** timesheets, expenses, invoices. Drop mock data on those three. The rest can keep the mocks; nobody pays for data they cannot put in and get out.
+3. **Ship a prototype of the month-end close agent** on that one pilot's data. Measure the time savings in minutes, on video, with their CFO's face on camera.
+4. **Use the video as the entire pitch** for customers 2-10. Stop building features until the video exists.
+5. **Delete every plan file** that is not THE_PLAN, CLAUDE, one spec per concern, and one ADR per decision.
 
-| Phase | Optimistic weeks | **Realistic weeks (2 founders)** | Theme | Exit criteria |
-|-------|-----------------:|---------------------------------:|-------|---------------|
-| 0 | done | done | Prototype | All 19 HTML pages approved |
-| 1 | done (2026-04-15) | done (2026-04-15) | Foundation docs | All specs + ADRs final, deferred registry extracted (DEF-001 to DEF-064) |
-| 2 | 4 to 7 | **6 to 9** | Foundation build | **(build track DONE 2026-04-15)** Local dev infrastructure + FastAPI scaffold + Next.js scaffold + migration runner + 9 vendor wrappers M1 + tenancy middleware + audit log trigger + event bus + feature registry + atom layer (20 atoms) + shell + 45 backend tests + containerized dev stack. GCP setup and first staging deploy moved to §16 Deploy Track in EXECUTION_CHECKLIST.md (founder-triggered after MVP is demo-ready). Cmd+K palette, notifications drawer, ConflictResolver, EntitlementLock deferred to the Phase 5a feature that needs them.
-| 3 | 8 to 11 | **8 to 13** | Auth + onboarding + full operator console | OIDC + passkey + password auth paths, onboarding wizard with AI column mapper, full operator console |
-| 4 | 12 to 15 | **13 to 18** | Core data + Dashboard pass 1 | Employees, clients, projects, dashboard scaffold. **Customer-validation gate clears here (see "Validated lead gate" below).** |
-| 5 | 16 to 24 | **20 to 32** | Core modules | Timesheets (week-as-entity), leaves, expenses (OCR), invoices (PDF) + month-end close agent full implementation, approvals, admin, account, dashboard pass 2, payroll export, ongoing imports, first-contact UX hardenings |
-| 6 | 25 to 34 | **32 to 42** | Tier 2 + portal | Calendar, Gantt, resource planning, HR module, insights page, client portal. **SOC 2 Type 1 audit kickoff (parallel to Tier 2 build).** |
-| 7 | 35 to 42 | **42 to 54** | Hardening + launch | Security audit, perf pass, beta onboarding, docs, public launch, **SOC 2 Type 1 certification by customer 3-4** |
-
-**Read this twice:** the realistic total with two founders is **42 to 54 weeks** (10 to 13 calendar months from week 0 to public launch). The optimistic total of 35 to 42 weeks (8 to 10 months) is still too aggressive; the bottom-up math below shows why.
-
-**If solo-founder reality returns** (co-founder drops out, leaves, or cannot commit): fall back to the original realistic column from the 2026-04-15 harsh review: Phase 2 **6 to 10**, Phase 3 **12 to 18**, Phase 4 **20 to 26**, Phase 5 **30 to 46**, Phase 6 **48 to 60**, Phase 7 **62 to 72** (15 to 18 calendar months). The cost of losing one founder is roughly 20 extra calendar weeks and a forced Tier 2 scope cut. Keep this fallback visible so the team knows what is at stake.
-
-### Why the realistic column
-
-The realistic numbers come from these adjustments to the optimistic baseline:
-
-1. **Combined productive build time per week is 24 to 34 hours, not 40-60.** Two founders at "20-30 hours/week nominal" each still have to handle customer discovery (shared 50/50 from Phase 4), pilot management (shared in Phase 6+), weekly logs and cross-doc maintenance, founder review sessions for the flawless gate, learning curve, and ~10% lost to vacations, sickness, and life. Add ~15% coordination overhead (syncs, code review, decision alignment) between founders. Net combined productive build time = **24 to 34 hours/week**.
-2. **Phase 5 has 10 distinct features**, each at the flawless gate. Optimistic was "1 feature/week", which is still impossible at two-founder cadence because quality gates do not parallelize: one person builds, the other reviews. Bottom-up with two-founder parallelism: average 2 weeks/feature × 10 features = 20 weeks, with hard items (invoices + month-end close agent, approvals, week-as-entity timesheets) eating 3-4 weeks each. Realistic Phase 5 floor = 20 weeks, ceiling = 32.
-3. **Phase 2 includes the entire shell infrastructure** (atom layer + Cmd+K palette + notifications drawer + conflict resolver pattern + entitlement lock UI) plus the month-end close agent scaffolding plus GCP setup and the first staging deploy. Two-founder split: founder runs the atom layer + shell in parallel to co-founder running the backend scaffold + `ai/client.py`. Realistic Phase 2 floor = **6 weeks**, ceiling = **9 weeks**. The previous floor/ceiling of 4-7 underestimated the frontend learning curve. Ship the widened buffer, do not consume it.
-4. **Phase 4 has the customer-validation gate** before the heavy build of Phase 5 starts; this is a deliberate hold point. With two founders, discovery and demo outreach run on the co-founder's time without stealing Tier 1 build hours.
-5. **Phase 7 hardening + launch** is sized at 6-8 weeks of productive work plus the SOC 2 Type 1 audit window (see milestone below).
-
-### Team bandwidth math (the load-bearing assumption)
-
-Two founders in place from day 0. Division of labor:
-- **Founder** (non-technical product owner, ~20 h/week): product + design + frontend + founder review sessions + customer-facing demo calls.
-- **Co-founder** (~20 to 30 h/week, treat as a range): backend + infra + AI + technical discovery + code review + pilot technical enablement.
-- Both on customer calls when the firm is evaluating Gamma seriously.
-
-| Activity | Founder h/week | Co-founder h/week |
-|---|---|---|
-| Tier 1 build | 12 to 14 (Phase 2-5), 8 to 10 (Phase 6-7) | 14 to 20 (Phase 2-5), 10 to 14 (Phase 6-7) |
-| Customer discovery + demo calls | 0 (Phase 2-3), 1 to 2 (Phase 4+) | 0 (Phase 2-3), 1 to 2 (Phase 4+, technical deep-dives) |
-| Pilot management (per active pilot) | 0 (Phase 2-4), 1.5 to 2.5 h/pilot/week (Phase 5+) | 0 (Phase 2-4), 1.5 to 2.5 h/pilot/week (Phase 5+) |
-| Weekly logs, cross-doc maintenance, deferred-decision triage | 1 to 2 | 0 to 1 |
-| Founder review sessions (flawless gate item 15) | 1 to 2 | 0 to 1 (attending) |
-| Coordination overhead (syncs, PR review, decision alignment) | 1 to 2 | 1 to 2 |
-| Learning curve (front-loaded) | 2 to 4 (Phase 2), 1 to 2 (Phase 3-5), ~0 (Phase 6+) | 1 to 2 (Phase 2), ~1 (Phase 3-5), ~0 (Phase 6+) |
-| **Total nominal claim** | 17 to 30 h/week | 18 to 33 h/week |
-| **Combined productive build time** | **~24 to 34 h/week** (post-overhead) | |
-
-**Phase 6-7 with 3+ active pilots running concurrently is still tight even with two founders.** Pilot management alone consumes 9-15 h/week across the two of us at 3 pilots. Choose between dropping pilots, dropping Tier 2 scope, or extending the calendar. Do not try to run 5 pilots concurrently.
-
-### Validated lead gate (required to clear before Phase 4 starts, externalized to the co-founder)
-
-The original plan committed to **40 weeks of build before the first paying customer signs**. That is build-blind: betting a year of work on an avatar customer described in `CLAUDE.md` whose existence has not been verified. **Before Phase 4 (Core data + Dashboard pass 1) begins, this gate must be cleared:**
-
-- [ ] **At least one validated lead** in writing. Validation = a named decision-maker at a real consulting firm (50-500 employees, EU) who has done a 30-min discovery call AND has either (a) signed a non-binding pilot LOI, or (b) committed in writing to a paid pilot at first-customer pricing once Tier 1 is live, or (c) prepaid a deposit.
-- [ ] Two more leads at the "Interested" stage in the pipeline (per `docs/GO_TO_MARKET.md` section 4), even if not yet committed.
-- [ ] Target 3+ validated leads by week 20 (mid-Phase 4, two weeks before Phase 4 exit).
-
-### Gate enforcement (the anti-rationalization protection)
-
-The failure mode of this gate is not "the gate trips and we ignore it". The failure mode is "the gate feels close enough and the founder rationalizes past it because the code is moving". To prevent this:
-
-1. **The co-founder has written authority to halt Phase 5.** If the validated-lead gate has not cleared by end of week 20, the co-founder unilaterally halts Phase 5 build. The founder does not get a veto. This authority is written into the co-founder agreement, not a verbal understanding. It is the single most important anti-sunk-cost protection in the whole plan.
-2. **Three calendar reminders are set now:** week 18 (warning: gate review in 2 weeks), week 19 (warning: gate review in 1 week), week 20 (gate review meeting, 60 minutes, both founders present, decision binding). Put these in the shared founder calendar the same day as committing this plan change.
-3. **Consequence on gate failure is pre-specified:** if the gate fails at week 20, the founder goes full-time on customer discovery for **4 weeks**. No Phase 5 build during those 4 weeks. No exceptions. No "just this one feature". At the end of the 4 weeks, re-run the gate. If it still fails, the founder and co-founder hold a "fold vs pivot" conversation and either change the category, change the price, or pause the project. Writing the consequence down now is the only way to make it real at week 20 when sunk-cost thinking is strongest.
-4. **What "4 weeks of focused outreach" actually looks like:** founder books 20+ new discovery calls per week via LinkedIn, warm intros, and conference outreach. 2-3 hours of outreach per day. No code, no design, no meetings. The co-founder continues maintenance-only work on the existing Phase 4 codebase but does not start any new feature.
-5. **No retroactive scope creep.** Do not expand the gate criteria to include "qualified interest" or "active discussion" or "warm fuzzies". The only valid evidence is (a) signed LOI, (b) written pilot commitment, or (c) prepaid deposit. Anything else fails the gate.
-
-With a co-founder in place, the outreach playbook splits: founder handles demo calls and design reviews, co-founder handles technical deep-dives during discovery. This doubles the weekly discovery bandwidth without stealing Tier 1 build hours from either of us.
-
-The customer-validation gate exists because the harshest bug in the original plan was not technical: it was the assumption that the avatar is a buyer. It is not. You need a buyer to validate that. Every week without a validated lead is a week the plan is wrong about its own assumptions.
-
-### Go-to-market milestones
-
-Two columns again: optimistic and realistic (two-founder). Use the realistic column for any commitment to a customer or external party.
-
-| Optimistic week | **Realistic week (2 founders)** | Milestone |
-|----------------:|--------------------------------:|-----------|
-| 11 | **13** | Auth + onboarding + operator console flawless |
-| 15 | **18** | Dashboard pass 1 live with core data; **validated lead gate cleared** |
-| 24 | **32** | All Tier 1 features flawless |
-| 27 | **36** | First non-paying pilot kickoff (demo-to-contract motion, no self-serve signup) |
-| 34 | **42** | Tier 2 features + client portal functional; **SOC 2 Type 1 audit engaged** |
-| 40 | **48** | First paying customer signs (manual billing path) |
-| 42 | **54** | Public launch |
-| - | **56 to 60** | **SOC 2 Type 1 certification lands** (target: by customer 3-4) |
-| 50+ | **66+** | Automated billing live (Stripe / Revolut / Paddle, final choice at DEF-029 trigger time, **only after customer #5-10**) |
-
-**Note:** billing automation is NOT on the critical path for first revenue. Phase 2 manual PDF invoicing via Workspace SMTP Relay handles the first 1-5 customers without any Stripe/Revolut/Paddle integration. The "automated billing live" milestone is **post-launch**, on the Customer #6 trigger; it has been moved out of Phase 7 into the post-launch playbook (see end of this file).
-
-### Slippage policy
-
-- **Dates can move. Quality cannot.**
-- If we are 2+ weeks behind on a phase, drop Tier 2 scope first, never Tier 1 quality.
-- If a Tier 1 feature fails its flawless gate twice, escalate: founder decides scope cut or extra time.
-- Update target weeks in this file when slippage happens. Do not keep stale targets visible.
-
-### Honest caveats
-
-- Total budget at the realistic two-founder columns above: **42 to 54 productive weeks**, which at 24-34 combined productive hours/week is roughly **10 to 13 calendar months** from week 0 to public launch.
-- "One Tier 1 feature per week in Phase 5" was an aspiration in earlier versions of this file. The realistic two-founder column reflects the bottom-up estimate (10 features × 2 weeks average with parallelism = 20 weeks).
-- "13 Tier 1 features at flawless quality" (per the corrected `docs/SCOPE.md`, command palette is shell infrastructure not a Tier 1 feature) plus the month-end close agent and the first-contact UX hardenings (bulk row actions, global non-AI search, in-app feedback button, notifications inbox page) per `docs/SCOPE.md`.
-- Pilot and commercial milestones assume customer discovery is already in progress. **If no warm leads exist by Phase 4 entry**, the validated-lead gate halts the build instead of slipping the launch date.
-- **If the co-founder drops out**, fall back to the solo-founder realistic column (62 to 72 weeks; see the "If solo-founder reality returns" note under the table). Plan for this contingency, do not pretend it cannot happen.
-
-### Success criteria for v1.0
-
-**Measurable (targets, not measured baselines):**
-- Lighthouse performance >= 90 on every page
-- API p95 < 500 ms on reads (internal SLO)
-- Bulk CSV import: canonical seed dataset (201 employees + 120 clients + 260 projects + 52 weeks of timesheets) in < 60 s
-- Timesheet submission: < 2 min for a full week
-- Expense submission: < 30 s with OCR
-- OCR p95 < 15 s end-to-end
-- Invoice generation p95 < 3 s
-- Zero flaky tests in CI
-- Lighthouse PWA score >= 95
-
-**Subjective (founder gate):**
-- Every page feels like the same app
-- Zero dead ends
-- Dark mode default looks polished; light mode is complete
-- Visual parity with `prototype/` verified side-by-side
-- Founder can take a week off without everything breaking
-
-**v1.0 definition of success:**
-- 1 paying customer at annual price
-- At least 10 firms at "interested" stage in the sales pipeline
-- No P0 bugs in production for 30 consecutive days
-- Customer advocate willing to give a testimonial
+Everything below is this COO playbook, made concrete.
 
 ---
 
-## The seven phases, what to ship, how to know you are done
+## 2. Pricing (locked 2026-04-18, reviewed after customer 5)
 
-Each phase has: a list of concrete tasks, a definition of done, and the time target. Time targets are optimistic. If you slip 2+ weeks on any phase, drop Tier 2 scope first, never Tier 1 quality.
+Annual billed, ex-VAT, EUR. Seat = active user in last 30 days. Reference users who appear in data but never log in are not billable.
 
-### Phase 2: Foundation build
+### 2.1 The tiers
 
-**Goal:** local dev stack up, backend + frontend scaffolds running entirely on the dev machine, the plumbing that every feature depends on in place. **No GCP, no deployment.** Deploy track is §16 in EXECUTION_CHECKLIST.md and runs after Phase 5a MVP is demo-ready.
+| SKU | List €/seat/month | Annual €/seat | Canonical 201-seat ACV | What it buys |
+|---|---:|---:|---:|---|
+| **Starter (pilot)** | - | - | €8,000 flat | 90-day, 10-seat pilot. Real data, no production commitment. Converts to any tier or closes cleanly. |
+| **Essential** | **17** | **204** | **€41,004** | Time, projects, clients, expenses (manual), invoices, leaves, approvals, admin, account, dashboard. PWA mobile. CSV import + export. EU data residency. Email support. |
+| **Business** | **29** | **348** | **€69,948** | Essential + receipt OCR + Cmd+K AI palette + insight cards + **month-end close agent** + SCIM + SAML + multi-rate VAT + priority support. |
+| **Enterprise** | **45** | **540** | **€108,540** | Business + expense anomaly agent + overdue cash agent + overwork sentinel + budget burn agent + dedicated TAM + pen-test report + source-code escrow + uptime SLA + custom DPA + SOC 2 Type 2. |
 
-**Target:** 6 to 9 weeks of two-founder work at ~24-34 combined h/week productive. **BUILD TRACK DONE 2026-04-15** (shipped in 10 commits across backend, frontend, infra/docker, Makefile, CI workflow).
+**Why three tiers, not one.** A single €35 SKU forces every buyer through the same gate. With three tiers: SMB (50-100 seats) says yes at Essential, the main pipeline (100-300) lives at Business, and Enterprise (200-500) is a lever we only pull after the gates clear. Loss of the top band does not kill the quarter.
 
-**Concrete tasks:**
+**Why annual only.** Monthly billing doubles finance overhead and pulls procurement into a quarterly conversation. Founder time is the scarcest resource. Annual is locked for v1.0. Monthly is DEF'd (fires at customer 6 when Stripe/Revolut lands, see §6 DEF-029).
 
-1. **GCP account setup** - **DEFERRED to §16 Deploy Track.** Not needed for MVP demo; runs after Phase 5a when a pilot customer asks for a production URL. Keeps the build track focused on local dev reality.
+**Why no free tier.** The free tier in a 200-seat firm is the competition's foot in the door. Our free tier is the 90-day pilot at €8k, which trades cash for our own commitment to the customer's success.
 
-2. **Cloudflare setup** - **DEFERRED to §16 Deploy Track.** Same reason. DNS, WAF, Access, Email Routing all happen when the app needs a public hostname.
+### 2.2 Discounts and floors
 
-3. **Google Workspace setup** - **DEFERRED to §16 Deploy Track.** Mailhog handles dev email entirely. Workspace SMTP Relay swaps in when the app needs to send real mail.
+- Early-adopter discount: first 5 annual conversions get **30% off year 1, 20% off year 2, 10% off year 3**, grandfathered on any tier the customer sits on when they convert. Written into their custom contract per `backend/app/features/admin/` tenant_custom_contracts row.
+- Procurement floor: never quote below **€120/seat/year** on Essential or **€240/seat/year** on Business. Below those the unit economics break (GCP + Ollama inference + support + 20% founder margin).
+- Enterprise: no published list; priced on seat count × SKU × contract term × negotiated add-ons. Minimum 200 seats.
 
-4. **GitHub setup** - **PARTIAL:** repo exists, `.github/workflows/ci.yml` live with pre-commit + backend (ruff + pytest 60% floor) + frontend (typecheck + vitest, lockfile-gated). Environments, deploy secrets, branch protection all move to §16 Deploy Track.
+### 2.3 Pricing review triggers
 
-5. **Backend scaffold** - **DONE 2026-04-15.**
-   - [x] `backend/app/main.py` with FastAPI + middleware chain: `TenancyMiddleware`, CORS, typed error handler
-   - [x] `backend/app/core/tenancy.py` with `ContextVar` + `SET LOCAL search_path` per ADR-001
-   - [x] `backend/app/core/security.py` with JWT audience binding (ops/app/portal) per ADR-010
-   - [x] `backend/app/core/database.py` with SQLAlchemy async engine + per-request session factory
-   - [x] `backend/app/core/config.py` with Pydantic settings
-   - [x] `backend/app/core/feature_registry.py` (M6, 12 features auto-register)
-   - [x] `backend/app/core/errors.py` typed exceptions (401/402/403/404/409/422/429)
-   - [x] `backend/app/core/audit.py` writer + PG trigger rejecting UPDATE/DELETE
-   - [x] `backend/migrations/env.py` with per-tenant `-x tenant=...` orchestration via SQLAlchemy async
-   - [x] First migration creates public.tenants, public.country_holidays, public.audit_log + append-only trigger
-   - [x] `backend/app/ai/client.py` AIClient Protocol + MockAIClient (vendor swap in §16)
-   - [x] `backend/app/events/bus.py` in-process event bus (M5)
-   - [x] `backend/app/tasks/celery_app.py` with 3 queues (critical, default, bulk)
-   - [ ] 👥 **Phase 3a carryover blocker:** wire JWT claim extraction into `TenancyMiddleware._extract_from_jwt` (currently a stub returning None)
+The €17 / €29 / €45 bar is reviewed when any of the following fires:
+- Customer 5 signs at Business or Enterprise (anchor is proven).
+- SOC 2 Type 2 lands (enterprise step-up enabled).
+- Two consecutive months of pilot-to-annual conversion <50% (pricing too high or value too thin).
+- Renewal churn in the first 3 cohorts >15% (price-value mismatch).
 
-6. **Frontend scaffold** - **DONE 2026-04-15.**
-   - [x] Next.js 15.1 + React 19 + Tailwind 4 + TypeScript strict mode, compiles clean + passes typecheck + passes vitest + passes `next build`
-   - [x] `frontend/styles/tokens.css` byte-exact mirror of `prototype/_tokens.css` (allowlisted in em-dash hook, CLAUDE.md rule 3)
-   - [x] `frontend/styles/globals.css` with `@import tailwindcss` + `@theme inline` bridge
-   - [x] `frontend/app/[locale]/(ops)/layout.tsx` (operator shell variant)
-   - [x] `frontend/app/[locale]/(app)/layout.tsx` (main app shell with Providers + AppShell)
-   - [x] `frontend/components/shell/sidebar.tsx` at 224px, topbar, bottom-nav, app-shell wrapper
-   - [x] 20 atoms + 3 patterns (Button, Input, Card, Modal, Table, Select, Checkbox, Radio, Toggle, Textarea, Badge, Pill, Breadcrumb, Tabs, Accordion, Drawer, Toast, Tooltip, SearchInput, AIInsightCard, AIInvoiceExplanation + EmptyState + FilterBar + StatPill)
-   - [x] `frontend/lib/api-client.ts` with typed `ApiClientError` (402 entitlement, 409 conflict)
-   - [x] `frontend/lib/optimistic.ts` with `useOptimisticMutation` wrapper
-   - [x] `frontend/lib/offline.ts` IndexedDB queue stub
-   - [x] `frontend/lib/realtime.ts` WebSocket singleton stub
-   - [ ] 🧑 `frontend/app/[locale]/(portal)/layout.tsx` portal shell - deferred to Phase 6
-   - [ ] 🧑 Cmd+K palette, notifications drawer, ConflictResolver UI, EntitlementLock UI - each ships with the first Phase 5a feature that actually needs it
-
-7. **Database bootstrap** - **PARTIAL.**
-   - [x] First Alembic migration covers `public.tenants`, `public.country_holidays`, `public.audit_log` + append-only trigger
-   - [x] Second Alembic migration seeds FR + UK holidays for 2026 and 2027
-   - [x] Migration runner uses SQLAlchemy async (no psycopg2 dependency)
-   - [ ] 👥 Run `alembic upgrade head` against the local dev DB once docker group is fixed (`make mvp-up` handles this)
-   - [ ] 👥 Phase 3a: add `public.app_users`, `ops_users`, `portal_contacts`, session tables (ADR-010 three-audience identity)
-   - [ ] 👥 Phase 3a: tenant provisioning service that creates `t_<slug>` schemas and runs per-tenant migrations
-   - [ ] 👥 Phase 3a: seed the `feature_flags` table with the initial kill switches (currently only the in-process feature registry holds this)
-
-8. **Minimum operator console** - **PARTIAL.**
-   - [x] `backend/app/features/admin/models.py` Tenant ORM
-   - [x] Admin service + routes at `/api/v1/ops/features`, `/kill-switch`, `/overrides`
-   - [x] 12 feature modules self-register with the feature registry (M6)
-   - [x] `(ops)` route group: layout + static Tenants + static Flags pages
-   - [ ] 👥 Phase 3a: wire the static ops pages to live `/api/v1/ops/*` data
-   - [ ] 👥 Phase 3a: operator authentication (passkey-only per ADR-010) or Phase 3b hardening
-   - [ ] 👥 Phase 3a: `(ops)/tenants/new` create wizard
-
-9. **Atom layer** - **DONE 2026-04-15.** 20 atoms + 3 patterns, byte-for-byte prototype tokens, dark + light via `[data-theme="light"]`. Storybook deferred (DEF-049).
-
-10. **`docs/ROLLBACK_RUNBOOK.md`** - **PARTIAL (doc exists).** Per-tenant rollback drill deferred to §16 Deploy Track (needs a real staging environment to run against).
-
-11. **First DR drill** - **DEFERRED to §16 Deploy Track.** Requires real staging.
-
-12. **Month-end close agent scaffolding** - **PARTIAL.** MockAIClient + AI eval harness skeleton at `backend/app/ai/evals/harness.py` are live. Full 5-example eval set per feature + the 24-analyzer library + invoice draft generation land in Phase 5a (`EXECUTION_CHECKLIST.md` §6.2).
-
-13. **Testing infrastructure scaffolding** - **DONE 2026-04-15.** pytest + hypothesis + pytest-asyncio + pytest-mock + vitest + Playwright installed. 45 backend tests pass. GitHub Actions CI: pre-commit + backend (ruff + pytest 60% floor) + frontend (typecheck + vitest, lockfile-gated).
-
-14. **Property-based test invariants (first 5)** - **DONE 2026-04-15.** FR domestic VAT, intra-EU reverse charge, UK domestic VAT, tenant schema shape, tenant schema SQL-injection rejection. The tenant schema property test caught a real regex-anchor bug in `tenancy.py` during Phase 2 (`^` vs `\A` / `\Z`).
-
-15. **AI eval harness with 5 examples per feature** - **SKELETON only.** `backend/app/ai/evals/harness.py` exists; 5 hand-curated examples per feature ships with each feature in Phase 3a-5a (column mapper in 3a, month-end close in 5a, OCR in 5a).
-
-16. **Contract test harness** - **DONE 2026-04-15.** Contract test asserts `/api/v1/*` versioning + OpenAPI shape for auth + ops routes. `openapi-typescript` frontend diff ships with Phase 3a when the first real endpoints land.
-
-17. **Snapshot test framework** - **NOT STARTED.** Phase 5a invoice PDF prereq. Ships with the first WeasyPrint render in `backend/app/features/invoices/`.
-
-**Definition of done (Phase 2, build track):**
-- [x] `make mvp-up` brings up Postgres + Redis + Mailhog + backend + frontend containers (solves the WSL2 localhost binding issue)
-- [x] Backend runs as a compose service, reaches Postgres via Docker DNS `postgres:5432`
-- [x] Frontend runs as a compose service, browser hits it at `http://localhost:3000/en`
-- [x] 45 backend tests pass locally (`make backend-test-local` or `make dev-test-backend`)
-- [x] Frontend typecheck + vitest + `next build` all green (`make dev-test-frontend`)
-- [x] 9 vendor wrappers M1 with stub implementations, CI lint blocks vendor SDK imports outside wrappers
-- [x] 20 atoms + 3 patterns, dark and light mode both look right
-- [x] Repo is em-dash-free and banned-vocabulary-free across every file (verified by pre-commit on the full repo, per CLAUDE.md rules 5 and 6)
-- [ ] 🧑 One-time founder unblock: `newgrp docker` in the current shell, then `make mvp-up`
-- [ ] 👥 Phase 3a carryover: JWT claim wiring into `TenancyMiddleware._extract_from_jwt`
-
-**Definition of done (Phase 2, deploy track):** moved to §16 Deploy Track in `EXECUTION_CHECKLIST.md`. Agent never initiates this; founder calls for it post-MVP.
-
-**What NOT to build in Phase 2 (still accurate):**
-- Login flows beyond the stub (Phase 3a password + OIDC, Phase 3b MFA + hardening)
-- Employee/client/project pages (Phase 4)
-- Any Tier 2 page (Phase 6)
-- Any feature gated by `@gated_feature` other than the gate itself (wait until Phase 4)
-- Anything in §16 Deploy Track (wait for founder trigger post-MVP)
+Every price change writes one row into `docs/pricing_history.md` with date, old tier, new tier, and trigger.
 
 ---
 
-### Phase 3: Auth + onboarding + full operator console
+## 3. What is actually done (honest, as of 2026-04-18)
 
-**Goal:** a new customer can sign up (via demo-to-contract flow) and get their data into the app through the onboarding wizard. Operator console has every page needed to run a manual sales motion.
+This replaces every "DONE" claim in the dead `EXECUTION_CHECKLIST.md`. A row is done only if it has code + tests + at least one user-visible path on a real browser.
 
-**Target:** 4 weeks.
+### 3.1 Foundation (Phase 2) - DONE
 
-**Concrete tasks, in order:**
+- `make mvp-up` brings up Postgres + Redis + Mailhog + backend + frontend locally.
+- 45+ property + contract + tenancy tests green.
+- 9 vendor wrappers M1 with stubs. CI lint blocks vendor SDK imports outside wrappers.
+- 20 atoms + 13 patterns. Dark + light. Tokens byte-exact with prototype.
+- Pre-commit hooks: em-dash, banned words, console.log, `#fff`/rgba, inline Intl, hardcoded aria-labels, no-raw-icon-size, hardcoded-date-locale.
 
-1. **OIDC setup for tenant users**
-   - [ ] `backend/app/features/auth/oidc.py` using `authlib`
-   - [ ] Google Workspace OIDC client registration
-   - [ ] Microsoft Entra OIDC client registration
-   - [ ] `public.oidc_providers` table per tenant (schema already in section 2.2)
-   - [ ] `/api/v1/auth/oidc/callback/{provider}` route
-   - [ ] `users.oidc_subject` linking
+### 3.2 Backend features - SCAFFOLDED, NOT WIRED TO PRODUCTION DATA
 
-2. **Passkey and password fallback auth**
-   - [ ] WebAuthn enrollment at `/account/security`
-   - [ ] WebAuthn challenge at `/login/passkey`
-   - [ ] bcrypt password path at `/login/password` with rate limiting
+Every feature below has `routes.py` + `service.py` + `models.py` + `schemas.py` + `ai_tools.py`. None serve the frontend yet because the frontend reads mocks.
 
-3. **Magic-link invite flow**
-   - [ ] `/invite/[token]` page that lands new employees in signup
-   - [ ] Invite creation in `public.invitations` from the onboarding wizard
-   - [ ] Email template `auth_invite.mjml` sent via Workspace SMTP Relay
+- `auth` - OIDC scaffold, password + JWT, audience binding (ops/app/portal).
+- `admin` - tenants, flags, kill switches, subscription stubs.
+- `imports` - CSV pipeline, AI column mapper, tested commit endpoint.
+- `employees`, `clients`, `projects` - CRUD + AI tools.
+- `timesheets`, `leaves`, `expenses`, `invoices`, `approvals` - CRUD + AI tools; no business logic beyond service shape.
+- `dashboard` - stub returning deterministic KPIs.
+- `search` - feature-registry backed.
+- `ai/` - AIClient protocol, MockAIClient, OllamaAIClient, 15 of 16 tools in `ai/registry.py`, golden-example evals per tool, PII boundary metatest.
+- Schema-per-tenant: `alembic_runs` table + `migrations/runner.py` + fan-out Celery task.
+- Confidential tier: `employee_compensation`, `employee_banking`, `leave_requests.reason_encrypted` with `pgcrypto` stub.
+- Idempotency middleware + audit writer + `@audited` + `@gated_feature` applied to every mutating route.
+- Seed script: 1 admin user + 201 employees + 120 clients + 260 projects + 700 leaves + 10,400 timesheet weeks + 39,000 entries + 8,400 expenses + 900 invoices + 9,000 invoice lines + audit log + notifications. **Pinned counts test blocks regression.**
+- 189 backend tests pass.
 
-4. **MFA + recovery**
-   - [ ] TOTP setup at `/mfa/setup` for non-SSO users
-   - [ ] 10 single-use recovery codes (hashed)
-   - [ ] Password reset at `/password/reset`
+### 3.3 Frontend - DESIGN BAR MATCHED, LIVE DATA NOT WIRED
 
-5. **Onboarding wizard (the big one)**
-   - [ ] `/onboarding` wizard per APP_BLUEPRINT 1.8
-   - [ ] CSV upload via GCS presigned URL, 20 MB limit
-   - [ ] ClamAV Celery virus scan integration
-   - [ ] AI column mapper tool in `backend/app/features/imports/ai_tools.py` calling Gemini
-   - [ ] Manual column mapper UI as fallback
-   - [ ] Validation pipeline per DATA_INGESTION section 2.4
-   - [ ] Preview screen with error report
-   - [ ] Celery import runner with `public.import_checkpoints` for resumability
-   - [ ] WebSocket progress on `/ws/notifications`
-   - [ ] End-to-end test: import the canonical seed dataset (201 employees + 120 clients + 260 projects + 52 weeks of timesheets) in under 60 seconds
+- 19 pages all on the Leaves/Dashboard bar: PageHeader, app-aura, 3-tile KPI row, AI recommendations where real, `useUrlListState` on list pages, skeleton + empty + error branches, aria-busy + aria-live.
+- i18n EN + FR in lock-step (1191 leaves each). Parity metatest prevents raw-key leaks.
+- All dates and currencies via `lib/format.ts`. Tabular nums globally.
+- Design system hygiene: 0 hardcoded English, 0 `#fff`/rgba in shipped code, 0 console.log, 0 em dashes, 0 banned words, 0 raw icon sizes.
+- Command palette shell built; entity search works; 15 LLM-router tools registered but not wired end-to-end.
 
-6. **Operator console full v1.0 set**
-   - [ ] 11.4 tenant detail tabs (Users, Subscription, Entitlements, Custom Contract, Lifecycle)
-   - [ ] 11.6 subscription invoices list + 11.7 detail
-   - [ ] 11.8 custom contracts list + 11.9 detail
-   - [ ] 11.10 feature flags page
-   - [ ] 11.11 kill switches page (with required reason text)
-   - [ ] 11.12 migrations status page (reads from `alembic_runs`)
-   - [ ] 11.13 sub-processors list editor
+### 3.4 Governance + quality gates - STRUCTURAL
 
-**Definition of done (Phase 3):**
-- A prospective customer can be onboarded end-to-end in under 60 minutes (you create tenant → send invite → they log in via OIDC → upload CSVs via onboarding wizard → data is imported)
-- Every auth path works on real devices (passkey on a YubiKey, OIDC via Google and Microsoft)
-- The flawless gate passes for all auth pages and the onboarding wizard
-- The operator console covers every manual-billing action
+- Unified 70-item `docs/FLAWLESS_GATE.md` under ADR-012.
+- M1-M10 modularity rules enforced in CI per `docs/MODULARITY.md`.
+- Six testing layers defined in `docs/TESTING_STRATEGY.md`.
+
+### 3.5 What is NOT done, bluntly
+
+- **Month-end close agent.** Zero code. The scaffolding exists; the analyzer + handler + eval suite + UI do not. See §4 Weeks 3-4.
+- **Frontend wired to live API on any page.** All 19 pages still read `lib/mock-data.ts`. See §4 Weeks 1-2.
+- **First pilot customer.** No named lead committed in writing. See §4 Weeks 5-6.
+- **Staging or production deployment.** `docs/ROLLBACK_RUNBOOK.md` untouched. `make mvp-up` is the only running surface. See §4 Weeks 7-10.
+- **4 residual CRITIC items:** A3 (`useOptimisticMutation` retrofit), B1 (8 invented patterns ADR), C11 (real audit_log on detail pages), C13 (`ConflictResolverProvider` smoke test). Folded into §4 Weeks 7-10.
+- **SOC 2, pen-test, escrow.** All deferred to §5 Q3-Q4.
 
 ---
 
-### Phase 4: Core data + Dashboard pass 1
+## 4. The 12-week path to first €1 of revenue
 
-**Goal:** employees, clients, projects, and a first dashboard. The founder's team and sales team can start demoing the app with real data.
+12 calendar weeks, two-founder cadence, ~24-34 combined productive h/week. This is the only roadmap that matters. Everything else slides.
 
-**Target:** 4 weeks.
+Every task below carries (**File:** absolute path in repo), (**Do:** one-sentence action), (**Accept:** pass/fail criterion), (**Test:** the test file path and assertion to add), (**DEF refs:** any deferred decisions whose triggers could fire during this task, pointing into §6). Agents do not improvise beyond these four lines.
 
-**One Tier 1 feature at a time, in this order:**
+### 4.0 Rules for every week
 
-1. **Employees** (3.1, 3.2) + `features/employees/` full stack + seed data generator + CRUD + profile tabs + manager hierarchy + `employee_visibility` materialized view
-2. **Clients** (7.1, 7.2) + full CRUD + contacts + reverse-charge VAT support
-3. **Projects** (7.3, 7.4) + full CRUD + T&M vs fixed-price + project_allocations + project_rates + project_milestones
-4. **Dashboard pass 1** (2.1) with widgets wired to employees, clients, projects data
-5. **Operator console pages 11.14-11.18** (DPA versions, residency audit viewer, maintenance mode toggle, cross-tenant audit log browser, health dashboard)
-
-**Definition of done:** flawless gate passes for all four Tier 1 features, the dashboard shows real data from the imported test tenant, the operator console is feature-complete for v1.0.
+- **Read order before starting any task:** `CLAUDE.md` → this file §4 for current week → referenced spec (`specs/*.md`) → prototype HTML → memory (`~/.claude/projects/.../memory/MEMORY.md`) → target file.
+- **Commit rhythm:** one logical task = one commit. Commit message names the task number (e.g. `week1.1: timesheets wire to /timesheets/weeks`) + `## senior-ui-critic` and `## senior-ux-critic` reports when frontend touched.
+- **No `git commit` without founder ask.** CLAUDE.md rule 9. Agents stage changes and ping the founder for `/commit`.
+- **No new atoms, no token edits.** CLAUDE.md rules 3 and 4. If tempted, stop and ask.
+- **70-item gate before ticking box.** `docs/FLAWLESS_GATE.md`. Partial gates lie.
 
 ---
 
-### Phase 5: Core modules
+### Weeks 1-2: Close the loop on three pages
 
-**Goal:** all Tier 1 features flawless. This is the longest phase.
+**Goal:** timesheets, expenses, invoices render live from the backend on a seeded tenant. No mock data on those three. The rest can keep mocks.
 
-**Target:** 9 weeks. Probably slips to 11-13.
+#### Task 1.1 - Wire timesheets
 
-**One Tier 1 feature at a time, in this order (each takes 1-3 weeks):**
+- **File:** `frontend/features/timesheets/use-timesheets.ts`
+- **Do:** flip `USE_API` dual-arm to always-on; point week list to `GET /api/v1/timesheets/weeks`, per-week detail to `GET /api/v1/timesheets/weeks/{id}`, entry writes to `PATCH /api/v1/timesheets/weeks/{id}/entries`. Use `lib/api-client.ts` fetcher; do not write a new fetcher.
+- **Do also:** delete `lib/mock-data.ts` imports from `app/[locale]/(app)/timesheets/page.tsx` and `app/[locale]/(app)/timesheets/[week_id]/page.tsx`. Replace with the hook.
+- **Accept:** `make mvp-up` + a seeded browser session at `/timesheets` lists 10,400 weeks from DB, paginated. Opening a week loads its entries. Editing a cell fires a real `PATCH`. Autosave hits the API.
+- **Test:** `frontend/tests/e2e/timesheets.spec.ts` - Playwright: navigate `/timesheets`, assert 1+ row with non-empty submitter name, open one week, type `8` into a draft cell, blur, assert `PATCH` response 200, assert cell persists on reload.
+- **DEF refs:** none fires during this task.
 
-1. **Timesheets** (4.1, 4.2) with week-as-entity state machine, submit/approve/reject/recall, version locking, offline support via IndexedDB queue
-2. **Leaves** (5.1, 5.2) with request flow, balance calculation from `leave_types.accrual_rate`, approval routing to direct manager
-3. **Expenses** (6.1, 6.2) with OCR via Gemini vision, manual fallback, approval routing (direct manager + finance co-approval above threshold)
-4. **Approvals hub** (4.3) as a unified board across timesheets, leaves, expenses
-5. **Invoices** (8.1, 8.2) with volume-band calculation, WeasyPrint PDF template (budget 1 full week on the template alone for French legal precision), sequence generation under concurrency
-6. **Admin console** (9.1) with Users, Roles, Teams, Billing, Audit Log, Security sections
-7. **Account settings** (9.2) with Profile, Security (passkey + password + MFA + sessions), Notifications, Language, PWA push opt-in
-8. **Dashboard pass 2** (2.1) with full data from all modules including AI insight cards
-9. **Payroll CSV export** per DATA_INGESTION section 6: Silae + Payfit + generic adapters
-10. **Ongoing CSV imports page** per DATA_INGESTION section 3 in the admin console
+#### Task 1.2 - Wire expenses
 
-**Definition of done (Phase 5):** every Tier 1 feature passes the flawless gate, the canonical seed tenant works end-to-end for a full monthly cycle (time entry → submit → approve → invoice → payroll export), real customers can be onboarded.
+- **File:** `frontend/features/expenses/use-expenses.ts`
+- **Do:** flip `USE_API`; point list to `GET /api/v1/expenses`, submit to `POST /api/v1/expenses` via existing `useSubmitExpense` mutation. Keep OCR two-stage row landed in CRITIC A4.
+- **Do also:** replace `CLIENT_NAMES` lookup (if any stub) at `app/[locale]/(app)/expenses/page.tsx` with the real joined response.
+- **Accept:** `/expenses` lists 8,400 seeded expenses with employee names expanded server-side. Submit modal + photo upload produces a new DB row with `status='draft'`, visible on page reload.
+- **Test:** `frontend/tests/e2e/expenses.spec.ts` - Playwright: open submit modal, attach `tests/fixtures/receipt.jpg`, fill amount 42, submit, assert row appears with amount 42 and status draft.
+- **DEF refs:** none.
 
-**Check-in gate before Phase 6:** run all 14 Tier 1 features through the flawless gate one more time in a batch. If anything fails, fix it before starting Phase 6.
+#### Task 1.3 - Wire invoices
 
----
+- **File:** `frontend/features/invoices/use-invoices.ts`
+- **Do:** flip `USE_API`; list → `GET /api/v1/invoices`, detail → `GET /api/v1/invoices/{id}` + `GET /api/v1/invoices/{id}/lines`. Drop the `CLIENT_NAMES` map at `invoices/page.tsx:66`. Expand client + project names server-side via the existing `?expand=client,project` param.
+- **Accept:** `/invoices` lists 900 seeded invoices with client names visible, filter by status works, opening one invoice shows its 8-12 real line items.
+- **Test:** `frontend/tests/e2e/invoices.spec.ts` - Playwright: navigate `/invoices`, assert ≥100 rows, open one with `status=sent`, assert total matches sum of lines to 2 decimal places.
+- **DEF refs:** none.
 
-### Phase 6: Tier 2 features + client portal
+#### Task 1.4 - Run the 70-item gate on all three
 
-**Goal:** the features that differentiate Gamma from boring PSA tools, and the client portal.
+- **Do:** for each of `/timesheets`, `/expenses`, `/invoices`, run `docs/FLAWLESS_GATE.md`. Save screenshots to `docs/gate-reports/<feature>/`. Invoke `senior-ui-critic` and `senior-ux-critic` subagents; paste reports into the commit message.
+- **Accept:** 70/70 green on all three pages. Zero red items. Any red item returns the feature to the builder.
 
-**Target:** 9 weeks. Tier 2 has a lower quality bar than Tier 1 (functional + polished, not flawless).
+#### Task 1.5 - Delete dead mock imports
 
-**Tier 2 features can run in parallel with each other:**
+- **File:** `frontend/lib/mock-data.ts` (partial)
+- **Do:** remove the three feature sections (timesheets, expenses, invoices) from the mock file. Keep the rest (employees, clients, projects, etc.) until their weeks land in §5.
+- **Accept:** `grep -R "from.*mock-data" frontend/features/timesheets frontend/features/expenses frontend/features/invoices` returns zero.
 
-1. **Calendar** (10.1) month view read-only
-2. **Gantt** (10.2) read-only pan/zoom
-3. **Resource planning** (10.3) read-only heatmap
-4. **HR module** (10.4) recruitment pipeline read-only
-5. **Insights page** (10.5) ranked AI insights list
-6. **Client portal** (12.1-12.4) read-only status + invoices, ships late in this phase
+**Week 2 exit criterion:** a browser session at `make mvp-up` shows 201 employees' timesheets, 8,400 expenses, 900 invoices from the database. Zero mock imports on those three pages. All three pages pass the 70-item gate.
 
-**Definition of done:** Tier 2 features work reliably and look consistent with the rest of the app. Client portal can be opened by a customer's client with a passkey.
-
----
-
-### Phase 7: Hardening + launch
-
-**Goal:** production-ready, first paying customer, public launch.
-
-**Target:** 8 weeks optimistic, **12 weeks realistic** at two-founder cadence (realistic weeks 42 to 54 in the table above).
-
-1. **SOC 2 Type 1 audit window**: target certification by customer 3-4 (up from customer 5 in the solo plan). Work starts in Phase 6 parallel to Tier 2 features. Engage auditor by week 32 of the realistic column (post-Phase 4 customer-validation gate). Certification lands in the realistic week 56-60 window (see Go-to-market milestones).
-2. **Security audit**: cross-tenant leak tests, auth flow attack surface, rate limit stress tests, SQL injection, XSS, CSRF, three-gate feature gating boundary tests
-3. **Performance pass**: p95 latency targets met, Lighthouse scores, bundle sizes, database query counts, N+1 elimination, three-gate cold-start coalescing (see "Performance risks to verify" in `specs/DATA_ARCHITECTURE.md`)
-4. **Beta onboarding**: onboard 3 pilot customers manually (demo-to-contract motion)
-5. **Docs site**: public documentation using Mintlify or similar
-6. **Video tutorials**: onboarding, timesheet, expense, invoice (short recordings, not Hollywood)
-7. **Legal review**: DPA, TOS, privacy policy reviewed by French SaaS lawyer (€500-2000)
-8. **Public status page**: `status.gammahr.com` on Cloudflare Workers + R2 (DEF-016 trigger fires here: "before first paying customer signs")
-9. **Incident response runbook review**: `docs/ROLLBACK_RUNBOOK.md`, `docs/COMPLIANCE.md`, `docs/DEGRADED_MODE.md`, `docs/BILLING_LIFECYCLE.md`, `docs/DATA_RETENTION.md`, and `docs/MIGRATION_PATTERNS.md` are all delivered before Phase 5 start. Phase 7 reviews all six for drift against the real implementation and updates them for any new failure modes discovered during Phase 5. The three that were missing in earlier drafts (billing lifecycle, data retention, migration patterns) were written in April 2026 after the brutal-review pass.
-10. **Audit log archival pipeline live**: weekly Celery export of >90-day-old `audit_log` partitions to `gammahr-prod-audit-archive` GCS bucket (Cold Line storage class, lifecycle policy, retention policy lock). The 7-year retention requirement cannot be met by Cloud SQL PITR alone.
-11. **Public launch**: announce, Product Hunt, LinkedIn
-
-**Definition of done:** 1 paying customer, no P0 bugs for 30 consecutive days, founder can take a week off without everything breaking.
+**DEFs whose trigger could fire this fortnight:** none expected. See §6 for the full list and triggers.
 
 ---
 
-## Pre-customer-2 commitment (measurement before the next signature)
+### Weeks 3-4: Month-end close agent MVP
 
-**Before customer 2 signs, these three things must be true:**
+**Goal:** a working analyzer that drafts invoices for one month on the canonical seed. Gemma (Ollama) ranks and explains. User confirms. This is the one feature that justifies the Business tier.
 
-1. **Run the full month-end close flow on customer 1's real data and time it end-to-end.** Start the timer when the founder clicks "Start month-end close", stop it when the last invoice is marked ready-to-send. Record the elapsed time in minutes. Record the number of drafts, the number of drafts the founder edited, and the number of drafts the founder accepted as-is. This is the demonstrable-value measurement.
-2. **Video-record the customer 1 CFO (or the equivalent finance approver) using the flow**, with their face on camera, with their permission. 3 minutes maximum. Capture the genuine reaction when the queue loads, when the explanations render, and when the batch-send completes. This video is the single most important sales asset for customers 2 through 10.
-3. **Publish a one-pager case study** with the before/after numbers and a pull-quote from the customer. Format: "Customer 1 (named or anonymized at their request) closed their month in X hours instead of Y days. That is an Nx improvement. The video is at <link>." One page, one hero number, one quote. This is what customer 2 reads before the first call.
+Cross-reference: `specs/APP_BLUEPRINT.md §8.3` is the source of truth for this feature. Every task here anchors on a section of that spec. `specs/AI_FEATURES.md §7` names the `explain_invoice_draft` tool.
 
-**Hard decision rule:** if the measured savings in step 1 are less than **90 minutes per month** (on a 201-employee canonical tenant), STOP before signing customer 2. Re-anchor the ACV story before any new pricing commitment. Do not grandfather customer 2 at €70k ACV if the demo cannot justify it. The €35/seat pricing depends on this feature being demonstrably differentiated, not approximately differentiated.
+#### Task 2.1 - Feature module skeleton
 
-**Why this is a hard gate, not a soft one:** customer 1 is locked at €70k ACV for 3 years (the grandfathered pilot pricing in `docs/GO_TO_MARKET.md` section 2). Customer 2 is where the real pricing test happens. If the founder signs customer 2 at €35/seat on the same pitch before validating savings, customers 2 through 10 all anchor on a possibly-unjustifiable number. The only lever to re-anchor is before customer 2, not after.
+- **File (new):** `backend/app/features/invoicing_agent/{routes,service,models,schemas,ai_tools,analyzers,tasks}.py` + `tests/`.
+- **Do:** create one-sentence-per-file shells per M10 rule (one domain concept per file). `models.py` holds the `InvoiceDraft` row (referencing `invoices.id` and period). `service.py` owns the draft-generation algorithm. `analyzers.py` holds the deterministic analyzer functions. `tasks.py` holds the Celery fan-out. `ai_tools.py` wraps `explain_invoice_draft`.
+- **Accept:** import works; `routes.py` registers `/api/v1/invoices/month-end/*`; empty tests pass.
+- **Test:** `tests/test_invoicing_agent_shape.py` asserts the four routes from APP_BLUEPRINT §8.3 exist in the OpenAPI schema.
+- **DEF refs:** DEF-029 (payments) does not fire; we still invoice manually in Phase 2.
 
-This commitment is a **Phase 7 post-launch action**, not a Phase 7 launch task. It fires when customer 1 completes their second month-end close cycle on real data (typically 60-90 days after go-live).
+#### Task 2.2 - Deterministic draft generator
 
----
+- **File:** `backend/app/features/invoicing_agent/service.py`
+- **Do:** implement `generate_drafts(period_start, period_end) -> list[DraftInvoice]`. For each client with ≥1 approved `timesheet_entries` or `expenses.billable=true` in the period, build one draft per the algorithm in `specs/DATA_ARCHITECTURE.md §4.4.1`. Uses `rate_periods`, `projects.billing_type`, `expenses.markup_pct`. Writes `invoices` rows with `status='draft'` and a `draft_batch_id` linking them.
+- **Accept:** `POST /api/v1/invoices/month-end/start` with period=2026-03 creates N ≤ 120 drafts (one per client with billable activity), idempotent on replay (same period twice = same output byte-for-byte).
+- **Test:** `tests/test_invoicing_agent_service.py::test_idempotent_snapshot` - snapshot of the draft list for period 2026-03 on the canonical seed.
+- **DEF refs:** DEF-001 (full workflow engine) does not fire; drafts use single-hop finance approval. DEF-006 (retainers) does not fire; only T&M + fixed-price projects flow into drafts.
 
-## Post-launch playbook (NOT in Phase 7)
+#### Task 2.3 - Nine deterministic analyzers
 
-These triggers fire after launch, not during it. Putting them in Phase 7 was a category error in earlier versions of this file: Phase 7 ships v1.0 with one paying customer, and these items only become real on customer #2-#10.
+- **File:** `backend/app/features/invoicing_agent/analyzers.py`
+- **Do:** implement the nine signals from APP_BLUEPRINT §8.3: `rate_change_mid_period`, `line_count_anomaly`, `total_value_anomaly`, `new_employee_on_project`, `fx_rate_fallback_used`, `client_on_hold`, `expense_not_matched`, `unmatched_approved_entries`, `milestone_due`. Each returns `{code, severity, human_readable_reason, entity_refs}`.
+- **Accept:** each analyzer has 2+ unit tests (positive case + negative case). No analyzer touches the LLM.
+- **Test:** `tests/test_analyzers.py::test_<code>_<case>` - one per case.
 
-| Trigger | Action | DEF reference |
-|---|---|---|
-| Customer #2 signs | Confirm the demo-to-contract motion is repeatable, write the "first 30 days" playbook for new pilots into `docs/WEEKLY_LOG.md` | - |
-| Customer #5 signs OR manual billing exceeds 2 hours/week | Start payment processor integration (Stripe / Revolut / Paddle, evaluated at trigger time) | DEF-029 |
-| Sustained inbound requests for self-serve OR customer #6 signs | Build self-serve signup flow at `gammahr.com/register` | DEF-028 |
-| Customer #6 signs (after billing automation) | Self-serve volume band calculator in admin billing page | DEF-059 |
-| Customer #10 OR audit/compliance inquiry | DPA version management UI in operator console | DEF-037 |
-| Sustained >2 DSR emails/month | Self-service DSR form at `gammahr.com/privacy/dsr` | DEF-034 |
-| Tenant count exceeds 30 OR second drift incident | Cross-tenant schema drift auto-reconciliation UI | DEF-054 |
-| Year 2-3 OR Cloud SQL connection saturation | Self-hosted PgBouncer on Compute Engine | DEF-013 |
+#### Task 2.4 - `explain_invoice_draft` AI tool
 
----
+- **File:** `backend/app/features/invoicing_agent/ai_tools.py`
+- **Do:** register the 16th tool per `specs/AI_FEATURES.md §3.1`. Input: draft + analyzer signals. Output: one paragraph (2-3 sentences, plain text, no markdown, no em dashes) + top 3 ranked signals. Batched at up to 20 drafts per prompt call.
+- **Accept:** `ai/evals/invoicing_agent/` has 5 golden examples (clean-close, missing-timesheets, expense-outlier, FX-mixed, small-client). CI blocks on regression.
+- **Test:** `backend/app/ai/evals/invoicing_agent/test_golden.py` runs the five examples through the Ollama tier locally (MockAIClient in CI) and asserts the ranker returns the expected top-1 signal.
 
-## The weekly rhythm (what you do each Monday)
+#### Task 2.5 - Month-end close page
 
-1. **Open `THE_PLAN.md`** (this file) and check which phase you are in.
-2. **Pick the next unchecked task** in the current phase. One task at a time.
-3. **Read the spec sections referenced** by that task before writing any code.
-4. **Read the prototype HTML** if the task is frontend-visible.
-5. **Build the task** to the flawless gate if it is Tier 1, or to functional + polished if it is Tier 2.
-6. **Run the gate checklist** from `docs/FLAWLESS_GATE.md`.
-7. **Ship to staging** (auto-deploys from `main`).
-8. **Manual promotion to prod** after smoke tests.
-9. **Check off the task** in this file.
-10. **Write a weekly note in `docs/WEEKLY_LOG.md`** (create it if it does not exist): what shipped, what slipped, what you learned.
+- **File (new):** `frontend/app/[locale]/(app)/invoices/month-end/page.tsx` + `frontend/features/invoicing_agent/use-month-end.ts`.
+- **Do:** implement the six-step flow in APP_BLUEPRINT §8.3. Uses existing atoms. One new pattern only: `InvoiceDraftRow`. If a ninth invented pattern is tempting, stop and file ADR-014 per §4 week 7-10 B1.
+- **Accept:** click-through: Start close → 120 drafts appear → approve 118, edit 2, reject 0 → Send batch. Undo window 5 s per `docs/FLAWLESS_GATE.md` item 25.
+- **Test:** `frontend/tests/e2e/month-end-close.spec.ts` - full golden path on the canonical seed. Stopwatch assertion: end-to-end time <10 minutes.
+- **DEF refs:** DEF-029 (payment processor), DEF-021 (SMTP migration), DEF-027 (Gmail OAuth) do not fire; send uses existing WeasyPrint + Workspace SMTP Relay path.
 
-**If you cannot finish a task in one week:**
-- Do not abandon it.
-- Do not start a parallel Tier 1 task.
-- Break the task into smaller sub-tasks and finish the current slice.
-- Re-estimate the rest.
+#### Task 2.6 - Record the value video
 
-**If you slip 2+ weeks on a phase:**
-- Drop Tier 2 scope first, never Tier 1 quality.
-- Re-baseline the ROADMAP dates.
-- Update this file to reflect the new reality.
+- **Do:** founder runs the golden path end-to-end on the canonical seed, screen-recorded with narration. 3 minutes maximum. Shows: seeded employees, approved timesheets, one Start click, 120 drafts appearing with AI explanations, 3 confirms, 1 edit, 1 batch send, "Month-end close complete" panel. File name `docs/sales/demo_month_end_close_v1.mp4`, with transcript at `docs/sales/demo_transcript.md`.
+- **Accept:** both founders agree the video looks like a real product, not a demo. If not, iterate the UI and re-record until yes.
+
+**Week 4 exit criterion:** a founder can run the full month-end close on the canonical 201-seat seed in under 10 minutes, recorded on video, with an AI paragraph on every draft. Video is the asset for §4 Weeks 5-6.
+
+**DEFs whose trigger could fire this fortnight:** DEF-046 (Gemini → Claude fallback) if eval pass rate drops; unlikely on golden seed. DEF-044 (multi-vendor fallback) dormant.
 
 ---
 
-## The emergency manual (when you feel lost)
+### Weeks 5-6: Pilot sales motion
 
-### "I don't know what to build next."
-Open THIS FILE, find the current phase, find the first unchecked task. Build it.
+**Goal:** one named pilot signed.
 
-### "I think we should add feature X."
-Check `docs/DEFERRED_DECISIONS.md`. If X is there with a DEF-NNN, it is deferred; do not add it until the trigger fires. If X is not there, it is scope creep; either add it as a new DEF entry or decide explicitly to break scope (which you should not do).
+#### Task 3.1 - Build the 50-lead list
 
-### "I think we made the wrong decision about Y."
-Open the relevant spec file (`DATA_ARCHITECTURE.md`, an ADR, etc). If the decision is still right, close the tab. If it needs to change, open a PR with explicit reasoning and update the spec. Do not silently drift.
+- **File (new):** `docs/founder/pipeline.md` (founder-only; not agent-readable beyond read)
+- **Do:** founder identifies 50 warm-intro targets on LinkedIn: COOs, finance leads, HR operations managers at 50-500 employee consulting firms in France and UK. Three columns: name + firm + intro path. Agent does not populate this.
+- **Accept:** 50 named rows before Monday of week 5.
 
-### "An AI agent suggested something that conflicts with the plan."
-Trust the plan. The agent is lossy; the plan was carefully built. Point the agent at the relevant spec file. If the agent still disagrees, assume the agent is wrong unless you personally verify the conflict.
+#### Task 3.2 - Outreach cadence
 
-### "A customer is asking for a feature that is in the deferred registry."
-Check if the feature's DEF-NNN trigger has fired. If yes, start the work with the deferral's cost estimate as the target. If no, tell the customer it is on the roadmap but not in v1.0, and note the request in `docs/WEEKLY_LOG.md` so patterns become visible.
+- **Do:** founder sends 20 first-contact messages per week. 3 sentences: who you are, what Gamma is, one-line ask for a 30-minute call + video link. No product pitch, no feature list.
+- **Accept:** response tracking in `docs/founder/pipeline.md` with stages Curious / Interested / Evaluating / Committed / Live.
 
-### "The app is broken in prod at 2am."
-Rollback procedure per `docs/ROLLBACK_RUNBOOK.md`:
-1. Cloud Run: traffic shift to previous revision
-2. If schema issue: Alembic downgrade + Celery fan-out
-3. If data corruption: Cloud SQL PITR
-4. Post-incident: write up what happened, add a test that would have caught it
+#### Task 3.3 - Sales pack v1
 
-### "I am overwhelmed and cannot decide."
-Stop. Close the laptop. Come back tomorrow. The plan will still be here.
+- **File (new):** `docs/sales/sales_pack_v1.md`
+- **Do:** one page containing: video link (Task 2.6), €70k-junior-analyst-salary anchor math (the comparison that justifies €17-45/seat), comparison grid vs Kantata + Factorial + BambooHR + Harvest, and a pilot contract summary.
+- **Accept:** founder can email it as a single PDF via `print > save as PDF`. Under 3 MB.
 
----
+#### Task 3.4 - Pilot contract template
 
-## What is NOT in THE_PLAN
+- **File (new):** `docs/sales/contracts/pilot_template.md` + `docs/sales/contracts/pilot_template.pdf`
+- **Do:** draft per `docs/GO_TO_MARKET.md §3`: €8k flat, 90 days, 10 seats, real data, convertible to any tier on day 90 or cleanly closed. Clauses: EU data residency (`europe-west9`), GDPR Art. 28 DPA reference, success criteria (one month-end close run), exit terms.
+- **Accept:** founder's UK solicitor signs off via email. File the solicitor's approval email at `docs/sales/contracts/pilot_template_approval.txt`.
 
-These are intentionally not here because they are covered elsewhere and should not be duplicated:
+#### Task 3.5 - Procurement pack v1 (minimum viable)
 
-- **Absolute calendar dates (like "ship on March 1"):** this file uses target weeks (W4, W8, W12 etc) instead. When slippage happens, update the target weeks in the "Target weeks per phase" section above rather than inventing calendar deadlines.
-- **Schema details:** see `specs/DATA_ARCHITECTURE.md`. This file tells you what to build; the spec tells you the table shapes.
-- **Page layouts:** see `specs/APP_BLUEPRINT.md` and `prototype/*.html`. This file tells you the order; those files tell you what each page looks like.
-- **Pricing numbers:** see `docs/GO_TO_MARKET.md`. Not in this plan to avoid dual-source-of-truth.
-- **Commit messages, PR templates, CI config:** outside this plan's scope.
+- **File (new):** `docs/sales/procurement_pack_v1/` with:
+  - `dpa_template.pdf` (already referenced in `FOUNDER_CHECKLIST §6`)
+  - `sub_processors.md` (mirrors the op console page)
+  - `dpia_note.md` (one page, GDPR Art. 35 screening)
+  - `security_summary.md` (one page: Google OIDC + passkeys + Cloud KMS at rest + TLS 1.3 in flight + `europe-west9` residency + no third-party AI)
+  - `gdpr_export_demo.md` (link to Article 15 / 17 export flow already in `features/admin/`)
+- **Accept:** a CFO can open the folder and read it in 20 minutes. Every claim is traceable to a spec or ADR.
+- **DEF refs:** DEF-033 (BYOK) disclosed as Enterprise-tier only. DEF-034 (self-service DSR form) disclosed as "email privacy@" flow; automated form triggers at >2 DSRs/month. DEF-035 (sub-processor email subscription) disclosed as "manual blast"; automation triggers at >4 changes/year or >50 customers.
 
----
+#### Task 3.6 - Close one pilot
 
-## The one-page reminder (pin this above your desk)
+- **File (new):** `docs/sales/contracts/pilot_001.md`
+- **Do:** founder negotiates, signs, takes deposit. Deposit wired to Global Gamma Ltd's Revolut Business or HSBC UK account.
+- **Accept:** €8k in the bank. Pilot kickoff date scheduled. Contract filed.
 
-```
-PHASE YOU ARE IN:    [fill in each week]
-NEXT TASK:           [fill in each week]
-WEEK STARTED:        [date]
-PROTOTYPE FILE:      prototype/<page>.html
-SPEC SECTIONS:       DATA_ARCHITECTURE §X, APP_BLUEPRINT §Y
+**Week 6 exit criterion:** €8k in the bank from a named consulting firm. Pilot kickoff scheduled on the calendar.
 
-DO THIS WEEK:
-  [ ] Build the next task in the current phase
-  [ ] Run the flawless gate if Tier 1
-  [ ] Deploy to staging, smoke test, promote to prod
-  [ ] Update THE_PLAN.md with the check-mark
-  [ ] Write a weekly note in docs/WEEKLY_LOG.md
-
-DO NOT THIS WEEK:
-  [ ] Reopen any locked decision
-  [ ] Start a parallel Tier 1 feature
-  [ ] Add a feature from the deferred registry unless its trigger has fired
-  [ ] Invent new atoms outside the design system
-  [ ] Commit or push unless you explicitly meant to
-```
+**DEFs whose trigger could fire this fortnight:** DEF-036 (DocuSign e-sign) fires if manual DPA handling exceeds 1 h/week; escalate only at customer 10. DEF-076 (source-code escrow) only if the pilot customer asks on day one; almost never for a 90-day pilot.
 
 ---
 
-## The file map (where everything lives now)
+### Weeks 7-10: Pilot onboarding + ship the last 4 CRITIC items
 
-| You need to know... | Read this file |
-|---|---|
-| What to do this week + target weeks + success criteria + slippage policy | **THE_PLAN.md** (this file) |
-| Navigation guide + "what to give the AI when" | `README.md` |
-| Agent contract + hard rules + feel + core principles + stack | `CLAUDE.md` |
-| The data model | `specs/DATA_ARCHITECTURE.md` |
-| Every page in the app | `specs/APP_BLUEPRINT.md` |
-| How AI is wired | `specs/AI_FEATURES.md` |
-| Design system atoms | `specs/DESIGN_SYSTEM.md` |
-| PWA and responsive rules | `specs/MOBILE_STRATEGY.md` |
-| How customer data gets IN | `docs/DATA_INGESTION.md` |
-| What you decided NOT to do | `docs/DEFERRED_DECISIONS.md` |
-| Tier 1 vs Tier 2 | `docs/SCOPE.md` |
-| Quality checklist (15 items) | `docs/FLAWLESS_GATE.md` |
-| Commercial plan and pricing | `docs/GO_TO_MARKET.md` |
-| Architecture rationale (one file per decision) | `docs/decisions/ADR-*.md` |
-| Visual spec (frozen) | `prototype/*.html` |
-| Agent roles and pipeline | `agents/AGENTS.md` |
+**Goal:** pilot customer has their real data in, uses timesheets + expenses + invoices + close agent for one full month, gives us a testimonial.
+
+#### Task 4.1 - Onboard the pilot
+
+- **File:** operate via the operator console at `ops.gammahr.com` (built in Phase 2) or locally.
+- **Do:** create the pilot tenant. Load their real employees + clients + projects via CSV through the existing `features/imports/` pipeline (see `docs/DATA_INGESTION.md`). Send magic-link invites to 10 named users. Schedule a 1 h onboarding call with their CFO.
+- **Accept:** the pilot's CFO can log in via passkey, open `/timesheets`, and see their real employees.
+- **DEF refs:** DEF-024 (SCIM) and DEF-025 (SAML) deliberately NOT fired here; we use manual invite + OIDC for the pilot. DEF-060 (HRIS auto-sync) not fired; CSV only. DEF-061 (historical non-timesheet import) not fired; they keep historic invoices in their prior system.
+
+#### Task 4.2 - Retrofit `useOptimisticMutation` (residual CRITIC A3)
+
+- **Files:** `frontend/features/approvals/use-approvals.ts`, `frontend/features/leaves/use-leaves.ts`, `frontend/features/expenses/use-expenses.ts`, `frontend/features/invoices/use-invoices.ts`.
+- **Do:** for every mutation in each of the four, wrap via `lib/optimistic.ts::useOptimisticMutation`. Declare `conflictFields` per entity. 409 must open the shared `ConflictResolver`. `useSubmitExpense` already retrofitted; replicate for the other three.
+- **Accept:** a Playwright test forces a 409 on each mutation path; `ConflictResolver` opens with "keep mine" and "take theirs" choices.
+- **Test:** `frontend/tests/e2e/409-conflict.spec.ts` - one scenario per mutation path. The invoice status change is the spine case (see Task 4.5).
+
+#### Task 4.3 - ADR-014: 8 invented patterns (residual CRITIC B1)
+
+- **File (new):** `docs/decisions/ADR-014-phase4-invented-patterns.md`
+- **Do:** for each of `ai-recommendations`, `detail-header-bar`, `range-calendar`, `resources-filter-bar`, `timeline-window-selector`, `multi-select-pill`, `ai-insight-card`, `ai-invoice-explanation`, write: where it is used, why no existing atom covered it, scope (which features may use it), and the lock (a ninth requires a new ADR). Mirror into `specs/DESIGN_SYSTEM.md §4.2`.
+- **Accept:** founder signs off by commenting on the PR. CI guard in `scripts/check_invented_patterns.sh` validates that `components/patterns/` contains exactly those eight plus the 13 from `specs/DESIGN_SYSTEM.md`.
+
+#### Task 4.4 - Real audit_log on detail pages (residual CRITIC C11)
+
+- **Files:** `backend/app/features/admin/routes.py` (already has `/audit/entries`), `frontend/features/activity/use-activity.ts`, all `/employees/[id]`, `/clients/[id]`, `/projects/[id]`, `/invoices/[id]` pages.
+- **Do:** flip `use-activity.ts` USE_API on. Implement the compact before→after diff renderer. Drop into the Activity tab of each detail page. Respect `actor_type` from the audit row so ops actions render "operator" with a distinct badge.
+- **Accept:** editing an employee's name, reloading `/employees/[id]` Activity tab, the change is visible with old and new values. Matches `docs/FLAWLESS_GATE.md` item 26.
+- **DEF refs:** none fires.
+
+#### Task 4.5 - `ConflictResolverProvider` smoke test (residual CRITIC C13)
+
+- **File (new):** `frontend/tests/e2e/invoice-status-conflict.spec.ts`
+- **Do:** Playwright: user A and user B load the same invoice; A changes status `draft → sent`, B changes `draft → cancelled`. B's `PATCH` must 409. Resolver opens with both versions. User picks "take theirs". Assert final state is `sent` and audit row records both attempts.
+- **Accept:** test passes green in CI; `ConflictResolverProvider` verified end-to-end on a real mutation path.
+
+#### Task 4.6 - Production-grade staging
+
+- **Files:** `infra/` (Cloud Run manifest, Cloud SQL + Cloudflare config, secrets in GCP Secret Manager).
+- **Do:** provision the GCP project `gamma-prod` in `europe-west9` per `specs/DATA_ARCHITECTURE.md §1`. Deploy backend to Cloud Run, frontend to Cloud Run, Cloud SQL Postgres 16 with PITR. Cloudflare DNS + WAF + Access. One canary domain `staging.gammahr.com`. Manual promote to `app.gammahr.com` via `gcloud run services update-traffic`.
+- **Accept:** `make staging-deploy` runs green. Frontend reachable at `staging.gammahr.com` over TLS. Seed script executes in under 3 minutes on Cloud SQL.
+- **DEF refs:** DEF-013 (managed PgBouncer) dormant until ~20 tenants; DEF-015 (Cloud Trace) dormant until first slowness bug; DEF-016 (public status page) fires now because we have a paying customer - add a minimal status page to §4 Task 4.7 only if the pilot requests one, else defer to §5 Q2. DEF-018 (preview-URL-per-branch) dormant until second engineer.
+
+#### Task 4.7 - First DR drill
+
+- **File (new):** `docs/incidents/dr_drill_2026-05-XX.md`
+- **Do:** exercise `docs/ROLLBACK_RUNBOOK.md` on staging. Simulate a data corruption. Recover via Cloud SQL PITR. Write the lessons learned.
+- **Accept:** PITR restore time recorded (must be under 2 hours at current data volume). Runbook updated if any step failed.
+- **DEF refs:** DEF-017 (legal SLA) dormant; our SLA is internal for the pilot per `docs/GO_TO_MARKET.md §11`.
+
+**Weeks 7-10 exit criterion:** pilot customer runs a full month-end close on their real data in production, not staging. Recorded. Quoted.
+
+**DEFs whose trigger could fire this block:** DEF-014 (error grouping) fires if founder spends >2 h/incident debugging; if it fires, swap to Cloud Logging fingerprint rules before reaching for Sentry.
 
 ---
 
-## Final word
+### Weeks 11-12: Convert and prep customer 2
 
-We spent serious effort locking this plan. The hardest part of small-team SaaS is not building; it is the constant reopening of decided questions. This file exists to stop that.
+**Goal:** pilot converts to annual at Business tier or closes cleanly. Case study shipped. Customer 2 pipeline has 3 validated leads.
 
-When you want to reopen something, open the relevant spec file instead. If the spec is wrong, fix the spec explicitly. If the spec is right, close the tab and build the next task.
+#### Task 5.1 - Pre-customer-2 measurement gate
 
-**Ship v1.0. One feature at a time. To the flawless gate. On the plan.**
+- **File (new):** `docs/sales/pilot_001_measurement.md`
+- **Do:** measure on the pilot's month-end run: elapsed time, drafts edited, drafts accepted as-is. If time saved ≥90 min/month, proceed to customer 2. If not, renegotiate pricing on any new pilot before signing.
+- **Accept:** one page with three numbers: minutes saved, % drafts accepted as-is, customer NPS after close.
+
+#### Task 5.2 - Case study
+
+- **File (new):** `docs/sales/case_studies/pilot_001.md` + `gamma.com/case-studies/<slug>` page (if site exists).
+- **Do:** one page, one hero number, one quote from the CFO, one chart. No chartjunk.
+- **Accept:** founder ships the case study publicly. First customer logo on the site. Pilot customer signed a written quote-use permission.
+
+#### Task 5.3 - Customer 2-10 outreach
+
+- **Do:** founder uses the case study as the opener for every warm lead. Book 5 new discovery calls per week.
+- **Accept:** 3 leads at "Committed" stage by end of week 12. If none, pause and re-plan pricing per §2.3 triggers.
+
+#### Task 5.4 - Retro
+
+- **File (new):** `docs/weekly/2026-07-XX-retro-q1.md`
+- **Do:** both founders list: what worked, what didn't, what to cut from the plan. Update this file's §4 and §5 directly if any week's approach proved wrong.
+- **Accept:** the retro is committed. Any plan-level changes show up as a dated diff in this file's changelog (last line at the bottom).
+
+**Weeks 11-12 exit criterion:** first annual contract signed at Business tier (€69,948 for a 201-seat firm; likely smaller pilots land €20-40k ACV). Or pilot closes cleanly and we re-plan the next quarter before signing anything else.
+
+**DEFs whose trigger could fire this block:** DEF-029 (payment processor) - fires at customer 5-10; during this block, pre-read the Revolut vs Stripe vs Paddle decision note but do not implement. DEF-028 (self-serve signup) - fires at customer 6; not now. DEF-031 (multi-year contract discount) - fires only if enterprise buyer demands it.
+
+---
+
+## 5. Quarters 2-4: toward the €45/seat Enterprise tier
+
+Only start these after Q1 closes with the first annual contract. Slippage in Q1 defers Q2 by the same amount.
+
+Every task carries the same four-line contract (File / Do / Accept / Test) as §4. Agents execute without improvisation.
+
+### 5.1 Q2 (weeks 13-26): Business tier features + SOC 2 Type 1 kickoff
+
+#### Q2 Task A - SCIM 2.0 (DEF-024 resolved, now implemented)
+
+- **File (new):** `backend/app/features/scim/{routes,service,models,schemas,tests}.py`
+- **Do:** SCIM 2.0 endpoints per RFC 7644. `/Users` and `/Groups`. Upserts into `users` and `teams`. JWT bearer auth per-tenant. Okta + Azure AD + Google Workspace provisioning suites green.
+- **Accept:** Okta test plan green in `docs/tests/okta_scim_suite.md`. Same for Azure AD. Same for Google Workspace.
+- **Test:** `backend/app/features/scim/tests/test_rfc7644.py` covers 20 SCIM conformance cases.
+- **Business tier gate.** Lift price to €29/seat only when this lands.
+
+#### Q2 Task B - SAML 2.0 federation (DEF-025 resolved)
+
+- **File (new):** `backend/app/features/saml/{routes,service,schemas,tests}.py`
+- **Do:** SP-initiated SAML. IdP metadata upload per-tenant. Okta, ADFS, PingFederate test flows.
+- **Accept:** Okta SAML test green. ADFS test green. PingFederate test green.
+- **Test:** `backend/app/features/saml/tests/test_idp_flows.py`.
+
+#### Q2 Task C - Multi-rate VAT + intra-community reverse charge + UK post-Brexit (DEF-007 resolved)
+
+- **Files:** `backend/app/features/tax/rules/{fr,uk,eu_intra,eu_extra}.py`, `backend/app/features/invoices/service.py` (line-level VAT).
+- **Do:** per-line VAT rate selection, EU intra-community reverse charge, UK post-Brexit VAT treatment.
+- **Accept:** 30 property-tested invoice cases across FR, UK, DE, NL, IT, ES, PL. Zero rounding drift.
+- **Test:** `tests/test_vat_property.py` with Hypothesis.
+
+#### Q2 Task D - AI kill-switch console + per-agent budget caps + AI events audit page
+
+- **Files:** `frontend/app/[locale]/(app)/admin/ai/page.tsx`, `backend/app/features/admin/routes.py` extension.
+- **Do:** per-tenant admin sees a page listing the 4 AI surfaces (command palette, OCR, insights, close agent) with on/off switches + monthly spend + kill-switch audit log. Mirrors `specs/AI_FEATURES.md §2`.
+- **Accept:** a tenant admin can pause any surface and see the pause reflected in Cmd+K within 30 s. A "AI events" page lists the last 1000 events with actor, tool, tokens, cost.
+
+#### Q2 Task E - SOC 2 Type 1 engagement
+
+- **Do:** founder engages a Type 1 auditor (Prescient, AuditBoard partner, or similar EU-aware firm). Kick off 3-month observation window.
+- **Accept:** auditor agreement signed and filed at `docs/compliance/soc2_type1_engagement.pdf`.
+- **DEF refs:** DEF-077 (pen-test) usually bundled into the SOC 2 Type 2 step, not Type 1; defer to Q3.
+
+#### Q2 Task F - Wire remaining pages to live API
+
+- **Files:** all `frontend/features/*/use-*.ts` not yet wired (employees, clients, projects, leaves, approvals, admin, dashboard, calendar).
+- **Do:** flip `USE_API` on each hook. Delete the feature's slice from `lib/mock-data.ts`. At the end of Q2, delete `lib/mock-data.ts` entirely.
+- **Accept:** `grep -R "from.*mock-data" frontend/` returns zero (outside `tests/fixtures/`).
+
+#### Q2 Task G - Customers 2-5
+
+- **Do:** founder closes customers 2-5 using the case study. Annual contracts, Essential or Business tier.
+- **Accept:** 4 more signatures. €160k+ total ACV committed.
+
+**Q2 exit criterion:** Business tier is real; SCIM + SAML + multi-rate VAT live; customers 2-5 signed; SOC 2 T1 audit window running.
+
+**DEFs fired this quarter:** DEF-007, DEF-024, DEF-025 all resolved into Tier 1.1 work. DEF-013 (managed PgBouncer) triggers near customer 5 if connection pressure appears; deploy self-hosted PgBouncer VM per the DEF note.
+
+---
+
+### 5.2 Q3 (weeks 27-39): Enterprise agents + SOC 2 Type 1 cert
+
+#### Q3 Task A - Expense anomaly agent (DEF-039 resolved for Enterprise tier only)
+
+- **File (new):** `backend/app/features/expense_anomaly/{service,analyzers,ai_tools,tests}.py`
+- **Do:** per-employee + per-project historical baselines. Flags receipts that are >3σ above the baseline OR duplicate submissions within 14 days. One-paragraph explanation via the AI tool.
+- **Accept:** Playwright E2E: submit a €5,000 dinner receipt on a project with a €50 mean; agent flags it; finance reviewer sees the flag + explanation + "keep / reject / ask employee" options. 5 eval examples in CI.
+
+#### Q3 Task B - Overdue cash agent (part of Enterprise tier)
+
+- **File (new):** `backend/app/features/cash_agent/{service,analyzers,ai_tools,tests}.py`
+- **Do:** daily Celery job scans invoices where `due_date < today AND status IN (sent, overdue)`. For each, produces a suggested chase action (first email, escalation email, phone call, hold). User confirms.
+- **Accept:** E2E: seed 3 overdue invoices, run the daily job, see 3 ranked suggestions in `/cash/overdue`, confirm 1, check audit_log.
+
+#### Q3 Task C - Overwork + PTO sentinel
+
+- **File (new):** `backend/app/features/overwork_sentinel/{analyzers,tasks,tests}.py`
+- **Do:** weekly Celery job. Flags employees with >45 h billable in the last 7 days AND no leave booked in the next 90 days. Insight card on the manager's dashboard.
+- **Accept:** a manager can see the sentinel card, click through to the employee, and trigger a 1:1 invitation via the existing calendar integration.
+
+#### Q3 Task D - Budget burn agent
+
+- **File (new):** `backend/app/features/budget_agent/{service,analyzers,tests}.py`
+- **Do:** per-project, computes actual spend vs budgeted at the current burn rate and projects month-end + project-end. Flags overruns at 80% and 100%. Dashboard card.
+- **Accept:** three projects at different stages of burn show three different cards with different colors.
+
+#### Q3 Task E - Third-party pen-test (DEF-077 resolved)
+
+- **Do:** engage Cobalt, HackerOne, NCC Group, or Bishop Fox. OWASP ASVS Level 2 scope.
+- **Accept:** pen-test report filed at `docs/compliance/pentest_2026_q3.pdf`. Critical/High findings remediated within 30 days.
+- **Cost:** €15-30k + 2-4 weeks founder remediation per DEF-077.
+
+#### Q3 Task F - Source-code escrow (DEF-076 resolved, as Enterprise attach)
+
+- **Do:** engage NCC Group, Iron Mountain, or Codekeeper. Sign the tri-party agreement with the first Enterprise customer. Monthly deposit ceremony via CI cron job uploading a tag archive.
+- **Accept:** first monthly deposit verified. Annual escrow cost €2-4k per customer.
+- **Cost:** paid per Enterprise customer.
+
+#### Q3 Task G - SOC 2 Type 1 cert lands
+
+- **Accept:** Type 1 report filed at `docs/compliance/soc2_type1_report.pdf`. Sales uses it to open Enterprise doors.
+
+#### Q3 Task H - Customers 6-10
+
+- **Accept:** 5 more customers. At least one at Enterprise tier (€108k+ ACV). Move the SKU ladder per §2.3 if the trigger fires.
+
+**Q3 exit criterion:** Enterprise tier is real; 4 agents live; pen-test passed; SOC 2 T1 in sales hand.
+
+**DEFs fired this quarter:** DEF-039 (expense anomaly) resolved as Enterprise tier. DEF-076, DEF-077 resolved. DEF-029 (payment processor) fires at customer 6 - choose Revolut (existing relationship, lower EU card fees) vs Stripe Billing (full subscription stack) vs Paddle (merchant-of-record). Founder decision. Implement chosen path in 2-4 weeks per DEF-029.
+
+---
+
+### 5.3 Q4 (weeks 40-52): Enterprise tier launches + public launch
+
+#### Q4 Task A - Approvals autopilot
+
+- **File (new):** `backend/app/features/approvals_autopilot/{analyzers,service,tests}.py`
+- **Do:** for expenses under a configurable threshold with zero anomaly signals and a policy-matching employee history, auto-approve after a 24 h silent-review window. Finance sees the autopilot digest daily.
+- **Accept:** 50% of trivial approvals auto-handled with zero false-approvals in the first 30 days.
+
+#### Q4 Task B - Staffing recommender (DEF-069 resolved, Enterprise tier feature)
+
+- **File (new):** `backend/app/features/staffing_agent/{analyzers,service,ai_tools,tests}.py`
+- **Do:** per `docs/DEFERRED_DECISIONS.md` (now inlined in §6 DEF-069): calendar + leaves + allocations + skills tags + historical work-time. Proposes next-month staffing per project with confidence.
+- **Accept:** a project manager sees 3 staffing options ranked; accepts one; the allocations are drafted, not committed, until the manager confirms.
+- **Trigger gate:** 6 months of production history from customer 1 must exist. Do not ship earlier.
+
+#### Q4 Task C - SOC 2 Type 2 observation starts
+
+- **Do:** 12-month observation window kicks off. All controls from Type 1 must run continuously.
+- **Accept:** monthly control evidence filed at `docs/compliance/soc2_t2_evidence/YYYY-MM/`.
+
+#### Q4 Task D - Client portal read-only (`(portal)` route group)
+
+- **Files:** `frontend/app/[locale]/(portal)/` (was held under ADR-013 until Phase 6).
+- **Do:** implement `specs/APP_BLUEPRINT.md §12`. Passkey-first login, read-only dashboard + invoices list + invoice detail.
+- **Accept:** a client portal user can log in and view their invoices. Cannot write. Matches `docs/FLAWLESS_GATE.md` item 67.
+
+#### Q4 Task E - Public marketing site at `gamma.com`
+
+- **Do:** build the marketing site: tagline, feature grid, pricing page with the three tiers, ROI calculator ("enter your seat count, see annual cost vs Kantata"), comparison pages.
+- **Accept:** `gamma.com` loads in <1.5 s from EU, <2.5 s from US. Three case studies visible.
+
+#### Q4 Task F - Product Hunt / LinkedIn launch
+
+- **Do:** founder coordinates the launch on both channels. Three months of warm-up content (LinkedIn posts, case studies) before the launch day.
+- **Accept:** Top-5 Product of the Day, or the founder gets 100+ DMs from founders and CFOs.
+
+#### Q4 Task G - Customers 11-20, first Enterprise contract
+
+- **Accept:** 10 more customers. At least 1 Enterprise contract signed (€108k+ ACV).
+
+**Q4 exit criterion:** v1.0 ships per §10 ship criteria.
+
+**DEFs fired this quarter:** DEF-069 (staffing agent) resolved as v1.1 Enterprise feature. DEF-044 (multi-vendor AI fallback) may fire if we see a sustained Vertex AI outage; the `ai/client.py` abstraction makes it a 1-2 week swap.
+
+---
+
+## 6. The 75 deferred decisions, now part of the plan
+
+**Formerly `docs/DEFERRED_DECISIONS.md`, deleted in the next commit.** The registry is re-homed here so agents read one file. Every row has: status, ID, item, v1.0 chosen path, why deferred, trigger to revisit, rough cost. No DEF is allowed to disappear; updating means striking through here, not deleting.
+
+**Two conventions:**
+- **Status values:** `Open` = active tradeoff. `Resolved (YYYY-MM, PR #NNN)` = trigger fired and work was done. Append-only; never delete a Resolved row.
+- **Stable IDs:** DEF-NNN never changes. Reference from code comments (`# DEF-021: ...`), commit messages, ADRs.
+
+### 6.1 DEFs triggered by customer count (primary sales milestones)
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-002 | Operator console impersonation ("log in as tenant admin") | No impersonation UI. JWT shape + audit contract defined now. Read-only visibility via tenant detail pages only. | Impersonation is a big audit/security surface, not needed for first 1-5 customers | First support ticket that cannot be resolved without seeing the customer's exact view | 1-2 weeks |
+| Open | DEF-003 | Operator console billing UI (Stripe/manual billing management) | Founder handles billing manually via `subscription_invoices` + Workspace SMTP Relay | Billing mechanics are Phase 5+; v1.0 operator console is tenant lifecycle only | >5 paying customers OR manual billing exceeds 2 h/week | 2-3 weeks |
+| Open | DEF-004 | Operator console support tools (broadcast banners, richer flag toggles, maintenance drain orchestration) | None in v1.0 | Single-tenant deployment does not need coordination tools | Second paying customer OR first production incident requiring a broadcast | 1-2 weeks |
+| Open | DEF-028 | Self-serve signup flow (public form → auto provisioning → checkout) | Operator-console-only tenant creation; founder clicks "New Tenant", customer receives magic-link invite | Self-serve needs payment integration + auto-provisioning + abuse protection + email verification + legal checkboxes; 3-4 weeks not needed for manual sales | Customer 6 OR sustained inbound requests | 3-4 weeks |
+| Open | DEF-029 | Payment processor integration (Stripe Billing, Revolut Merchant Acquiring, or Paddle) | Manual PDF invoicing via Workspace SMTP Relay; wire transfer or SEPA; founder marks paid in operator console | Full payment integration is 2-3 weeks; manual invoicing is 1 h per new customer, fine for 1-5 customers | Customer 5-10 OR manual billing exceeds 2 h/week. Evaluate Revolut (lower EU card fees, no full subscription product, needs thin wrapper) vs Stripe Billing (full stack) vs Paddle (merchant-of-record, ~5% fee, zero-VAT). Founder decision | 2-3 wk Stripe / 3-4 wk Revolut / 1-2 wk Paddle |
+| Open | DEF-030 | Multi-currency Gamma subscription billing (GBP, USD) | EUR-only subscriptions. Tenants invoice own clients in multi-currency via `fx_rates`. | FX complexity + tax-per-currency filings + customer confusion | Customer asks to pay in GBP or USD AND is large enough to justify | 1-2 weeks |
+| Open | DEF-031 | Multi-year contract discounts (2-year, 3-year) | Monthly + annual (annual ~15% discount) only | Multi-year adds contract templates, prepayment handling, refund edge cases | First enterprise deal requiring multi-year | 1 week |
+| Open | DEF-032 | Paddle (merchant-of-record) billing path | Stripe or Revolut + OSS VAT registration via founder's accountant | Paddle's 5% fee is 2x Stripe/Revolut but eliminates all EU VAT compliance | Founder's accounting becomes a sustained time sink OR expands outside EU | 1-2 wk rewrite of billing |
+| Open | DEF-059 | Automated volume-band calculator in self-serve billing UI | Manual calculation by founder in Phase 2 | Blocked by DEF-028 + DEF-029 | After self-serve (DEF-028) AND payment processor (DEF-029) ship | 2-3 days on top |
+| Open | DEF-036 | E-signature flow for DPA signing (DocuSign or equivalent) | Founder emails DPA PDF, customer signs and returns, founder files in Google Drive | DocuSign is paid SaaS ($10-25/user/month), manual is fine <10 customers | Customer 10 OR manual DPA handling exceeds 1 h/week | 1 wk setup + SaaS |
+| Open | DEF-037 | DPA version management UI in operator console | Manual tracking in `dpa_versions` table + email notifications | UI is nice but not blocking | Customer 10 OR audit/compliance inquiry | 1-2 weeks |
+| Open | DEF-016 | Public status page (`status.gammahr.com`) | Internal-only SLOs in Cloud Monitoring | Needs incident-management process + historical data | Before first paying customer signs | 1 week |
+
+### 6.2 DEFs triggered by scale thresholds (tenants, rows, volume)
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-013 | Managed PgBouncer (AWS RDS Proxy equivalent on GCP) | Self-hosted PgBouncer on small Compute Engine VM | GCP has no managed PgBouncer; VM is boring ops | Year 2-3 at ~20-30 tenants; Cloud Monitoring alert on Cloud SQL connection saturation | 1 wk setup + patching |
+| Open | DEF-019 | Managed Redis (GCP Memorystore) | Self-hosted Redis on `e2-micro` VM (~€7/mo) | Memorystore minimum 1GB at ~€35/mo vs €7 self-host | Year 2-3, HA matters, OR Redis memory >500MB | 2-3 days migration |
+| Open | DEF-020 | Cloud Run Jobs for Celery workers | Celery workers on small Compute Engine VM | Cloud Run's request-duration model doesn't fit long-running workers | Worker auto-scaling patterns get complex | 1 wk rework |
+| Open | DEF-021 | Migrate off Workspace SMTP Relay to SES/Postmark/Resend | Workspace SMTP Relay via `smtp-relay.gmail.com` | 10k/day quota fits through Year 4-5; Relay free inside Workspace sub we need anyway | Sustained daily sending >80% of quota OR bounce tracking >2 h/week | 1-2 days swap in `sender.py` |
+| Open | DEF-048 | Horizontal WebSocket scaling via Redis pub/sub fan-out | Single backend instance with in-process WebSocket | Redis pub/sub adds complexity, unnecessary at 201-employee tenant | Adding a second backend instance | 1 week |
+| Open | DEF-052 | Expand-migrate-contract zero-downtime migration strategy | Celery fan-out with `alembic_runs` tracking, synchronous at deploy | Adds significant op complexity; current pattern handles ~500 tenants | Tenant count >300-500 AND migration fan-out exceeds deploy window (>10 min) | 2-3 wk deploy pipeline rework |
+| Open | DEF-054 | Cross-tenant schema drift auto-reconciliation UI | Weekly Celery schema-fingerprint check + alert | Drift is rare <20 tenants; manual repair works | 2nd-3rd drift incident OR tenant count >30 | 1-2 weeks |
+| Open | DEF-055 | External feature flag platform (LaunchDarkly, GrowthBook, Unleash) | In-house `feature_flags` table + decorator (~200 LOC) | In-house covers Phase 2-3; external adds cost + vendor dependency | Flag count >~50 OR percentage rollouts OR 2nd frontend dev | 1 day adapter swap |
+| Open | DEF-057 | Percentage-based gradual rollouts with deterministic hashing | Schema supports `rules_jsonb` but no rollout UI | Rollouts add UI + hashing + analytics complexity | Phase 5+ OR risky feature about to ship | 3-5 days |
+| Open | DEF-058 | Full A/B testing and experimentation framework | In-house flags do not include experiment analytics | Experiments need per-variant analytics, cohort tracking, significance | Year 2-3 when traffic justifies statistical power | 3-4 wk (likely swap to GrowthBook) |
+| Open | DEF-043 | Per-tenant AI prompt A/B testing | Single active prompt version per tool | Experiment platform needs tenant analytics + variant routing + significance | Year 2-3 when enough tenants | 3-4 weeks |
+| Open | DEF-045 | Per-user AI budget limits within a tenant | Per-tenant budget only; per-user via rate limits | Per-user budgeting adds UI + storage + enforcement; rate limits cover abuse | Tenant admin explicit request OR enterprise demand | 1-2 weeks |
+
+### 6.3 DEFs triggered by customer explicit request (feature scope)
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-001 | Full approval workflow engine (multi-hop, parallel, conditional, amount-tiered) | Single-hop direct manager for timesheets/leaves; direct manager + finance co-approval above threshold for expenses; `approval_delegations` handles vacation cover | Workflow engines are 4-6 weeks; 90% of consulting firms only need direct-manager routing | Customer requests multi-hop OR conditional beyond single finance threshold | 4-6 weeks |
+| Open | DEF-005 | Per-tenant subdomain (`acme.gammahr.com`) | All tenants on `app.gammahr.com`; selection via login | Subdomain adds DNS automation + cert provisioning + subdomain routing | Enterprise customer requests vanity URL; Tier 2 feature | 2-3 weeks |
+| Open | DEF-006 | Retainer project billing type | T&M + fixed-price only | Retainers have complex accrual + rollover rules; two types cover 85% of consulting revenue | Customer with significant retainer revenue signs | 1-2 weeks |
+| Open | DEF-008 | Portal SSO (client portal users via corporate SSO) | Passkey-first + password fallback + TOTP in `portal_users` | SSO for portal users requires per-portal OIDC client provisioning | Customer's clients request corporate SSO | 2-3 weeks |
+| Open | DEF-009 | Outbound webhooks (`invoice.sent`, `timesheet.approved`) | None; reserved table shape documented; `kill_switch.webhooks` reserved | Full feature (retry, signature, dead letter, admin UI) | Customer integration request OR first enterprise deal | 2-3 weeks |
+| Open | DEF-010 | Bank feed integration (PSD2 / Open Banking) | None | Per-provider PSD2 integration (Tink, GoCardless, Plaid EU) per bank per country | Customer explicitly asks OR expense volume justifies | 4-8 wk per provider |
+| Open | DEF-011 | Email-to-expense ingestion (forward receipt email) | Manual upload only (PWA photo + Gemini OCR) | Inbound email + attachment extraction + OCR chaining | Phase 6 "fun things" polish batch | 1-2 weeks |
+| Open | DEF-012 | Live presence indicators ("Alice is editing") | Optimistic locking + field-level conflict diff + revision history | Presence needs WebSocket channels per record + UI cost; feel polish | Phase 6 polish batch | 1-2 weeks |
+| Open | DEF-023 | Per-tenant BYO sending domain (`billing@customerfirm.com`) | All outbound from `mail.gammahr.com` | Per-tenant DKIM key provisioning + DNS verification | Tier 2 premium after first paying customers | 2-3 weeks |
+| Open | DEF-026 | Tenant BYO-SMTP (tenant enters own SMTP, Gamma relays) | Gamma sends from `mail.gammahr.com` | Encrypted credential storage + per-tenant SMTP error handling + support burden | Tenant requests branded sending OR deliverability complaints | 1-2 weeks |
+| Open | DEF-027 | OAuth-to-tenant-Gmail for invoice delivery | Same as DEF-026 in v1.0 | Google OAuth verification requires CASA audit ($15-75k/yr) for `gmail.send` | Only realistic after incorporation + SOC 2 + audit budget | 4-8 wk + $15-75k/yr |
+| Open | DEF-033 | BYOK (customer-held encryption keys) | Cloud KMS CMEK keys owned by Gamma, per-tenant keyring | BYOK requires customer-side key management + break-glass | First enterprise deal requiring | 3-4 weeks |
+| Open | DEF-047 | Full PWA offline support beyond timesheets | Narrow offline scope: timesheet entry only | Full offline = 2-3 mo product feature + sync conflict class | Customer request OR field-work feedback | 2-3 months |
+| Open | DEF-050 | Offline-first full state sync (Linear/Notion mode) | Narrow online-first + timesheet-only offline | Offline-first is a different product model, not a feature addition | Product pivots to offline-first | 3-6 mo rewrite |
+| Open | DEF-051 | Native mobile app wrapper (React Native, Capacitor) | PWA only; installable via "Add to Home Screen" | PWA covers 95%; native wrapper adds App Store compliance, doubles maintenance | Customer requests App Store OR native-only features (geolocation clock-in) | 4-6 wk Capacitor / 3-4 mo RN |
+| Open | DEF-060 | Automatic HRIS sync (Workday, Personio, BambooHR, Rippling, HiBob) | CSV bulk import for onboarding + ongoing batch adds; no auto-sync | Per-provider connector, mapping, ongoing conflict | Customer explicitly asks AND deal size justifies 2-3 wk connector | 2-3 wk per provider |
+| Open | DEF-061 | Historical leaves, expenses, invoices bulk import | Only historical timesheets importable at onboarding | Legal record-keeping stays with prior system; two sources of truth risk | Customer explicitly requests AND data is clean | 1-2 wk per entity type |
+| Open | DEF-062 | Bidirectional payroll sync | One-way CSV export (Silae, Payfit, generic) | File handoff is industry norm; bidirectional = multi-wk per provider | Customer explicitly requests AND specific provider demands | 3-4 wk per provider |
+| Open | DEF-063 | Excel `.xlsx` import beyond CSV | CSV only; users convert Excel to CSV | `pandas.read_excel` adds `openpyxl`; CSV covers first customer | Customer complaint OR 3rd customer with Excel-only | 1-2 days |
+| Open | DEF-064 | Google Sheets direct import via OAuth | CSV upload only | Google OAuth verification is multi-wk compliance process | Customer explicitly requests AND compliance tax acceptable | 2-3 wk + annual audit |
+| Open | DEF-065 | E-invoicing URN support (Peppol, Chorus Pro, FatturaPA) | Standard PDF + email delivery, no portal integration | Per-country portal integration; non-trivial | First B2G contract requiring Peppol or national portal | 3-6 wk per portal |
+| Open | DEF-067 | Multi-currency Gamma subscription billing (e.g. GBP for HSBC UK) | EUR-only subscriptions | Phase 2 manual invoicing is EUR-only; DEF-029 can carry later | First customer requiring non-EUR billing of the Gamma sub itself | 1-2 wk on top of DEF-029 |
+| Open | DEF-068 | Second payroll provider adapter | Phase 5 ships one payroll CSV adapter tuned to first pilot + generic adapter | Each provider has own CSV shape + validation + tests | Customer 2 uses different payroll provider than customer 1 | 1-2 wk per provider |
+
+### 6.4 DEFs triggered by compliance or security events
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-017 | Legal contractual SLA (refunds on uptime breach) | Internal SLOs + eventual public status page; no legal commitment | Legal SLA requires multi-region or documented DR + contractual liability | Enterprise demands contractual uptime AND DR posture accepts risk | varies |
+| Open | DEF-034 | Self-service DSR form at `gammahr.com/privacy/dsr` with 48 h SLA before Gamma takes over | Manual via `privacy@gammahr.com`; tenant-admin self-service covers common case | Direct-to-Gamma DSR volume expected very low | Sustained >2 DSR emails/month OR first regulatory inquiry | 1-2 weeks |
+| Open | DEF-035 | Subscribe-to-sub-processor-changes email UX | Public sub-processor page + manual email blast | Automated flow needs email capture + double opt-in + unsubscribe; manual works <50 tenants | Sub-processor changes become frequent (>4/yr) OR customer requests | 3-5 days |
+| Open | DEF-066 | Ongoing password breach check (HIBP API or equivalent) | Set-time check only against offline top-10k breached list | Ongoing needs HIBP API (or equivalent) with EU-compliant DPA | First security review after pilot 3 OR breach DB with EU-licensed terms | 1-2 weeks |
+| Open | DEF-076 | Source-code escrow (NCC Group / Iron Mountain / Codekeeper) | None; Enterprise attach per `docs/GO_TO_MARKET.md §2` | Escrow needs named provider + tri-party agreement + monthly deposit ceremonies | First Enterprise deal that names escrow as signing condition OR year-2 renewal of canonical buyer | 2-3 wk + €2-4k/yr per customer |
+| Open | DEF-077 | Third-party pen-test report (annual, retest on critical findings) | Internal SAST/DAST only via CI; Enterprise attach | Reputable pen-test €15-30k/cycle + remediation | First Enterprise deal naming pen-test OR SOC 2 Type 2 audit window opens | €15-30k/cycle + 2-4 wk founder remediation |
+| Open | DEF-053 | Auto-rollback on error-rate spike | Manual Cloud Run revision rollback | Auto-rollback needs tuning to avoid false positives | Phase 3 after Cloud Monitoring baseline-calibrated | 2-3 days |
+| Open | DEF-056 | Auto circuit breaker on metric thresholds | Manual emergency read-only via feature flag + DB read-only | Needs calibrated metrics to avoid false positives | Phase 3 after Cloud Monitoring baseline OR first false-positive manual lesson | 1 week |
+| Open | DEF-015 | Distributed tracing (Cloud Trace / OpenTelemetry on FastAPI + Celery + frontend) | `request_id` correlation via structured logs | OpenTelemetry instrumentation is real work; no value until multi-hop slowness bug | First slowness bug not solvable via logs in 20 min | 3-5 days |
+| Open | DEF-014 | Error fingerprint-grouping dashboard (Sentry-style top-10) | Raw structured logs in Cloud Logging + Logs Insights | Fingerprint grouping good UX, not essential for 1-2 customers | Root-cause debugging >2 h/incident sustained | 3-5 days (Cloud Function + custom metric) |
+
+### 6.5 DEFs triggered by team growth or operational pain
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-018 | Preview-URL-per-branch deployments | Three static envs (local, staging, prod) | Extra infra for marginal benefit at solo-dev velocity | First additional backend engineer hired | 1 week |
+| Open | DEF-022 | Email visual regression testing (Litmus, Email on Acid, Mailosaur) | Manual visual check on test Outlook.com account | Paid SaaS premature for small template set | Template count >10 OR customer complaint | 1 day + monthly fee |
+| Open | DEF-049 | Storybook for UI atoms/patterns | No Storybook; components documented via code | Storybook setup + maintenance is real; premature for solo founder | Second frontend dev OR design system >30 atoms | 1 wk setup + maintenance |
+| Open | DEF-075 | Extract `infra/ops/` library to standalone repo | Lives as `infra/ops/` in monorepo; extractable (own `pyproject.toml`, no imports from app, lazy vendor SDK imports) | Cross-repo overhead while API churns | 90 consecutive days post-launch with no API change OR 2nd Global Gamma product needs it OR open-source decision OR security mandate OR first external contributor | ~1 day via `git subtree split` |
+
+### 6.6 DEFs triggered by AI vendor or evals
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-038 | AI-drafted emails and comments (reply suggestions, drafting, polishing) | Core three surfaces only | Draft-email UX needs inline editor + tone controls + per-user style learning | Phase 5-6 polish OR customer request | 2-3 weeks |
+| Open | DEF-039 | Anomaly detection on expenses (AI flags unusual receipts) | Manual review via finance-admin approval. **RESOLVED Q3 Task A for Enterprise tier (§5.2).** | Anomaly needs historical baselines + model training + FP tuning | Enterprise tier launch OR customer fraud incident | 2-3 weeks |
+| Open | DEF-040 | Resource planning AI assist (suggested staffing) | Manual Gantt/capacity views (Tier 2) | Requires skill taxonomy + capacity modeling + multi-objective optimization; depends on Tier 2 | After Tier 2 planning ships | 3-4 weeks |
+| Open | DEF-041 | AI-summarized weekly digest (personalized per user) | Template-based daily digest only (opt-in) | AI digest cost scales linearly with user count; template is free | Phase 5+ OR customer complaint | 1-2 weeks |
+| Open | DEF-042 | Predictive staffing + revenue forecasting ("this project will need 2 more seniors in 3 mo") | No forecasting in v1.0 | Needs time-series modeling + validation + confidence bands; not a Flash-tier task | Phase 6+ AI polish | 4-6 weeks |
+| Open | DEF-044 | Automatic model fallback on vendor outage (Gemini → Claude Haiku hot swap) | Single-model Gemini 2.5 Flash via Vertex AI EU; no automatic fallback | Dual-vendor maintenance real cost; single-vendor outage rare; degraded mode handles partial outages | First sustained Vertex AI outage affecting customers OR enterprise demands multi-vendor | 1-2 wk (wrapper designed for it) |
+| Open | DEF-046 | Migrate back to Anthropic Claude Haiku (or any other LLM vendor) | Single-model Gemini 2.5 Flash via Vertex AI EU | Reversibility escape hatch; `ai/client.py` designed for one-file swap; evals in CI catch regressions | Gemini eval pass rate drops below threshold 2 consecutive weeks OR Vertex AI EU pricing changes materially OR new Haiku tier materially cheaper | 1-2 days swap |
+| Open | DEF-069 | Predictive staffing agent (calendar + leaves + allocations + skills + history) | No predictive staffing. **RESOLVED Q4 Task B (§5.3) for Enterprise tier.** | Needs 6 months production history | (a) 6 mo history from customer 1, (b) customer 3 signs, (c) ≥2 customers request forecasting in writing | 4-6 weeks |
+| Open | DEF-070 | Auto-timesheet drafting from calendar + Jira + git | Manual timesheet entry only; positioned as v1.1 | Needs OAuth (Calendar, Graph, Atlassian, GitHub) + privacy review | (a) customer 3 signs, (b) pilot commits to OAuth during pilot, (c) 4-6 wk budget | 4-6 weeks |
+
+### 6.7 DEFs triggered by geographic expansion
+
+| Status | ID | Item | v1.0 path | Why deferred | Trigger | Cost |
+|---|---|---|---|---|---|---|
+| Open | DEF-071 | Canada expansion (PIPEDA + Quebec Law 25, GST/HST/PST/QST per-province, bilingual FR-first Quebec invoicing, residency in `northamerica-northeast1` Montreal) | Year 1 FR + UK only. Architecture scaffolding in place (`tenants.residency_region`, `tenants.legal_jurisdiction`, per-country strategy modules) so year 2 = config + one-file change | PIPEDA federal + Quebec Law 25 stricter, FR-first service in Quebec, local DPO threshold. GST/HST/PST/QST per-province complex. Montreal residency preferred. | (a) First Canadian lead Committed, (b) year 2+, (c) customer 5+ live. **Work items:** add `ca.py` tax rules with provincial dispatch, `ca.py` labor rules, CA holidays, register new GCP project in `northamerica-northeast1`, configure Cloud SQL cross-region replication (staying Canadian), `fr-CA` locale files | 4-6 wk + legal |
+| Open | DEF-072 | Morocco expansion (CNDP cross-border filing under Loi 09-08, Arabic RTL invoice rendering, MAD currency, TVA 20%, CMI local payment network, bilingual FR + MSA) | Year 1 FR + UK only. Morocco has no GCP region; served from `europe-west9` (Paris) under CNDP safeguards | Arabic invoice must be RTL (WeasyPrint template variant, 3-5 days). MAD currency. Stripe added Morocco 2024; CMI local. Islamic calendar holidays shift yearly per Hijri | (a) First Moroccan lead Committed, (b) year 2+, (c) customer 5+ live. **Work items:** CNDP filing, `ma.py` tax rules, `ma.py` labor rules, Arabic RTL WeasyPrint templates, MAD seed, CMI adapter (if Stripe insufficient), Moroccan holidays including Islamic dates, `ar-MA` locale files with RTL | 5-7 wk + CNDP lead time |
+| Open | DEF-073 | Niger expansion (CNPDCP under Loi 2017-28, XOF currency pegged to EUR at 655.957, TVA 19%, WAEMU convention collective, mobile money payment rails) | Year 1 FR + UK only. Niger has no GCP region; served from `europe-west9` under CNPDCP safeguards. Mobile money = dedicated 4-6 wk item | CNPDCP safeguards. XOF (pegged EUR, shared with 7 WAEMU states). Mobile money (Orange Money, MTN MoMo) dominates over cards. WAEMU convention collective shared with Senegal, Côte d'Ivoire, Burkina Faso. Internet reliability varies; PWA offline queue essential (already in v1.0) | (a) First Nigerien lead Committed, (b) year 2+, (c) customer 5+ live AND mobile money budget. **Work items:** CNPDCP filing, `ne.py` tax rules, `ne.py` WAEMU labor rules, XOF seed, mobile money adapter (Flutterwave, CinetPay, HUB2, or direct Orange Money API), Nigerien holidays incl Islamic, confirm `fr-NE` variant or reuse `fr-FR` | 6-8 wk incl mobile money |
+| Open | DEF-074 | WAEMU shared expansion (Senegal, Côte d'Ivoire, Burkina Faso, Benin, Togo, Mali, Guinée-Bissau) | Year 1 FR + UK only. After DEF-073 Niger lives, most architecture is reusable for other WAEMU | Shared XOF, labor framework, many tax rules. New WAEMU country ≈ new `legal_jurisdiction` code + country tax deltas + local holidays + local payment provider | (a) DEF-073 Niger live ≥6 mo, (b) first lead in any WAEMU country | 1-2 wk per additional WAEMU country once Niger live |
+
+### 6.8 DEFs resolved or absorbed 2026-04-18
+
+| Status | ID | Item | v1.0 path (then) | Reason resolved | Reference |
+|---|---|---|---|---|---|
+| Resolved (2026-04-18, lifted to Tier 1.1) | DEF-007 | Multi-rate VAT (different rates per invoice line, regional splits, goods + services on one invoice) | Single-rate + reverse-charge boolean | Lifted to Tier 1.1 (committed for v1.1) per `docs/SCOPE.md`. Enterprise procurement gate for year-2 price step-up. §5.1 Q2 Task C is the implementation task. | `docs/SCOPE.md` |
+| Resolved (2026-04-18, lifted to Tier 1.1) | DEF-024 | SCIM provisioning from Google Workspace + Microsoft Entra | OIDC + manual user creation | Lifted to Tier 1.1; §5.1 Q2 Task A implements | `docs/SCOPE.md` |
+| Resolved (2026-04-18, lifted to Tier 1.1) | DEF-025 | SAML federation (beyond OIDC) | OIDC only | Lifted to Tier 1.1; §5.1 Q2 Task B implements | `docs/SCOPE.md` |
+| Open (Enterprise attach only) | DEF-078 | Dedicated Technical Account Manager (TAM) program | Priority email support only | Real TAM is 0.2 FTE per customer; waits for post-founder engineering hire. Enterprise attach in §2.1 | First Enterprise customer naming TAM as signing condition AND first post-founder engineering hire lands | 0.2 FTE + €10-20k/yr attach |
+
+---
+
+## 7. The kill list (what we stop pretending to build)
+
+Confirmed dead for v1.0 and v1.1:
+
+- **Retainer billing** (DEF-006). Not in any tier until customer 10+ asks.
+- **Multi-currency Gamma billing** (DEF-030, DEF-067). EUR only. GBP and CHF invoicing to end customers works; our own subscription stays EUR.
+- **Peppol / Chorus Pro / FatturaPA** (DEF-065). Post-launch.
+- **Self-serve signup** (DEF-028). Demo-to-contract motion only until customer 10.
+- **Free tier.** The 90-day pilot at €8k is the free tier.
+- **Gantt, resource planning, HR recruitment, insights page standalone.** Gantt + planning already absorbed into Employees/Clients/Projects list pages per `specs/APP_BLUEPRINT.md §10`. HR + insights deferred until Business tier has 5 paying customers.
+- **Native mobile app** (DEF-051). PWA only.
+- **Full offline** (DEF-047, DEF-050). Timesheet-only offline.
+- **Chatbot surface anywhere.** Every AI is tool-call-backed per `specs/AI_FEATURES.md §1`. No free-form Q&A.
+- **Any feature in DEF-038 through DEF-046** not explicitly promoted in §5.
+- **Any WAEMU country beyond Niger** (DEF-074) until Niger has 6 months of production use.
+
+---
+
+## 8. Documents that stay, documents that die
+
+### 8.1 Stays (single source of truth per concern)
+
+- `CLAUDE.md` - agent contract + hard rules.
+- `THE_PLAN.md` - this file. The only roadmap. Includes the 75 DEFs in §6.
+- `FOUNDER_CHECKLIST.md` - founder's personal list (pipeline, legal, health). Not agent-readable except for read. Rewritten 2026-04-18 to reference this file's sections rather than the dead `EXECUTION_CHECKLIST.md`.
+- `specs/DATA_ARCHITECTURE.md`, `specs/APP_BLUEPRINT.md`, `specs/AI_FEATURES.md`, `specs/DESIGN_SYSTEM.md`, `specs/MOBILE_STRATEGY.md` - the "what."
+- `docs/FLAWLESS_GATE.md` - the 70-item bar. Unified.
+- `docs/MODULARITY.md`, `docs/TESTING_STRATEGY.md` - CI-enforced structural rules.
+- `docs/GO_TO_MARKET.md` - commercial mechanics. Update to the three-tier pricing in §2 of this plan on the next commit.
+- `docs/ROLLBACK_RUNBOOK.md`, `docs/COMPLIANCE.md`, `docs/DEGRADED_MODE.md` - operational runbooks.
+- `docs/DATA_INGESTION.md` - CSV + OCR + payroll pipeline.
+- `docs/SCOPE.md` - Tier 1 / 1.1 / 2.
+- `docs/decisions/ADR-*.md` - one ADR per locked decision.
+- `prototype/*.html` - frozen visual spec.
+
+### 8.2 Dies (delete in the follow-up commit after this plan ships)
+
+- `CRITIC_PLAN.md` - 4 open items absorbed into §4 Weeks 7-10.
+- `SELLABILITY_PLAN.md` - tiered pricing + agent roadmap absorbed into §2 and §5.
+- `opus_plan.md`, `opus_plan_v2.md` - frontend bar work mostly complete; remaining work absorbed into §4 Weeks 1-2 and 7-10.
+- `OPUS_CRITICS.md`, `OPUS_CRITICS_V2.md` - audit findings superseded by the unified gate (ADR-012). Historical value zero.
+- `HAIKU_CRITICS.md` - same.
+- `EXECUTION_CHECKLIST.md` - DONE-lies and stale phase structure. Replaced by §3 (honest state) and §4 (12-week path) and §5 (Q2-Q4 roadmap).
+- `PROMPT.md` - agent prompt template. Belongs in `.claude/skills/` if anywhere.
+- `docs/DEFERRED_DECISIONS.md` - 75 entries folded inline into §6 of this file.
+
+Keeping 11 overlapping plan files is how decisions get re-opened. One plan, one direction, git history for anything we need to recover.
+
+---
+
+## 9. Weekly rhythm (simplified)
+
+**Monday, 09:00, 15 minutes.**
+1. Open this file. Find the current week in §4 (or §5 after Q1).
+2. Pick the next unchecked task. One task.
+3. Put three items on a physical note: build task, founder-review slot, discovery calls to make.
+
+**Friday, 17:00, 30 minutes.**
+1. Check off what shipped.
+2. Write `docs/weekly/YYYY-MM-DD.md`: shipped, slipped, learned, decide-next-week.
+3. If slippage ≥2 weeks on the current week's goal, re-plan §4 before starting next Monday.
+
+**Monthly, first Monday.**
+1. Review pricing triggers (§2.3). Move the SKU ladder if a trigger fired.
+2. Review §6 DEF triggers. Resolve any that fired. Update §5 if a resolution changes the roadmap.
+3. Review runway. If <12 months, book 5 investor calls this week.
+4. Review health. If 2+ red flags in `FOUNDER_CHECKLIST §9`, stop and talk to someone.
+
+---
+
+## 10. When things go wrong (one-screen emergency manual)
+
+- **"I don't know what to build."** Open §4. Find the current week. Build the first unchecked task.
+- **"A feature I need is DEF'd."** Open §6. Check the trigger. If fired, lift it (write a new row with `Resolved` status) and plan the work into the current quarter. If not, note the customer request in `docs/weekly/` and move on.
+- **"The pilot is about to churn."** Stop all feature work. Put both founders on the customer for the week. Nothing else matters.
+- **"Customer 2 wants a discount below the floor."** Walk. Unit economics do not bend. We are not VC-funded discretionary revenue.
+- **"An AI agent suggests rewriting the plan."** Say no. This file is the plan. Edit it explicitly with reasoning if it needs to change. Do not let the agent drift it.
+- **"The app is broken in prod."** `docs/ROLLBACK_RUNBOOK.md`. Cloud Run traffic shift. If schema, Alembic downgrade + Celery fan-out. If data, Cloud SQL PITR.
+- **"The AI eval pass rate dropped."** DEF-046 in §6. Swap `ai/client.py` to the fallback vendor. Re-run evals. If green, pin the fallback as new default and write the ADR.
+
+---
+
+## 11. Ship criteria for v1.0
+
+v1.0 ships when:
+1. One pilot signed and converted to annual at Business or Enterprise tier.
+2. That customer has run a full month-end close on their real data in production.
+3. Zero P0 bugs in production for 30 consecutive days.
+4. Case study published with a named hero number.
+5. Three more pilots in Committed stage.
+
+Not when the 70-item gate is green on every page. Not when every DEF is promoted. Not when the docs are perfect. Revenue + stability + proof.
+
+---
+
+## 12. Final word
+
+This is the fifth plan rewrite. It will not be the last. What is different this time: one plan, three pricing tiers, 75 DEFs inline, 12 weeks to revenue, nine files that die. If the next iteration of this file does not get shorter, we are doing it wrong.
+
+Ship. Measure. Charge. Repeat.
+
+---
+
+## Changelog
+
+- **2026-04-18 (this rewrite):** merged 75 DEFs inline (§6). Expanded §4 and §5 with per-task file paths + acceptance criteria + tests + DEF cross-refs. Added §4.0 rules for every week. Added §10 entry for eval-pass-rate drop (DEF-046). Kept pricing (§2), kill list (§7), weekly rhythm (§9), ship criteria (§11) from the prior rewrite.
+- **2026-04-18 (prior rewrite):** replaced 594-line legacy plan with the tiered-pricing + 12-week structure.
