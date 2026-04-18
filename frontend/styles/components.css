@@ -3426,10 +3426,16 @@ svg circle[data-animate].chart-animate-in {
   background: var(--color-surface-2);
   color: var(--color-primary);
 }
-.kpi-card-icon[data-tone="primary"] { background: var(--color-primary-muted); color: var(--color-primary); }
-.kpi-card-icon[data-tone="accent"]  { background: var(--color-accent-muted);  color: var(--color-accent); }
-.kpi-card-icon[data-tone="gold"]    { background: var(--color-gold-muted);    color: var(--color-gold); }
-.kpi-card-icon[data-tone="info"]    { background: var(--color-info-muted);    color: var(--color-info); }
+/* B7: KPI icons stay neutral. Accent belongs to one primary action per
+   region, not to decoration. data-tone is kept so feature code does not
+   have to churn, but every tone resolves to the same neutral surface. */
+.kpi-card-icon[data-tone="primary"],
+.kpi-card-icon[data-tone="accent"],
+.kpi-card-icon[data-tone="gold"],
+.kpi-card-icon[data-tone="info"] {
+  background: var(--color-surface-2);
+  color: var(--color-text-2);
+}
 .kpi-card-label {
   font-size: 11px;
   font-weight: var(--weight-medium);
@@ -5272,6 +5278,18 @@ svg circle[data-animate].chart-animate-in {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+}
+/* C10: at 375px the pill row becomes a horizontal scroller rather than
+   a 3-line wrap so the filter bar stays a single band above the list. */
+@media (max-width: 480px) {
+  .resources-filter-bar { flex-wrap: nowrap; }
+  .resources-filter-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .resources-filter-pills::-webkit-scrollbar { display: none; }
 }
 .resources-filter-meta {
   display: inline-flex;
