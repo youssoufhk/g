@@ -1,0 +1,3 @@
+{"name": "over budget check", "prompt": "is project 42 over budget", "expected": {"tool": "compute_budget_burn", "project_id": 42}}
+{"name": "specific date", "prompt": "budget burn for project Aurora as of March 31", "expected": {"tool": "compute_budget_burn", "fields": ["project_id", "as_of"]}}
+{"name": "forecast", "prompt": "will project 101 come in under budget", "expected": {"tool": "compute_budget_burn", "project_id": 101}}

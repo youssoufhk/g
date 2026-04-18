@@ -1,0 +1,4 @@
+{"name": "who is off today", "prompt": "who is on leave today", "expected": {"tool": "filter_leaves", "fields": ["date_from", "date_to", "status"], "status": "approved"}}
+{"name": "pending approvals", "prompt": "leave requests waiting for my sign-off", "expected": {"tool": "filter_leaves", "fields": ["status"], "status": "pending"}}
+{"name": "sick leave last month", "prompt": "sick leaves last month", "expected": {"tool": "filter_leaves", "fields": ["leave_type_code", "date_from", "date_to"], "leave_type_code": "sick"}}
+{"name": "specific employee", "prompt": "Ben's upcoming leaves", "expected": {"tool": "filter_leaves", "fields": ["employee_id", "date_from"]}}

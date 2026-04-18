@@ -1,0 +1,4 @@
+{"name": "overdue shortcut", "prompt": "which invoices are overdue", "expected": {"tool": "filter_invoices", "fields": ["overdue_only"], "overdue_only": true}}
+{"name": "by client label", "prompt": "all invoices for HSBC UK this quarter", "expected": {"tool": "filter_invoices", "fields": ["client_id", "date_from", "date_to"]}}
+{"name": "status filter", "prompt": "draft invoices waiting to be issued", "expected": {"tool": "filter_invoices", "fields": ["status"], "status": "draft"}}
+{"name": "project scope", "prompt": "invoices tied to project Aurora from February", "expected": {"tool": "filter_invoices", "fields": ["project_id", "date_from", "date_to"]}}

@@ -11,8 +11,8 @@ falls back to a fuzzy string match against known synonyms. The fallback
 is good enough for the canonical seed CSVs and keeps the demo loop
 running when Ollama is down.
 
-See ``backend/app/ai/evals/column_mapper/`` for the 5 hand-curated eval
-examples that gate this tool at merge time.
+See ``backend/app/ai/evals/onboarding_column_mapper/`` for the 5
+hand-curated eval examples that gate this tool at merge time.
 """
 
 from __future__ import annotations
@@ -22,9 +22,35 @@ import json
 import re
 from dataclasses import dataclass
 
+from pydantic import BaseModel, Field
+
 from app.ai.client import AIClient
+from app.ai.registry import ToolSpec, register
 from app.features.imports.schemas import ColumnMapping, EntityType
 from app.features.imports.validators import target_fields
+
+
+class ColumnMapperInput(BaseModel):
+    """LLM-facing input schema for the onboarding column mapper tool.
+
+    Mirrors the arguments of ``map_columns`` but uses Pydantic so the
+    registry can generate the Gemini function-call schema from a single
+    source of truth."""
+
+    headers: list[str] = Field(
+        ...,
+        min_length=1,
+        description="CSV column headers exactly as the customer wrote them",
+    )
+    entity_type: EntityType = Field(
+        ...,
+        description="target import entity: employees, clients, projects, teams",
+    )
+
+
+class ColumnMapperOutput(BaseModel):
+    mapping: list[ColumnMapping]
+    ai_explanation: str | None = None
 
 
 @dataclass
@@ -238,3 +264,19 @@ def _parse_llm_json(text: str) -> dict[str, object] | None:
     if isinstance(parsed, dict):
         return parsed
     return None
+
+
+SPEC = register(
+    ToolSpec(
+        name="onboarding_column_mapper",
+        feature="imports",
+        description=(
+            "Map a customer CSV's columns to the target Gamma schema for "
+            "an onboarding import (employees, clients, projects, teams)."
+        ),
+        input_schema=ColumnMapperInput,
+        output_schema=ColumnMapperOutput,
+        handler=None,
+        tags=("onboarding", "read-only"),
+    )
+)

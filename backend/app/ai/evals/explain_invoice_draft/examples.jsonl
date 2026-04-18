@@ -1,0 +1,3 @@
+{"name": "budget exceeded", "prompt": "invoice 450 draft with signals: budget_exceeded, hours_out_of_range, fx_drift", "expected": {"tool": "explain_invoice_draft", "fields": ["invoice_id", "analyzer_signals"]}}
+{"name": "no anomalies", "prompt": "invoice 451 draft with signals: []", "expected": {"tool": "explain_invoice_draft", "invoice_id": 451, "analyzer_signals": []}}
+{"name": "scope change", "prompt": "invoice 452 draft with signals: scope_change_pending, late_timesheet_entries", "expected": {"tool": "explain_invoice_draft", "fields": ["invoice_id", "analyzer_signals"]}}

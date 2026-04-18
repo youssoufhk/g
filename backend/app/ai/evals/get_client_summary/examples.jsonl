@@ -1,0 +1,3 @@
+{"name": "by id", "prompt": "summary of client 17", "expected": {"tool": "get_client_summary", "client_id": 17}}
+{"name": "by name hint", "prompt": "overview for HSBC UK", "expected": {"tool": "get_client_summary", "fields": ["client_id"]}}
+{"name": "revenue question", "prompt": "how much revenue have we booked with client 5", "expected": {"tool": "get_client_summary", "client_id": 5}}

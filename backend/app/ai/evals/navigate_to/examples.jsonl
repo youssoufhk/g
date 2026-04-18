@@ -1,0 +1,4 @@
+{"name": "employee profile", "prompt": "open Alice Dupont's profile", "expected": {"tool": "navigate_to", "entity_kind": "employee"}}
+{"name": "invoice detail", "prompt": "show me invoice 308", "expected": {"tool": "navigate_to", "entity_kind": "invoice", "entity_id": 308}}
+{"name": "client list", "prompt": "take me to clients", "expected": {"tool": "navigate_to", "entity_kind": "client", "entity_id": null}}
+{"name": "dashboard", "prompt": "back to the dashboard", "expected": {"tool": "navigate_to", "entity_kind": "dashboard"}}

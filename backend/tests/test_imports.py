@@ -1,8 +1,8 @@
 """Unit tests for backend/app/features/imports/*.
 
 These tests mock the AIClient so they run offline. The live-LLM eval
-against Ollama lives at backend/app/ai/evals/column_mapper/ and is run
-in the agent/founder eval loop, not on every commit.
+against Ollama lives at backend/app/ai/evals/onboarding_column_mapper/
+and is run in the agent/founder eval loop, not on every commit.
 """
 
 from __future__ import annotations

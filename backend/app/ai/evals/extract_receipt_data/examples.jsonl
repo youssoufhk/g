@@ -1,0 +1,3 @@
+{"name": "lunch receipt", "prompt": "receipt image: lunch at Le Bistrot, 2026-03-12, 42.50 EUR, category meals_client", "expected": {"tool": "extract_receipt_data", "fields": ["file_id", "expected_currency", "expected_category_list"]}}
+{"name": "taxi with VAT", "prompt": "receipt image: G7 taxi, 2026-03-14, 28.40 EUR including 2.37 VAT, category transport", "expected": {"tool": "extract_receipt_data", "fields": ["file_id", "expected_currency"]}}
+{"name": "hotel multi-line", "prompt": "receipt image: Accor hotel, 2026-02-28, 420.00 EUR, category lodging", "expected": {"tool": "extract_receipt_data", "fields": ["file_id", "expected_category_list"]}}

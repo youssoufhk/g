@@ -1,0 +1,3 @@
+{"name": "by id", "prompt": "summary of project 42", "expected": {"tool": "get_project_summary", "project_id": 42}}
+{"name": "by name hint", "prompt": "tell me about project Aurora", "expected": {"tool": "get_project_summary", "fields": ["project_id"]}}
+{"name": "status question", "prompt": "what's the status of project 101", "expected": {"tool": "get_project_summary", "project_id": 101}}

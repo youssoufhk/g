@@ -1,0 +1,4 @@
+{"name": "by employee and status", "prompt": "Carlos's expenses that are still pending approval", "expected": {"tool": "filter_expenses", "fields": ["employee_id", "status"], "status": "submitted"}}
+{"name": "high amount scan", "prompt": "expenses above 500 EUR this year", "expected": {"tool": "filter_expenses", "fields": ["amount_min_cents", "date_from", "date_to"], "amount_min_cents": 50000}}
+{"name": "category scope", "prompt": "travel expenses from Q1", "expected": {"tool": "filter_expenses", "fields": ["category", "date_from", "date_to"]}}
+{"name": "rejected cleanup", "prompt": "rejected expenses I need to follow up on", "expected": {"tool": "filter_expenses", "fields": ["status"], "status": "rejected"}}

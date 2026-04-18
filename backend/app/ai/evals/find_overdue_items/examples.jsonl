@@ -1,0 +1,4 @@
+{"name": "default scope", "prompt": "what is overdue", "expected": {"tool": "find_overdue_items", "fields": ["scope"], "scope": "me"}}
+{"name": "team scope", "prompt": "anything overdue on my team", "expected": {"tool": "find_overdue_items", "fields": ["scope"], "scope": "team"}}
+{"name": "tenant admin", "prompt": "all overdue items across the firm", "expected": {"tool": "find_overdue_items", "fields": ["scope"], "scope": "tenant"}}
+{"name": "invoices only", "prompt": "which invoices are late", "expected": {"tool": "find_overdue_items", "fields": ["include_kinds"], "include_kinds": ["invoice"]}}

@@ -1,0 +1,4 @@
+{"name": "all pending", "prompt": "what is waiting on me", "expected": {"tool": "filter_approvals", "fields": []}}
+{"name": "urgent only", "prompt": "urgent approvals I need to clear", "expected": {"tool": "filter_approvals", "fields": ["urgent_only"], "urgent_only": true}}
+{"name": "timesheets only", "prompt": "timesheets awaiting my approval", "expected": {"tool": "filter_approvals", "fields": ["entity_type"], "entity_type": "timesheet"}}
+{"name": "invoice sign-off", "prompt": "invoices waiting for approval", "expected": {"tool": "filter_approvals", "fields": ["entity_type"], "entity_type": "invoice"}}

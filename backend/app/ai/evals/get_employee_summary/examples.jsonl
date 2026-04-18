@@ -1,0 +1,3 @@
+{"name": "by id", "prompt": "profile for employee 23", "expected": {"tool": "get_employee_summary", "employee_id": 23}}
+{"name": "by name hint", "prompt": "tell me about Alice Dupont", "expected": {"tool": "get_employee_summary", "fields": ["employee_id"]}}
+{"name": "contribution question", "prompt": "what is Ben's contribution this month", "expected": {"tool": "get_employee_summary", "fields": ["employee_id"]}}
