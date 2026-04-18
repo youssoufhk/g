@@ -481,4 +481,165 @@ Rules that stay in force throughout:
 - Commit messages: one-line summary + short body. Always include `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`.
 - Run `npx tsc --noEmit` (frontend) and `pytest` (backend) before each commit. If either breaks, fix before committing.
 
+---
+
+## 10. Correction: KPI count is 3, not 4
+
+Founder note 2026-04-18 overnight: the Leaves/Dashboard bar is **3 KPIs, not 4**. Several pages shipped in Batches B/C with 4-tile KPI rows and must be reduced to 3:
+
+- `admin/page.tsx` via `features/admin/admin-kpis.tsx` - currently 4 tiles (users / flags / billing / audit). Pick the 3 most load-bearing (suggested: users / flags / audit-today) and drop the fourth. Or merge billing into audit-today as a secondary line.
+- `approvals/page.tsx` via `features/approvals/approvals-kpis.tsx` - currently 4 tiles (timesheet / expense / leave / invoice). `invoice` is non-clickable and fabricated (no data contract). **Drop the invoice tile.** Keep 3.
+- `timesheets/page.tsx` via `features/timesheets/timesheets-kpis.tsx` - currently 4 (week total / billable / non-billable / overtime). Drop `non-billable` (can be inferred as `total - billable` in tooltip). Keep 3.
+- `invoices/page.tsx` via `features/invoices/invoices-kpis.tsx` - audit: if it ships 4, reduce to 3 (outstanding/overdue + paid + drafts is the natural 3).
+
+General rule now codified: **every `*-kpis.tsx` composition renders exactly 3 tiles.** If a 4th metric matters, move it into the AiRecommendations panel as a one-line hint, not a KPI tile. Update the resuming agent acceptance checklist with this constraint.
+
+---
+
+## 11. Resume prompt for a fresh agent
+
+Paste this verbatim into a new Claude Opus session. Do not pre-brief; the prompt is self-contained.
+
+```
+You are resuming an overnight sweep on the GammaHR v2 repo at
+/home/kerzika/ai-workspace/claude-projects/gammahr_v2. The founder is
+asleep and will not answer questions. Use best judgement. Never ask
+the founder anything; decide and move on.
+
+READ ONLY THESE FILES (do not read others unless a specific task
+below requires it):
+1. /home/kerzika/ai-workspace/claude-projects/gammahr_v2/CLAUDE.md
+   - hard rules. Memorize sections 2, 7, 9.
+2. /home/kerzika/ai-workspace/claude-projects/gammahr_v2/opus_plan_v2.md
+   - THIS file. Read sections 7, 8, 9, 10, 11, 12 only.
+3. git log -10 --oneline, then git status --short - to see where the
+   last session stopped.
+
+Do NOT read:
+- OPUS_CRITICS.md or OPUS_CRITICS_V2.md in full. Their conclusions are
+  already distilled into §8 of opus_plan_v2.md.
+- The prototype/ folder (frozen).
+- Any page you are not actively editing.
+- THE_PLAN.md, EXECUTION_CHECKLIST.md, or other roadmap docs unless
+  §8 of opus_plan_v2.md explicitly tells you to edit one.
+
+EXECUTE in this order, one task at a time, committing after each.
+Never run parallel subagents. Never use --no-verify. Never ask a
+question; use best judgement. If a task looks impossible, skip it,
+write one sentence in opus_plan_v2.md §7.4 "Skipped with reason",
+commit, and continue.
+
+Order:
+A. Verify Batch D commit landed (71d0d26). If missing, redo P10+P11
+   from opus_plan_v2.md §2 sequentially, commit.
+B. Apply the KPI=3 correction from opus_plan_v2.md §10 to admin,
+   approvals, timesheets, invoices (4-tile KPIs reduced to 3).
+   Commit as one change: "opus bar sweep: normalize *-kpis.tsx to 3
+   tiles".
+C. Opus_plan_v2.md §P12 cross-cutting hygiene (4 bullets). Commit.
+D. Opus_plan_v2.md §8 founder follow-ups in the §9 order. Commit
+   after each item. Keep each commit scope tight and focused.
+
+RULES IN FORCE (do not break):
+- No em dashes anywhere. Use hyphens. (Pre-commit hook enforces.)
+- No banned words from CLAUDE.md §2.
+- No new frontend atoms under components/ui/. Feature-level
+  compositions under features/<name>/ are OK.
+- Every user-visible string via next-intl. EN + FR keys added in the
+  same edit; messages/en.json and messages/fr.json line counts must
+  stay equal.
+- Numbers via lib/format.ts. tabular-nums. No inline Intl.DateTimeFormat.
+- No #fff or rgba() - use var(--color-*) tokens.
+- No console.log in shipped code.
+- Dates: convert relative to absolute when storing in memory/notes.
+- Before every commit: npx tsc --noEmit (frontend) must be clean. If
+  there are backend changes: pytest too. Fix breakage before commit.
+- Commit message format: one-line summary, short body explaining
+  why, Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>.
+- Max 1 subagent at a time. Prefer doing the work yourself.
+
+CRITIC LOOP (after the §9 list is exhausted):
+Do NOT stop. Re-critic the entire codebase against the bar.
+1. Read opus_plan_v2.md §12 "Critic loop" for the rubric.
+2. Survey the current state with Glob + Grep (NOT by reading files
+   whole). Look for: hardcoded English in JSX, missing aria-busy on
+   async regions, inline Intl.DateTimeFormat, hardcoded #fff/rgba,
+   console.log, em dashes, new atoms added without ADR, KPI tiles
+   that are not 3, missing i18n parity (en vs fr key counts), pages
+   without app-aura where they need it.
+3. For each red item found: fix, typecheck, commit. One item per
+   commit.
+4. When you complete a full pass without finding any red item, add
+   a dated "Pass N green - <timestamp>" entry to opus_plan_v2.md
+   §12.history, commit, then start pass N+1 on the next logical
+   layer (a11y, performance, RBAC coverage, seed completeness,
+   etc. per the §12 rubric).
+5. Never stop. The founder explicitly said "reiterate non stop".
+
+If you hit a rate limit, append a one-paragraph state note to
+opus_plan_v2.md §7.5 "Latest resume checkpoint" describing exactly
+what you were doing, commit, stop. The next agent will pick up from
+that checkpoint.
+```
+
+---
+
+## 12. Critic loop rubric (used by the resuming agent after §9 exhausts)
+
+When §9 is fully committed, run this loop forever (one pass at a time,
+one commit per fix). Each pass targets one layer. When a layer is
+green, move to the next. When all six are green, start over at layer 1
+with a fresh eye.
+
+### 12.1 Layer 1 - design bar parity
+For every page under `frontend/app/[locale]/(app)/*/page.tsx`:
+- PageHeader present where the page type needs one.
+- `app-aura` background present on all render branches (loading, error, success).
+- Exactly 3 KPI tiles via `features/<feature>/<feature>-kpis.tsx` when the page has KPIs.
+- AiRecommendations panel present on pages with real suggestions; absent where there are none.
+- Filters use `useUrlListState`.
+- aria-busy + aria-live on async regions; skeleton + EmptyState + error branch all present.
+- Every entity reference is a `<Link>`.
+- tabular-nums on all numerics.
+- No hardcoded English, no hardcoded `#fff`/`rgba()`, no `console.log`, no em dashes, no banned words.
+- `npx tsc --noEmit` clean.
+
+### 12.2 Layer 2 - i18n parity
+- `messages/en.json` and `messages/fr.json` have identical key counts and identical structure.
+- Every `useTranslations(...)` namespace used in JSX has corresponding EN + FR keys.
+- No string literal in JSX outside `t("...")` calls (except ARIA role strings, token names, entity ids).
+
+### 12.3 Layer 3 - a11y
+- Every button has an accessible name.
+- Every icon-only button has `aria-label`.
+- Every modal has focus trap (check existing Modal atom).
+- Tab order matches visual order on detail pages.
+- Skip-to-content link present in layout.
+- Every `aria-busy` region also has `aria-live`.
+
+### 12.4 Layer 4 - backend hardening
+- `@audited`, `@gated_feature`, `Idempotency-Key` applied to every mutating route.
+- Seed script row counts match `DATA_ARCHITECTURE.md §12.10`.
+- Schema-per-tenant migrations in place.
+- AI tools: count built vs count in `AI_FEATURES.md §3.1`; build the next missing one per pass.
+
+### 12.5 Layer 5 - testing
+- At least one Playwright E2E spec per Tier 1 feature.
+- Unit tests cover every service function on a backend feature.
+- Eval suite >= 3 examples per AI surface.
+
+### 12.6 Layer 6 - docs & gate
+- `docs/FLAWLESS_GATE.md` is the single authoritative gate (per §8.9).
+- No check mark in `EXECUTION_CHECKLIST.md` that is not backed by (a) backend route, (b) E2E spec, (c) audit writer.
+- ADRs filed for every deviation from CLAUDE.md / ADR-001..010 / specs.
+
+### 12.7 history
+
+Append one line per completed pass. Do not delete past entries.
+
+- 2026-04-18: D7 gate unification + ADR-012 (merged OPUS v1/V2 critic rubrics into single 70-item FLAWLESS_GATE).
+- 2026-04-18: D8 ADR-011 Ollama + tool-schema wiring in `ai/client.py` (8 ollama-client tests pass).
+- 2026-04-18: D9 pricing rebase + Tier 1.1 lift for SCIM / SAML / multi-rate VAT (DEF-024, DEF-025, DEF-007 resolved).
+- 2026-04-18: D10 stage 1 of §8.4 seed coverage: leave_types + leave_requests + leave_balances migration (20260418_1000) + 700 deterministic leave-request generator + pinned counts test (9 tests pass).
+
 End of plan.

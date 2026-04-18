@@ -5,8 +5,9 @@ inserts the rows under the ``t_dev`` tenant (or any tenant schema passed
 via ``--tenant``). All inserts are ``ON CONFLICT DO NOTHING`` so the
 script is safe to re-run.
 
-Phase 5a will extend this script with timesheet_weeks, leave_requests,
-expenses, and invoices once those tables exist.
+Phase 5a stages this script feature-by-feature: leave_requests land in
+stage 1 alongside the 20260418_1000 migration; timesheet_weeks, expenses,
+and invoices arrive in later stages as their schemas ship.
 
 Usage (from repo root with a running Postgres):
     python -m scripts.seed_demo_tenant
@@ -26,7 +27,7 @@ import csv
 import os
 import random
 import sys
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -269,6 +270,191 @@ async def seed_team_allocations(
 
 
 # ---------------------------------------------------------------------------
+# Leaves (Phase 5a)
+# ---------------------------------------------------------------------------
+
+# Canonical leave catalogue per DATA_ARCHITECTURE.md section 2.9 and
+# section 12.10. Order is stable so the generator picks reproducibly.
+LEAVE_TYPE_CATALOGUE: tuple[dict[str, object], ...] = (
+    {
+        "code": "VAC",
+        "name": "Paid Vacation",
+        "accrual_rate": 2.08,
+        "max_balance": 60.0,
+        "paid": True,
+        "color": "#1b8a5a",
+        "is_medical": False,
+    },
+    {
+        "code": "SICK",
+        "name": "Sick Leave",
+        "accrual_rate": 0.0,
+        "max_balance": None,
+        "paid": True,
+        "color": "#c44536",
+        "is_medical": True,
+    },
+    {
+        "code": "PERS",
+        "name": "Personal",
+        "accrual_rate": 0.17,
+        "max_balance": 5.0,
+        "paid": True,
+        "color": "#6a7fdb",
+        "is_medical": False,
+    },
+    {
+        "code": "RTT",
+        "name": "RTT",
+        "accrual_rate": 0.83,
+        "max_balance": 15.0,
+        "paid": True,
+        "color": "#f2a007",
+        "is_medical": False,
+    },
+    {
+        "code": "PAR",
+        "name": "Parental",
+        "accrual_rate": 0.0,
+        "max_balance": None,
+        "paid": True,
+        "color": "#a35cd1",
+        "is_medical": False,
+    },
+)
+
+
+# Status mix: 450 approved + 150 pending + 100 rejected = 700 (DATA_ARCHITECTURE
+# section 12.10). Pending is split into draft + submitted so all 4 statuses
+# are hit (founder follow-up 8.4). 30 + 120 = 150 pending preserves the
+# published total.
+LEAVE_STATUS_MIX: tuple[tuple[str, int], ...] = (
+    ("draft", 30),
+    ("submitted", 120),
+    ("approved", 450),
+    ("rejected", 100),
+)
+
+LEAVE_TOTAL = sum(count for _, count in LEAVE_STATUS_MIX)  # 700
+
+
+def generate_leave_rows(
+    employee_ids: list[int],
+    leave_type_codes: list[str],
+    *,
+    seed: int = 42,
+) -> list[dict[str, object]]:
+    """Pure deterministic generator for the 700 demo leave requests.
+
+    Returns a list of row-shaped dicts with no DB dependency so tests can
+    pin counts without running Postgres. Dates are spread across 2025-2027
+    so reports for any of those years find rows.
+    """
+    if not employee_ids:
+        raise ValueError("generate_leave_rows requires at least one employee")
+    if not leave_type_codes:
+        raise ValueError("generate_leave_rows requires at least one leave type")
+
+    rng = random.Random(seed)
+    rows: list[dict[str, object]] = []
+
+    # Calendar span covers three fiscal years to give the dashboard room.
+    year_floor = date(2025, 1, 1)
+    year_ceiling = date(2027, 12, 15)
+    span_days = (year_ceiling - year_floor).days
+
+    for status, count in LEAVE_STATUS_MIX:
+        for _ in range(count):
+            emp_id = rng.choice(employee_ids)
+            type_code = rng.choice(leave_type_codes)
+            duration_days = rng.choice([1, 1, 2, 3, 5, 5, 7, 10])
+            start_offset = rng.randint(0, max(0, span_days - duration_days))
+            start = year_floor + timedelta(days=start_offset)
+            end = start + timedelta(days=duration_days - 1)
+            rows.append(
+                {
+                    "employee_id": emp_id,
+                    "leave_type_code": type_code,
+                    "start_date": start,
+                    "end_date": end,
+                    "days": float(duration_days),
+                    "status": status,
+                }
+            )
+
+    return rows
+
+
+async def seed_leave_types(conn, tenant_id: int) -> dict[str, int]:
+    """Insert the canonical leave catalogue. Returns {code: db_id}."""
+    mapping: dict[str, int] = {}
+    for spec in LEAVE_TYPE_CATALOGUE:
+        db_id = await conn.fetchval(
+            """
+            INSERT INTO public.leave_types (
+                tenant_id, name, code, accrual_rate, max_balance,
+                paid, color, is_medical
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (tenant_id, code) DO NOTHING
+            RETURNING id
+            """,
+            tenant_id,
+            spec["name"],
+            spec["code"],
+            spec["accrual_rate"],
+            spec["max_balance"],
+            spec["paid"],
+            spec["color"],
+            spec["is_medical"],
+        )
+        if db_id is None:
+            db_id = await conn.fetchval(
+                "SELECT id FROM public.leave_types WHERE tenant_id=$1 AND code=$2",
+                tenant_id,
+                spec["code"],
+            )
+        mapping[str(spec["code"])] = db_id
+    return mapping
+
+
+async def seed_leaves(
+    conn,
+    tenant_id: int,
+    employee_map: dict[int, int],
+    type_map: dict[str, int],
+) -> int:
+    """Insert the 700 deterministic demo leave requests. Returns row count."""
+    if not employee_map or not type_map:
+        return 0
+
+    rows = generate_leave_rows(
+        employee_ids=sorted(employee_map.values()),
+        leave_type_codes=sorted(type_map.keys()),
+    )
+
+    inserted = 0
+    for row in rows:
+        type_db_id = type_map[str(row["leave_type_code"])]
+        await conn.execute(
+            """
+            INSERT INTO public.leave_requests (
+                tenant_id, employee_id, leave_type_id,
+                start_date, end_date, days, status, version
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 0)
+            """,
+            tenant_id,
+            row["employee_id"],
+            type_db_id,
+            row["start_date"],
+            row["end_date"],
+            row["days"],
+            row["status"],
+        )
+        inserted += 1
+    return inserted
+
+
+# ---------------------------------------------------------------------------
 # Parse helpers
 # ---------------------------------------------------------------------------
 
@@ -334,13 +520,20 @@ async def main(tenant_schema: str) -> None:
         )
         print(f"[seed]   {alloc_count} allocations ready")
 
+        print("[seed] Seeding leave types...")
+        type_map = await seed_leave_types(conn, tenant_id)
+        print(f"[seed]   {len(type_map)} leave types ready")
+
+        print("[seed] Seeding leave requests (700 deterministic rows)...")
+        leave_count = await seed_leaves(conn, tenant_id, emp_map, type_map)
+        print(f"[seed]   {leave_count} leave requests inserted")
+
     finally:
         await conn.close()
 
     print("[seed] Done.")
     print(
-        "[seed] Timesheets, leaves, expenses, invoices seed in Phase 5a once "
-        "those tables exist."
+        "[seed] Timesheets, expenses, invoices seed in later Phase 5a stages."
     )
 
 
