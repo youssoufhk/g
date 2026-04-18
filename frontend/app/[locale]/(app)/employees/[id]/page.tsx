@@ -19,6 +19,7 @@ import {
 import { StatPill } from "@/components/patterns/stat-pill";
 import { EmptyState } from "@/components/patterns/empty-state";
 import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { useDetailKeyboardNav } from "@/hooks/use-detail-keyboard-nav";
 import { EMPLOYEES } from "@/lib/mock-data";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -98,6 +99,10 @@ export default function EmployeeProfilePage({
       next: idx < EMPLOYEES.length - 1 ? EMPLOYEES[idx + 1]?.id ?? null : null,
     };
   }, [id]);
+  useDetailKeyboardNav(
+    siblings.prev ? `/employees/${siblings.prev}` : null,
+    siblings.next ? `/employees/${siblings.next}` : null,
+  );
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState("");
   const [editTitle, setEditTitle] = useState("");

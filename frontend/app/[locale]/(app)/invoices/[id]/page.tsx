@@ -12,6 +12,7 @@ import {
 
 import { EmptyState } from "@/components/patterns/empty-state";
 import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { useDetailKeyboardNav } from "@/hooks/use-detail-keyboard-nav";
 import { INVOICES } from "@/lib/mock-data";
 import { AIInsightCard } from "@/components/patterns/ai-insight-card";
 import { Badge } from "@/components/ui/badge";
@@ -195,6 +196,10 @@ export default function InvoiceDetailPage({
       next: idx < INVOICES.length - 1 ? INVOICES[idx + 1]?.id ?? null : null,
     };
   }, [id]);
+  useDetailKeyboardNav(
+    siblings.prev ? `/invoices/${siblings.prev}` : null,
+    siblings.next ? `/invoices/${siblings.next}` : null,
+  );
 
   const headerBar = (
     <DetailHeaderBar

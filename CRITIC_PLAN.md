@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 2/8
+- Part A (UX reds, highest-visibility): 3/8
 - Part B (UI reds, atom lock-down): 7/12
 - Part C (yellow polish): 8/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 17/35
+Overall in-session: 18/35
 
 ---
 
@@ -42,7 +42,7 @@ Overall in-session: 17/35
    - `app/[locale]/(app)/projects/page.tsx`
    - `app/[locale]/(app)/admin/page.tsx`
 
-7. [ ] **A7 [B9/B11]** Breadcrumb + keyboard prev/next on 4 detail pages:
+7. [x] **A7 [B9/B11]** Breadcrumb + keyboard prev/next on 4 detail pages:
    - `app/[locale]/(app)/employees/[id]/page.tsx`
    - `app/[locale]/(app)/clients/[id]/page.tsx`
    - `app/[locale]/(app)/projects/[id]/page.tsx`

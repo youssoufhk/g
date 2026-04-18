@@ -4,6 +4,7 @@ import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { useDetailKeyboardNav } from "@/hooks/use-detail-keyboard-nav";
 import { CLIENTS } from "@/lib/mock-data";
 import {
   Building2,
@@ -236,6 +237,10 @@ export default function ClientProfilePage({
       next: idx < CLIENTS.length - 1 ? CLIENTS[idx + 1]?.id ?? null : null,
     };
   }, [id]);
+  useDetailKeyboardNav(
+    siblings.prev ? `/clients/${siblings.prev}` : null,
+    siblings.next ? `/clients/${siblings.next}` : null,
+  );
   const headerBar = (
     <DetailHeaderBar
       backHref="/clients"

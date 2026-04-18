@@ -4,6 +4,7 @@ import { use, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { useDetailKeyboardNav } from "@/hooks/use-detail-keyboard-nav";
 import { PROJECTS } from "@/lib/mock-data";
 import {
   FolderOpen,
@@ -99,6 +100,10 @@ export default function ProjectDetailPage({
       next: idx < PROJECTS.length - 1 ? PROJECTS[idx + 1]?.id ?? null : null,
     };
   }, [id]);
+  useDetailKeyboardNav(
+    siblings.prev ? `/projects/${siblings.prev}` : null,
+    siblings.next ? `/projects/${siblings.next}` : null,
+  );
 
   const [completedOverrides, setCompletedOverrides] = useState<Record<number, boolean>>({});
   const [localMilestones, setLocalMilestones] = useState<Array<{ name: string; date: string; complete: boolean }>>([]);
