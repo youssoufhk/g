@@ -9,11 +9,11 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 ## Progress at a glance
 
 - Part A (UX reds, highest-visibility): 3/8
-- Part B (UI reds, atom lock-down): 8/12
+- Part B (UI reds, atom lock-down): 9/12
 - Part C (yellow polish): 12/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 23/35
+Overall in-session: 24/35
 
 ---
 
@@ -75,7 +75,7 @@ Overall in-session: 23/35
 
 17. [ ] **B9 [B9 WCAG]** Add `@axe-core/playwright` to the visual test pipeline; fail build on AA violation. Report runs in `tests/a11y.spec.ts`.
 
-18. [ ] **B10 [G30]** Skeleton fidelity: skeleton rows and cells must mirror real column widths and KPI strip above. Fix `invoices/page.tsx:75` skeleton + add dashboard skeleton.
+18. [x] **B10 [G30]** Skeleton fidelity: skeleton rows and cells must mirror real column widths and KPI strip above. Fix `invoices/page.tsx:75` skeleton + add dashboard skeleton.
 
 19. [x] **B11 [F26/F27]** Row hover `cursor: pointer` on all clickable table rows. Replace `btn:active { transform: scale(0.97) }` with one surface step darker + 80ms.
 

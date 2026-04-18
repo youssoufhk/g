@@ -74,19 +74,22 @@ const CLIENT_NAMES: Record<string, string> = {
 // ── Skeleton rows ─────────────────────────────────────────────────────────────
 
 function SkeletonRows() {
+  // Column widths mirror the TH declarations 20 lines above.
+  // Skeleton widths sit at roughly 80% of the column minWidth so the
+  // placeholder conveys "data is coming" without stretching the layout.
   return (
     <>
       {Array.from({ length: 5 }).map((_, i) => (
         <TR key={i}>
           <TD style={{ width: 40 }}><Skeleton variant="text" width={16} /></TD>
-          <TD><Skeleton variant="title" width={130} /></TD>
-          <TD><Skeleton variant="text" width={90} /></TD>
-          <TD><Skeleton variant="text" width={110} /></TD>
-          <TD><Skeleton variant="text" width={80} /></TD>
-          <TD><Skeleton variant="text" width={80} /></TD>
-          <TD><Skeleton variant="text" width={80} /></TD>
-          <TD><Skeleton variant="text" width={60} /></TD>
-          <TD style={{ width: 44 }}><Skeleton variant="text" width={24} /></TD>
+          <TD style={{ minWidth: 150 }}><Skeleton variant="title" width={120} /></TD>
+          <TD style={{ minWidth: 120 }}><Skeleton variant="text" width={96} /></TD>
+          <TD style={{ minWidth: 160 }}><Skeleton variant="text" width={128} /></TD>
+          <TD style={{ minWidth: 110 }}><Skeleton variant="text" width={88} /></TD>
+          <TD style={{ minWidth: 110 }}><Skeleton variant="text" width={88} /></TD>
+          <TD numeric style={{ minWidth: 130 }}><Skeleton variant="text" width={96} /></TD>
+          <TD style={{ minWidth: 90 }}><Skeleton variant="text" width={64} /></TD>
+          <TD style={{ width: 44 }}><Skeleton variant="text" width={20} /></TD>
         </TR>
       ))}
     </>
