@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import clsx from "clsx";
 
 /**
@@ -17,18 +18,20 @@ const SIZE_PX: Record<SpinnerSize, number> = {
 export function Spinner({
   size = "sm",
   className,
-  label = "Loading",
+  label,
 }: {
   size?: SpinnerSize;
   className?: string;
   label?: string;
 }) {
+  const t = useTranslations("app");
+  const resolvedLabel = label ?? t("loading");
   const px = SIZE_PX[size];
   return (
     <span
       className={clsx(className)}
       role="status"
-      aria-label={label}
+      aria-label={resolvedLabel}
       style={{
         display: "inline-block",
         width: px,
