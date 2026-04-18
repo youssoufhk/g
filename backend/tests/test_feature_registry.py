@@ -129,9 +129,7 @@ AI_HANDLER_NO_SERVICE_EXEMPT = frozenset({"core"})
 # before the service layer existed. Each entry must shrink the set
 # when closed, not quietly disappear. When the last entry is removed,
 # delete this constant and the matching assertion.
-AI_HANDLER_NO_SERVICE_CASCADE = frozenset({
-    "approvals",
-})
+AI_HANDLER_NO_SERVICE_CASCADE: frozenset[str] = frozenset()
 # 2026-04-18: ``invoices`` closed. service.py + routes.py + models.py
 # landed in a follow-up commit that wires the list endpoint to the
 # Phase 5a invoice tables (migration 20260418_1300). The AI handler

@@ -42,6 +42,7 @@ from app.features import (  # noqa: F401
     timesheets,
 )
 from app.features.admin.routes import router as admin_router
+from app.features.approvals.routes import router as approvals_router
 from app.features.auth.routes import router as auth_router
 
 # Model import side effects so Base.metadata sees every Phase 4 table.
@@ -123,5 +124,6 @@ app.include_router(invoices_router, prefix="/api/v1/invoices", tags=["invoices"]
 app.include_router(expenses_router, prefix="/api/v1/expenses", tags=["expenses"])
 app.include_router(leaves_router, prefix="/api/v1/leaves", tags=["leaves"])
 app.include_router(timesheets_router, prefix="/api/v1/timesheets", tags=["timesheets"])
+app.include_router(approvals_router, prefix="/api/v1/approvals", tags=["approvals"])
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["dashboard"])
 app.include_router(search_router, prefix="/api/v1/search", tags=["search"])
