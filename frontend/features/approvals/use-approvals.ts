@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { apiFetch } from "@/lib/api-client";
 import { USE_API } from "@/lib/api-mode";
+import { useOptimisticMutation } from "@/lib/optimistic";
 
 import type { ApprovalListFilters, ApprovalRequest, ApprovalType } from "./types";
 
@@ -156,5 +157,48 @@ export function useApprovals(filters: ApprovalListFilters = {}) {
       return filterApprovals(MOCK_APPROVALS, filters);
     },
     staleTime: 30_000,
+  });
+}
+
+export type ApprovalDecisionVars = {
+  id: string;
+  decision: "approved" | "rejected";
+  reason?: string;
+};
+
+export type ApprovalDecisionResult = {
+  id: string;
+  status: "approved" | "rejected";
+};
+
+/**
+ * Approve or reject a request. Retrofits CRITIC_PLAN A3:
+ * useOptimisticMutation wraps the call so a 409 (another approver
+ * already decided) opens the shared ConflictResolver instead of a
+ * silent overwrite. Write endpoint ships with D5.
+ */
+export function useDecideApproval() {
+  return useOptimisticMutation<ApprovalDecisionResult, ApprovalDecisionVars>({
+    mutationKey: ["approvals", "decide"],
+    mutationFn: async (vars) => {
+      if (USE_API) {
+        return apiFetch<ApprovalDecisionResult>(`/approvals/${vars.id}/decision`, {
+          method: "POST",
+          body: JSON.stringify({ decision: vars.decision, reason: vars.reason }),
+          headers: { "content-type": "application/json" },
+        });
+      }
+      await new Promise((r) => setTimeout(r, 300));
+      return { id: vars.id, status: vars.decision };
+    },
+    conflictFields: ({ variables, serverState }) => [
+      {
+        field: "status",
+        label: "Decision",
+        yours: variables.decision,
+        theirs: (serverState as ApprovalDecisionResult).status,
+        kind: "text",
+      },
+    ],
   });
 }

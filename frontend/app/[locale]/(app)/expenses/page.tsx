@@ -37,7 +37,7 @@ import {
   weeksFor,
   type WindowPresetValue,
 } from "@/components/patterns/timeline-window-selector";
-import { useExpenses } from "@/features/expenses/use-expenses";
+import { useExpenses, useSubmitExpense } from "@/features/expenses/use-expenses";
 import { ExpensesKpis } from "@/features/expenses/expenses-kpis";
 import { useUrlListState } from "@/hooks/use-url-list-state";
 
@@ -705,7 +705,8 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
     project_id: "",
     billable: false,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitMutation = useSubmitExpense();
+  const isSubmitting = submitMutation.isPending;
   const [submitted, setSubmitted] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [ocrDetection, setOcrDetection] = useState<
@@ -770,42 +771,54 @@ function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (isSubmitting || submitted) return;
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-      const PROJECT_NAMES: Record<string, string> = {
-        p1: "HSBC Digital Transformation",
-        p2: "BNP Risk Model",
-        p3: "TotalEnergies ESG Strategy",
-        p4: "Renault Lean Analytics",
-      };
-      const newExpense: Expense = {
-        id: `exp-new-${Date.now()}`,
-        employee_id: CURRENT_USER_ID,
-        employee_name: "Youssouf Kerzika",
-        project_id: form.project_id || undefined,
-        project_name: form.project_id ? PROJECT_NAMES[form.project_id] : undefined,
-        category: (form.category || "other") as ExpenseCategory,
+    const PROJECT_NAMES: Record<string, string> = {
+      p1: "HSBC Digital Transformation",
+      p2: "BNP Risk Model",
+      p3: "TotalEnergies ESG Strategy",
+      p4: "Renault Lean Analytics",
+    };
+    const amountNumber = parseFloat(form.amount) || 0;
+    submitMutation.mutate(
+      {
         description: form.description || t("no_description"),
-        amount: parseFloat(form.amount) || 0,
+        amount_cents: Math.round(amountNumber * 100),
         currency: form.currency,
         expense_date: form.expense_date || new Date().toISOString().slice(0, 10),
-        status: "submitted",
+        category: (form.category || "other") as ExpenseCategory,
+        project_id: form.project_id || undefined,
         billable: form.billable,
-      };
-      setForm({
-        description: "",
-        amount: "",
-        currency: "EUR",
-        expense_date: "",
-        category: "",
-        project_id: "",
-        billable: false,
-      });
-      setOcrDetection(null);
-      if (onSubmitted) setTimeout(() => onSubmitted(newExpense), 600);
-    }, 800);
+      },
+      {
+        onSuccess: (result) => {
+          setSubmitted(true);
+          const newExpense: Expense = {
+            id: result.id,
+            employee_id: CURRENT_USER_ID,
+            employee_name: "Youssouf Kerzika",
+            project_id: form.project_id || undefined,
+            project_name: form.project_id ? PROJECT_NAMES[form.project_id] : undefined,
+            category: (form.category || "other") as ExpenseCategory,
+            description: form.description || t("no_description"),
+            amount: amountNumber,
+            currency: form.currency,
+            expense_date: form.expense_date || new Date().toISOString().slice(0, 10),
+            status: result.status,
+            billable: form.billable,
+          };
+          setForm({
+            description: "",
+            amount: "",
+            currency: "EUR",
+            expense_date: "",
+            category: "",
+            project_id: "",
+            billable: false,
+          });
+          setOcrDetection(null);
+          if (onSubmitted) setTimeout(() => onSubmitted(newExpense), 600);
+        },
+      },
+    );
   }
 
   return (

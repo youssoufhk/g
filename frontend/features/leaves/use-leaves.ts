@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { USE_API } from "@/lib/api-mode";
 import { LEAVES } from "@/lib/mock-data";
+import { useOptimisticMutation } from "@/lib/optimistic";
 
 import type { LeaveBalance, LeaveListFilters, LeaveRequest, LeaveStatus, LeaveType } from "./types";
 
@@ -91,5 +92,49 @@ export function useLeaveBalance() {
       };
     },
     staleTime: 30_000,
+  });
+}
+
+export type LeaveRequestVars = {
+  type: LeaveType;
+  start_date: string;
+  end_date: string;
+  reason?: string;
+};
+
+export type LeaveRequestResult = {
+  id: string;
+  status: LeaveStatus;
+};
+
+/**
+ * File a leave request. Retrofits CRITIC_PLAN A3: useOptimisticMutation
+ * catches 409s (e.g., overlapping dates already approved) and escalates
+ * to the shared resolver rather than silently losing the submission.
+ * Write endpoint ships with D5.
+ */
+export function useSubmitLeaveRequest() {
+  return useOptimisticMutation<LeaveRequestResult, LeaveRequestVars>({
+    mutationKey: ["leaves", "submit"],
+    mutationFn: async (vars) => {
+      if (USE_API) {
+        return apiFetch<LeaveRequestResult>("/leaves", {
+          method: "POST",
+          body: JSON.stringify(vars),
+          headers: { "content-type": "application/json" },
+        });
+      }
+      await new Promise((r) => setTimeout(r, 300));
+      return { id: `lv-new-${Date.now()}`, status: "pending" };
+    },
+    conflictFields: ({ variables, serverState }) => [
+      {
+        field: "dates",
+        label: "Dates",
+        yours: `${variables.start_date} to ${variables.end_date}`,
+        theirs: (serverState as LeaveRequestResult & { window?: string }).window ?? "",
+        kind: "date",
+      },
+    ],
   });
 }

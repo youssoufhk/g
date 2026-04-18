@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { USE_API } from "@/lib/api-mode";
 import { EXPENSES } from "@/lib/mock-data";
+import { useOptimisticMutation } from "@/lib/optimistic";
 
 import type { Expense, ExpenseCategory, ExpenseListFilters, ExpenseStatus } from "./types";
 
@@ -97,5 +98,54 @@ export function useExpenses(filters: ExpenseListFilters = {}) {
       return filterExpenses(EXPENSES, filters);
     },
     staleTime: 30_000,
+  });
+}
+
+export type SubmitExpenseVars = {
+  id?: string;
+  description: string;
+  amount_cents: number;
+  currency: string;
+  expense_date: string;
+  category: ExpenseCategory;
+  project_id?: string;
+  billable: boolean;
+};
+
+export type SubmitExpenseResult = { id: string; status: ExpenseStatus };
+
+/**
+ * Submit an expense. Uses the shared three-layer 409 resolver via
+ * useOptimisticMutation so conflicting edits from another tab surface
+ * the pattern, not a silent overwrite. See CRITIC_PLAN A3.
+ *
+ * Live arm calls POST /expenses once D5 write endpoints land; today
+ * the mock arm simulates latency and returns a generated id.
+ */
+export function useSubmitExpense() {
+  return useOptimisticMutation<SubmitExpenseResult, SubmitExpenseVars>({
+    mutationKey: ["expenses", "submit"],
+    mutationFn: async (vars) => {
+      if (USE_API) {
+        return apiFetch<SubmitExpenseResult>("/expenses", {
+          method: "POST",
+          body: JSON.stringify(vars),
+          headers: { "content-type": "application/json" },
+        });
+      }
+      await new Promise((r) => setTimeout(r, 400));
+      return { id: vars.id ?? `exp-new-${Date.now()}`, status: "submitted" };
+    },
+    conflictFields: ({ variables, serverState }) => [
+      {
+        field: "amount_cents",
+        label: "Amount",
+        yours: variables.amount_cents,
+        theirs:
+          (serverState as SubmitExpenseResult & { amount_cents?: number })
+            .amount_cents ?? 0,
+        kind: "number",
+      },
+    ],
   });
 }

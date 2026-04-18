@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { USE_API } from "@/lib/api-mode";
 import { INVOICES } from "@/lib/mock-data";
+import { useOptimisticMutation } from "@/lib/optimistic";
 
 import type { Invoice, InvoiceListFilters, InvoiceStatus } from "./types";
 
@@ -113,5 +114,49 @@ export function useInvoice(id: string) {
       return invoice;
     },
     staleTime: 60_000,
+  });
+}
+
+export type InvoiceStatusChangeVars = {
+  id: string;
+  status: InvoiceStatus;
+  version?: number;
+};
+
+export type InvoiceStatusChangeResult = {
+  id: string;
+  status: InvoiceStatus;
+  version: number;
+};
+
+/**
+ * Change the status of an invoice (issue, send, mark-paid, cancel).
+ * Retrofits CRITIC_PLAN A3: useOptimisticMutation wraps the call so a
+ * stale-version 409 raised by concurrent finance edits opens the
+ * shared resolver. Write endpoint ships with D5.
+ */
+export function useUpdateInvoiceStatus() {
+  return useOptimisticMutation<InvoiceStatusChangeResult, InvoiceStatusChangeVars>({
+    mutationKey: ["invoices", "status"],
+    mutationFn: async (vars) => {
+      if (USE_API) {
+        return apiFetch<InvoiceStatusChangeResult>(`/invoices/${vars.id}/status`, {
+          method: "POST",
+          body: JSON.stringify({ status: vars.status, version: vars.version }),
+          headers: { "content-type": "application/json" },
+        });
+      }
+      await new Promise((r) => setTimeout(r, 300));
+      return { id: vars.id, status: vars.status, version: (vars.version ?? 0) + 1 };
+    },
+    conflictFields: ({ variables, serverState }) => [
+      {
+        field: "status",
+        label: "Status",
+        yours: variables.status,
+        theirs: (serverState as InvoiceStatusChangeResult).status,
+        kind: "text",
+      },
+    ],
   });
 }

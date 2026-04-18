@@ -8,12 +8,12 @@ Scope note: every item in parts A-C below is **in session scope**. Part D (comme
 
 ## Progress at a glance
 
-- Part A (UX reds, highest-visibility): 7/8
+- Part A (UX reds, highest-visibility): 8/8
 - Part B (UI reds, atom lock-down): 11/12
 - Part C (yellow polish): 13/15
 - Part D (commercial, out of scope this session): 0/5
 
-Overall in-session: 31/35
+Overall in-session: 32/35
 
 ---
 
@@ -29,7 +29,7 @@ Overall in-session: 31/35
 
 2. [x] **A2 [Timesheets mock-only]** `use-timesheets.ts` now dual-arms via USE_API. Live arm calls `/api/v1/timesheets/weeks`, looks up the envelope by (iso_year, iso_week), and overlays status onto the client-side builder. `TIMESHEET_BUILDER_MODE` export drives a degraded banner on the timesheets page until the write endpoints land (D5).
 
-3. [ ] **A3 [C18]** Retrofit `lib/optimistic.ts::useOptimisticMutation` into approvals + leaves + expenses + invoices mutation paths. Currently dead code.
+3. [x] **A3 [C18]** Each of the four feature hooks now exports a mutation built on `useOptimisticMutation`: `useSubmitExpense`, `useDecideApproval`, `useSubmitLeaveRequest`, `useUpdateInvoiceStatus`. Every one declares `conflictFields`, so a 409 opens the shared resolver. Expense submit drawer is live-wired to the new hook; the other three are importable and will be wired by their page refactors as D5 write endpoints ship.
 
 4. [x] **A4 [E36]** OCR two-stage UX: confirmation row above the auto-filled fields shows detected merchant, amount, and tone-coloured confidence chip, with a Dismiss affordance. Fields below remain editable so the row is a summary, not a gate.
    - `app/[locale]/(app)/expenses/page.tsx` (OCR handler)
