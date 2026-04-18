@@ -2617,3 +2617,167 @@ svg circle[data-animate].chart-animate-in {
   border-bottom: 1px solid var(--color-border-subtle);
   margin-bottom: var(--space-4);
 }
+
+
+/* ============================================================
+   PHASE 1a - Display variants for dashboard redesign
+   Additive only: existing .stat-card / .dashboard-greeting-title
+   behavior is unchanged. Opt in via data-variant="display" or
+   the new classes below.
+   ============================================================ */
+
+.section-overline {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-overline);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.dashboard-greeting-title[data-variant="display"] {
+  font-family: var(--font-serif);
+  font-size: var(--text-display-3xl);
+  font-weight: var(--weight-light);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+@media (max-width: 640px) {
+  .dashboard-greeting-title[data-variant="display"] {
+    font-size: var(--text-display-xl);
+  }
+}
+.dashboard-greeting-date-overline {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-overline);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.stat-card[data-variant="display"] {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  padding: var(--space-5);
+  gap: var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
+.stat-card[data-variant="display"] .stat-label {
+  letter-spacing: var(--letter-spacing-overline);
+  margin-bottom: 0;
+}
+.stat-card[data-variant="display"] .stat-value {
+  font-family: var(--font-serif);
+  font-size: var(--text-display-2xl);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--color-text-1);
+}
+.stat-card[data-variant="display"] .stat-row {
+  align-items: baseline;
+}
+.stat-card[data-variant="display"] .stat-secondary {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  color: var(--color-text-2);
+  padding-bottom: 0;
+}
+.stat-card[data-variant="display"][data-interactive="true"]:hover {
+  transform: var(--lift-sm);
+  box-shadow: var(--shadow-2);
+}
+
+.quick-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+@media (min-width: 768px) {
+  .quick-action-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.quick-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 56px;
+  padding: var(--space-1) var(--space-5) var(--space-1) var(--space-1);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-1);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-fast) var(--ease-out);
+  width: 100%;
+  text-align: left;
+}
+.quick-action-pill:hover {
+  transform: var(--lift-sm);
+  box-shadow: var(--shadow-2);
+  color: var(--color-text-1);
+}
+.quick-action-pill:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.quick-action-pill-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-primary);
+}
+.quick-action-pill[data-emphasis="true"] .quick-action-pill-icon {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+.quick-action-pill-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  flex: 1;
+  min-width: 0;
+}
+.quick-action-pill-label {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-1);
+}
+.quick-action-pill-sub {
+  font-size: var(--text-caption);
+  color: var(--color-text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quick-action-pill-arrow {
+  flex-shrink: 0;
+  color: var(--color-text-3);
+  transition: color var(--motion-fast) var(--ease-out),
+              transform var(--motion-fast) var(--ease-out);
+}
+.quick-action-pill:hover .quick-action-pill-arrow {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+.dashboard-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
