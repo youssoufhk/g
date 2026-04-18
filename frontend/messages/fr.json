@@ -1,4 +1,9 @@
 {
+  "activity": {
+    "empty_title": "Aucune activite",
+    "empty_desc": "Les modifications apportees a cet enregistrement apparaitront ici.",
+    "list_aria": "Activite recente"
+  },
   "expenses": {
     "page_title": "Notes de frais",
     "new_expense": "Nouvelle dépense",

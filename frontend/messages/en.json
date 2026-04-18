@@ -1,4 +1,9 @@
 {
+  "activity": {
+    "empty_title": "No activity yet",
+    "empty_desc": "Changes made to this record will show up here.",
+    "list_aria": "Recent activity"
+  },
   "expenses": {
     "page_title": "Expenses",
     "new_expense": "New expense",

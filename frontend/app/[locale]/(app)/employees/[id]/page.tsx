@@ -18,6 +18,7 @@ import {
 
 import { StatPill } from "@/components/patterns/stat-pill";
 import { EmptyState } from "@/components/patterns/empty-state";
+import { RecentActivity } from "@/components/patterns/recent-activity";
 import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
 import { useDetailKeyboardNav } from "@/hooks/use-detail-keyboard-nav";
 import { EMPLOYEES } from "@/lib/mock-data";
@@ -457,17 +458,13 @@ export default function EmployeeProfilePage({
                 </div>
               )}
 
-              {/* Recent activity placeholder */}
+              {/* Recent activity (CRITIC_PLAN C11) */}
               <div className="card" style={{ padding: 0 }}>
                 <div className="card-header">
                   <span className="card-title">{t("detail_recent_activity")}</span>
                 </div>
                 <div className="card-body">
-                  <EmptyState
-                    icon={Clock}
-                    title={t("detail_no_activity_title")}
-                    description={t("detail_no_activity_desc")}
-                  />
+                  <RecentActivity entity_type="employee" entity_id={id} />
                 </div>
               </div>
             </div>
