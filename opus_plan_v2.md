@@ -643,5 +643,6 @@ Append one line per completed pass. Do not delete past entries.
 - 2026-04-18: D10 stage 1 of §8.4 seed coverage: leave_types + leave_requests + leave_balances migration (20260418_1000) + 700 deterministic leave-request generator + pinned counts test (9 tests pass).
 - 2026-04-18: D10 stage 2 of §8.4: timesheet_weeks + timesheet_entries migration (20260418_1100) + 10,400 week + 39,000 entry deterministic generators + pinned count tests (19 tests pass).
 - 2026-04-18: D10 stage 3 of §8.4: expense_categories + expenses migration (20260418_1200) + 8,400 deterministic expense generator (monthly + senior-only buckets, category mix pinned) + tests (26 tests pass).
+- 2026-04-18: D10 stage 4 of §8.4: invoices + invoice_lines + invoice_payments + invoice_sequences migration (20260418_1300) + 900 invoice + 9,000 line deterministic generators + tests (37 tests pass). §8.4 seed coverage complete.
 
 End of plan.

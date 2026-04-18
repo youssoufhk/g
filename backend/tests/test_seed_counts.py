@@ -18,6 +18,12 @@ from collections import Counter
 from scripts.seed_demo_tenant import (
     EXPENSE_CATEGORY_CATALOGUE,
     EXPENSE_TOTAL,
+    INVOICE_LINES_PER_INVOICE,
+    INVOICE_LINES_TOTAL,
+    INVOICE_STATUS_MIX,
+    INVOICE_TOTAL,
+    INVOICES_PER_MONTH,
+    INVOICES_PER_YEAR,
     LEAVE_STATUS_MIX,
     LEAVE_TOTAL,
     LEAVE_TYPE_CATALOGUE,
@@ -26,6 +32,8 @@ from scripts.seed_demo_tenant import (
     TIMESHEET_WEEKS_PER_EMPLOYEE,
     TIMESHEET_YEAR,
     generate_expense_rows,
+    generate_invoice_line_rows,
+    generate_invoice_rows,
     generate_leave_rows,
     generate_timesheet_entry_rows,
     generate_timesheet_week_rows,
@@ -343,3 +351,100 @@ def test_generate_expense_rows_rejects_empty_or_missing_categories() -> None:
             senior_employee_ids=_senior_employee_ids(),
             category_codes=["FOOD", "TRANSPORT"],
         )
+
+
+# ---------------------------------------------------------------------------
+# Invoices (DATA_ARCHITECTURE section 12.10)
+#   - 900 invoices/year (75/month x 12)
+#   - Status mix: 50 draft + 200 sent + 600 paid + 50 overdue
+#   - Invoice lines: exactly 10 per invoice -> 9,000 lines total
+# ---------------------------------------------------------------------------
+
+
+def _client_ids(n: int = 120) -> list[int]:
+    return list(range(1, n + 1))
+
+
+def test_invoice_constants_match_canonical_spec() -> None:
+    assert INVOICE_TOTAL == 900
+    assert INVOICES_PER_YEAR == 900
+    assert INVOICES_PER_MONTH == 75
+    assert INVOICE_LINES_PER_INVOICE == 10
+    assert INVOICE_LINES_TOTAL == 9_000
+
+
+def test_invoice_status_mix_sums_to_900() -> None:
+    assert sum(count for _, count in INVOICE_STATUS_MIX) == 900
+
+
+def test_generate_invoice_rows_produces_900() -> None:
+    rows = generate_invoice_rows(client_ids=_client_ids())
+    assert len(rows) == 900
+
+
+def test_generate_invoice_rows_is_deterministic() -> None:
+    first = generate_invoice_rows(client_ids=_client_ids())
+    second = generate_invoice_rows(client_ids=_client_ids())
+    assert first == second
+
+
+def test_generate_invoice_rows_status_counts_match_spec() -> None:
+    rows = generate_invoice_rows(client_ids=_client_ids())
+    by_status = Counter(str(r["status"]) for r in rows)
+    assert by_status["draft"] == 50
+    assert by_status["sent"] == 200
+    assert by_status["paid"] == 600
+    assert by_status["overdue"] == 50
+
+
+def test_generate_invoice_rows_total_matches_subtotal_plus_tax() -> None:
+    rows = generate_invoice_rows(client_ids=_client_ids())
+    for r in rows:
+        subtotal = int(r["subtotal_cents"])  # type: ignore[arg-type]
+        tax = int(r["tax_total_cents"])  # type: ignore[arg-type]
+        total = int(r["total_cents"])  # type: ignore[arg-type]
+        assert total == subtotal + tax
+
+
+def test_generate_invoice_rows_numbers_are_unique() -> None:
+    rows = generate_invoice_rows(client_ids=_client_ids())
+    numbers = [str(r["number"]) for r in rows]
+    assert len(numbers) == len(set(numbers))
+
+
+def test_generate_invoice_rows_issue_dates_in_canonical_year() -> None:
+    rows = generate_invoice_rows(client_ids=_client_ids())
+    years = {r["issue_date"].year for r in rows}  # type: ignore[union-attr]
+    assert years == {2026}
+
+
+def test_generate_invoice_line_rows_produces_9000() -> None:
+    invoices = generate_invoice_rows(client_ids=_client_ids())
+    lines = generate_invoice_line_rows(
+        invoice_rows=invoices, project_ids=_project_ids()
+    )
+    assert len(lines) == 9_000
+
+
+def test_generate_invoice_line_rows_exactly_10_per_invoice() -> None:
+    invoices = generate_invoice_rows(client_ids=_client_ids())
+    lines = generate_invoice_line_rows(
+        invoice_rows=invoices, project_ids=_project_ids()
+    )
+    by_seq = Counter(int(line["invoice_sequence"]) for line in lines)  # type: ignore[arg-type]
+    assert len(by_seq) == 900
+    assert all(v == 10 for v in by_seq.values())
+
+
+def test_generate_invoice_rows_rejects_empty_inputs() -> None:
+    import pytest
+
+    with pytest.raises(ValueError):
+        generate_invoice_rows(client_ids=[])
+    with pytest.raises(ValueError):
+        generate_invoice_line_rows(
+            invoice_rows=[], project_ids=_project_ids()
+        )
+    invoices = generate_invoice_rows(client_ids=_client_ids())
+    with pytest.raises(ValueError):
+        generate_invoice_line_rows(invoice_rows=invoices, project_ids=[])

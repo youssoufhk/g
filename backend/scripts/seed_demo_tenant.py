@@ -880,6 +880,219 @@ async def seed_expenses(
 
 
 # ---------------------------------------------------------------------------
+# Invoices (Phase 5a, stage 4)
+# ---------------------------------------------------------------------------
+
+# Canonical volume per DATA_ARCHITECTURE.md section 12.10:
+#   - 900 invoices/year = 75/month * 12 months
+#   - Status mix: 50 draft + 200 sent + 600 paid + 50 overdue = 900
+#   - Each invoice has ~10 line items (pinned as exactly 10 for
+#     determinism; real generation will vary once the invoice
+#     algorithm in section 4.4.1 ships).
+INVOICE_YEAR = 2026
+INVOICES_PER_MONTH = 75
+INVOICES_PER_YEAR = INVOICES_PER_MONTH * 12  # 900
+INVOICE_LINES_PER_INVOICE = 10
+INVOICE_TOTAL = INVOICES_PER_YEAR
+INVOICE_LINES_TOTAL = INVOICE_TOTAL * INVOICE_LINES_PER_INVOICE  # 9,000
+
+INVOICE_STATUS_MIX: tuple[tuple[str, int], ...] = (
+    ("draft", 50),
+    ("sent", 200),
+    ("paid", 600),
+    ("overdue", 50),
+)
+
+
+def generate_invoice_rows(
+    client_ids: list[int],
+    *,
+    year: int = INVOICE_YEAR,
+    seed: int = 53,
+) -> list[dict[str, object]]:
+    """Emit exactly 900 invoices spread across the 12 months.
+
+    Pure. Uses (client_id, sequence) tuples to guarantee uniqueness
+    without needing the DB sequence table. The status mix is assigned
+    by position so the test can pin totals without running the RNG.
+    """
+    if not client_ids:
+        raise ValueError("client_ids must not be empty")
+
+    rng = random.Random(seed)
+    clients = sorted(client_ids)
+    rows: list[dict[str, object]] = []
+    status_plan = [s for s, count in INVOICE_STATUS_MIX for _ in range(count)]
+    if len(status_plan) != INVOICE_TOTAL:
+        raise AssertionError(
+            f"status mix sum ({len(status_plan)}) must equal {INVOICE_TOTAL}"
+        )
+
+    sequence = 0
+    for month in range(1, 13):
+        for _ in range(INVOICES_PER_MONTH):
+            sequence += 1
+            client_id = rng.choice(clients)
+            issue_day = min(28, 1 + rng.randint(0, 27))
+            issue = date(year, month, issue_day)
+            due = issue + timedelta(days=30)
+            status = status_plan[sequence - 1]
+            subtotal = 10_000_00 + rng.randint(0, 50_000_00)  # cents
+            tax_total = subtotal * 20 // 100  # flat 20% to keep totals CHECK-clean
+            rows.append(
+                {
+                    "client_id": client_id,
+                    "number": f"GAMMA-{year}-{sequence:04d}",
+                    "issue_date": issue,
+                    "due_date": due,
+                    "status": status,
+                    "currency": "EUR",
+                    "subtotal_cents": subtotal,
+                    "tax_total_cents": tax_total,
+                    "total_cents": subtotal + tax_total,
+                    "sequence": sequence,
+                }
+            )
+    return rows
+
+
+def generate_invoice_line_rows(
+    invoice_rows: list[dict[str, object]],
+    project_ids: list[int],
+    *,
+    seed: int = 59,
+) -> list[dict[str, object]]:
+    """Emit exactly 10 lines per invoice against a rotating project set."""
+    if not invoice_rows:
+        raise ValueError("invoice_rows must not be empty")
+    if not project_ids:
+        raise ValueError("project_ids must not be empty")
+
+    rng = random.Random(seed)
+    projs = sorted(project_ids)
+    lines: list[dict[str, object]] = []
+
+    for inv in invoice_rows:
+        # Split the subtotal across 10 lines deterministically (integer cents).
+        total_cents = int(inv["subtotal_cents"])  # type: ignore[arg-type]
+        per_line = total_cents // INVOICE_LINES_PER_INVOICE
+        remainder = total_cents - per_line * INVOICE_LINES_PER_INVOICE
+        picked = [projs[i % len(projs)] for i in range(INVOICE_LINES_PER_INVOICE)]
+        rng.shuffle(picked)
+        for idx in range(INVOICE_LINES_PER_INVOICE):
+            amount = per_line + (remainder if idx == 0 else 0)
+            lines.append(
+                {
+                    "invoice_sequence": int(inv["sequence"]),  # type: ignore[arg-type]
+                    "description": f"Consulting services - line {idx + 1}",
+                    "quantity": "1.0000",
+                    "unit": "day",
+                    "unit_price_cents": amount,
+                    "amount_cents": amount,
+                    "tax_rate": "0.2000",
+                    "tax_amount_cents": amount * 20 // 100,
+                    "project_id": picked[idx],
+                }
+            )
+    return lines
+
+
+async def seed_invoices(
+    conn,
+    tenant_id: int,
+    client_map: dict[int, int],
+    project_map: dict[int, int],
+    *,
+    year: int = INVOICE_YEAR,
+) -> tuple[int, int]:
+    """Insert 900 invoices + 9,000 lines. Returns (invoices, lines)."""
+    if not client_map or not project_map:
+        return (0, 0)
+
+    invoices = generate_invoice_rows(
+        client_ids=sorted(client_map.values()), year=year
+    )
+    lines = generate_invoice_line_rows(
+        invoice_rows=invoices, project_ids=sorted(project_map.values())
+    )
+
+    # Bootstrap the sequence counter so the real invoice-generation flow
+    # picks up from 901 the first time it runs against this tenant.
+    await conn.execute(
+        """
+        INSERT INTO public.invoice_sequences (tenant_id, year, next_value)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (tenant_id, year)
+          DO UPDATE SET next_value = EXCLUDED.next_value
+        """,
+        tenant_id,
+        year,
+        INVOICES_PER_YEAR + 1,
+    )
+
+    inv_db_ids: dict[int, int] = {}
+    inv_inserted = 0
+    for inv in invoices:
+        db_id = await conn.fetchval(
+            """
+            INSERT INTO public.invoices (
+                tenant_id, client_id, number, issue_date, due_date,
+                status, currency, subtotal_cents, tax_total_cents,
+                total_cents, pdf_status, version
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending', 0)
+            ON CONFLICT (tenant_id, number) DO NOTHING
+            RETURNING id
+            """,
+            tenant_id,
+            inv["client_id"],
+            inv["number"],
+            inv["issue_date"],
+            inv["due_date"],
+            inv["status"],
+            inv["currency"],
+            inv["subtotal_cents"],
+            inv["tax_total_cents"],
+            inv["total_cents"],
+        )
+        if db_id is None:
+            db_id = await conn.fetchval(
+                "SELECT id FROM public.invoices WHERE tenant_id=$1 AND number=$2",
+                tenant_id,
+                inv["number"],
+            )
+        inv_db_ids[int(inv["sequence"])] = db_id  # type: ignore[arg-type]
+        inv_inserted += 1
+
+    line_inserted = 0
+    for line in lines:
+        invoice_db_id = inv_db_ids.get(int(line["invoice_sequence"]))  # type: ignore[arg-type]
+        if invoice_db_id is None:
+            continue
+        await conn.execute(
+            """
+            INSERT INTO public.invoice_lines (
+                tenant_id, invoice_id, description, quantity, unit,
+                unit_price_cents, amount_cents, tax_rate, tax_amount_cents,
+                project_id, version
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 0)
+            """,
+            tenant_id,
+            invoice_db_id,
+            line["description"],
+            line["quantity"],
+            line["unit"],
+            line["unit_price_cents"],
+            line["amount_cents"],
+            line["tax_rate"],
+            line["tax_amount_cents"],
+            line["project_id"],
+        )
+        line_inserted += 1
+
+    return (inv_inserted, line_inserted)
+
+
+# ---------------------------------------------------------------------------
 # Parse helpers
 # ---------------------------------------------------------------------------
 
@@ -1005,12 +1218,22 @@ async def main(tenant_schema: str) -> None:
         )
         print(f"[seed]   {exp_count} expenses inserted")
 
+        print("[seed] Seeding invoices (900) + lines (9,000)...")
+        inv_count, line_count = await seed_invoices(
+            conn, tenant_id, cli_map, proj_map
+        )
+        print(
+            f"[seed]   {inv_count} invoices + {line_count} lines inserted"
+        )
+
     finally:
         await conn.close()
 
     print("[seed] Done.")
     print(
-        "[seed] Invoices seed in later Phase 5a stages."
+        "[seed] All §8.4 seed stages complete. 201 employees + 120 clients + "
+        "260 projects + 700 leaves + 10,400 ts weeks + 39,000 ts entries + "
+        "8,400 expenses + 900 invoices (+ 9,000 lines)."
     )
 
 
