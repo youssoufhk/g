@@ -24,6 +24,12 @@ Skipped:
     frontend/tests/**         -- test data / Playwright color assertions
     frontend/node_modules/**  -- vendor code
     frontend/scripts/**       -- build / dev scripts
+    frontend/features/*/mock-*.ts{,x} -- synthetic fixture data. In
+                                 production these per-entity brand
+                                 swatches come from the DB (tenant /
+                                 project brand fields), not from theme
+                                 tokens. Token discipline applies to UI
+                                 chrome, not to content.
 
 Allowed tokens: all var(--color-*), var(--glass-*), var(--overlay-*)
 plus the three explicit token aliases ``--color-white``,
@@ -81,10 +87,16 @@ SKIP_PREFIXES = (
     "frontend/app/[locale]/(app)/design-system/",  # design atoms preview
 )
 
+# Synthetic fixture modules. Real values flow from the DB in production,
+# so token discipline (which governs UI chrome) does not bind here.
+MOCK_FIXTURE = re.compile(r"(?:^|/)frontend/features/[^/]+/mock-[^/]+\.(?:ts|tsx|js|jsx)$")
+
 
 def _should_skip(path: str) -> bool:
     normalised = path.replace("\\", "/")
-    return any(normalised.startswith(p) or f"/{p}" in normalised for p in SKIP_PREFIXES)
+    if any(normalised.startswith(p) or f"/{p}" in normalised for p in SKIP_PREFIXES):
+        return True
+    return bool(MOCK_FIXTURE.search(normalised))
 
 
 def scan(path: str) -> list[str]:
