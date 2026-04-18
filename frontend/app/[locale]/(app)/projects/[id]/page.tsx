@@ -1,8 +1,22 @@
 "use client";
 
-import { use, useState, useRef } from "react";
+import { use, useMemo, useState, useRef } from "react";
 import Link from "next/link";
-import { FolderOpen, CheckCircle, Circle, Plus, Check, Pencil, MoreHorizontal, FileText, UserPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { PROJECTS } from "@/lib/mock-data";
+import {
+  FolderOpen,
+  CheckCircle,
+  Circle,
+  Plus,
+  Check,
+  Pencil,
+  MoreHorizontal,
+  FileText,
+  UserPlus,
+  CalendarDays,
+} from "lucide-react";
 
 import { EmptyState } from "@/components/patterns/empty-state";
 import { StatPill } from "@/components/patterns/stat-pill";
@@ -16,13 +30,10 @@ import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
 import { useProject } from "@/features/projects/use-projects";
-import type { ProjectPhase } from "@/features/projects/types";
+import type { ProjectPhase, ProjectStatus } from "@/features/projects/types";
+import { formatCurrency, formatDate } from "@/lib/format";
 
 // ── helpers ────────────────────────────────────────────────────────────────
-
-function formatEur(n: number): string {
-  return "€ " + n.toLocaleString("en-GB");
-}
 
 function budgetPct(amount: number, consumed: number): number {
   if (amount === 0) return 0;
@@ -49,7 +60,9 @@ function daysAccent(days: number): StatAccent {
   return "accent";
 }
 
-const PHASE_TONE: Record<ProjectPhase, string> = {
+type BadgeTone = "default" | "primary" | "success" | "warning" | "error" | "info" | "accent" | "gold" | "ghost" | "ghost-primary" | "neutral";
+
+const PHASE_TONE: Record<ProjectPhase, BadgeTone> = {
   discovery: "default",
   proposal: "info",
   delivery: "primary",
@@ -59,14 +72,11 @@ const PHASE_TONE: Record<ProjectPhase, string> = {
   on_hold: "ghost",
 };
 
-const PHASE_LABEL: Record<ProjectPhase, string> = {
-  discovery: "Discovery",
-  proposal: "Proposal",
-  delivery: "Delivery",
-  review: "Review",
-  complete: "Complete",
-  at_risk: "At Risk",
-  on_hold: "On Hold",
+const STATUS_TONE: Record<ProjectStatus, BadgeTone> = {
+  active: "success",
+  complete: "default",
+  on_hold: "warning",
+  cancelled: "error",
 };
 
 // ── page ───────────────────────────────────────────────────────────────────
@@ -77,7 +87,18 @@ export default function ProjectDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const t = useTranslations("projects");
   const { data: project, isLoading, error } = useProject(id);
+  const siblings = useMemo(() => {
+    const idx = PROJECTS.findIndex((p) => p.id === id);
+    if (idx === -1) return { idx: -1, total: PROJECTS.length, prev: null, next: null };
+    return {
+      idx,
+      total: PROJECTS.length,
+      prev: idx > 0 ? PROJECTS[idx - 1]?.id ?? null : null,
+      next: idx < PROJECTS.length - 1 ? PROJECTS[idx + 1]?.id ?? null : null,
+    };
+  }, [id]);
 
   const [completedOverrides, setCompletedOverrides] = useState<Record<number, boolean>>({});
   const [localMilestones, setLocalMilestones] = useState<Array<{ name: string; date: string; complete: boolean }>>([]);
@@ -106,62 +127,79 @@ export default function ProjectDetailPage({
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--space-4)",
-        }}
-      >
-        <Skeleton variant="title" style={{ height: 32, width: "40%" }} />
-        <Skeleton variant="card" style={{ height: 160 }} />
-        <div
-          style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "var(--space-4)" }}
-        >
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} variant="card" style={{ height: 80 }} />
-          ))}
+      <>
+        <div className="app-aura" aria-hidden="true">
+          <div className="app-aura-accent" />
         </div>
-      </div>
+        <div
+          aria-busy="true"
+          aria-live="polite"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-4)",
+          }}
+        >
+          <div aria-hidden="true" style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+            <Skeleton variant="title" style={{ height: 32, width: "40%" }} />
+            <Skeleton variant="card" style={{ height: 160 }} />
+            <div
+              style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "var(--space-4)" }}
+            >
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} variant="card" style={{ height: 80 }} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
   if (error || !project) {
     return (
-      <EmptyState
-        icon={FolderOpen}
-        title="Project not found"
-        description="This project does not exist or you do not have access."
-        action={
-          <Link href="/projects">
-            <Button variant="primary" size="sm">
-              Back to projects
-            </Button>
-          </Link>
-        }
-      />
+      <>
+        <div className="app-aura" aria-hidden="true">
+          <div className="app-aura-accent" />
+        </div>
+        <EmptyState
+          icon={FolderOpen}
+          title={t("detail_not_found_title")}
+          description={t("detail_not_found_desc")}
+          action={
+            <Link href="/projects">
+              <Button variant="primary" size="sm">
+                {t("detail_back")}
+              </Button>
+            </Link>
+          }
+        />
+      </>
     );
   }
 
   const pct = budgetPct(project.budget_eur, project.budget_consumed_eur);
   const tone = budgetTone(pct);
   const days = project.end_date ? daysRemaining(project.end_date) : null;
+  const numStyle = { fontVariantNumeric: "tabular-nums" as const };
 
   return (
     <>
-      {/* Breadcrumb */}
-      <nav
-        className="breadcrumb"
-        style={{ marginBottom: "var(--space-4)" }}
-      >
-        <Link href="/projects" style={{ color: "var(--color-text-2)" }}>
-          Projects
-        </Link>
-        <span style={{ color: "var(--color-text-2)", margin: "0 var(--space-2)" }}>
-          /
-        </span>
-        <span style={{ color: "var(--color-text-1)" }}>{project.name}</span>
-      </nav>
+      <div className="app-aura" aria-hidden="true">
+        <div className="app-aura-accent" />
+      </div>
+      <DetailHeaderBar
+        backHref="/projects"
+        backLabel={t("detail_back")}
+        title={project.name}
+        prevHref={siblings.prev ? `/projects/${siblings.prev}` : null}
+        nextHref={siblings.next ? `/projects/${siblings.next}` : null}
+        prevLabel={t("detail_prev")}
+        nextLabel={t("detail_next")}
+        position={siblings.idx >= 0 ? siblings.idx + 1 : null}
+        total={siblings.total}
+        positionLabel={(p, total) => t("detail_position", { position: p, total })}
+      />
 
       {/* Hero card */}
       <div
@@ -193,7 +231,7 @@ export default function ProjectDetailPage({
               >
                 -
               </span>
-              <span>Managed by </span>
+              <span>{t("detail_managed_by")} </span>
               <Link
                 href={`/employees/${project.manager_id}`}
                 style={{ color: "var(--color-primary)" }}
@@ -202,56 +240,19 @@ export default function ProjectDetailPage({
               </Link>
             </div>
             <div className="project-detail-badges">
-              <Badge
-                tone={
-                  PHASE_TONE[project.phase] as Parameters<typeof Badge>[0]["tone"]
-                }
-              >
-                {PHASE_LABEL[project.phase]}
+              <Badge tone={PHASE_TONE[project.phase]}>
+                {t(`phase_full_${project.phase}`)}
               </Badge>
-              <Badge
-                tone={
-                  project.status === "active"
-                    ? "success"
-                    : project.status === "on_hold"
-                      ? "warning"
-                      : project.status === "cancelled"
-                        ? "error"
-                        : "default"
-                }
-              >
-                {project.status.charAt(0).toUpperCase() +
-                  project.status.slice(1).replace("_", " ")}
+              <Badge tone={STATUS_TONE[project.status]}>
+                {t(`status_full_${project.status}`)}
               </Badge>
               <div className="separator" />
               <div className="detail-badge">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <span>
-                  {new Date(project.start_date).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                <CalendarDays size={14} aria-hidden="true" />
+                <span style={numStyle}>
+                  {formatDate(project.start_date)}
                   {" - "}
-                  {project.end_date
-                    ? new Date(project.end_date).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "Ongoing"}
+                  {project.end_date ? formatDate(project.end_date) : t("detail_ongoing")}
                 </span>
               </div>
             </div>
@@ -259,20 +260,20 @@ export default function ProjectDetailPage({
 
           <div style={{ display: "flex", gap: "var(--space-2)" }}>
             <Button variant="secondary" size="sm" leadingIcon={<Pencil size={14} />} onClick={openEditModal}>
-              Edit
+              {t("detail_edit")}
             </Button>
             <Dropdown
               align="right"
               trigger={({ toggle, open }) => (
-                <Button variant="ghost" size="sm" iconOnly aria-label="More actions" aria-expanded={open} onClick={toggle}>
+                <Button variant="ghost" size="sm" iconOnly aria-label={t("detail_more_actions")} aria-expanded={open} onClick={toggle}>
                   <MoreHorizontal size={16} />
                 </Button>
               )}
             >
-              <DropdownItem icon={<UserPlus size={14} />}>Add team member</DropdownItem>
+              <DropdownItem icon={<UserPlus size={14} />}>{t("detail_add_team_member")}</DropdownItem>
               <DropdownDivider />
               <DropdownItem icon={<FileText size={14} />} onClick={handleExport}>
-                {exportLoading ? "Exporting..." : "Export project"}
+                {exportLoading ? t("detail_exporting") : t("detail_export")}
               </DropdownItem>
             </Dropdown>
           </div>
@@ -282,48 +283,62 @@ export default function ProjectDetailPage({
       {/* KPI strip */}
       <div className="kpi-grid">
         <StatPill
-          label="Total budget"
-          value={formatEur(project.budget_eur)}
+          label={t("detail_kpi_total_budget")}
+          value={formatCurrency(project.budget_eur, "EUR", { fractionDigits: 0 })}
           accent="gold"
         />
         <StatPill
-          label="Budget consumed"
+          label={t("detail_kpi_budget_consumed")}
           value={`${pct}%`}
-          secondary={formatEur(project.budget_consumed_eur)}
+          secondary={formatCurrency(project.budget_consumed_eur, "EUR", { fractionDigits: 0 })}
           accent={tone === "error" ? "error" : tone === "warning" ? "warning" : "primary"}
         />
         <StatPill
-          label="Team size"
+          label={t("detail_kpi_team_size")}
           value={project.team_size}
-          secondary={project.team_size === 1 ? "person" : "people"}
+          secondary={project.team_size === 1 ? t("detail_people_one") : t("detail_people_other")}
           accent="info"
         />
         <StatPill
-          label="Days remaining"
-          value={days === null ? "-" : days < 0 ? "Overdue" : days}
+          label={t("detail_kpi_days_remaining")}
+          value={
+            days === null
+              ? "-"
+              : days < 0
+                ? t("detail_overdue")
+                : days
+          }
           secondary={
-            days !== null && days >= 0
-              ? project.end_date
-                ? new Date(project.end_date).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                  })
-                : undefined
+            days !== null && days >= 0 && project.end_date
+              ? formatDate(project.end_date, "short")
               : undefined
           }
           accent={days === null ? "primary" : daysAccent(days)}
         />
       </div>
 
+      {/* Budget progress */}
+      <div className="card" style={{ padding: "var(--space-4)", marginTop: "var(--space-4)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "var(--space-2)" }}>
+          <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-2)" }}>
+            {t("detail_budget_progress")}
+          </span>
+          <span style={{ ...numStyle, fontSize: "var(--text-body-sm)", color: "var(--color-text-2)" }}>
+            {pct}%
+          </span>
+        </div>
+        <ProgressBar value={pct} tone={tone} />
+      </div>
+
       {/* Tabs */}
       <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="overview">{t("detail_tab_overview")}</TabsTrigger>
           <TabsTrigger value="team" count={project.team_size}>
-            Team
+            {t("detail_tab_team")}
           </TabsTrigger>
-          <TabsTrigger value="budget">Budget</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="budget">{t("detail_tab_budget")}</TabsTrigger>
+          <TabsTrigger value="timeline">{t("detail_tab_timeline")}</TabsTrigger>
         </TabsList>
 
         {/* Overview tab */}
@@ -339,7 +354,7 @@ export default function ProjectDetailPage({
             {/* Left: milestones */}
             <div className="card" style={{ padding: 0 }}>
               <div className="card-header">
-                <span className="card-title">Milestones</span>
+                <span className="card-title">{t("detail_milestones")}</span>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -349,7 +364,7 @@ export default function ProjectDetailPage({
                   }}
                 >
                   <Plus size={14} />
-                  Add
+                  {t("detail_add")}
                 </Button>
               </div>
               <div className="card-body" style={{ paddingTop: 0 }}>
@@ -362,7 +377,7 @@ export default function ProjectDetailPage({
                           <div
                             className={`milestone-icon ${isComplete ? "complete" : "upcoming"}`}
                             style={{ cursor: "pointer" }}
-                            title="Click to toggle complete"
+                            title={t("detail_milestone_toggle")}
                             onClick={() =>
                               setCompletedOverrides((prev) => ({
                                 ...prev,
@@ -378,12 +393,8 @@ export default function ProjectDetailPage({
                           </div>
                           <div className="milestone-content">
                             <div className="milestone-name">{m.name}</div>
-                            <div className="milestone-dates">
-                              {new Date(m.date).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
+                            <div className="milestone-dates" style={numStyle}>
+                              {formatDate(m.date)}
                             </div>
                           </div>
                         </div>
@@ -402,7 +413,7 @@ export default function ProjectDetailPage({
                           ref={addInputRef}
                           type="text"
                           className="form-input"
-                          placeholder="Add milestone name..."
+                          placeholder={t("detail_milestone_placeholder")}
                           value={newMilestoneName}
                           onChange={(e) => setNewMilestoneName(e.target.value)}
                           onKeyDown={(e) => {
@@ -427,6 +438,7 @@ export default function ProjectDetailPage({
                         <Button
                           variant="primary"
                           size="sm"
+                          aria-label={t("detail_add")}
                           onClick={() => {
                             if (newMilestoneName.trim()) {
                               setLocalMilestones((prev) => [
@@ -459,7 +471,7 @@ export default function ProjectDetailPage({
                       ref={addInputRef}
                       type="text"
                       className="form-input"
-                      placeholder="Add milestone name..."
+                      placeholder={t("detail_milestone_placeholder")}
                       value={newMilestoneName}
                       onChange={(e) => setNewMilestoneName(e.target.value)}
                       onKeyDown={(e) => {
@@ -484,6 +496,7 @@ export default function ProjectDetailPage({
                     <Button
                       variant="primary"
                       size="sm"
+                      aria-label={t("detail_add")}
                       onClick={() => {
                         if (newMilestoneName.trim()) {
                           setLocalMilestones((prev) => [
@@ -503,7 +516,7 @@ export default function ProjectDetailPage({
                     </Button>
                   </div>
                 ) : (
-                  <EmptyState title="No milestones" description="Milestones will appear here once added." />
+                  <EmptyState title={t("detail_milestones_empty_title")} description={t("detail_milestones_empty_desc")} />
                 )}
               </div>
             </div>
@@ -511,7 +524,7 @@ export default function ProjectDetailPage({
             {/* Right: team */}
             <div className="card" style={{ padding: 0 }}>
               <div className="card-header">
-                <span className="card-title">Team</span>
+                <span className="card-title">{t("detail_tab_team")}</span>
                 <Badge tone="default">{project.team_size}</Badge>
               </div>
               <div className="card-body" style={{ paddingTop: 0 }}>
@@ -551,8 +564,8 @@ export default function ProjectDetailPage({
                   </div>
                 ) : (
                   <EmptyState
-                    title="No team assigned"
-                    description="Team members will appear here once added."
+                    title={t("detail_team_empty_title")}
+                    description={t("detail_team_empty_desc")}
                   />
                 )}
               </div>
@@ -564,8 +577,8 @@ export default function ProjectDetailPage({
         <TabsContent value="team">
           <div className="detail-tabs-content">
             <EmptyState
-              title="Full team view"
-              description="Team capacity and contribution data will appear here."
+              title={t("detail_team_full_title")}
+              description={t("detail_team_full_desc")}
             />
           </div>
         </TabsContent>
@@ -574,8 +587,8 @@ export default function ProjectDetailPage({
         <TabsContent value="budget">
           <div className="detail-tabs-content">
             <EmptyState
-              title="Budget breakdown"
-              description="Detailed budget tracking by category will appear here."
+              title={t("detail_budget_title")}
+              description={t("detail_budget_desc")}
             />
           </div>
         </TabsContent>
@@ -584,8 +597,8 @@ export default function ProjectDetailPage({
         <TabsContent value="timeline">
           <div className="detail-tabs-content">
             <EmptyState
-              title="Project timeline"
-              description="Interactive Gantt timeline view will appear here."
+              title={t("detail_timeline_title")}
+              description={t("detail_timeline_desc")}
             />
           </div>
         </TabsContent>
@@ -594,19 +607,19 @@ export default function ProjectDetailPage({
       <Modal
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit project"
+        title={t("detail_edit_project")}
         footer={
           <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>{t("detail_cancel")}</Button>
             <Button variant="primary" size="sm" onClick={handleEditSave} disabled={editSaving}>
-              {editSaving ? "Saving..." : "Save changes"}
+              {editSaving ? t("detail_saving") : t("detail_save_changes")}
             </Button>
           </div>
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <div>
-            <label className="form-label" htmlFor="edit-project-name">Project name</label>
+            <label className="form-label" htmlFor="edit-project-name">{t("detail_project_name")}</label>
             <Input
               id="edit-project-name"
               value={editProjectName}

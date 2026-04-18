@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Plus, X, CalendarX } from "lucide-react";
 import { PageHeader } from "@/components/patterns/page-header";
+import { EmptyState } from "@/components/patterns/empty-state";
+import { MultiSelectPill } from "@/components/patterns/multi-select-pill";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 
@@ -10,10 +13,13 @@ import { Modal } from "@/components/ui/modal";
 // Types
 // ---------------------------------------------------------------------------
 
+type EventTypeKey = "leave" | "leave-pending" | "milestone" | "holiday";
+type FilterTypeKey = "leave" | "milestone" | "holiday";
+
 type CalendarEvent = {
   id: string;
   label: string;
-  type: "leave" | "leave-pending" | "milestone" | "holiday";
+  type: EventTypeKey;
 };
 
 type CalendarDay = {
@@ -26,10 +32,10 @@ type CalendarDay = {
 // Static event data for April 2026
 // ---------------------------------------------------------------------------
 
-const LEAVE_EVENTS: Array<{ start: number; end: number; label: string; type: CalendarEvent["type"] }> = [
-  { start: 10, end: 11, label: "Lucas Ferreira - On leave", type: "leave" },
-  { start: 14, end: 14, label: "Omar Hassan - On leave", type: "leave" },
-  { start: 21, end: 25, label: "Amara Diallo - Pending leave", type: "leave-pending" },
+const LEAVE_EVENTS: Array<{ start: number; end: number; label: string; type: EventTypeKey }> = [
+  { start: 10, end: 11, label: "Lucas Ferreira", type: "leave" },
+  { start: 14, end: 14, label: "Omar Hassan", type: "leave" },
+  { start: 21, end: 25, label: "Amara Diallo", type: "leave-pending" },
 ];
 
 const MILESTONE_EVENTS: Array<{ day: number; label: string }> = [
@@ -40,14 +46,13 @@ const MILESTONE_EVENTS: Array<{ day: number; label: string }> = [
 ];
 
 const HOLIDAY_EVENTS: Array<{ month: number; day: number; label: string }> = [
-  { month: 3, day: 6, label: "Easter Monday" },  // April = month index 3
-  { month: 4, day: 1, label: "Labour Day" },     // May = month index 4
+  { month: 3, day: 6, label: "Easter Monday" },
+  { month: 4, day: 1, label: "Labour Day" },
 ];
 
 function buildEventsMap(year: number, month: number): Record<number, CalendarEvent[]> {
   const map: Record<number, CalendarEvent[]> = {};
 
-  // Holidays for this month
   for (const h of HOLIDAY_EVENTS) {
     if (h.month === month) {
       if (!map[h.day]) map[h.day] = [];
@@ -59,7 +64,6 @@ function buildEventsMap(year: number, month: number): Record<number, CalendarEve
     }
   }
 
-  // Leave and milestone events only for April 2026
   if (month === 3 && year === 2026) {
     for (const ev of LEAVE_EVENTS) {
       for (let d = ev.start; d <= ev.end; d++) {
@@ -81,35 +85,38 @@ function buildEventsMap(year: number, month: number): Record<number, CalendarEve
 // Month grid builder
 // ---------------------------------------------------------------------------
 
-function buildMonthGrid(year: number, month: number): CalendarDay[][] {
+function buildMonthGrid(
+  year: number,
+  month: number,
+  activeTypes: Set<FilterTypeKey>,
+): CalendarDay[][] {
   const eventsMap = buildEventsMap(year, month);
-  const firstDow = new Date(year, month, 1).getDay(); // 0 = Sun
+  const firstDow = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
 
   const cells: CalendarDay[] = [];
 
-  // Trailing days from previous month
   for (let i = firstDow - 1; i >= 0; i--) {
     cells.push({ date: daysInPrevMonth - i, month: "prev", events: [] });
   }
 
-  // Current month days
   for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({
-      date: d,
-      month: "current",
-      events: eventsMap[d] ?? [],
+    const raw = eventsMap[d] ?? [];
+    const filtered = raw.filter((ev) => {
+      if (ev.type === "leave" || ev.type === "leave-pending") return activeTypes.has("leave");
+      if (ev.type === "milestone") return activeTypes.has("milestone");
+      if (ev.type === "holiday") return activeTypes.has("holiday");
+      return true;
     });
+    cells.push({ date: d, month: "current", events: filtered });
   }
 
-  // Leading days from next month to fill last row
   let tail = 1;
   while (cells.length % 7 !== 0) {
     cells.push({ date: tail++, month: "next", events: [] });
   }
 
-  // Split into rows of 7
   const rows: CalendarDay[][] = [];
   for (let i = 0; i < cells.length; i += 7) {
     rows.push(cells.slice(i, i + 7));
@@ -148,16 +155,8 @@ function resolvedEventStyle(ev: CalendarEvent): React.CSSProperties {
 }
 
 // ---------------------------------------------------------------------------
-// Month / day label helpers
+// YM helpers
 // ---------------------------------------------------------------------------
-
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const DAY_NAMES_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 function parseYearMonth(ym: string): { year: number; month: number } {
   const [y, m] = ym.split("-").map(Number);
@@ -172,27 +171,11 @@ function addMonths(ym: string, delta: number): string {
   return `${y}-${mo}`;
 }
 
-function formatDayHeading(year: number, month: number, date: number): string {
-  const dow = new Date(year, month, date).getDay();
-  return `${DAY_NAMES_FULL[dow]}, ${date} ${MONTH_NAMES[month]} ${year}`;
-}
-
 function formatDateValue(year: number, month: number, date: number): string {
   const mo = String(month + 1).padStart(2, "0");
   const d = String(date).padStart(2, "0");
   return `${year}-${mo}-${d}`;
 }
-
-// ---------------------------------------------------------------------------
-// Legend items
-// ---------------------------------------------------------------------------
-
-const LEGEND_ITEMS = [
-  { label: "Leave", dotBg: "var(--color-warning)" },
-  { label: "Pending leave", dotBg: "var(--color-info)" },
-  { label: "Milestone", dotBg: "var(--color-primary)" },
-  { label: "Holiday", dotBg: "var(--color-gold)" },
-];
 
 // ---------------------------------------------------------------------------
 // Add Event Modal form state
@@ -209,6 +192,10 @@ type AddEventForm = {
 // ---------------------------------------------------------------------------
 
 export default function CalendarPage() {
+  const t = useTranslations("calendar");
+  const locale = useLocale();
+  const intlLocale = locale === "fr" ? "fr-FR" : "en-GB";
+
   const [currentYM, setCurrentYM] = useState("2026-04");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [hoveredDate, setHoveredDate] = useState<number | null>(null);
@@ -216,6 +203,11 @@ export default function CalendarPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [addForm, setAddForm] = useState<AddEventForm>({ title: "", type: "meeting", date: "" });
+  const [activeTypeFilters, setActiveTypeFilters] = useState<FilterTypeKey[]>([
+    "leave",
+    "milestone",
+    "holiday",
+  ]);
 
   const today = new Date();
   const todayYear = today.getFullYear();
@@ -223,15 +215,47 @@ export default function CalendarPage() {
   const todayDate = today.getDate();
 
   const { year, month } = parseYearMonth(currentYM);
-  const rows = buildMonthGrid(year, month);
-  const monthLabel = `${MONTH_NAMES[month]} ${year}`;
+
+  // Localized month + day labels from Intl (no hardcoded English arrays).
+  const monthLongLabel = useMemo(
+    () => new Date(year, month, 1).toLocaleDateString(intlLocale, { month: "long", year: "numeric" }),
+    [year, month, intlLocale],
+  );
+
+  const dayNamesShort = useMemo(() => {
+    // Build Sun..Sat short names using any known Sunday as a reference.
+    const base = new Date(2024, 0, 7); // 2024-01-07 is a Sunday
+    const out: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+      out.push(d.toLocaleDateString(intlLocale, { weekday: "short" }));
+    }
+    return out;
+  }, [intlLocale]);
+
+  const activeTypeSet = useMemo(() => new Set(activeTypeFilters), [activeTypeFilters]);
+  const rows = useMemo(
+    () => buildMonthGrid(year, month, activeTypeSet),
+    [year, month, activeTypeSet],
+  );
   const isCurrentMonth = year === todayYear && month === todayMonth;
 
-  // Events for selected day
+  // Totals for empty-month detection (after filters)
+  const visibleEventCount = useMemo(
+    () => rows.reduce((acc, row) => acc + row.reduce((a, c) => a + c.events.length, 0), 0),
+    [rows],
+  );
+
   const selectedDayEvents: CalendarEvent[] = (() => {
     if (selectedDate === null) return [];
     const eventsMap = buildEventsMap(year, month);
-    return eventsMap[selectedDate] ?? [];
+    const raw = eventsMap[selectedDate] ?? [];
+    return raw.filter((ev) => {
+      if (ev.type === "leave" || ev.type === "leave-pending") return activeTypeSet.has("leave");
+      if (ev.type === "milestone") return activeTypeSet.has("milestone");
+      if (ev.type === "holiday") return activeTypeSet.has("holiday");
+      return true;
+    });
   })();
 
   function handleDayClick(cell: CalendarDay) {
@@ -254,7 +278,7 @@ export default function CalendarPage() {
 
   function handleCreateEvent() {
     setShowAddModal(false);
-    showToastMessage("Event created");
+    showToastMessage(t("toast_created"));
   }
 
   function showToastMessage(msg: string) {
@@ -262,27 +286,70 @@ export default function CalendarPage() {
     setTimeout(() => setToast(null), 3000);
   }
 
+  function typeLabel(type: EventTypeKey): string {
+    switch (type) {
+      case "leave":
+        return t("type_leave");
+      case "leave-pending":
+        return t("type_leave_pending");
+      case "milestone":
+        return t("type_milestone");
+      case "holiday":
+        return t("type_holiday");
+    }
+  }
+
+  const typeFilterOptions = [
+    { value: "leave", label: t("type_leave") },
+    { value: "milestone", label: t("type_milestone") },
+    { value: "holiday", label: t("type_holiday") },
+  ];
+
+  const legendItems = [
+    { label: t("type_leave"), dotBg: "var(--color-warning)" },
+    { label: t("type_leave_pending"), dotBg: "var(--color-info)" },
+    { label: t("type_milestone"), dotBg: "var(--color-primary)" },
+    { label: t("type_holiday"), dotBg: "var(--color-gold)" },
+  ];
+
+  function formatDayHeading(y: number, m: number, d: number): string {
+    return new Date(y, m, d).toLocaleDateString(intlLocale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }
+
   return (
     <>
-      <PageHeader title="Calendar" />
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
+      </div>
 
-      {/* Top bar: month nav + view toggle + Add Event */}
+      <PageHeader title={t("page_title")} />
+
+      {/* Sticky month header: nav + today + filter chips + view toggle + Add */}
       <div
         style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          background: "var(--color-surface-0)",
           display: "flex",
           alignItems: "center",
           gap: "var(--space-3)",
+          padding: "var(--space-2) 0",
           marginBottom: "var(--space-5)",
           flexWrap: "wrap",
         }}
       >
-        {/* Month navigation */}
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
           <Button
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Previous month"
+            aria-label={t("prev_month")}
             onClick={() => {
               setCurrentYM(addMonths(currentYM, -1));
               setSelectedDate(null);
@@ -292,22 +359,24 @@ export default function CalendarPage() {
           </Button>
 
           <h2
+            aria-live="polite"
             style={{
               fontSize: "var(--text-heading-2)",
               fontWeight: "var(--weight-semibold)",
               color: "var(--color-text-1)",
-              minWidth: 160,
+              minWidth: 180,
               textAlign: "center",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
-            {monthLabel}
+            {monthLongLabel}
           </h2>
 
           <Button
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Next month"
+            aria-label={t("next_month")}
             onClick={() => {
               setCurrentYM(addMonths(currentYM, 1));
               setSelectedDate(null);
@@ -327,12 +396,21 @@ export default function CalendarPage() {
                 setSelectedDate(null);
               }}
             >
-              Today
+              {t("today")}
             </Button>
           )}
         </div>
 
-        {/* Spacer */}
+        {/* Filter chip */}
+        <MultiSelectPill
+          label={t("filter_event_type")}
+          options={typeFilterOptions}
+          selected={activeTypeFilters}
+          onChange={(next) => setActiveTypeFilters(next as FilterTypeKey[])}
+          searchPlaceholder={t("filter_search_placeholder")}
+          emptyLabel={t("filter_empty")}
+        />
+
         <div style={{ flex: 1 }} />
 
         {/* View toggle */}
@@ -361,12 +439,11 @@ export default function CalendarPage() {
                 lineHeight: "1.5",
               }}
             >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
+              {v === "month" ? t("view_month") : t("view_week")}
             </button>
           ))}
         </div>
 
-        {/* Add Event */}
         <Button
           variant="primary"
           size="sm"
@@ -376,11 +453,10 @@ export default function CalendarPage() {
           }}
         >
           <Plus size={14} />
-          Add Event
+          {t("add_event")}
         </Button>
       </div>
 
-      {/* Week view placeholder */}
       {view === "week" && (
         <div
           style={{
@@ -398,15 +474,13 @@ export default function CalendarPage() {
           }}
         >
           <CalendarX size={24} strokeWidth={1.5} />
-          <span>Week view is not available yet. Switch back to Month to see all events.</span>
+          <span>{t("week_view_unavailable")}</span>
         </div>
       )}
 
-      {/* Month view */}
       {view === "month" && (
         <>
-          {/* Calendar grid */}
-          <div style={{ overflowX: "auto" }}>
+          <div style={{ overflowX: "auto" }} aria-busy={false}>
             <div
               style={{
                 background: "var(--color-surface-0)",
@@ -416,7 +490,6 @@ export default function CalendarPage() {
                 minWidth: 420,
               }}
             >
-              {/* Day name header */}
               <div
                 style={{
                   display: "grid",
@@ -425,7 +498,7 @@ export default function CalendarPage() {
                   borderBottom: "0.5px solid var(--color-border-subtle)",
                 }}
               >
-                {DAY_NAMES_SHORT.map((name) => (
+                {dayNamesShort.map((name) => (
                   <div
                     key={name}
                     style={{
@@ -443,7 +516,6 @@ export default function CalendarPage() {
                 ))}
               </div>
 
-              {/* Week rows */}
               {rows.map((row, ri) => (
                 <div
                   key={ri}
@@ -496,10 +568,8 @@ export default function CalendarPage() {
                             ? "1.5px solid var(--color-primary)"
                             : undefined,
                           outlineOffset: "-1.5px",
-                          transition: "background 0.1s",
                         }}
                       >
-                        {/* Day number */}
                         <div
                           style={{
                             display: "flex",
@@ -517,9 +587,10 @@ export default function CalendarPage() {
                                 height: 24,
                                 borderRadius: "50%",
                                 background: "var(--color-primary)",
-                                color: "#fff",
+                                color: "var(--color-text-on-primary)",
                                 fontSize: "var(--text-caption)",
                                 fontWeight: "var(--weight-medium)",
+                                fontVariantNumeric: "tabular-nums",
                               }}
                             >
                               {cell.date}
@@ -534,6 +605,7 @@ export default function CalendarPage() {
                                     ? "var(--color-text-3)"
                                     : "var(--color-text-1)",
                                 lineHeight: "24px",
+                                fontVariantNumeric: "tabular-nums",
                               }}
                             >
                               {cell.date}
@@ -541,7 +613,6 @@ export default function CalendarPage() {
                           )}
                         </div>
 
-                        {/* Event chips */}
                         <div
                           style={{
                             display: "flex",
@@ -576,7 +647,17 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Day Detail Panel */}
+          {/* Empty-month state (applies when filters hide everything or month has no data) */}
+          {visibleEventCount === 0 && (
+            <div style={{ marginTop: "var(--space-4)" }}>
+              <EmptyState
+                icon={CalendarX}
+                title={t("empty_month_title")}
+                description={t("empty_month_desc")}
+              />
+            </div>
+          )}
+
           {selectedDate !== null && (
             <div
               style={{
@@ -587,7 +668,6 @@ export default function CalendarPage() {
                 padding: "var(--space-5)",
               }}
             >
-              {/* Panel header */}
               <div
                 style={{
                   display: "flex",
@@ -601,6 +681,7 @@ export default function CalendarPage() {
                     fontSize: "var(--text-heading-3)",
                     fontWeight: "var(--weight-semibold)",
                     color: "var(--color-text-1)",
+                    fontVariantNumeric: "tabular-nums",
                   }}
                 >
                   {formatDayHeading(year, month, selectedDate)}
@@ -608,7 +689,7 @@ export default function CalendarPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedDate(null)}
-                  aria-label="Close day detail"
+                  aria-label={t("close_day_detail")}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -621,24 +702,11 @@ export default function CalendarPage() {
                     color: "var(--color-text-3)",
                     cursor: "pointer",
                   }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "var(--color-surface-1)";
-                    (e.currentTarget as HTMLButtonElement).style.color =
-                      "var(--color-text-1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "transparent";
-                    (e.currentTarget as HTMLButtonElement).style.color =
-                      "var(--color-text-3)";
-                  }}
                 >
                   <X size={14} />
                 </button>
               </div>
 
-              {/* Event list or empty state */}
               {selectedDayEvents.length === 0 ? (
                 <div
                   style={{
@@ -651,7 +719,7 @@ export default function CalendarPage() {
                   }}
                 >
                   <CalendarX size={20} strokeWidth={1.5} />
-                  <span style={{ fontSize: "var(--text-sm)" }}>No events</span>
+                  <span style={{ fontSize: "var(--text-sm)" }}>{t("no_events")}</span>
                 </div>
               ) : (
                 <div
@@ -676,7 +744,6 @@ export default function CalendarPage() {
                           background: "var(--color-surface-1)",
                         }}
                       >
-                        {/* Color dot */}
                         <span
                           style={{
                             display: "inline-block",
@@ -696,17 +763,15 @@ export default function CalendarPage() {
                         >
                           {ev.label}
                         </span>
-                        {/* Type badge */}
                         <span
                           style={{
                             ...style,
                             fontSize: "var(--text-caption)",
                             borderRadius: "var(--radius-sm)",
                             padding: "1px 6px",
-                            textTransform: "capitalize",
                           }}
                         >
-                          {ev.type.replace("-", " ")}
+                          {typeLabel(ev.type)}
                         </span>
                       </div>
                     );
@@ -714,7 +779,6 @@ export default function CalendarPage() {
                 </div>
               )}
 
-              {/* Add Event button */}
               <div style={{ marginTop: "var(--space-2)" }}>
                 <Button
                   variant="secondary"
@@ -722,13 +786,12 @@ export default function CalendarPage() {
                   onClick={() => openAddModal(selectedDate)}
                 >
                   <Plus size={14} />
-                  Add Event
+                  {t("add_event")}
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Legend */}
           <div
             style={{
               display: "flex",
@@ -738,7 +801,7 @@ export default function CalendarPage() {
               flexWrap: "wrap",
             }}
           >
-            {LEGEND_ITEMS.map(({ label, dotBg }) => (
+            {legendItems.map(({ label, dotBg }) => (
               <div
                 key={label}
                 style={{
@@ -766,16 +829,15 @@ export default function CalendarPage() {
         </>
       )}
 
-      {/* Add Event Modal */}
       <Modal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title="Add Event"
+        title={t("add_event")}
         size="sm"
         footer={
           <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
             <Button variant="ghost" size="sm" onClick={() => setShowAddModal(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="primary"
@@ -783,13 +845,12 @@ export default function CalendarPage() {
               onClick={handleCreateEvent}
               disabled={!addForm.title.trim()}
             >
-              Create
+              {t("create")}
             </Button>
           </div>
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-          {/* Title */}
           <div>
             <label
               htmlFor="event-title"
@@ -801,14 +862,14 @@ export default function CalendarPage() {
                 marginBottom: "var(--space-1)",
               }}
             >
-              Title
+              {t("form_title")}
             </label>
             <input
               id="event-title"
               type="text"
               value={addForm.title}
               onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))}
-              placeholder="Event title"
+              placeholder={t("form_title_placeholder")}
               style={{
                 width: "100%",
                 padding: "var(--space-2) var(--space-3)",
@@ -823,7 +884,6 @@ export default function CalendarPage() {
             />
           </div>
 
-          {/* Type */}
           <div>
             <label
               htmlFor="event-type"
@@ -835,7 +895,7 @@ export default function CalendarPage() {
                 marginBottom: "var(--space-1)",
               }}
             >
-              Type
+              {t("form_type")}
             </label>
             <select
               id="event-type"
@@ -858,14 +918,13 @@ export default function CalendarPage() {
                 cursor: "pointer",
               }}
             >
-              <option value="leave">Leave</option>
-              <option value="holiday">Holiday</option>
-              <option value="milestone">Milestone</option>
-              <option value="meeting">Meeting</option>
+              <option value="leave">{t("type_leave")}</option>
+              <option value="holiday">{t("type_holiday")}</option>
+              <option value="milestone">{t("type_milestone")}</option>
+              <option value="meeting">{t("type_meeting")}</option>
             </select>
           </div>
 
-          {/* Date */}
           <div>
             <label
               htmlFor="event-date"
@@ -877,7 +936,7 @@ export default function CalendarPage() {
                 marginBottom: "var(--space-1)",
               }}
             >
-              Date
+              {t("form_date")}
             </label>
             <input
               id="event-date"
@@ -894,13 +953,13 @@ export default function CalendarPage() {
                 color: "var(--color-text-1)",
                 outline: "none",
                 boxSizing: "border-box",
+                fontVariantNumeric: "tabular-nums",
               }}
             />
           </div>
         </div>
       </Modal>
 
-      {/* Toast */}
       {toast && (
         <div
           role="status"
@@ -919,7 +978,7 @@ export default function CalendarPage() {
             fontWeight: "var(--weight-medium)",
             zIndex: 2000,
             pointerEvents: "none",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+            boxShadow: "var(--shadow-3)",
           }}
         >
           {toast}

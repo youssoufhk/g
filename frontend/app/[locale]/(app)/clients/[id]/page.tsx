@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { CLIENTS } from "@/lib/mock-data";
 import {
-  ArrowLeft,
   Building2,
   Calendar,
   FolderKanban,
@@ -26,43 +28,14 @@ import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { useClient } from "@/features/clients/use-clients";
 import type { Client } from "@/features/clients/types";
+import { formatCurrencyCompact, formatDate } from "@/lib/format";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-const CURRENCY_SYMBOL: Record<Client["currency"], string> = {
-  GBP: "£",
-  EUR: "€",
-  USD: "$",
-};
-
-function formatRevenue(amount: number, currency: Client["currency"]): string {
-  if (amount === 0) return "-";
-  const symbol = CURRENCY_SYMBOL[currency];
-  const formatted = new Intl.NumberFormat("en-GB", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-  return `${symbol}${formatted}`;
-}
-
-function formatSinceDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    month: "short",
-    year: "numeric",
-  });
-}
 
 function statusTone(status: Client["status"]): "success" | "default" | "warning" {
   if (status === "active") return "success";
   if (status === "prospect") return "warning";
   return "default";
-}
-
-function statusLabel(status: Client["status"]): string {
-  if (status === "active") return "Active";
-  if (status === "inactive") return "Inactive";
-  return "Prospect";
 }
 
 function currencyTone(currency: Client["currency"]): "gold" | "info" | "default" {
@@ -75,7 +48,7 @@ function currencyTone(currency: Client["currency"]): "gold" | "info" | "default"
 
 function ProfileSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }} aria-hidden="true">
       <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-5)" }}>
         <Skeleton variant="avatar" width={80} height={80} />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
@@ -96,6 +69,7 @@ function ProfileSkeleton() {
 // ── Overview tab ──────────────────────────────────────────────────────────────
 
 function OverviewTab({ client }: { client: Client }) {
+  const t = useTranslations("clients");
   const hasProjects = client.active_projects > 0;
   const hasContacts = (client.contacts ?? []).length > 0;
 
@@ -112,18 +86,19 @@ function OverviewTab({ client }: { client: Client }) {
       {/* Active projects */}
       <Card>
         <CardHeader>
-          <CardTitle>Active projects</CardTitle>
+          <CardTitle>{t("overview_active_projects_title")}</CardTitle>
         </CardHeader>
         <CardBody>
           {!hasProjects ? (
             <EmptyState
               icon={FolderKanban}
-              title="No active projects"
-              description="This client has no active projects right now."
+              title={t("overview_no_projects_title")}
+              description={t("overview_no_projects_desc")}
             />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-              <div
+              <Link
+                href="/projects"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -131,6 +106,8 @@ function OverviewTab({ client }: { client: Client }) {
                   padding: "var(--space-4)",
                   background: "var(--color-surface-1)",
                   borderRadius: "var(--radius-md)",
+                  textDecoration: "none",
+                  color: "inherit",
                 }}
               >
                 <FolderKanban size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
@@ -140,16 +117,19 @@ function OverviewTab({ client }: { client: Client }) {
                       fontWeight: "var(--weight-medium)",
                       fontSize: "var(--text-body-sm)",
                       color: "var(--color-text-1)",
+                      fontVariantNumeric: "tabular-nums",
                     }}
                   >
-                    {client.active_projects} active {client.active_projects === 1 ? "project" : "projects"}
+                    {t("overview_projects_summary", { count: client.active_projects })}
                   </span>
                   <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", marginTop: 2 }}>
-                    See Projects tab for full details
+                    {t("overview_projects_hint")}
                   </div>
                 </div>
-                <Badge tone="success">{client.active_projects}</Badge>
-              </div>
+                <Badge tone="success">
+                  <span style={{ fontVariantNumeric: "tabular-nums" }}>{client.active_projects}</span>
+                </Badge>
+              </Link>
             </div>
           )}
         </CardBody>
@@ -158,14 +138,14 @@ function OverviewTab({ client }: { client: Client }) {
       {/* Contacts */}
       <Card>
         <CardHeader>
-          <CardTitle>Contacts</CardTitle>
+          <CardTitle>{t("overview_contacts_title")}</CardTitle>
         </CardHeader>
         <CardBody>
           {!hasContacts ? (
             <EmptyState
               icon={Users}
-              title="No contacts"
-              description="Add billing and project contacts for this client."
+              title={t("overview_no_contacts_title")}
+              description={t("overview_no_contacts_desc")}
             />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
@@ -209,7 +189,7 @@ function OverviewTab({ client }: { client: Client }) {
       {client.notes && (
         <Card style={{ gridColumn: "1 / -1" }}>
           <CardHeader>
-            <CardTitle>Notes</CardTitle>
+            <CardTitle>{t("overview_notes_title")}</CardTitle>
           </CardHeader>
           <CardBody>
             <p style={{ fontSize: "var(--text-body)", color: "var(--color-text-2)", lineHeight: 1.6 }}>
@@ -224,21 +204,16 @@ function OverviewTab({ client }: { client: Client }) {
 
 // ── Placeholder tab ───────────────────────────────────────────────────────────
 
-const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {
-  Projects: "All projects for this client will appear here. Go to Projects to create one.",
-  Invoices: "All invoices for this client will appear here. Use the New Invoice button to create one.",
-  Team: "Team members allocated to this client will appear here once projects are assigned.",
-  Documents: "Contracts and signed documents for this client will appear here once uploaded.",
-};
-
-function PlaceholderTab({ icon: Icon, label }: { icon: typeof FileText; label: string }) {
-  return (
-    <EmptyState
-      icon={Icon}
-      title={`No ${label.toLowerCase()} yet`}
-      description={PLACEHOLDER_DESCRIPTIONS[label] ?? `${label} will appear here once available.`}
-    />
-  );
+function PlaceholderTab({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: typeof FileText;
+  title: string;
+  description: string;
+}) {
+  return <EmptyState icon={Icon} title={title} description={description} />;
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -249,7 +224,32 @@ export default function ClientProfilePage({
   params: Promise<{ id: string; locale: string }>;
 }) {
   const { id } = use(params);
+  const t = useTranslations("clients");
   const { data: client, isLoading, error } = useClient(id);
+  const siblings = useMemo(() => {
+    const idx = CLIENTS.findIndex((c) => c.id === id);
+    if (idx === -1) return { idx: -1, total: CLIENTS.length, prev: null, next: null };
+    return {
+      idx,
+      total: CLIENTS.length,
+      prev: idx > 0 ? CLIENTS[idx - 1]?.id ?? null : null,
+      next: idx < CLIENTS.length - 1 ? CLIENTS[idx + 1]?.id ?? null : null,
+    };
+  }, [id]);
+  const headerBar = (
+    <DetailHeaderBar
+      backHref="/clients"
+      backLabel={t("detail_back")}
+      title={client?.name ?? ""}
+      prevHref={siblings.prev ? `/clients/${siblings.prev}` : null}
+      nextHref={siblings.next ? `/clients/${siblings.next}` : null}
+      prevLabel={t("detail_prev")}
+      nextLabel={t("detail_next")}
+      position={siblings.idx >= 0 ? siblings.idx + 1 : null}
+      total={siblings.total}
+      positionLabel={(p, total) => t("detail_position", { position: p, total })}
+    />
+  );
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState("");
   const [editIndustry, setEditIndustry] = useState("");
@@ -281,52 +281,60 @@ export default function ClientProfilePage({
     }, 800);
   }
 
+  const statusLabelKey = (status: Client["status"]): string => {
+    if (status === "active") return t("status_active");
+    if (status === "inactive") return t("status_inactive");
+    return t("status_prospect");
+  };
+
   if (isLoading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
-        <Link
-          href="/clients"
-          style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", color: "var(--color-text-2)", textDecoration: "none", fontSize: "var(--text-body)", fontWeight: "var(--weight-medium)" }}
+      <>
+        <div className="app-aura" aria-hidden>
+          <div className="app-aura-accent" />
+        </div>
+        <div
+          aria-busy="true"
+          aria-live="polite"
+          style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}
         >
-          <ArrowLeft size={18} aria-hidden /> Back to clients
-        </Link>
-        <ProfileSkeleton />
-      </div>
+          {headerBar}
+          <ProfileSkeleton />
+        </div>
+      </>
     );
   }
 
   if (error || !client) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
-        <Link
-          href="/clients"
-          style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", color: "var(--color-text-2)", textDecoration: "none", fontSize: "var(--text-body)", fontWeight: "var(--weight-medium)" }}
-        >
-          <ArrowLeft size={18} aria-hidden /> Back to clients
-        </Link>
-        <EmptyState
-          icon={Building2}
-          title="Client not found"
-          description="This client does not exist or you do not have access."
-          action={
-            <Link href="/clients">
-              <Button variant="secondary" size="sm">Back to clients</Button>
-            </Link>
-          }
-        />
-      </div>
+      <>
+        <div className="app-aura" aria-hidden>
+          <div className="app-aura-accent" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+          {headerBar}
+          <EmptyState
+            icon={Building2}
+            title={t("not_found_title")}
+            description={t("not_found_desc")}
+            action={
+              <Link href="/clients">
+                <Button variant="secondary" size="sm">{t("not_found_action")}</Button>
+              </Link>
+            }
+          />
+        </div>
+      </>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
-      {/* Back link */}
-      <Link
-        href="/clients"
-        style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", color: "var(--color-text-2)", textDecoration: "none", fontSize: "var(--text-body)", fontWeight: "var(--weight-medium)" }}
-      >
-        <ArrowLeft size={18} aria-hidden /> Back to clients
-      </Link>
+    <>
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+        {headerBar}
 
       {/* Hero card */}
       <div
@@ -389,12 +397,12 @@ export default function ClientProfilePage({
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
                   <Calendar size={16} style={{ color: "var(--color-text-3)" }} aria-hidden />
-                  Client since {formatSinceDate(client.since_date)}
+                  {t("detail_client_since", { date: formatDate(client.since_date, "medium") })}
                 </span>
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap" }}>
-                <Badge tone={statusTone(client.status)} dot>{statusLabel(client.status)}</Badge>
+                <Badge tone={statusTone(client.status)} dot>{statusLabelKey(client.status)}</Badge>
                 <Badge tone={currencyTone(client.currency)}>{client.currency}</Badge>
                 {client.team_size > 0 && (
                   <span
@@ -404,10 +412,11 @@ export default function ClientProfilePage({
                       gap: "var(--space-1)",
                       fontSize: "var(--text-body-sm)",
                       color: "var(--color-text-3)",
+                      fontVariantNumeric: "tabular-nums",
                     }}
                   >
                     <Users size={14} aria-hidden />
-                    {client.team_size} team members
+                    {t("detail_team_members", { count: client.team_size })}
                   </span>
                 )}
               </div>
@@ -415,9 +424,9 @@ export default function ClientProfilePage({
 
             {/* Actions */}
             <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0 }}>
-              <Button variant="secondary" size="sm" onClick={openEdit}>Edit</Button>
+              <Button variant="secondary" size="sm" onClick={openEdit}>{t("detail_edit")}</Button>
               <Button variant="primary" size="sm" leadingIcon={<Receipt size={14} aria-hidden />} onClick={() => setShowInvoiceModal(true)}>
-                New invoice
+                {t("detail_new_invoice")}
               </Button>
             </div>
           </div>
@@ -434,24 +443,28 @@ export default function ClientProfilePage({
         className="kpi-strip"
       >
         <StatPill
-          label="Active projects"
-          value={client.active_projects}
-          secondary={`/ ${client.total_projects} total`}
+          label={t("kpi_active_projects")}
+          value={<span style={{ fontVariantNumeric: "tabular-nums" }}>{client.active_projects}</span>}
+          secondary={t("kpi_active_projects_secondary", { total: client.total_projects })}
           accent="primary"
         />
         <StatPill
-          label="Revenue YTD"
-          value={formatRevenue(client.revenue_ytd, client.currency)}
+          label={t("kpi_revenue_ytd")}
+          value={
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>
+              {client.revenue_ytd > 0 ? formatCurrencyCompact(client.revenue_ytd, client.currency) : "-"}
+            </span>
+          }
           accent="gold"
         />
         <StatPill
-          label="Open invoices"
+          label={t("kpi_open_invoices")}
           value="-"
           accent="warning"
         />
         <StatPill
-          label="Team members"
-          value={client.team_size}
+          label={t("kpi_team_members")}
+          value={<span style={{ fontVariantNumeric: "tabular-nums" }}>{client.team_size}</span>}
           accent="info"
         />
       </div>
@@ -459,11 +472,11 @@ export default function ClientProfilePage({
       {/* Tabs */}
       <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="projects" count={client.total_projects}>Projects</TabsTrigger>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
-          <TabsTrigger value="team" count={client.team_size}>Team</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="overview">{t("tab_overview")}</TabsTrigger>
+          <TabsTrigger value="projects" count={client.total_projects}>{t("tab_projects")}</TabsTrigger>
+          <TabsTrigger value="invoices">{t("tab_invoices")}</TabsTrigger>
+          <TabsTrigger value="team" count={client.team_size}>{t("tab_team")}</TabsTrigger>
+          <TabsTrigger value="documents">{t("tab_documents")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -471,19 +484,19 @@ export default function ClientProfilePage({
         </TabsContent>
 
         <TabsContent value="projects">
-          <PlaceholderTab icon={FolderKanban} label="Projects" />
+          <PlaceholderTab icon={FolderKanban} title={t("placeholder_projects_title")} description={t("placeholder_projects_desc")} />
         </TabsContent>
 
         <TabsContent value="invoices">
-          <PlaceholderTab icon={Receipt} label="Invoices" />
+          <PlaceholderTab icon={Receipt} title={t("placeholder_invoices_title")} description={t("placeholder_invoices_desc")} />
         </TabsContent>
 
         <TabsContent value="team">
-          <PlaceholderTab icon={Users} label="Team" />
+          <PlaceholderTab icon={Users} title={t("placeholder_team_title")} description={t("placeholder_team_desc")} />
         </TabsContent>
 
         <TabsContent value="documents">
-          <PlaceholderTab icon={FileText} label="Documents" />
+          <PlaceholderTab icon={FileText} title={t("placeholder_documents_title")} description={t("placeholder_documents_desc")} />
         </TabsContent>
       </Tabs>
 
@@ -507,23 +520,23 @@ export default function ClientProfilePage({
       <Modal
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit client"
+        title={t("edit_modal_title")}
         footer={
           <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>{t("edit_cancel")}</Button>
             <Button variant="primary" size="sm" onClick={handleEditSave} disabled={editSaving}>
-              {editSaving ? "Saving..." : "Save changes"}
+              {editSaving ? t("edit_saving") : t("edit_save")}
             </Button>
           </div>
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <div>
-            <label className="form-label" htmlFor="edit-client-name">Company name</label>
+            <label className="form-label" htmlFor="edit-client-name">{t("edit_field_name")}</label>
             <Input id="edit-client-name" value={editName} onChange={(e) => setEditName(e.target.value)} />
           </div>
           <div>
-            <label className="form-label" htmlFor="edit-client-industry">Industry</label>
+            <label className="form-label" htmlFor="edit-client-industry">{t("edit_field_industry")}</label>
             <Input id="edit-client-industry" value={editIndustry} onChange={(e) => setEditIndustry(e.target.value)} />
           </div>
         </div>
@@ -532,28 +545,29 @@ export default function ClientProfilePage({
       <Modal
         open={showInvoiceModal}
         onClose={() => setShowInvoiceModal(false)}
-        title="New invoice"
-        description={client ? `Create a new invoice for ${client.name}.` : "Create a new invoice."}
+        title={t("invoice_modal_title")}
+        description={client ? t("invoice_modal_desc", { name: client.name }) : undefined}
         footer={
           <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
-            <Button variant="secondary" size="sm" onClick={() => setShowInvoiceModal(false)}>Cancel</Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowInvoiceModal(false)}>{t("edit_cancel")}</Button>
             <Button variant="primary" size="sm" onClick={handleInvoiceSave} disabled={invoiceSaving || !invoiceAmount.trim()}>
-              {invoiceSaving ? "Creating..." : "Create invoice"}
+              {invoiceSaving ? t("invoice_submitting") : t("invoice_submit")}
             </Button>
           </div>
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <div>
-            <label className="form-label" htmlFor="invoice-amount">Amount ({client?.currency ?? "EUR"})</label>
-            <Input id="invoice-amount" type="number" placeholder="0.00" value={invoiceAmount} onChange={(e) => setInvoiceAmount(e.target.value)} />
+            <label className="form-label" htmlFor="invoice-amount">{t("invoice_field_amount", { currency: client?.currency ?? "EUR" })}</label>
+            <Input id="invoice-amount" type="number" placeholder={t("invoice_field_amount_placeholder")} value={invoiceAmount} onChange={(e) => setInvoiceAmount(e.target.value)} />
           </div>
           <div>
-            <label className="form-label" htmlFor="invoice-desc">Description</label>
-            <Input id="invoice-desc" placeholder="e.g. Consulting services - April 2026" value={invoiceDesc} onChange={(e) => setInvoiceDesc(e.target.value)} />
+            <label className="form-label" htmlFor="invoice-desc">{t("invoice_field_description")}</label>
+            <Input id="invoice-desc" placeholder={t("invoice_field_description_placeholder")} value={invoiceDesc} onChange={(e) => setInvoiceDesc(e.target.value)} />
           </div>
         </div>
       </Modal>
-    </div>
+      </div>
+    </>
   );
 }

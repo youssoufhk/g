@@ -1,40 +1,48 @@
 "use client";
 
-import { useState } from "react";
-import { Clock, Receipt, Umbrella, CheckSquare, AlertCircle, Search } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import {
+  Clock,
+  Receipt,
+  Umbrella,
+  CheckSquare,
+  AlertCircle,
+  Search,
+  AlertTriangle,
+  Sparkles,
+  CheckCircle2,
+} from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
-import { StatPill } from "@/components/patterns/stat-pill";
 import { EmptyState } from "@/components/patterns/empty-state";
+import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ApprovalsKpis } from "@/features/approvals/approvals-kpis";
 import { useApprovals } from "@/features/approvals/use-approvals";
 import type { ApprovalRequest, ApprovalType, ApprovalStatus } from "@/features/approvals/types";
+import { useUrlListState } from "@/hooks/use-url-list-state";
+import { formatCurrency, formatDate } from "@/lib/format";
+import { useUndoableAction } from "@/lib/use-undoable-action";
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+const formatDateTime = (iso: string) => formatDate(iso, "withTime");
 
-function formatCurrency(amount: number, currency: string): string {
-  return `${currency} ${amount.toLocaleString("en-GB", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+function daysSince(iso: string): number {
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  return Math.max(0, Math.floor((now - then) / (1000 * 60 * 60 * 24)));
 }
 
 // ── type config ────────────────────────────────────────────────────────────
 
 type BadgeTone = "default" | "primary" | "success" | "warning" | "error" | "info" | "accent" | "gold" | "ghost" | "ghost-primary" | "neutral";
+type KpiKey = "timesheet" | "expense" | "leave" | "invoice";
 
 const TYPE_ICON: Record<ApprovalType, React.ComponentType<{ size?: number; "aria-hidden"?: boolean }>> = {
   timesheet: Clock,
@@ -48,12 +56,6 @@ const TYPE_BADGE_TONE: Record<ApprovalType, BadgeTone> = {
   leave: "info",
 };
 
-const TYPE_LABEL: Record<ApprovalType, string> = {
-  timesheet: "Timesheet",
-  expense: "Expense",
-  leave: "Leave",
-};
-
 const STATUS_BADGE_TONE: Record<ApprovalStatus, BadgeTone> = {
   pending: "warning",
   approved: "success",
@@ -65,30 +67,15 @@ const STATUS_BADGE_TONE: Record<ApprovalStatus, BadgeTone> = {
 type ApprovalCardProps = {
   item: ApprovalRequest;
   showActions: boolean;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
 };
 
-function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardProps) {
+function ApprovalCard({ item, showActions, selected, onToggleSelect, onApprove, onReject }: ApprovalCardProps) {
+  const t = useTranslations("approvals");
   const TypeIcon = TYPE_ICON[item.type];
-  const [approving, setApproving] = useState(false);
-  const [rejecting, setRejecting] = useState(false);
-
-  function handleApprove() {
-    setApproving(true);
-    setTimeout(() => {
-      setApproving(false);
-      onApprove(item.id);
-    }, 800);
-  }
-
-  function handleReject() {
-    setRejecting(true);
-    setTimeout(() => {
-      setRejecting(false);
-      onReject(item.id);
-    }, 800);
-  }
 
   return (
     <div
@@ -100,20 +87,19 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
         display: "flex",
         flexDirection: "column",
         gap: "var(--space-3)",
-        transition: "border-color 150ms ease, box-shadow 150ms ease",
         cursor: "default",
       }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "var(--color-border-strong)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "var(--shadow-2)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "var(--color-border)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-      }}
     >
-      {/* Row 1: avatar + name + timestamp + urgency badge */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        {showActions && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggleSelect(item.id)}
+            aria-label={t("select_item_aria", { name: item.requester_name })}
+            style={{ width: 16, height: 16, accentColor: "var(--color-primary)" }}
+          />
+        )}
         <Avatar
           name={item.requester_name}
           colorIndex={item.requester_avatar_color_index}
@@ -134,6 +120,7 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
               marginLeft: "var(--space-2)",
               fontSize: "var(--text-caption)",
               color: "var(--color-text-3)",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {formatDateTime(item.submitted_at)}
@@ -142,12 +129,11 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
         {item.urgency === "high" && (
           <Badge tone="error">
             <AlertCircle size={11} aria-hidden style={{ marginRight: 3 }} />
-            Urgent
+            {t("urgent")}
           </Badge>
         )}
       </div>
 
-      {/* Row 2: type icon + subject */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
         <span style={{ color: "var(--color-text-2)", flexShrink: 0, display: "flex" }}>
           <TypeIcon size={16} aria-hidden />
@@ -163,7 +149,6 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
         </span>
       </div>
 
-      {/* Row 3: meta pills */}
       <div
         style={{
           display: "flex",
@@ -172,15 +157,14 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
           gap: "var(--space-2)",
         }}
       >
-        <Badge tone={TYPE_BADGE_TONE[item.type]}>{TYPE_LABEL[item.type]}</Badge>
-        <Badge tone={STATUS_BADGE_TONE[item.status]}>
-          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-        </Badge>
+        <Badge tone={TYPE_BADGE_TONE[item.type]}>{t(`type_${item.type}`)}</Badge>
+        <Badge tone={STATUS_BADGE_TONE[item.status]}>{t(`status_${item.status}`)}</Badge>
         {item.period && (
           <span
             style={{
               fontSize: "var(--text-caption)",
               color: "var(--color-text-2)",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {item.period}
@@ -193,6 +177,7 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
               fontSize: "var(--text-caption)",
               fontWeight: "var(--weight-medium)",
               color: "var(--color-text-1)",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {formatCurrency(item.amount, item.currency)}
@@ -208,7 +193,6 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
         )}
       </div>
 
-      {/* Row 4: actions (only when pending) */}
       {showActions && (
         <div
           style={{
@@ -218,22 +202,16 @@ function ApprovalCard({ item, showActions, onApprove, onReject }: ApprovalCardPr
             borderTop: "1px solid var(--color-border-subtle)",
           }}
         >
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleApprove}
-            disabled={approving || rejecting}
-          >
-            {approving ? "Approving..." : "Approve"}
+          <Button variant="primary" size="sm" onClick={() => onApprove(item.id)}>
+            {t("action_approve")}
           </Button>
           <Button
             variant="ghost"
             size="sm"
             style={{ color: "var(--color-error)" }}
-            onClick={handleReject}
-            disabled={approving || rejecting}
+            onClick={() => onReject(item.id)}
           >
-            {rejecting ? "Rejecting..." : "Reject"}
+            {t("action_reject")}
           </Button>
         </div>
       )}
@@ -259,7 +237,7 @@ function ApprovalListSkeleton() {
 
 // ── search bar ─────────────────────────────────────────────────────────────
 
-function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function SearchBar({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <div
       style={{
@@ -270,13 +248,12 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
         border: "1px solid var(--color-border)",
         borderRadius: "var(--radius-md)",
         padding: "var(--space-2) var(--space-3)",
-        marginBottom: "var(--space-4)",
       }}
     >
       <Search size={14} style={{ color: "var(--color-text-3)", flexShrink: 0 }} aria-hidden />
       <input
         type="search"
-        placeholder="Search by name, subject, or project..."
+        placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
@@ -292,355 +269,430 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
   );
 }
 
-// ── pending tab ────────────────────────────────────────────────────────────
+// ── page ────────────────────────────────────────────────────────────────────
 
-function PendingTab() {
-  const { data: rawItems, isLoading } = useApprovals({ status: "pending" });
+type MultiKey = "type" | "status";
+
+export default function ApprovalsPage() {
+  const t = useTranslations("approvals");
+  const { data: rawItems, isLoading, error } = useApprovals({});
+
+  const url = useUrlListState<MultiKey>({ multiKeys: ["type", "status"] });
+  const search = url.search;
+  const typeSel = url.multi.type;
+  const statusSel = url.multi.status;
+
   const [localStatuses, setLocalStatuses] = useState<Record<string, ApprovalStatus>>({});
-  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [announcement, setAnnouncement] = useState<string>("");
+  const [tab, setTab] = useState<string>("pending");
 
-  function handleApprove(id: string) {
-    setLocalStatuses((prev) => ({ ...prev, [id]: "approved" }));
-  }
+  const applyOverride = (item: ApprovalRequest): ApprovalRequest =>
+    item.id in localStatuses ? { ...item, status: localStatuses[item.id] as ApprovalStatus } : item;
 
-  function handleReject(id: string) {
-    setLocalStatuses((prev) => ({ ...prev, [id]: "rejected" }));
-  }
+  const allItems = useMemo(() => (rawItems ?? []).map(applyOverride), [rawItems, localStatuses]);
 
-  if (isLoading) return <ApprovalListSkeleton />;
-
-  const allItems = rawItems ?? [];
-
-  // Apply local status overrides
-  const items = allItems
-    .map((item) =>
-      localStatuses[item.id] ? { ...item, status: localStatuses[item.id] as ApprovalStatus } : item
-    )
-    .filter((item) => item.status === "pending");
-
-  // Apply search
-  const filtered = search.trim()
-    ? items.filter(
-        (item) =>
-          item.requester_name.toLowerCase().includes(search.toLowerCase()) ||
-          item.subject.toLowerCase().includes(search.toLowerCase()) ||
-          (item.project_name ?? "").toLowerCase().includes(search.toLowerCase())
-      )
-    : items;
-
-  const pendingCount = items.length;
-
-  return (
-    <>
-      <SearchBar value={search} onChange={setSearch} />
-
-      {pendingCount > 0 && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "var(--space-4)",
-          }}
-        >
-          <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-3)" }}>
-            {pendingCount} pending request{pendingCount !== 1 ? "s" : ""}
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              items.forEach((item) => handleApprove(item.id));
-            }}
-          >
-            Approve all
-          </Button>
-        </div>
-      )}
-
-      {filtered.length === 0 && !search && (
-        <EmptyState
-          icon={CheckSquare}
-          title="All caught up"
-          description="No pending requests at this time."
-        />
-      )}
-
-      {filtered.length === 0 && search && (
-        <EmptyState
-          icon={Search}
-          title="No results"
-          description={`No pending requests match "${search}".`}
-        />
-      )}
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-        {filtered.map((item) => (
-          <ApprovalCard
-            key={item.id}
-            item={item}
-            showActions={item.status === "pending"}
-            onApprove={handleApprove}
-            onReject={handleReject}
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-// ── all tab ────────────────────────────────────────────────────────────────
-
-function AllTab() {
-  const { data: rawItems, isLoading } = useApprovals({});
-  const [localStatuses, setLocalStatuses] = useState<Record<string, ApprovalStatus>>({});
-  const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<ApprovalType | "all">("all");
-
-  function handleApprove(id: string) {
-    setLocalStatuses((prev) => ({ ...prev, [id]: "approved" }));
-  }
-
-  function handleReject(id: string) {
-    setLocalStatuses((prev) => ({ ...prev, [id]: "rejected" }));
-  }
-
-  if (isLoading) return <ApprovalListSkeleton />;
-
-  const items = (rawItems ?? []).map((item) =>
-    localStatuses[item.id] ? { ...item, status: localStatuses[item.id] as ApprovalStatus } : item
+  // Pre-sort oldest-first
+  const sortedByOldest = useMemo(
+    () => [...allItems].sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()),
+    [allItems],
   );
 
-  const filtered = items.filter((item) => {
-    const matchSearch =
-      !search.trim() ||
-      item.requester_name.toLowerCase().includes(search.toLowerCase()) ||
-      item.subject.toLowerCase().includes(search.toLowerCase()) ||
-      (item.project_name ?? "").toLowerCase().includes(search.toLowerCase());
-    const matchType = typeFilter === "all" || item.type === typeFilter;
-    return matchSearch && matchType;
+  // Counts per type (pending only)
+  const pendingItems = useMemo(() => sortedByOldest.filter((i) => i.status === "pending"), [sortedByOldest]);
+  const timesheetCount = pendingItems.filter((i) => i.type === "timesheet").length;
+  const expenseCount = pendingItems.filter((i) => i.type === "expense").length;
+  const leaveCount = pendingItems.filter((i) => i.type === "leave").length;
+  const invoiceCount = 0; // No invoice approvals in current data contract; tile shown for parity.
+
+  const activeKpi: KpiKey | undefined =
+    typeSel.length === 1 && (["timesheet", "expense", "leave"] as const).includes(typeSel[0] as ApprovalType)
+      ? (typeSel[0] as KpiKey)
+      : undefined;
+
+  function selectKpi(target: ApprovalType) {
+    const current = typeSel[0];
+    url.setMulti("type", current === target ? [] : [target]);
+  }
+
+  // Filtering
+  function matchesFilters(item: ApprovalRequest): boolean {
+    if (typeSel.length > 0 && !typeSel.includes(item.type)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !item.requester_name.toLowerCase().includes(q) &&
+        !item.subject.toLowerCase().includes(q) &&
+        !(item.project_name ?? "").toLowerCase().includes(q)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  const pendingFiltered = pendingItems.filter(matchesFilters);
+  const allFiltered = sortedByOldest.filter(matchesFilters);
+  const historyFiltered = sortedByOldest.filter((i) => i.status !== "pending").filter(matchesFilters);
+
+  // Recommendations based on real data
+  const oldestPending = pendingItems[0];
+  const oldestPendingDays = oldestPending ? daysSince(oldestPending.submitted_at) : 0;
+  const staleTimesheets = pendingItems.filter(
+    (i) => i.type === "timesheet" && daysSince(i.submitted_at) >= 7,
+  ).length;
+  const readyToBulk = pendingItems.filter((i) => i.urgency !== "high").length;
+
+  const recommendations: AiRecommendation[] = [
+    ...(staleTimesheets > 0
+      ? [
+          {
+            id: "rec-stale",
+            icon: AlertTriangle,
+            tone: "gold" as const,
+            title: t("rec_stale_title"),
+            detail: t("rec_stale_detail", { count: staleTimesheets }),
+            applyLabel: t("rec_review"),
+            onApply: () => {
+              url.setMulti("type", ["timesheet"]);
+              setTab("pending");
+            },
+          },
+        ]
+      : []),
+    ...(oldestPendingDays > 0 && pendingItems.length > 0
+      ? [
+          {
+            id: "rec-oldest",
+            icon: Clock,
+            tone: "primary" as const,
+            title: t("rec_oldest_title"),
+            detail: t("rec_oldest_detail", { days: oldestPendingDays }),
+            applyLabel: t("rec_review"),
+            onApply: () => setTab("pending"),
+          },
+        ]
+      : []),
+    ...(readyToBulk >= 3
+      ? [
+          {
+            id: "rec-bulk",
+            icon: Sparkles,
+            tone: "accent" as const,
+            title: t("rec_bulk_title"),
+            detail: t("rec_bulk_detail", { count: readyToBulk }),
+          },
+        ]
+      : []),
+  ];
+
+  // Mutations
+  const handleApprove = useUndoableAction<string>({
+    apply: (id) => setLocalStatuses((prev) => ({ ...prev, [id]: "approved" })),
+    revert: (id) =>
+      setLocalStatuses((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      }),
+    successTitle: t("toast_approved_title"),
+    successDescription: t("toast_undo"),
   });
 
-  if (items.length === 0) {
-    return (
-      <EmptyState
-        icon={CheckSquare}
-        title="No requests"
-        description="No approval requests found."
-      />
-    );
+  const handleReject = useUndoableAction<string>({
+    apply: (id) => setLocalStatuses((prev) => ({ ...prev, [id]: "rejected" })),
+    revert: (id) =>
+      setLocalStatuses((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      }),
+    successTitle: t("toast_rejected_title"),
+    successDescription: t("toast_undo"),
+    tone: "warning",
+  });
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelected(new Set());
+  }
+
+  function bulkApprove() {
+    const ids = Array.from(selected);
+    ids.forEach((id) => handleApprove(id));
+    setAnnouncement(t("announce_bulk_approved", { count: ids.length }));
+    clearSelection();
+  }
+
+  function bulkReject() {
+    const ids = Array.from(selected);
+    ids.forEach((id) => handleReject(id));
+    setAnnouncement(t("announce_bulk_rejected", { count: ids.length }));
+    clearSelection();
+  }
+
+  const pendingVisibleIds = new Set(pendingFiltered.map((i) => i.id));
+  const selectedVisibleCount = Array.from(selected).filter((id) => pendingVisibleIds.has(id)).length;
+  const allSelected = pendingFiltered.length > 0 && selectedVisibleCount === pendingFiltered.length;
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      clearSelection();
+    } else {
+      setSelected(new Set(pendingFiltered.map((i) => i.id)));
+    }
   }
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          gap: "var(--space-3)",
-          marginBottom: "var(--space-4)",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 200 }}>
-          <SearchBar value={search} onChange={setSearch} />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            background: "var(--color-surface-1)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-md)",
-            overflow: "hidden",
-          }}
-        >
-          {(["all", "timesheet", "expense", "leave"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTypeFilter(t)}
-              style={{
-                padding: "var(--space-1-5) var(--space-3)",
-                fontSize: "var(--text-sm)",
-                fontWeight: "var(--weight-medium)",
-                color: typeFilter === t ? "var(--color-text-1)" : "var(--color-text-3)",
-                background: typeFilter === t ? "var(--color-surface-0)" : "transparent",
-                border: "none",
-                cursor: "pointer",
-                textTransform: "capitalize",
-              }}
-            >
-              {t === "all" ? "All" : TYPE_LABEL[t]}
-            </button>
-          ))}
-        </div>
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
       </div>
 
-      {filtered.length === 0 ? (
-        <EmptyState
-          icon={Search}
-          title="No results"
-          description="No requests match your filters."
+      <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <PageHeader title={t("page_title")} count={pendingItems.length} />
+
+        {recommendations.length > 0 && (
+          <AiRecommendations
+            items={recommendations}
+            title={t("ai_recs_title")}
+            overline={t("ai_recs_overline")}
+          />
+        )}
+
+        <ApprovalsKpis
+          timesheetCount={timesheetCount}
+          expenseCount={expenseCount}
+          leaveCount={leaveCount}
+          invoiceCount={invoiceCount}
+          activeType={activeKpi}
+          onSelectTimesheet={() => selectKpi("timesheet")}
+          onSelectExpense={() => selectKpi("expense")}
+          onSelectLeave={() => selectKpi("leave")}
         />
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-          {filtered.map((item) => (
-            <ApprovalCard
-              key={item.id}
-              item={item}
-              showActions={item.status === "pending"}
-              onApprove={handleApprove}
-              onReject={handleReject}
-            />
-          ))}
+
+        {/* aria-live region for bulk announcements */}
+        <div aria-live="polite" aria-atomic="true" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
+          {announcement}
         </div>
-      )}
-    </>
-  );
-}
 
-// ── history tab ────────────────────────────────────────────────────────────
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList>
+            <TabsTrigger value="pending" count={pendingItems.length > 0 ? pendingItems.length : undefined}>
+              {t("tab_pending")}
+            </TabsTrigger>
+            <TabsTrigger value="all">{t("tab_all")}</TabsTrigger>
+            <TabsTrigger value="history">{t("tab_history")}</TabsTrigger>
+          </TabsList>
 
-function HistoryTab() {
-  const { data: items, isLoading } = useApprovals({});
-  const [search, setSearch] = useState("");
+          <TabsContent value="pending">
+            <div style={{ paddingTop: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+              <SearchBar value={search} onChange={url.setSearch} placeholder={t("search_placeholder")} />
 
-  const history = items?.filter((a) => a.status !== "pending") ?? [];
-
-  if (isLoading) return <ApprovalListSkeleton />;
-
-  if (history.length === 0) {
-    return (
-      <EmptyState
-        icon={CheckSquare}
-        title="No history yet"
-        description="Reviewed requests will appear here."
-      />
-    );
-  }
-
-  const filtered = search.trim()
-    ? history.filter(
-        (item) =>
-          item.requester_name.toLowerCase().includes(search.toLowerCase()) ||
-          item.subject.toLowerCase().includes(search.toLowerCase())
-      )
-    : history;
-
-  return (
-    <>
-      <SearchBar value={search} onChange={setSearch} />
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-        {filtered.map((item) => {
-          const TypeIcon = TYPE_ICON[item.type];
-          return (
-            <div
-              key={item.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "var(--space-4)",
-                padding: "var(--space-3) var(--space-4)",
-                background: "var(--color-surface-0)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-lg)",
-              }}
-            >
-              <Avatar
-                name={item.requester_name}
-                colorIndex={item.requester_avatar_color_index}
-                size="sm"
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontWeight: "var(--weight-semibold)",
-                    fontSize: "var(--text-body-sm)",
-                    color: "var(--color-text-1)",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {item.requester_name}
-                </div>
+              {selected.size > 0 && (
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "var(--space-1)",
-                    marginTop: "var(--space-0-5)",
-                    fontSize: "var(--text-caption)",
-                    color: "var(--color-text-2)",
+                    justifyContent: "space-between",
+                    gap: "var(--space-3)",
+                    padding: "var(--space-2) var(--space-3)",
+                    background: "var(--color-surface-1)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-md)",
                   }}
                 >
-                  <TypeIcon size={12} aria-hidden />
-                  <span>{item.subject}</span>
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "var(--space-1)", flexShrink: 0 }}>
-                <Badge tone={STATUS_BADGE_TONE[item.status]}>
-                  {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                </Badge>
-                {item.reviewer_note && (
-                  <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-                    {item.reviewer_note}
+                  <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>
+                    {t("bulk_selected", { count: selected.size })}
                   </span>
+                  <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                    <Button variant="secondary" size="sm" onClick={clearSelection}>
+                      {t("bulk_clear")}
+                    </Button>
+                    <Button variant="ghost" size="sm" style={{ color: "var(--color-error)" }} onClick={bulkReject}>
+                      {t("bulk_reject")}
+                    </Button>
+                    <Button variant="primary" size="sm" leadingIcon={<CheckCircle2 size={14} aria-hidden />} onClick={bulkApprove}>
+                      {t("bulk_approve")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {pendingFiltered.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", fontSize: "var(--text-body-sm)", color: "var(--color-text-2)" }}>
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      style={{ width: 16, height: 16, accentColor: "var(--color-primary)" }}
+                    />
+                    {t("select_all")}
+                  </label>
+                  <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-3)", fontVariantNumeric: "tabular-nums" }}>
+                    {t("pending_count", { count: pendingFiltered.length })}
+                  </span>
+                </div>
+              )}
+
+              <div aria-busy={isLoading} aria-live="polite">
+                {isLoading ? (
+                  <ApprovalListSkeleton />
+                ) : error ? (
+                  <div role="alert" style={{ padding: "var(--space-4)", background: "var(--color-error-muted)", borderRadius: "var(--radius-md)", color: "var(--color-error)", fontSize: "var(--text-body-sm)" }}>
+                    {t("load_error")} {(error as Error).message}
+                  </div>
+                ) : pendingFiltered.length === 0 ? (
+                  <EmptyState
+                    icon={CheckSquare}
+                    title={search || typeSel.length > 0 ? t("empty_filtered_title") : t("empty_caught_up_title")}
+                    description={search || typeSel.length > 0 ? t("empty_filtered_desc") : t("empty_caught_up_desc")}
+                    action={
+                      search || typeSel.length > 0 ? (
+                        <Button variant="secondary" size="sm" onClick={() => url.clearAll()}>
+                          {t("empty_clear")}
+                        </Button>
+                      ) : undefined
+                    }
+                  />
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                    {pendingFiltered.map((item) => (
+                      <ApprovalCard
+                        key={item.id}
+                        item={item}
+                        showActions
+                        selected={selected.has(item.id)}
+                        onToggleSelect={toggleSelect}
+                        onApprove={handleApprove}
+                        onReject={handleReject}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
-          );
-        })}
+          </TabsContent>
+
+          <TabsContent value="all">
+            <div style={{ paddingTop: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+              <SearchBar value={search} onChange={url.setSearch} placeholder={t("search_placeholder")} />
+              <div aria-busy={isLoading} aria-live="polite">
+                {isLoading ? (
+                  <ApprovalListSkeleton />
+                ) : allFiltered.length === 0 ? (
+                  <EmptyState
+                    icon={CheckSquare}
+                    title={t("empty_none_title")}
+                    description={t("empty_none_desc")}
+                  />
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                    {allFiltered.map((item) => (
+                      <ApprovalCard
+                        key={item.id}
+                        item={item}
+                        showActions={item.status === "pending"}
+                        selected={selected.has(item.id)}
+                        onToggleSelect={toggleSelect}
+                        onApprove={handleApprove}
+                        onReject={handleReject}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <div style={{ paddingTop: "var(--space-5)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+              <SearchBar value={search} onChange={url.setSearch} placeholder={t("search_placeholder")} />
+              <div aria-busy={isLoading} aria-live="polite">
+                {isLoading ? (
+                  <ApprovalListSkeleton />
+                ) : historyFiltered.length === 0 ? (
+                  <EmptyState
+                    icon={CheckSquare}
+                    title={t("empty_history_title")}
+                    description={t("empty_history_desc")}
+                  />
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+                    {historyFiltered.map((item) => {
+                      const TypeIcon = TYPE_ICON[item.type];
+                      return (
+                        <div
+                          key={item.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "var(--space-4)",
+                            padding: "var(--space-3) var(--space-4)",
+                            background: "var(--color-surface-0)",
+                            border: "1px solid var(--color-border)",
+                            borderRadius: "var(--radius-lg)",
+                          }}
+                        >
+                          <Avatar
+                            name={item.requester_name}
+                            colorIndex={item.requester_avatar_color_index}
+                            size="sm"
+                          />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div
+                              style={{
+                                fontWeight: "var(--weight-semibold)",
+                                fontSize: "var(--text-body-sm)",
+                                color: "var(--color-text-1)",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {item.requester_name}
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "var(--space-1)",
+                                marginTop: "var(--space-0-5)",
+                                fontSize: "var(--text-caption)",
+                                color: "var(--color-text-2)",
+                              }}
+                            >
+                              <TypeIcon size={12} aria-hidden />
+                              <span>{item.subject}</span>
+                            </div>
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "var(--space-1)", flexShrink: 0 }}>
+                            <Badge tone={STATUS_BADGE_TONE[item.status]}>
+                              {t(`status_${item.status}`)}
+                            </Badge>
+                            <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", fontVariantNumeric: "tabular-nums" }}>
+                              {formatDate(item.submitted_at)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-    </>
-  );
-}
-
-// ── page ────────────────────────────────────────────────────────────────────
-
-export default function ApprovalsPage() {
-  const { data: allItems } = useApprovals({});
-
-  const pendingCount = allItems?.filter((a) => a.status === "pending").length ?? 0;
-  const highUrgencyCount = allItems?.filter((a) => a.status === "pending" && a.urgency === "high").length ?? 0;
-  const approvedThisWeek = allItems?.filter((a) => a.status === "approved").length ?? 0;
-
-  return (
-    <>
-      <PageHeader title="Approvals" />
-
-      <div className="kpi-grid" style={{ marginBottom: "var(--space-6)" }}>
-        <StatPill label="Pending" value={pendingCount} accent="warning" />
-        <StatPill label="High urgency" value={highUrgencyCount} accent="error" />
-        <StatPill label="Approved this week" value={approvedThisWeek} accent="success" />
-        <StatPill label="Avg response time" value="< 1 day" accent="info" />
-      </div>
-
-      <Tabs defaultValue="pending">
-        <TabsList>
-          <TabsTrigger value="pending" count={pendingCount > 0 ? pendingCount : undefined}>Pending</TabsTrigger>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="pending">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <PendingTab />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="all">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <AllTab />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <HistoryTab />
-          </div>
-        </TabsContent>
-      </Tabs>
     </>
   );
 }

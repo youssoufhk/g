@@ -94,9 +94,8 @@ export function useTimesheetWeek(weekStart: string) {
 
 export function useSubmitTimesheet() {
   return useMutation({
-    mutationFn: async (weekStart: string) => {
+    mutationFn: async (_weekStart: string) => {
       await new Promise((r) => setTimeout(r, 200));
-      console.log("[useSubmitTimesheet] submitted week:", weekStart);
       return { success: true };
     },
   });

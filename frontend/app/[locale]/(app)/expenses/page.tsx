@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Plane,
   UtensilsCrossed,
@@ -14,45 +15,42 @@ import {
   AlertCircle,
   UploadCloud,
   Sparkles,
+  Send,
   MoreHorizontal,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/patterns/page-header";
-import { FilterBar } from "@/components/patterns/filter-bar";
+import { ResourcesFilterBar, type FilterGroup } from "@/components/patterns/resources-filter-bar";
 import { EmptyState } from "@/components/patterns/empty-state";
-import { StatPill } from "@/components/patterns/stat-pill";
+import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { SearchInput } from "@/components/ui/search-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Drawer } from "@/components/ui/drawer";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
+import {
+  TimelineWindowSelector,
+  weeksFor,
+  type WindowPresetValue,
+} from "@/components/patterns/timeline-window-selector";
 import { useExpenses } from "@/features/expenses/use-expenses";
+import { ExpensesKpis } from "@/features/expenses/expenses-kpis";
+import { useUrlListState } from "@/hooks/use-url-list-state";
+
 import type {
   Expense,
   ExpenseCategory,
   ExpenseStatus,
-  ExpenseListFilters,
 } from "@/features/expenses/types";
+import { formatCurrency, formatCurrencyCompact, formatDate } from "@/lib/format";
+import { useUndoableAction } from "@/lib/use-undoable-action";
 
-// ── helpers ────────────────────────────────────────────────────────────────
+const CURRENT_USER_ID = "e1";
 
-function formatCurrency(amount: number, currency: string): string {
-  const symbols: Record<string, string> = { EUR: "EUR", GBP: "GBP", USD: "USD" };
-  const sym = symbols[currency] ?? currency;
-  return `${sym} ${amount.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
+const fmtBigEur = (n: number) => formatCurrencyCompact(n, "EUR");
 
 // ── category icon map ──────────────────────────────────────────────────────
 
@@ -64,16 +62,6 @@ const CATEGORY_ICON: Record<ExpenseCategory, React.ComponentType<{ size?: number
   software: Laptop,
   training: GraduationCap,
   other: Receipt,
-};
-
-const CATEGORY_LABEL: Record<ExpenseCategory, string> = {
-  travel: "Travel",
-  meals: "Meals",
-  accommodation: "Accommodation",
-  equipment: "Equipment",
-  software: "Software",
-  training: "Training",
-  other: "Other",
 };
 
 // ── status badge ───────────────────────────────────────────────────────────
@@ -90,26 +78,18 @@ function statusTone(status: ExpenseStatus): BadgeTone {
   }
 }
 
-function statusLabel(status: ExpenseStatus): string {
-  switch (status) {
-    case "draft": return "Draft";
-    case "submitted": return "Submitted";
-    case "approved": return "Approved";
-    case "rejected": return "Rejected";
-    case "reimbursed": return "Reimbursed";
-  }
-}
-
 // ── expense item ───────────────────────────────────────────────────────────
 
 function ExpenseItem({
   expense,
   onStatusChange,
   onDelete,
+  t,
 }: {
   expense: Expense;
   onStatusChange?: (id: string, status: ExpenseStatus) => void;
   onDelete?: (id: string) => void;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const Icon = CATEGORY_ICON[expense.category];
 
@@ -240,7 +220,7 @@ function ExpenseItem({
               whiteSpace: "nowrap",
             }}
           >
-            {expense.billable ? "Billable" : "Internal"}
+            {expense.billable ? t("billable") : t("internal")}
           </span>
 
           {/* Receipt indicator */}
@@ -256,7 +236,7 @@ function ExpenseItem({
               }}
             >
               <Paperclip size={12} aria-hidden />
-              Receipt
+              {t("receipt")}
             </span>
           )}
 
@@ -265,42 +245,42 @@ function ExpenseItem({
             tone={statusTone(expense.status)}
             dot={expense.status === "submitted"}
           >
-            {statusLabel(expense.status)}
+            {t(`status_${expense.status}`)}
           </Badge>
 
           {/* Actions dropdown */}
           <Dropdown
             align="right"
             trigger={({ toggle }) => (
-              <Button variant="ghost" size="sm" onClick={toggle} aria-label="Actions">
+              <Button variant="ghost" size="sm" onClick={toggle} aria-label={t("actions_aria")}>
                 <MoreHorizontal size={16} aria-hidden />
               </Button>
             )}
           >
             <DropdownItem onClick={() => onStatusChange?.(expense.id, expense.status)}>
-              View details
+              {t("action_view_details")}
             </DropdownItem>
             {(expense.status === "draft" || expense.status === "submitted") && (
               <DropdownItem onClick={() => onStatusChange?.(expense.id, "submitted")}>
-                {expense.status === "draft" ? "Submit" : "Edit"}
+                {expense.status === "draft" ? t("action_submit") : t("action_edit")}
               </DropdownItem>
             )}
             {expense.status === "rejected" && (
               <DropdownItem onClick={() => onStatusChange?.(expense.id, "submitted")}>
-                Re-submit
+                {t("action_resubmit")}
               </DropdownItem>
             )}
             {expense.status === "submitted" && (
               <>
                 <DropdownDivider />
                 <DropdownItem onClick={() => onStatusChange?.(expense.id, "approved")}>
-                  Approve
+                  {t("action_approve")}
                 </DropdownItem>
                 <DropdownItem
                   destructive
                   onClick={() => onStatusChange?.(expense.id, "rejected")}
                 >
-                  Reject
+                  {t("action_reject")}
                 </DropdownItem>
               </>
             )}
@@ -308,7 +288,7 @@ function ExpenseItem({
               <>
                 <DropdownDivider />
                 <DropdownItem destructive onClick={() => onDelete?.(expense.id)}>
-                  Delete
+                  {t("action_delete")}
                 </DropdownItem>
               </>
             )}
@@ -355,146 +335,346 @@ function ExpenseListSkeleton() {
   );
 }
 
+// ── category bar chart ──────────────────────────────────────────────────────
+
+function CategoryBars({
+  data,
+  max,
+  t,
+}: {
+  data: { category: ExpenseCategory; amount: number }[];
+  max: number;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const total = data.reduce((s, d) => s + d.amount, 0);
+  if (total === 0) return null;
+  return (
+    <div
+      style={{
+        background: "var(--color-surface-0)",
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius-lg)",
+        padding: "var(--space-4) var(--space-5)",
+      }}
+      aria-label={t("chart_aria")}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "var(--space-3)" }}>
+        <span style={{ fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>
+          {t("chart_title")}
+        </span>
+        <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", fontVariantNumeric: "tabular-nums" }}>
+          {fmtBigEur(total)}
+        </span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+        {data.map((d) => {
+          const pct = max > 0 ? (d.amount / max) * 100 : 0;
+          return (
+            <div key={d.category} style={{ display: "grid", gridTemplateColumns: "112px 1fr 64px", alignItems: "center", gap: "var(--space-3)" }}>
+              <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-2)" }}>
+                {t(`category_${d.category}`)}
+              </span>
+              <div style={{ height: 10, background: "var(--color-surface-2)", borderRadius: "var(--radius-full)", overflow: "hidden" }}>
+                <div
+                  style={{
+                    width: `${pct}%`,
+                    height: "100%",
+                    background: "var(--color-primary)",
+                    borderRadius: "var(--radius-full)",
+                    transition: "width 0.2s",
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-2)", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                {fmtBigEur(d.amount)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── my expenses tab ─────────────────────────────────────────────────────────
 
-function MyExpensesTab() {
-  const [filters, setFilters] = useState<ExpenseListFilters>({});
+type ExpenseMultiKey = "status" | "category";
+
+const STATUS_KEYS: ExpenseStatus[] = ["draft", "submitted", "approved", "rejected", "reimbursed"];
+const CATEGORY_KEYS: ExpenseCategory[] = [
+  "travel",
+  "meals",
+  "accommodation",
+  "equipment",
+  "software",
+  "training",
+  "other",
+];
+
+function MyExpensesTab({ localNew }: { localNew: Expense[] }) {
+  const t = useTranslations("expenses");
+  const url = useUrlListState<ExpenseMultiKey, WindowPresetValue>({
+    multiKeys: ["status", "category"],
+    windowKey: "window",
+    windowDefault: "3m",
+  });
+  const search = url.search;
+  const statusSel = url.multi.status;
+  const categorySel = url.multi.category;
+  const windowValue: WindowPresetValue = url.windowValue || "3m";
+  const windowWeeks = weeksFor(windowValue);
+
   const [localStatuses, setLocalStatuses] = useState<Record<string, ExpenseStatus>>({});
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
-  const { data: rawExpenses, isLoading, error } = useExpenses(filters);
-  const { data: rawAllExpenses } = useExpenses({});
 
-  function applyLocalState(items: Expense[] | undefined): Expense[] {
+  const { data: rawAll, isLoading, error } = useExpenses({});
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - windowWeeks * 7);
+
+  const applyLocal = (items: Expense[] | undefined): Expense[] => {
     if (!items) return [];
     return items
       .filter((e) => !deletedIds.has(e.id))
+      .filter((e) => e.employee_id === CURRENT_USER_ID)
+      .filter((e) => new Date(e.expense_date) >= cutoff)
       .map((e) => (e.id in localStatuses ? { ...e, status: localStatuses[e.id] as ExpenseStatus } : e));
-  }
+  };
 
-  const expenses = applyLocalState(rawExpenses);
-  const allExpenses = applyLocalState(rawAllExpenses);
+  const allExpenses = applyLocal([...localNew, ...(rawAll ?? [])]);
 
+  const matchesFilters = (e: Expense): boolean => {
+    if (statusSel.length > 0 && !statusSel.includes(e.status)) return false;
+    if (categorySel.length > 0 && !categorySel.includes(e.category)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !e.description.toLowerCase().includes(q) &&
+        !(e.client_name ?? "").toLowerCase().includes(q) &&
+        !(e.project_name ?? "").toLowerCase().includes(q) &&
+        !e.employee_name.toLowerCase().includes(q)
+      ) return false;
+    }
+    return true;
+  };
+
+  const expenses = allExpenses.filter(matchesFilters);
+  const total = expenses.length;
+
+  const runStatusChange = useUndoableAction<{ id: string; next: ExpenseStatus; prev: ExpenseStatus }>({
+    apply: ({ id, next }) => setLocalStatuses((prev) => ({ ...prev, [id]: next })),
+    revert: ({ id, prev: prevStatus }) =>
+      setLocalStatuses((prev) => {
+        const out = { ...prev };
+        if (prevStatus) out[id] = prevStatus;
+        else delete out[id];
+        return out;
+      }),
+    successTitle: t("toast_updated_title"),
+    successDescription: t("toast_undo_body"),
+  });
+  const runDelete = useUndoableAction<string>({
+    apply: (id) => setDeletedIds((prev) => new Set([...prev, id])),
+    revert: (id) => setDeletedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    }),
+    successTitle: t("toast_deleted_title"),
+    successDescription: t("toast_undo_body"),
+    tone: "warning",
+  });
   function handleStatusChange(id: string, status: ExpenseStatus) {
-    setLocalStatuses((prev) => ({ ...prev, [id]: status }));
+    const current = allExpenses.find((e) => e.id === id);
+    runStatusChange({ id, next: status, prev: current?.status ?? "draft" });
   }
-
   function handleDelete(id: string) {
-    setDeletedIds((prev) => new Set([...prev, id]));
+    runDelete(id);
   }
 
-  const STATUS_OPTIONS = [
-    { value: "", label: "All statuses" },
-    { value: "draft", label: "Draft" },
-    { value: "submitted", label: "Submitted" },
-    { value: "approved", label: "Approved" },
-    { value: "rejected", label: "Rejected" },
-    { value: "reimbursed", label: "Reimbursed" },
+  const pendingList = allExpenses.filter((e) => e.status === "submitted" || e.status === "draft");
+  const approvedList = allExpenses.filter((e) => e.status === "approved");
+  const reimbursedList = allExpenses.filter((e) => e.status === "reimbursed");
+  const pendingAmount = pendingList.reduce((s, e) => s + e.amount, 0);
+  const approvedAmount = approvedList.reduce((s, e) => s + e.amount, 0);
+  const reimbursedAmount = reimbursedList.reduce((s, e) => s + e.amount, 0);
+  const fmt = fmtBigEur;
+
+  const matchesFiltersForChart = (e: Expense): boolean => {
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !e.description.toLowerCase().includes(q) &&
+        !(e.client_name ?? "").toLowerCase().includes(q) &&
+        !(e.project_name ?? "").toLowerCase().includes(q)
+      ) return false;
+    }
+    return true;
+  };
+
+  const chartByCategory = CATEGORY_KEYS.map((cat) => {
+    const sum = allExpenses
+      .filter(matchesFiltersForChart)
+      .filter((e) => e.category === cat)
+      .reduce((s, e) => s + e.amount, 0);
+    return { category: cat, amount: sum };
+  });
+  const chartMax = Math.max(1, ...chartByCategory.map((c) => c.amount));
+
+  const activeKpi: string | undefined = (() => {
+    if (statusSel.length === 1) {
+      const s = statusSel[0];
+      if (s === "approved") return "approved";
+      if (s === "reimbursed") return "reimbursed";
+    }
+    if (
+      statusSel.length === 2 &&
+      statusSel.includes("draft") &&
+      statusSel.includes("submitted")
+    ) return "pending";
+    return undefined;
+  })();
+
+  function selectKpi(target: string) {
+    if (activeKpi === target) {
+      url.setMulti("status", []);
+      return;
+    }
+    if (target === "pending") url.setMulti("status", ["draft", "submitted"]);
+    else if (target === "approved") url.setMulti("status", ["approved"]);
+    else if (target === "reimbursed") url.setMulti("status", ["reimbursed"]);
+  }
+
+  const recommendations: AiRecommendation[] = [
+    ...(pendingList.length > 0
+      ? [
+          {
+            id: "rec-pending",
+            icon: Send,
+            tone: "gold" as const,
+            title: t("rec_pending_title"),
+            detail: t("rec_pending_detail", { count: pendingList.length }),
+            applyLabel: t("rec_review"),
+            onApply: () => url.setMulti("status", ["draft", "submitted"]),
+          },
+        ]
+      : []),
+    {
+      id: "rec-receipts",
+      icon: Sparkles,
+      tone: "accent" as const,
+      title: t("rec_receipts_title"),
+      detail: t("rec_receipts_detail"),
+    },
   ];
 
-  const CATEGORY_OPTIONS = [
-    { value: "", label: "All categories" },
-    { value: "travel", label: "Travel" },
-    { value: "meals", label: "Meals" },
-    { value: "accommodation", label: "Accommodation" },
-    { value: "equipment", label: "Equipment" },
-    { value: "software", label: "Software" },
-    { value: "training", label: "Training" },
-    { value: "other", label: "Other" },
+  const filterGroups: FilterGroup[] = [
+    {
+      key: "status",
+      label: t("filter_status"),
+      options: STATUS_KEYS.map((k) => ({ value: k, label: t(`status_${k}`) })),
+      selected: statusSel,
+      onChange: (v) => url.setMulti("status", v),
+      searchPlaceholder: t("search_status"),
+    },
+    {
+      key: "category",
+      label: t("filter_category"),
+      options: CATEGORY_KEYS.map((k) => ({ value: k, label: t(`category_${k}`) })),
+      selected: categorySel,
+      onChange: (v) => url.setMulti("category", v),
+      searchPlaceholder: t("search_category"),
+    },
   ];
+
+  const hasFilters = !!search || statusSel.length > 0 || categorySel.length > 0;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
-      {/* KPI strip - derived from live data */}
-      {(() => {
-        const all = allExpenses ?? [];
-        const pending = all.filter((e) => e.status === "submitted" || e.status === "draft");
-        const approved = all.filter((e) => e.status === "approved");
-        const reimbursed = all.filter((e) => e.status === "reimbursed");
-        const rejected = all.filter((e) => e.status === "rejected");
-        const pendingTotal = pending.reduce((s, e) => s + e.amount, 0);
-        const approvedTotal = approved.reduce((s, e) => s + e.amount, 0);
-        const reimbursedTotal = reimbursed.reduce((s, e) => s + e.amount, 0);
-        return (
-          <div className="kpi-grid">
-            <StatPill label="Pending" value={pendingTotal > 0 ? `EUR ${pendingTotal.toFixed(2)}` : "-"} accent="warning" />
-            <StatPill label="Approved" value={approvedTotal > 0 ? `EUR ${approvedTotal.toFixed(2)}` : "-"} accent="success" />
-            <StatPill label="Reimbursed (this month)" value={reimbursedTotal > 0 ? `EUR ${reimbursedTotal.toFixed(2)}` : "-"} accent="info" />
-            <StatPill label="Rejected" value={rejected.length > 0 ? rejected.length : "-"} accent="error" />
-          </div>
-        );
-      })()}
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+      <AiRecommendations
+        items={recommendations}
+        title={t("ai_recs_title")}
+        overline={t("ai_recs_overline")}
+      />
 
-      {/* Filter bar */}
-      <FilterBar>
-        <SearchInput
-          placeholder="Search expenses..."
-          value={filters.search ?? ""}
-          onChange={(e) =>
-            setFilters((f) => ({ ...f, search: e.target.value || undefined }))
-          }
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-2)" }}>
+          {t("scope_me")}
+        </span>
+        <TimelineWindowSelector
+          value={windowValue}
+          onChange={url.setWindow}
+          label={t("window_label")}
         />
-        <Select
-          value={filters.status ?? ""}
-          onChange={(e) =>
-            setFilters((f) => ({
-              ...f,
-              status: (e.target.value as ExpenseStatus) || undefined,
-            }))
-          }
-        >
-          {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </Select>
-        <Select
-          value={filters.category ?? ""}
-          onChange={(e) =>
-            setFilters((f) => ({
-              ...f,
-              category: (e.target.value as ExpenseCategory) || undefined,
-            }))
-          }
-        >
-          {CATEGORY_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </Select>
-      </FilterBar>
+      </div>
 
-      {/* Error state */}
+      <CategoryBars data={chartByCategory} max={chartMax} t={t} />
+
+      <ExpensesKpis
+        pendingAmount={fmt(pendingAmount)}
+        pendingCount={pendingList.length}
+        approvedAmount={fmt(approvedAmount)}
+        reimbursedAmount={fmt(reimbursedAmount)}
+        activeStatus={activeKpi}
+        onSelectPending={() => selectKpi("pending")}
+        onSelectApproved={() => selectKpi("approved")}
+        onSelectReimbursed={() => selectKpi("reimbursed")}
+      />
+
+      <ResourcesFilterBar
+        search={search}
+        onSearchChange={url.setSearch}
+        searchPlaceholder={t("search_placeholder")}
+        groups={filterGroups}
+        onClearAll={url.clearAll}
+        resultCount={total}
+        resultLabel={total === 1 ? t("result_expense") : t("result_expenses")}
+      />
+
       {error && (
-        <div className="card" style={{ borderColor: "var(--color-error-muted)" }}>
-          <div className="card-body">
-            <p style={{ color: "var(--color-error)", fontSize: "var(--text-body-sm)" }}>
-              Could not load expenses. {(error as Error).message}
-            </p>
-          </div>
+        <div role="alert" style={{ padding: "var(--space-4)", background: "var(--color-error-muted)", borderRadius: "var(--radius-md)", color: "var(--color-error)", fontSize: "var(--text-body-sm)" }}>
+          {t("load_error")} {(error as Error).message}
         </div>
       )}
 
-      {/* Expense list */}
-      {isLoading ? (
-        <ExpenseListSkeleton />
-      ) : !expenses || expenses.length === 0 ? (
-        <EmptyState
-          icon={Receipt}
-          title="No expenses found"
-          description="Try adjusting your filters or submit a new expense."
-        />
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-          {expenses.map((e) => (
-            <ExpenseItem
-              key={e.id}
-              expense={e}
-              onStatusChange={handleStatusChange}
-              onDelete={handleDelete}
+      {!error && (
+        <div
+          aria-busy={isLoading}
+          aria-live="polite"
+          style={{
+            maxHeight: "calc(10 * 88px)",
+            overflowY: "auto",
+            padding: "var(--space-1)",
+          }}
+        >
+          {isLoading ? (
+            <ExpenseListSkeleton />
+          ) : expenses.length === 0 ? (
+            <EmptyState
+              icon={Receipt}
+              title={hasFilters ? t("empty_filtered_title") : t("empty_title")}
+              description={hasFilters ? t("empty_filtered_desc") : t("empty_desc")}
+              action={
+                hasFilters ? (
+                  <Button variant="secondary" size="sm" onClick={() => url.clearAll()}>
+                    {t("empty_clear")}
+                  </Button>
+                ) : undefined
+              }
             />
-          ))}
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+              {expenses.map((e) => (
+                <ExpenseItem
+                  key={e.id}
+                  expense={e}
+                  onStatusChange={handleStatusChange}
+                  onDelete={handleDelete}
+                  t={t}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -513,7 +693,8 @@ type SubmitFormState = {
   billable: boolean;
 };
 
-function SubmitNewTab() {
+function SubmitExpenseForm({ onSubmitted }: { onSubmitted?: (e: Expense) => void }) {
+  const t = useTranslations("expenses");
   const [form, setForm] = useState<SubmitFormState>({
     description: "",
     amount: "",
@@ -528,22 +709,22 @@ function SubmitNewTab() {
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
 
   const PROJECT_OPTIONS = [
-    { value: "", label: "No project (internal)" },
+    { value: "", label: t("project_none") },
     { value: "p1", label: "HSBC Digital Transformation" },
     { value: "p2", label: "BNP Risk Model" },
     { value: "p3", label: "TotalEnergies ESG Strategy" },
     { value: "p4", label: "Renault Lean Analytics" },
   ];
 
-  const CATEGORY_OPTIONS = [
-    { value: "", label: "Select category" },
-    { value: "travel", label: "Travel" },
-    { value: "meals", label: "Meals" },
-    { value: "accommodation", label: "Accommodation" },
-    { value: "equipment", label: "Equipment" },
-    { value: "software", label: "Software" },
-    { value: "training", label: "Training" },
-    { value: "other", label: "Other" },
+  const CATEGORY_OPTIONS: { value: "" | ExpenseCategory; label: string }[] = [
+    { value: "", label: t("category_placeholder") },
+    { value: "travel", label: t("category_travel") },
+    { value: "meals", label: t("category_meals") },
+    { value: "accommodation", label: t("category_accommodation") },
+    { value: "equipment", label: t("category_equipment") },
+    { value: "software", label: t("category_software") },
+    { value: "training", label: t("category_training") },
+    { value: "other", label: t("category_other") },
   ];
 
   function handleOcrUpload() {
@@ -551,7 +732,7 @@ function SubmitNewTab() {
     setTimeout(() => {
       setForm((f) => ({
         ...f,
-        description: "Client dinner - La Brasserie Parisienne",
+        description: t("ocr_sample_description"),
         amount: "142.50",
         currency: "EUR",
         expense_date: "2026-04-15",
@@ -569,6 +750,26 @@ function SubmitNewTab() {
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitted(true);
+      const PROJECT_NAMES: Record<string, string> = {
+        p1: "HSBC Digital Transformation",
+        p2: "BNP Risk Model",
+        p3: "TotalEnergies ESG Strategy",
+        p4: "Renault Lean Analytics",
+      };
+      const newExpense: Expense = {
+        id: `exp-new-${Date.now()}`,
+        employee_id: CURRENT_USER_ID,
+        employee_name: "Youssouf Kerzika",
+        project_id: form.project_id || undefined,
+        project_name: form.project_id ? PROJECT_NAMES[form.project_id] : undefined,
+        category: (form.category || "other") as ExpenseCategory,
+        description: form.description || t("no_description"),
+        amount: parseFloat(form.amount) || 0,
+        currency: form.currency,
+        expense_date: form.expense_date || new Date().toISOString().slice(0, 10),
+        status: "submitted",
+        billable: form.billable,
+      };
       setForm({
         description: "",
         amount: "",
@@ -578,6 +779,7 @@ function SubmitNewTab() {
         project_id: "",
         billable: false,
       });
+      if (onSubmitted) setTimeout(() => onSubmitted(newExpense), 600);
     }, 800);
   }
 
@@ -614,7 +816,7 @@ function SubmitNewTab() {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleOcrUpload(); }}
-          aria-label="Upload receipt"
+          aria-label={t("upload_receipt_aria")}
         >
           <UploadCloud
             size={40}
@@ -629,17 +831,17 @@ function SubmitNewTab() {
               margin: 0,
             }}
           >
-            {isOcrProcessing ? "Scanning receipt..." : "Drop receipt here"}
+            {isOcrProcessing ? t("ocr_scanning") : t("ocr_drop_here")}
           </p>
           {!isOcrProcessing && (
             <>
-              <p style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", margin: 0 }}>or</p>
+              <p style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)", margin: 0 }}>{t("ocr_or")}</p>
               <div
                 style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", justifyContent: "center" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <Button variant="secondary" size="sm" onClick={handleOcrUpload}>Browse files</Button>
-                <Button variant="ghost" size="sm" onClick={handleOcrUpload}>Take photo</Button>
+                <Button variant="secondary" size="sm" onClick={handleOcrUpload}>{t("ocr_browse")}</Button>
+                <Button variant="ghost" size="sm" onClick={handleOcrUpload}>{t("ocr_take_photo")}</Button>
               </div>
             </>
           )}
@@ -652,7 +854,7 @@ function SubmitNewTab() {
             margin: 0,
           }}
         >
-          Supports: JPG, PNG, PDF · Max 5 MB
+          {t("ocr_supports")}
         </p>
 
         <div
@@ -668,7 +870,7 @@ function SubmitNewTab() {
           }}
         >
           <Sparkles size={14} aria-hidden />
-          <span>After upload, AI will pre-fill the form below</span>
+          <span>{t("ocr_prefill_hint")}</span>
         </div>
       </div>
 
@@ -686,10 +888,10 @@ function SubmitNewTab() {
               color: "var(--color-text-2)",
             }}
           >
-            Description
+            {t("form_description")}
           </label>
           <Input
-            placeholder="e.g. Client meeting lunch"
+            placeholder={t("form_description_placeholder")}
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
           />
@@ -705,7 +907,7 @@ function SubmitNewTab() {
                 color: "var(--color-text-2)",
               }}
             >
-              Amount
+              {t("form_amount")}
             </label>
             <Input
               type="number"
@@ -724,7 +926,7 @@ function SubmitNewTab() {
                 color: "var(--color-text-2)",
               }}
             >
-              Currency
+              {t("form_currency")}
             </label>
             <Select
               value={form.currency}
@@ -746,7 +948,7 @@ function SubmitNewTab() {
               color: "var(--color-text-2)",
             }}
           >
-            Date
+            {t("form_date")}
           </label>
           <Input
             type="date"
@@ -764,7 +966,7 @@ function SubmitNewTab() {
               color: "var(--color-text-2)",
             }}
           >
-            Category
+            {t("form_category")}
           </label>
           <Select
             value={form.category}
@@ -787,7 +989,7 @@ function SubmitNewTab() {
               color: "var(--color-text-2)",
             }}
           >
-            Project (optional)
+            {t("form_project")}
           </label>
           <Select
             value={form.project_id}
@@ -821,7 +1023,7 @@ function SubmitNewTab() {
                 color: "var(--color-text-1)",
               }}
             >
-              Billable to client
+              {t("billable_to_client")}
             </div>
             <div
               style={{
@@ -830,13 +1032,13 @@ function SubmitNewTab() {
                 marginTop: "var(--space-0-5)",
               }}
             >
-              This expense will appear on the client invoice
+              {t("billable_hint")}
             </div>
           </div>
           <Toggle
             checked={form.billable}
             onCheckedChange={(next) => setForm((f) => ({ ...f, billable: next }))}
-            label="Billable to client"
+            label={t("billable_to_client")}
           />
         </div>
 
@@ -853,7 +1055,7 @@ function SubmitNewTab() {
               textAlign: "center",
             }}
           >
-            Expense submitted for approval.
+            {t("submit_success")}
           </div>
         )}
         <Button
@@ -863,7 +1065,7 @@ function SubmitNewTab() {
           loading={isSubmitting}
           onClick={(e: React.MouseEvent) => handleSubmit(e as unknown as React.FormEvent)}
         >
-          {isSubmitting ? "Submitting..." : "Submit expense"}
+          {isSubmitting ? t("submitting") : t("submit_expense")}
         </Button>
       </form>
     </div>
@@ -873,37 +1075,45 @@ function SubmitNewTab() {
 // ── page ────────────────────────────────────────────────────────────────────
 
 export default function ExpensesPage() {
-  const [activeTab, setActiveTab] = useState("my-expenses");
+  const t = useTranslations("expenses");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [localNew, setLocalNew] = useState<Expense[]>([]);
 
   return (
     <>
-      <PageHeader
-        title="Expenses"
-        actions={
-          <Button variant="primary" size="md" onClick={() => setActiveTab("submit-new")}>
-            New expense
-          </Button>
-        }
-      />
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
+      </div>
+      <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <PageHeader
+          title={t("page_title")}
+          actions={
+            <Button
+              variant="primary"
+              size="md"
+              leadingIcon={<UploadCloud size={16} aria-hidden />}
+              onClick={() => setDrawerOpen(true)}
+            >
+              {t("new_expense")}
+            </Button>
+          }
+        />
+        <MyExpensesTab localNew={localNew} />
+      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="my-expenses">My expenses</TabsTrigger>
-          <TabsTrigger value="submit-new">Submit new</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="my-expenses">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <MyExpensesTab />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="submit-new">
-          <div style={{ paddingTop: "var(--space-5)" }}>
-            <SubmitNewTab />
-          </div>
-        </TabsContent>
-      </Tabs>
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title={t("drawer_title")}
+        width={520}
+      >
+        <SubmitExpenseForm
+          onSubmitted={(e) => {
+            setLocalNew((prev) => [e, ...prev]);
+            setDrawerOpen(false);
+          }}
+        />
+      </Drawer>
     </>
   );
 }

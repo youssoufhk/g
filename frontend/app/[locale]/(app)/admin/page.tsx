@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Users,
   Plus,
@@ -15,13 +15,13 @@ import {
   ClipboardList,
   ChevronDown,
   ChevronUp,
+  Sparkles,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 import { PageHeader } from "@/components/patterns/page-header";
-import { StatPill } from "@/components/patterns/stat-pill";
+import { AiRecommendations, type AiRecommendation } from "@/components/patterns/ai-recommendations";
 import {
-  DataTableWrapper,
   Table,
   THead,
   TBody,
@@ -37,6 +37,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
+import { AdminKpis } from "@/features/admin/admin-kpis";
+import { formatDate } from "@/lib/format";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,11 +46,11 @@ import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdow
 
 type UserStatus = "active" | "inactive" | "pending";
 type UserRole =
-  | "Owner"
-  | "Admin"
-  | "Finance Manager"
-  | "Project Manager"
-  | "Employee";
+  | "owner"
+  | "admin"
+  | "finance_manager"
+  | "project_manager"
+  | "employee";
 
 type AdminUser = {
   id: string;
@@ -56,193 +58,62 @@ type AdminUser = {
   email: string;
   role: UserRole;
   status: UserStatus;
-  lastSeen: string;
+  lastSeenIso: string | null;
   avatarColorIndex: number;
 };
 
 type FeatureFlag = {
   id: string;
-  name: string;
-  description: string;
+  nameKey: string;
+  descKey: string;
   enabled: boolean;
 };
 
+type AuditAction = "LOGIN" | "UPDATE" | "CREATE" | "APPROVE" | "INVITE" | "DELETE";
+
 type AuditEntry = {
   id: string;
-  timestamp: string;
+  timestampIso: string;
   user: string;
-  action: "LOGIN" | "UPDATE" | "CREATE" | "APPROVE" | "INVITE" | "DELETE";
+  action: AuditAction;
   resource: string;
   ip: string;
 };
 
 // ---------------------------------------------------------------------------
-// Mock data
+// Mock data (ISO dates only; labels come from i18n)
 // ---------------------------------------------------------------------------
 
+const NOW_ISO = "2026-04-18T09:30:00Z";
+
 const INITIAL_USERS: AdminUser[] = [
-  {
-    id: "u1",
-    name: "Youssouf Kerzika",
-    email: "youssouf.kerzika@globalg.consulting",
-    role: "Owner",
-    status: "active",
-    lastSeen: "Just now",
-    avatarColorIndex: 0,
-  },
-  {
-    id: "u2",
-    name: "Marie Dubois",
-    email: "marie.dubois@globalg.consulting",
-    role: "Admin",
-    status: "active",
-    lastSeen: "2h ago",
-    avatarColorIndex: 1,
-  },
-  {
-    id: "u3",
-    name: "Pierre Leclerc",
-    email: "pierre.leclerc@globalg.consulting",
-    role: "Finance Manager",
-    status: "active",
-    lastSeen: "Yesterday",
-    avatarColorIndex: 2,
-  },
-  {
-    id: "u4",
-    name: "Anna Schmidt",
-    email: "anna.schmidt@globalg.consulting",
-    role: "Project Manager",
-    status: "active",
-    lastSeen: "3 days ago",
-    avatarColorIndex: 3,
-  },
-  {
-    id: "u5",
-    name: "Tom Baker",
-    email: "tom.baker@globalg.consulting",
-    role: "Employee",
-    status: "inactive",
-    lastSeen: "2 weeks ago",
-    avatarColorIndex: 4,
-  },
-  {
-    id: "u6",
-    name: "Invited User",
-    email: "invite@company.com",
-    role: "Employee",
-    status: "pending",
-    lastSeen: "-",
-    avatarColorIndex: 5,
-  },
+  { id: "u1", name: "Youssouf Kerzika", email: "youssouf.kerzika@globalg.consulting", role: "owner", status: "active", lastSeenIso: "2026-04-18T09:15:00Z", avatarColorIndex: 0 },
+  { id: "u2", name: "Marie Dubois", email: "marie.dubois@globalg.consulting", role: "admin", status: "active", lastSeenIso: "2026-04-18T07:30:00Z", avatarColorIndex: 1 },
+  { id: "u3", name: "Pierre Leclerc", email: "pierre.leclerc@globalg.consulting", role: "finance_manager", status: "active", lastSeenIso: "2026-04-17T16:00:00Z", avatarColorIndex: 2 },
+  { id: "u4", name: "Anna Schmidt", email: "anna.schmidt@globalg.consulting", role: "project_manager", status: "active", lastSeenIso: "2026-04-15T12:00:00Z", avatarColorIndex: 3 },
+  { id: "u5", name: "Tom Baker", email: "tom.baker@globalg.consulting", role: "employee", status: "inactive", lastSeenIso: "2026-04-04T09:00:00Z", avatarColorIndex: 4 },
+  { id: "u6", name: "Invited User", email: "invite@company.com", role: "employee", status: "pending", lastSeenIso: null, avatarColorIndex: 5 },
 ];
 
 const INITIAL_FLAGS: FeatureFlag[] = [
-  {
-    id: "ai-invoice",
-    name: "AI Invoice Drafting",
-    description: "AI drafts invoices on day 28 of each month",
-    enabled: true,
-  },
-  {
-    id: "ai-mapper",
-    name: "AI Column Mapper",
-    description: "AI maps CSV columns during employee import",
-    enabled: true,
-  },
-  {
-    id: "ocr",
-    name: "OCR Receipt Scanning",
-    description: "Scan receipts with AI vision for expense auto-fill",
-    enabled: true,
-  },
-  {
-    id: "month-end",
-    name: "Month-end Close Agent",
-    description: "Automated month-end close workflow",
-    enabled: true,
-  },
-  {
-    id: "multi-currency",
-    name: "Multi-currency Billing",
-    description: "Bill clients in GBP, EUR, or USD",
-    enabled: true,
-  },
-  {
-    id: "client-portal",
-    name: "Client Portal",
-    description: "Self-service portal for clients to view invoices",
-    enabled: false,
-  },
-  {
-    id: "resource-planning",
-    name: "Resource Planning",
-    description: "Gantt + capacity planning views (Tier 2)",
-    enabled: false,
-  },
-  {
-    id: "payroll-export",
-    name: "Payroll Export",
-    description: "Export payroll data to external systems",
-    enabled: false,
-  },
-  {
-    id: "mfa",
-    name: "MFA Enforcement",
-    description: "Require 2FA for all users",
-    enabled: false,
-  },
+  { id: "ai-invoice", nameKey: "flag_ai_invoice_name", descKey: "flag_ai_invoice_desc", enabled: true },
+  { id: "ai-mapper", nameKey: "flag_ai_mapper_name", descKey: "flag_ai_mapper_desc", enabled: true },
+  { id: "ocr", nameKey: "flag_ocr_name", descKey: "flag_ocr_desc", enabled: true },
+  { id: "month-end", nameKey: "flag_month_end_name", descKey: "flag_month_end_desc", enabled: true },
+  { id: "multi-currency", nameKey: "flag_multi_currency_name", descKey: "flag_multi_currency_desc", enabled: true },
+  { id: "client-portal", nameKey: "flag_client_portal_name", descKey: "flag_client_portal_desc", enabled: false },
+  { id: "resource-planning", nameKey: "flag_resource_planning_name", descKey: "flag_resource_planning_desc", enabled: false },
+  { id: "payroll-export", nameKey: "flag_payroll_export_name", descKey: "flag_payroll_export_desc", enabled: false },
+  { id: "mfa", nameKey: "flag_mfa_name", descKey: "flag_mfa_desc", enabled: false },
 ];
 
 const AUDIT_LOG: AuditEntry[] = [
-  {
-    id: "a1",
-    timestamp: "Today 09:15",
-    user: "Youssouf Kerzika",
-    action: "LOGIN",
-    resource: "auth",
-    ip: "82.65.12.4",
-  },
-  {
-    id: "a2",
-    timestamp: "Today 08:30",
-    user: "Marie Dubois",
-    action: "UPDATE",
-    resource: "employee:amara-diallo",
-    ip: "91.23.45.6",
-  },
-  {
-    id: "a3",
-    timestamp: "Yesterday 17:00",
-    user: "Youssouf Kerzika",
-    action: "CREATE",
-    resource: "invoice:INV-2026-0042",
-    ip: "82.65.12.4",
-  },
-  {
-    id: "a4",
-    timestamp: "Yesterday 14:00",
-    user: "Pierre Leclerc",
-    action: "APPROVE",
-    resource: "expense:e2",
-    ip: "77.32.11.8",
-  },
-  {
-    id: "a5",
-    timestamp: "Apr 13 11:20",
-    user: "Anna Schmidt",
-    action: "CREATE",
-    resource: "timesheet:week-15",
-    ip: "88.44.22.1",
-  },
-  {
-    id: "a6",
-    timestamp: "Apr 13 09:00",
-    user: "Youssouf Kerzika",
-    action: "INVITE",
-    resource: "user:invite@company.com",
-    ip: "82.65.12.4",
-  },
+  { id: "a1", timestampIso: "2026-04-18T09:15:00Z", user: "Youssouf Kerzika", action: "LOGIN", resource: "auth", ip: "82.65.12.4" },
+  { id: "a2", timestampIso: "2026-04-18T08:30:00Z", user: "Marie Dubois", action: "UPDATE", resource: "employee:amara-diallo", ip: "91.23.45.6" },
+  { id: "a3", timestampIso: "2026-04-17T17:00:00Z", user: "Youssouf Kerzika", action: "CREATE", resource: "invoice:INV-2026-0042", ip: "82.65.12.4" },
+  { id: "a4", timestampIso: "2026-04-17T14:00:00Z", user: "Pierre Leclerc", action: "APPROVE", resource: "expense:e2", ip: "77.32.11.8" },
+  { id: "a5", timestampIso: "2026-04-13T11:20:00Z", user: "Anna Schmidt", action: "CREATE", resource: "timesheet:week-15", ip: "88.44.22.1" },
+  { id: "a6", timestampIso: "2026-04-13T09:00:00Z", user: "Youssouf Kerzika", action: "INVITE", resource: "user:invite@company.com", ip: "82.65.12.4" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -250,43 +121,48 @@ const AUDIT_LOG: AuditEntry[] = [
 // ---------------------------------------------------------------------------
 
 function RoleBadge({ role }: { role: UserRole }) {
+  const t = useTranslations("admin");
+  const label = t(`role_${role}`);
   switch (role) {
-    case "Owner":
-      return <Badge tone="primary">{role}</Badge>;
-    case "Admin":
-      return <Badge tone="info">{role}</Badge>;
-    case "Finance Manager":
-      return <Badge tone="warning">{role}</Badge>;
+    case "owner":
+      return <Badge tone="primary">{label}</Badge>;
+    case "admin":
+      return <Badge tone="info">{label}</Badge>;
+    case "finance_manager":
+      return <Badge tone="warning">{label}</Badge>;
     default:
-      return <Badge tone="default">{role}</Badge>;
+      return <Badge tone="default">{label}</Badge>;
   }
 }
 
 function StatusBadge({ status }: { status: UserStatus }) {
+  const t = useTranslations("admin");
   switch (status) {
     case "active":
-      return <Badge tone="success" dot>Active</Badge>;
+      return <Badge tone="success" dot>{t("status_active")}</Badge>;
     case "pending":
-      return <Badge tone="warning">Pending</Badge>;
+      return <Badge tone="warning">{t("status_pending")}</Badge>;
     default:
-      return <Badge tone="default">Inactive</Badge>;
+      return <Badge tone="default">{t("status_inactive")}</Badge>;
   }
 }
 
-function ActionBadge({ action }: { action: AuditEntry["action"] }) {
+function ActionBadge({ action }: { action: AuditAction }) {
+  const t = useTranslations("admin");
+  const label = t(`action_${action}`);
   switch (action) {
     case "LOGIN":
-      return <Badge tone="default">{action}</Badge>;
+      return <Badge tone="default">{label}</Badge>;
     case "UPDATE":
-      return <Badge tone="info">{action}</Badge>;
+      return <Badge tone="info">{label}</Badge>;
     case "CREATE":
-      return <Badge tone="success">{action}</Badge>;
+      return <Badge tone="success">{label}</Badge>;
     case "APPROVE":
-      return <Badge tone="primary">{action}</Badge>;
+      return <Badge tone="primary">{label}</Badge>;
     case "INVITE":
-      return <Badge tone="warning">{action}</Badge>;
+      return <Badge tone="warning">{label}</Badge>;
     case "DELETE":
-      return <Badge tone="error">{action}</Badge>;
+      return <Badge tone="error">{label}</Badge>;
   }
 }
 
@@ -301,6 +177,7 @@ function CardHeader({
   expanded,
   onToggle,
   count,
+  toggleLabels,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -308,6 +185,7 @@ function CardHeader({
   expanded?: boolean;
   onToggle?: () => void;
   count?: number;
+  toggleLabels?: { expand: string; collapse: string };
 }) {
   return (
     <div
@@ -338,6 +216,7 @@ function CardHeader({
               background: "var(--color-surface-2)",
               borderRadius: "var(--radius-full)",
               padding: "1px 8px",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {count}
@@ -347,7 +226,13 @@ function CardHeader({
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
         {action}
         {onToggle && (
-          <Button variant="ghost" size="xs" iconOnly onClick={onToggle} aria-label={expanded ? "Collapse" : "Expand"}>
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
+            onClick={onToggle}
+            aria-label={expanded ? toggleLabels?.collapse ?? "" : toggleLabels?.expand ?? ""}
+          >
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </Button>
         )}
@@ -369,8 +254,9 @@ function InviteModal({
   onClose: () => void;
   onInvite: (email: string, role: UserRole) => void;
 }) {
+  const t = useTranslations("admin");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<UserRole>("Employee");
+  const [role, setRole] = useState<UserRole>("employee");
   const [sending, setSending] = useState(false);
 
   function handleSend() {
@@ -380,7 +266,7 @@ function InviteModal({
       setSending(false);
       onInvite(email.trim(), role);
       setEmail("");
-      setRole("Employee");
+      setRole("employee");
       onClose();
     }, 800);
   }
@@ -389,16 +275,16 @@ function InviteModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Invite user"
-      description="Send an invitation email to add a new user to your workspace."
+      title={t("invite_title")}
+      description={t("invite_desc")}
       size="sm"
       footer={
         <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            Cancel
+            {t("action_cancel")}
           </Button>
-          <Button variant="primary" size="sm" onClick={handleSend} disabled={sending || !email.trim()}>
-            {sending ? "Sending..." : "Send invite"}
+          <Button variant="primary" size="sm" onClick={handleSend} disabled={sending || !email.trim()} aria-busy={sending}>
+            {sending ? t("invite_sending") : t("invite_send")}
           </Button>
         </div>
       }
@@ -409,12 +295,12 @@ function InviteModal({
             htmlFor="invite-email"
             style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}
           >
-            Email address
+            {t("invite_email_label")}
           </label>
           <Input
             id="invite-email"
             type="email"
-            placeholder="colleague@company.com"
+            placeholder={t("invite_email_placeholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -424,17 +310,17 @@ function InviteModal({
             htmlFor="invite-role"
             style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}
           >
-            Role
+            {t("invite_role_label")}
           </label>
           <Select
             id="invite-role"
             value={role}
             onChange={(e) => setRole(e.target.value as UserRole)}
           >
-            <option value="Admin">Admin</option>
-            <option value="Finance Manager">Finance Manager</option>
-            <option value="Project Manager">Project Manager</option>
-            <option value="Employee">Employee</option>
+            <option value="admin">{t("role_admin")}</option>
+            <option value="finance_manager">{t("role_finance_manager")}</option>
+            <option value="project_manager">{t("role_project_manager")}</option>
+            <option value="employee">{t("role_employee")}</option>
           </Select>
         </div>
       </div>
@@ -451,12 +337,13 @@ function EditRoleModal({
   onClose: () => void;
   onSave: (id: string, role: UserRole) => void;
 }) {
-  const [role, setRole] = useState<UserRole>(user?.role ?? "Employee");
+  const t = useTranslations("admin");
+  const [role, setRole] = useState<UserRole>(user?.role ?? "employee");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (user) setRole(user.role);
-  }, [user?.id]);
+  }, [user]);
 
   function handleSave() {
     if (!user) return;
@@ -472,15 +359,15 @@ function EditRoleModal({
     <Modal
       open={!!user}
       onClose={onClose}
-      title="Edit role"
+      title={t("edit_role_title")}
       size="sm"
       footer={
         <div style={{ display: "flex", gap: "var(--space-3)", justifyContent: "flex-end" }}>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            Cancel
+            {t("action_cancel")}
           </Button>
-          <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save"}
+          <Button variant="primary" size="sm" onClick={handleSave} disabled={saving} aria-busy={saving}>
+            {saving ? t("action_saving") : t("action_save")}
           </Button>
         </div>
       }
@@ -490,17 +377,17 @@ function EditRoleModal({
           htmlFor="edit-role-select"
           style={{ display: "block", marginBottom: "var(--space-2)", fontSize: "var(--text-body-sm)", fontWeight: "var(--weight-medium)", color: "var(--color-text-2)" }}
         >
-          Role for {user?.name}
+          {t("edit_role_for", { name: user?.name ?? "" })}
         </label>
         <Select
           id="edit-role-select"
           value={role}
           onChange={(e) => setRole(e.target.value as UserRole)}
         >
-          <option value="Admin">Admin</option>
-          <option value="Finance Manager">Finance Manager</option>
-          <option value="Project Manager">Project Manager</option>
-          <option value="Employee">Employee</option>
+          <option value="admin">{t("role_admin")}</option>
+          <option value="finance_manager">{t("role_finance_manager")}</option>
+          <option value="project_manager">{t("role_project_manager")}</option>
+          <option value="employee">{t("role_employee")}</option>
         </Select>
       </div>
     </Modal>
@@ -511,8 +398,16 @@ function EditRoleModal({
 // Users & Roles card
 // ---------------------------------------------------------------------------
 
-function UsersCard() {
-  const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS);
+function UsersCard({
+  users,
+  setUsers,
+  activeFilter,
+}: {
+  users: AdminUser[];
+  setUsers: React.Dispatch<React.SetStateAction<AdminUser[]>>;
+  activeFilter: "all" | "pending";
+}) {
+  const t = useTranslations("admin");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editRoleUser, setEditRoleUser] = useState<AdminUser | null>(null);
   const [expanded, setExpanded] = useState(true);
@@ -535,22 +430,24 @@ function UsersCard() {
         email,
         role,
         status: "pending",
-        lastSeen: "-",
+        lastSeenIso: null,
         avatarColorIndex: prev.length % 8,
       },
     ]);
   }
 
+  const filtered = activeFilter === "pending" ? users.filter((u) => u.status === "pending") : users;
   const activeCount = users.filter((u) => u.status === "active").length;
   const pendingCount = users.filter((u) => u.status === "pending").length;
-  const previewUsers = expanded ? users : users.slice(0, 3);
+  const adminCount = users.filter((u) => u.role === "admin" || u.role === "owner").length;
+  const previewUsers = expanded ? filtered : filtered.slice(0, 3);
 
   return (
     <>
-      <div className="card" style={{ gridColumn: "1 / -1" }}>
+      <div className="card" style={{ gridColumn: "1 / -1" }} id="admin-users-card">
         <CardHeader
           icon={<Users size={16} />}
-          title="Users & Roles"
+          title={t("card_users_title")}
           count={users.length}
           action={
             <Button
@@ -559,14 +456,14 @@ function UsersCard() {
               leadingIcon={<Plus size={14} />}
               onClick={() => setInviteOpen(true)}
             >
-              Invite user
+              {t("invite_user")}
             </Button>
           }
           expanded={expanded}
           onToggle={() => setExpanded((v) => !v)}
+          toggleLabels={{ expand: t("action_expand"), collapse: t("action_collapse") }}
         />
 
-        {/* Summary row - always visible */}
         <div
           style={{
             display: "flex",
@@ -577,24 +474,23 @@ function UsersCard() {
           }}
         >
           <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{activeCount}</span> active
+            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>{activeCount}</span> {t("summary_active")}
           </span>
           <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{pendingCount}</span> pending invite{pendingCount !== 1 ? "s" : ""}
+            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>{pendingCount}</span> {t("summary_pending")}
           </span>
           <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{users.filter((u) => u.role === "Admin" || u.role === "Owner").length}</span> admins
+            <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>{adminCount}</span> {t("summary_admins")}
           </span>
         </div>
 
-        {/* Table */}
         <Table>
           <THead>
             <TR>
-              <TH>User</TH>
-              <TH>Role</TH>
-              <TH>Status</TH>
-              <TH>Last seen</TH>
+              <TH>{t("col_user")}</TH>
+              <TH>{t("col_role")}</TH>
+              <TH>{t("col_status")}</TH>
+              <TH>{t("col_last_seen")}</TH>
               <TH style={{ width: 40 }} />
             </TR>
           </THead>
@@ -622,7 +518,7 @@ function UsersCard() {
                 <TD><RoleBadge role={user.role} /></TD>
                 <TD><StatusBadge status={user.status} /></TD>
                 <TD muted style={{ fontVariantNumeric: "tabular-nums" }}>
-                  {user.lastSeen}
+                  {user.lastSeenIso ? formatDate(user.lastSeenIso, "medium") : t("never_signed_in")}
                 </TD>
                 <TD style={{ width: 40 }}>
                   <Dropdown
@@ -632,7 +528,7 @@ function UsersCard() {
                         variant="ghost"
                         size="xs"
                         iconOnly
-                        aria-label="More actions"
+                        aria-label={t("action_more")}
                         aria-expanded={open}
                         onClick={toggle}
                       >
@@ -641,21 +537,21 @@ function UsersCard() {
                     )}
                   >
                     <DropdownItem icon={<Settings size={14} />} onClick={() => setEditRoleUser(user)}>
-                      Edit role
+                      {t("action_edit_role")}
                     </DropdownItem>
                     {user.status === "active" && (
                       <DropdownItem icon={<Shield size={14} />} destructive onClick={() => handleDeactivate(user.id)}>
-                        Deactivate
+                        {t("action_deactivate")}
                       </DropdownItem>
                     )}
                     {user.status === "pending" && (
                       <DropdownItem icon={<Mail size={14} />} onClick={() => {}}>
-                        Resend invite
+                        {t("action_resend_invite")}
                       </DropdownItem>
                     )}
                     <DropdownDivider />
                     <DropdownItem destructive onClick={() => handleRemove(user.id)}>
-                      Remove
+                      {t("action_remove")}
                     </DropdownItem>
                   </Dropdown>
                 </TD>
@@ -664,11 +560,10 @@ function UsersCard() {
           </TBody>
         </Table>
 
-        {/* Show more toggle when collapsed */}
-        {!expanded && users.length > 3 && (
+        {!expanded && filtered.length > 3 && (
           <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
             <Button variant="ghost" size="sm" onClick={() => setExpanded(true)}>
-              Show all {users.length} users
+              {t("show_all_users", { count: filtered.length })}
             </Button>
           </div>
         )}
@@ -684,8 +579,14 @@ function UsersCard() {
 // Feature Flags card
 // ---------------------------------------------------------------------------
 
-function FeatureFlagsCard() {
-  const [flags, setFlags] = useState<FeatureFlag[]>(INITIAL_FLAGS);
+function FeatureFlagsCard({
+  flags,
+  setFlags,
+}: {
+  flags: FeatureFlag[];
+  setFlags: React.Dispatch<React.SetStateAction<FeatureFlag[]>>;
+}) {
+  const t = useTranslations("admin");
   const [expanded, setExpanded] = useState(false);
 
   function toggleFlag(id: string) {
@@ -696,18 +597,19 @@ function FeatureFlagsCard() {
   const visibleFlags = expanded ? flags : flags.slice(0, 4);
 
   return (
-    <div className="card">
+    <div className="card" id="admin-flags-card">
       <CardHeader
         icon={<ToggleLeft size={16} />}
-        title="Feature Flags"
+        title={t("card_flags_title")}
         count={flags.length}
         expanded={expanded}
         onToggle={() => setExpanded((v) => !v)}
+        toggleLabels={{ expand: t("action_expand"), collapse: t("action_collapse") }}
       />
 
       <div style={{ padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid var(--color-border)" }}>
         <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-          <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{enabledCount}</span> of {flags.length} enabled
+          <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>{enabledCount}</span> {t("flags_of", { total: flags.length })}
         </span>
       </div>
 
@@ -725,16 +627,16 @@ function FeatureFlagsCard() {
           >
             <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", marginBottom: "2px" }}>
-                {flag.name}
+                {t(flag.nameKey)}
               </div>
               <div style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-                {flag.description}
+                {t(flag.descKey)}
               </div>
             </div>
             <Toggle
               checked={flag.enabled}
               onCheckedChange={() => toggleFlag(flag.id)}
-              label={`Toggle ${flag.name}`}
+              label={t("toggle_flag", { name: t(flag.nameKey) })}
             />
           </div>
         ))}
@@ -743,7 +645,7 @@ function FeatureFlagsCard() {
       {!expanded && flags.length > 4 && (
         <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
           <Button variant="ghost" size="sm" onClick={() => setExpanded(true)}>
-            Show {flags.length - 4} more flags
+            {t("show_more_flags", { count: flags.length - 4 })}
           </Button>
         </div>
       )}
@@ -756,6 +658,7 @@ function FeatureFlagsCard() {
 // ---------------------------------------------------------------------------
 
 function AuditLogCard() {
+  const t = useTranslations("admin");
   const [expanded, setExpanded] = useState(false);
   const [exporting, setExporting] = useState(false);
 
@@ -767,40 +670,41 @@ function AuditLogCard() {
   const visibleEntries = expanded ? AUDIT_LOG : AUDIT_LOG.slice(0, 3);
 
   return (
-    <div className="card">
+    <div className="card" id="admin-audit-card">
       <CardHeader
         icon={<ClipboardList size={16} />}
-        title="Audit Log"
+        title={t("card_audit_title")}
         action={
-          <Button variant="secondary" size="sm" leadingIcon={<Download size={14} />} onClick={handleExport} disabled={exporting}>
-            {exporting ? "Exporting..." : "Export CSV"}
+          <Button variant="secondary" size="sm" leadingIcon={<Download size={14} />} onClick={handleExport} disabled={exporting} aria-busy={exporting}>
+            {exporting ? t("audit_exporting") : t("audit_export")}
           </Button>
         }
         expanded={expanded}
         onToggle={() => setExpanded((v) => !v)}
+        toggleLabels={{ expand: t("action_expand"), collapse: t("action_collapse") }}
       />
 
       <div style={{ padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid var(--color-border)" }}>
         <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
-          <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)" }}>{AUDIT_LOG.length}</span> events in the last 7 days
+          <span style={{ fontWeight: "var(--weight-semibold)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>{AUDIT_LOG.length}</span> {t("audit_events_7d")}
         </span>
       </div>
 
-      <div style={{ overflowX: "auto" }}>
+      <div style={{ overflowX: "auto" }} aria-live="polite">
         <Table>
           <THead>
             <TR>
-              <TH>When</TH>
-              <TH>User</TH>
-              <TH>Action</TH>
-              <TH>Resource</TH>
+              <TH>{t("col_when")}</TH>
+              <TH>{t("col_user")}</TH>
+              <TH>{t("col_action")}</TH>
+              <TH>{t("col_resource")}</TH>
             </TR>
           </THead>
           <TBody>
             {visibleEntries.map((entry) => (
               <TR key={entry.id}>
                 <TD muted style={{ whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", fontSize: "var(--text-caption)" }}>
-                  {entry.timestamp}
+                  {formatDate(entry.timestampIso, "withTime")}
                 </TD>
                 <TD style={{ fontSize: "var(--text-body-sm)" }}>{entry.user}</TD>
                 <TD><ActionBadge action={entry.action} /></TD>
@@ -816,7 +720,7 @@ function AuditLogCard() {
       {!expanded && AUDIT_LOG.length > 3 && (
         <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
           <Button variant="ghost" size="sm" onClick={() => setExpanded(true)}>
-            Show all {AUDIT_LOG.length} events
+            {t("show_all_events", { count: AUDIT_LOG.length })}
           </Button>
         </div>
       )}
@@ -829,17 +733,18 @@ function AuditLogCard() {
 // ---------------------------------------------------------------------------
 
 function BillingCard() {
-  const rows: { label: string; value: string }[] = [
-    { label: "Plan", value: "Gamma Pro - Pilot" },
-    { label: "Billing period", value: "Active pilot (until Jun 30, 2026)" },
-    { label: "Seats", value: "6 / 200" },
-    { label: "Monthly cost", value: "\u20AC0 (pilot)" },
-    { label: "Contact", value: "billing@gammahr.com" },
+  const t = useTranslations("admin");
+  const rows: { label: string; value: string; numeric?: boolean }[] = [
+    { label: t("billing_plan"), value: t("billing_plan_value") },
+    { label: t("billing_period"), value: t("billing_period_value") },
+    { label: t("billing_seats"), value: "6 / 200", numeric: true },
+    { label: t("billing_cost"), value: t("billing_cost_value") },
+    { label: t("billing_contact"), value: "billing@gammahr.com" },
   ];
 
   return (
-    <div className="card">
-      <CardHeader icon={<CreditCard size={16} />} title="Billing" />
+    <div className="card" id="admin-billing-card">
+      <CardHeader icon={<CreditCard size={16} />} title={t("card_billing_title")} />
 
       <div style={{ padding: "var(--space-2) 0" }}>
         {rows.map((row, i) => (
@@ -857,7 +762,15 @@ function BillingCard() {
             <span style={{ fontSize: "var(--text-body-sm)", color: "var(--color-text-3)" }}>
               {row.label}
             </span>
-            <span style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", textAlign: "right" }}>
+            <span
+              style={{
+                fontWeight: "var(--weight-medium)",
+                fontSize: "var(--text-body-sm)",
+                color: "var(--color-text-1)",
+                textAlign: "right",
+                fontVariantNumeric: row.numeric ? "tabular-nums" : undefined,
+              }}
+            >
               {row.value}
             </span>
           </div>
@@ -872,21 +785,22 @@ function BillingCard() {
 // ---------------------------------------------------------------------------
 
 function SecurityCard() {
+  const t = useTranslations("admin");
   const [mfaEnforced, setMfaEnforced] = useState(false);
   const [sessionTimeout, setSessionTimeout] = useState(true);
 
   const securityItems: { id: string; label: string; description: string; enabled: boolean; onChange: () => void }[] = [
     {
       id: "mfa",
-      label: "Enforce MFA for all users",
-      description: "All users must set up 2FA to log in",
+      label: t("security_mfa_label"),
+      description: t("security_mfa_desc"),
       enabled: mfaEnforced,
       onChange: () => setMfaEnforced((v) => !v),
     },
     {
       id: "session",
-      label: "Session timeout (8h)",
-      description: "Users are logged out after 8 hours of inactivity",
+      label: t("security_session_label"),
+      description: t("security_session_desc"),
       enabled: sessionTimeout,
       onChange: () => setSessionTimeout((v) => !v),
     },
@@ -894,14 +808,14 @@ function SecurityCard() {
 
   return (
     <div className="card">
-      <CardHeader icon={<Lock size={16} />} title="Security" />
+      <CardHeader icon={<Lock size={16} />} title={t("card_security_title")} />
 
       <div style={{ padding: "var(--space-3) var(--space-5)", borderBottom: "1px solid var(--color-border)" }}>
         <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>
           <span style={{ fontWeight: "var(--weight-semibold)", color: mfaEnforced ? "var(--color-success)" : "var(--color-warning)" }}>
-            {mfaEnforced ? "MFA on" : "MFA off"}
+            {mfaEnforced ? t("security_mfa_on") : t("security_mfa_off")}
           </span>
-          {" - "}{mfaEnforced ? "All users require 2FA" : "2FA is optional"}
+          {" - "}{mfaEnforced ? t("security_mfa_on_hint") : t("security_mfa_off_hint")}
         </span>
       </div>
 
@@ -932,8 +846,8 @@ function SecurityCard() {
 
       <div style={{ padding: "var(--space-3) var(--space-5)", borderTop: "1px solid var(--color-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>Active sessions</span>
-          <span style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)" }}>3</span>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--color-text-3)" }}>{t("security_active_sessions")}</span>
+          <span style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-body-sm)", color: "var(--color-text-1)", fontVariantNumeric: "tabular-nums" }}>3</span>
         </div>
       </div>
     </div>
@@ -945,46 +859,144 @@ function SecurityCard() {
 // ---------------------------------------------------------------------------
 
 export default function AdminPage() {
+  const t = useTranslations("admin");
+  const [users, setUsers] = useState<AdminUser[]>(INITIAL_USERS);
+  const [flags, setFlags] = useState<FeatureFlag[]>(INITIAL_FLAGS);
+  const [activeKpi, setActiveKpi] = useState<"users" | "flags" | "billing" | "audit" | undefined>();
+  const [userFilter, setUserFilter] = useState<"all" | "pending">("all");
+
+  const pendingInvites = users.filter((u) => u.status === "pending").length;
+  const flagsEnabled = flags.filter((f) => f.enabled).length;
+
+  // audit "today" = events on 2026-04-18 per seed
+  const auditToday = useMemo(() => {
+    const today = NOW_ISO.slice(0, 10);
+    return AUDIT_LOG.filter((e) => e.timestampIso.slice(0, 10) === today).length;
+  }, []);
+
+  // Real data-backed recommendations only
+  const staleUsers = users.filter((u) => {
+    if (!u.lastSeenIso || u.status !== "active") return false;
+    const diffDays = (new Date(NOW_ISO).getTime() - new Date(u.lastSeenIso).getTime()) / 86400000;
+    return diffDays > 90;
+  }).length;
+
+  const disabledSecurityFlags = flags.filter((f) => f.id === "mfa" && !f.enabled).length;
+
+  const recommendations: AiRecommendation[] = [
+    ...(pendingInvites > 0
+      ? [
+          {
+            id: "rec-pending-invites",
+            icon: Mail,
+            tone: "gold" as const,
+            title: t("rec_pending_invites_title"),
+            detail: t("rec_pending_invites_detail", { count: pendingInvites }),
+            applyLabel: t("rec_review"),
+            onApply: () => {
+              setUserFilter("pending");
+              setActiveKpi("users");
+              document.getElementById("admin-users-card")?.scrollIntoView({ block: "start" });
+            },
+          },
+        ]
+      : []),
+    ...(staleUsers > 0
+      ? [
+          {
+            id: "rec-stale-users",
+            icon: Sparkles,
+            tone: "accent" as const,
+            title: t("rec_stale_users_title"),
+            detail: t("rec_stale_users_detail", { count: staleUsers }),
+          },
+        ]
+      : []),
+    ...(disabledSecurityFlags > 0
+      ? [
+          {
+            id: "rec-mfa-off",
+            icon: Shield,
+            tone: "primary" as const,
+            title: t("rec_mfa_off_title"),
+            detail: t("rec_mfa_off_detail"),
+            applyLabel: t("rec_configure"),
+            onApply: () => {
+              setActiveKpi("flags");
+              document.getElementById("admin-flags-card")?.scrollIntoView({ block: "start" });
+            },
+          },
+        ]
+      : []),
+  ];
+
+  function handleSelectKpi(key: "users" | "flags" | "billing" | "audit") {
+    const next = activeKpi === key ? undefined : key;
+    setActiveKpi(next);
+    if (key === "users" && next) setUserFilter("all");
+    const targetId =
+      key === "users"
+        ? "admin-users-card"
+        : key === "flags"
+        ? "admin-flags-card"
+        : key === "billing"
+        ? "admin-billing-card"
+        : "admin-audit-card";
+    if (next) document.getElementById(targetId)?.scrollIntoView({ block: "start", behavior: "auto" });
+  }
+
   return (
     <>
-      <PageHeader title="Administration" />
-
-      {/* Stats row */}
-      <div className="kpi-grid" style={{ marginBottom: "var(--space-5)" }}>
-        <StatPill label="Total users" value={201} />
-        <StatPill label="Active sessions" value={3} accent="success" />
-        <StatPill label="Pending invites" value={1} accent="warning" />
-        <StatPill label="Flags enabled" value={5} accent="info" />
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
       </div>
+      <div className="flex flex-col" style={{ gap: "var(--space-6)" }}>
+        <PageHeader title={t("page_title")} />
 
-      {/* Card grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "var(--space-4)",
-        }}
-        className="admin-card-grid"
-      >
-        {/* Users & Roles - full width */}
-        <UsersCard />
+        <AiRecommendations
+          items={recommendations}
+          title={t("ai_recs_title")}
+          overline={t("ai_recs_overline")}
+        />
 
-        {/* Feature Flags + Audit Log - 2 col */}
-        <FeatureFlagsCard />
-        <AuditLogCard />
+        <AdminKpis
+          usersCount={users.length}
+          pendingInvites={pendingInvites}
+          flagsEnabled={flagsEnabled}
+          flagsTotal={flags.length}
+          billingStatus={t("kpi_billing_value")}
+          billingHint={t("kpi_billing_hint")}
+          auditToday={auditToday}
+          activeKey={activeKpi}
+          onSelectUsers={() => handleSelectKpi("users")}
+          onSelectFlags={() => handleSelectKpi("flags")}
+          onSelectBilling={() => handleSelectKpi("billing")}
+          onSelectAudit={() => handleSelectKpi("audit")}
+        />
 
-        {/* Billing + Security - 2 col */}
-        <BillingCard />
-        <SecurityCard />
-      </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "var(--space-4)",
+          }}
+          className="admin-card-grid"
+        >
+          <UsersCard users={users} setUsers={setUsers} activeFilter={userFilter} />
+          <FeatureFlagsCard flags={flags} setFlags={setFlags} />
+          <AuditLogCard />
+          <BillingCard />
+          <SecurityCard />
+        </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .admin-card-grid {
-            grid-template-columns: 1fr !important;
+        <style>{`
+          @media (max-width: 768px) {
+            .admin-card-grid {
+              grid-template-columns: 1fr !important;
+            }
           }
-        }
-      `}</style>
+        `}</style>
+      </div>
     </>
   );
 }

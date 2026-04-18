@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Pencil,
   MoreHorizontal,
@@ -17,6 +18,8 @@ import {
 
 import { StatPill } from "@/components/patterns/stat-pill";
 import { EmptyState } from "@/components/patterns/empty-state";
+import { DetailHeaderBar } from "@/components/patterns/detail-header-bar";
+import { EMPLOYEES } from "@/lib/mock-data";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,35 +29,30 @@ import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdow
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { useEmployee } from "@/features/employees/use-employees";
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
+import { formatDate, formatCurrency, formatNumber } from "@/lib/format";
 
 function StatusBadge({
   status,
+  label,
 }: {
   status: "active" | "inactive" | "on_leave";
+  label: string;
 }) {
   switch (status) {
     case "active":
       return (
         <Badge tone="success" dot>
-          Active
+          {label}
         </Badge>
       );
     case "on_leave":
       return (
         <Badge tone="warning" dot>
-          On leave
+          {label}
         </Badge>
       );
     default:
-      return <Badge tone="default">Inactive</Badge>;
+      return <Badge tone="default">{label}</Badge>;
   }
 }
 
@@ -88,7 +86,18 @@ export default function EmployeeProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const t = useTranslations("employees");
   const { data: employee, isLoading, error } = useEmployee(id);
+  const siblings = useMemo(() => {
+    const idx = EMPLOYEES.findIndex((e) => e.id === id);
+    if (idx === -1) return { idx: -1, total: EMPLOYEES.length, prev: null, next: null };
+    return {
+      idx,
+      total: EMPLOYEES.length,
+      prev: idx > 0 ? EMPLOYEES[idx - 1]?.id ?? null : null,
+      next: idx < EMPLOYEES.length - 1 ? EMPLOYEES[idx + 1]?.id ?? null : null,
+    };
+  }, [id]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState("");
   const [editTitle, setEditTitle] = useState("");
@@ -118,36 +127,46 @@ export default function EmployeeProfilePage({
 
   if (error) {
     return (
-      <div className="card" style={{ padding: 0 }}>
-        <div className="card-body">
-          <EmptyState
-            icon={AlertTriangle}
-            title="Employee not found"
-            description="This employee does not exist or you may not have access."
-            action={
-              <Link href="/employees">
-                <Button variant="secondary" size="sm">
-                  Back to employees
-                </Button>
-              </Link>
-            }
-          />
+      <>
+        <div className="app-aura" aria-hidden>
+          <div className="app-aura-accent" />
         </div>
-      </div>
+        <div className="card" style={{ padding: 0 }}>
+          <div className="card-body">
+            <EmptyState
+              icon={AlertTriangle}
+              title={t("detail_error_title")}
+              description={t("detail_error_desc")}
+              action={
+                <Link href="/employees">
+                  <Button variant="secondary" size="sm">
+                    {t("detail_back")}
+                  </Button>
+                </Link>
+              }
+            />
+          </div>
+        </div>
+      </>
     );
   }
 
   if (isLoading || !employee) {
     return (
       <>
-        <ProfileHeroSkeleton />
-        <div className="kpi-grid" style={{ marginTop: "var(--space-4)" }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div className="stat-card" key={i}>
-              <Skeleton variant="text" width={80} />
-              <Skeleton variant="title" width={50} style={{ marginTop: "var(--space-2)" }} />
-            </div>
-          ))}
+        <div className="app-aura" aria-hidden>
+          <div className="app-aura-accent" />
+        </div>
+        <div aria-busy="true" aria-live="polite">
+          <ProfileHeroSkeleton />
+          <div className="kpi-grid" style={{ marginTop: "var(--space-4)" }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div className="stat-card" key={i}>
+                <Skeleton variant="text" width={80} />
+                <Skeleton variant="title" width={50} style={{ marginTop: "var(--space-2)" }} />
+              </div>
+            ))}
+          </div>
         </div>
       </>
     );
@@ -161,24 +180,21 @@ export default function EmployeeProfilePage({
 
   return (
     <>
-      {/* Breadcrumb */}
-      <nav
-        aria-label="Breadcrumb"
-        style={{
-          fontSize: "var(--text-caption)",
-          color: "var(--color-text-3)",
-          marginBottom: "var(--space-4)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-2)",
-        }}
-      >
-        <Link href="/employees" className="text-3">
-          Employees
-        </Link>
-        <span>/</span>
-        <span className="text-2">{employee.name}</span>
-      </nav>
+      <div className="app-aura" aria-hidden>
+        <div className="app-aura-accent" />
+      </div>
+      <DetailHeaderBar
+        backHref="/employees"
+        backLabel={t("detail_back")}
+        title={employee.name}
+        prevHref={siblings.prev ? `/employees/${siblings.prev}` : null}
+        nextHref={siblings.next ? `/employees/${siblings.next}` : null}
+        prevLabel={t("detail_prev")}
+        nextLabel={t("detail_next")}
+        position={siblings.idx >= 0 ? siblings.idx + 1 : null}
+        total={siblings.total}
+        positionLabel={(p, total) => t("detail_position", { position: p, total })}
+      />
 
       {/* Profile hero card */}
       <div className="card" style={{ padding: 0, overflow: "hidden", marginBottom: "var(--space-4)" }}>
@@ -243,7 +259,7 @@ export default function EmployeeProfilePage({
                   className="flex items-center flex-wrap"
                   style={{ gap: "var(--space-2)", marginTop: "var(--space-3)" }}
                 >
-                  <StatusBadge status={employee.status} />
+                  <StatusBadge status={employee.status} label={t(`detail_status_${employee.status}`)} />
                   {employee.location && (
                     <span
                       className="flex items-center gap-1 text-3"
@@ -258,14 +274,14 @@ export default function EmployeeProfilePage({
                     style={{ fontSize: "var(--text-caption)" }}
                   >
                     <CalendarDays size={12} aria-hidden />
-                    Since {formatDate(employee.start_date)}
+                    {t("detail_since", { date: formatDate(employee.start_date) })}
                   </span>
                   {employee.manager_name && (
                     <span
                       className="flex items-center gap-1 text-3"
                       style={{ fontSize: "var(--text-caption)" }}
                     >
-                      Reports to{" "}
+                      {t("detail_reports_to")}{" "}
                       {employee.manager_id ? (
                         <Link
                           href={`/employees/${employee.manager_id}`}
@@ -290,7 +306,7 @@ export default function EmployeeProfilePage({
                 leadingIcon={<Pencil size={14} />}
                 onClick={openEditModal}
               >
-                Edit profile
+                {t("detail_edit_profile")}
               </Button>
               <Dropdown
                 align="right"
@@ -299,7 +315,7 @@ export default function EmployeeProfilePage({
                     variant="ghost"
                     size="sm"
                     iconOnly
-                    aria-label="More actions"
+                    aria-label={t("detail_more_actions")}
                     aria-expanded={open}
                     onClick={toggle}
                   >
@@ -308,14 +324,14 @@ export default function EmployeeProfilePage({
                 )}
               >
                 <DropdownItem icon={<Receipt size={14} />} onClick={() => setActiveTab("expenses")}>
-                  View expenses
+                  {t("detail_view_expenses")}
                 </DropdownItem>
                 <DropdownItem icon={<Umbrella size={14} />} onClick={() => setActiveTab("leaves")}>
-                  View leaves
+                  {t("detail_view_leaves")}
                 </DropdownItem>
                 <DropdownDivider />
                 <DropdownItem icon={<FileText size={14} />} onClick={handleExport}>
-                  {exportLoading ? "Exporting..." : "Export profile"}
+                  {exportLoading ? t("detail_exporting") : t("detail_export_profile")}
                 </DropdownItem>
               </Dropdown>
             </div>
@@ -326,30 +342,30 @@ export default function EmployeeProfilePage({
       {/* KPI strip */}
       <div className="kpi-grid" style={{ marginBottom: "var(--space-6)" }}>
         <StatPill
-          label="Current projects"
-          value={projectCount}
-          secondary={projectCount === 1 ? "project" : "projects"}
+          label={t("detail_kpi_projects")}
+          value={formatNumber(projectCount)}
+          secondary={projectCount === 1 ? t("detail_kpi_project_unit_one") : t("detail_kpi_project_unit_other")}
           accent="primary"
         />
         <StatPill
-          label="Hours this month"
-          value={hoursThisMonth}
-          secondary={capacityHours > 0 ? `/ ${capacityHours} cap.` : undefined}
+          label={t("detail_kpi_hours")}
+          value={formatNumber(hoursThisMonth)}
+          secondary={capacityHours > 0 ? t("detail_kpi_capacity", { capacity: formatNumber(capacityHours) }) : undefined}
           accent="info"
         />
         <StatPill
-          label="Pending expenses"
+          label={t("detail_kpi_expenses")}
           value={
             pendingExpenses > 0
-              ? `€ ${pendingExpenses.toLocaleString("en-GB")}`
-              : "None"
+              ? formatCurrency(pendingExpenses, "EUR")
+              : t("detail_kpi_none")
           }
           accent="warning"
         />
         <StatPill
-          label="Leave balance"
-          value={leaveBalance}
-          secondary="days"
+          label={t("detail_kpi_leave")}
+          value={formatNumber(leaveBalance)}
+          secondary={t("detail_kpi_days")}
           accent="gold"
         />
       </div>
@@ -357,13 +373,13 @@ export default function EmployeeProfilePage({
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="timesheets">Timesheets</TabsTrigger>
+          <TabsTrigger value="overview">{t("detail_tab_overview")}</TabsTrigger>
+          <TabsTrigger value="timesheets">{t("detail_tab_timesheets")}</TabsTrigger>
           <TabsTrigger value="expenses" count={pendingExpenses > 0 ? 1 : undefined}>
-            Expenses
+            {t("detail_tab_expenses")}
           </TabsTrigger>
-          <TabsTrigger value="leaves">Leaves</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="leaves">{t("detail_tab_leaves")}</TabsTrigger>
+          <TabsTrigger value="documents">{t("detail_tab_documents")}</TabsTrigger>
         </TabsList>
 
         {/* Overview tab */}
@@ -372,15 +388,15 @@ export default function EmployeeProfilePage({
             {/* Left: current projects */}
             <div className="card" style={{ padding: 0 }}>
               <div className="card-header">
-                <span className="card-title">Current projects</span>
-                <Badge tone="default">{projectCount}</Badge>
+                <span className="card-title">{t("detail_current_projects")}</span>
+                <Badge tone="default">{formatNumber(projectCount)}</Badge>
               </div>
               <div className="card-body">
                 {projectCount === 0 ? (
                   <EmptyState
                     icon={Briefcase}
-                    title="No active projects"
-                    description="This employee is not assigned to any projects at the moment."
+                    title={t("detail_no_projects_title")}
+                    description={t("detail_no_projects_desc")}
                   />
                 ) : (
                   <div className="flex flex-col gap-2">
@@ -405,7 +421,7 @@ export default function EmployeeProfilePage({
                         >
                           {proj.name}
                         </Link>
-                        <Badge tone="primary">Active</Badge>
+                        <Badge tone="primary">{t("detail_status_active")}</Badge>
                       </div>
                     ))}
                   </div>
@@ -419,7 +435,7 @@ export default function EmployeeProfilePage({
               {employee.skills && employee.skills.length > 0 && (
                 <div className="card" style={{ padding: 0 }}>
                   <div className="card-header">
-                    <span className="card-title">Skills</span>
+                    <span className="card-title">{t("detail_skills")}</span>
                   </div>
                   <div className="card-body">
                     <div
@@ -439,13 +455,13 @@ export default function EmployeeProfilePage({
               {/* Recent activity placeholder */}
               <div className="card" style={{ padding: 0 }}>
                 <div className="card-header">
-                  <span className="card-title">Recent activity</span>
+                  <span className="card-title">{t("detail_recent_activity")}</span>
                 </div>
                 <div className="card-body">
                   <EmptyState
                     icon={Clock}
-                    title="No recent activity"
-                    description="Timesheet and approval history will appear here once timesheets are logged."
+                    title={t("detail_no_activity_title")}
+                    description={t("detail_no_activity_desc")}
                   />
                 </div>
               </div>
@@ -460,8 +476,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={Clock}
-                  title="No timesheet history"
-                  description="Timesheet entries and approval status will appear here once the employee starts logging time."
+                  title={t("detail_no_timesheets_title")}
+                  description={t("detail_no_timesheets_desc")}
                 />
               </div>
             </div>
@@ -475,8 +491,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={Receipt}
-                  title="No expenses"
-                  description="Submitted and approved expenses will appear here once the employee submits a claim."
+                  title={t("detail_no_expenses_title")}
+                  description={t("detail_no_expenses_desc")}
                 />
               </div>
             </div>
@@ -490,8 +506,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={Umbrella}
-                  title="No leave requests"
-                  description="Annual leave, sick days, and leave balances will appear here."
+                  title={t("detail_no_leaves_title")}
+                  description={t("detail_no_leaves_desc")}
                 />
               </div>
             </div>
@@ -505,8 +521,8 @@ export default function EmployeeProfilePage({
               <div className="card-body">
                 <EmptyState
                   icon={FileText}
-                  title="No documents"
-                  description="Contracts and signed documents will appear here once uploaded."
+                  title={t("detail_no_documents_title")}
+                  description={t("detail_no_documents_desc")}
                 />
               </div>
             </div>
@@ -517,21 +533,21 @@ export default function EmployeeProfilePage({
       <Modal
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit profile"
+        title={t("detail_edit_profile")}
         footer={
           <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
             <Button variant="secondary" size="sm" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t("detail_cancel")}
             </Button>
             <Button variant="primary" size="sm" onClick={handleEditSave} disabled={editSaving}>
-              {editSaving ? "Saving..." : "Save changes"}
+              {editSaving ? t("detail_saving") : t("detail_save_changes")}
             </Button>
           </div>
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <div>
-            <label className="form-label" htmlFor="edit-name">Full name</label>
+            <label className="form-label" htmlFor="edit-name">{t("detail_full_name")}</label>
             <Input
               id="edit-name"
               value={editName}
@@ -539,7 +555,7 @@ export default function EmployeeProfilePage({
             />
           </div>
           <div>
-            <label className="form-label" htmlFor="edit-title">Job title</label>
+            <label className="form-label" htmlFor="edit-title">{t("detail_job_title")}</label>
             <Input
               id="edit-title"
               value={editTitle}
