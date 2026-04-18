@@ -1036,6 +1036,8 @@
     "rec_stale_users_detail": "{count, plural, one {# utilisateur actif ne s'est pas connecte depuis plus de 90 jours.} other {# utilisateurs actifs ne se sont pas connectes depuis plus de 90 jours.}}",
     "rec_mfa_off_title": "MFA non appliquee",
     "rec_mfa_off_detail": "L'authentification a deux facteurs est optionnelle. Appliquez-la pour reduire le risque de compromission.",
+    "toast_user_deactivated": "{name} desactive",
+    "toast_user_removed": "{name} supprime",
     "kpi_section_aria": "Vue d'ensemble admin",
     "kpi_users_label": "Utilisateurs",
     "kpi_users_unit": "{count, plural, =0 { tous arrives} one { en attente} other { en attente}}",

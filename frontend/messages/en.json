@@ -1036,6 +1036,8 @@
     "rec_stale_users_detail": "{count, plural, one {# active user has not signed in for over 90 days.} other {# active users have not signed in for over 90 days.}}",
     "rec_mfa_off_title": "MFA is not enforced",
     "rec_mfa_off_detail": "Two-factor authentication is optional. Enforce it to reduce account takeover risk.",
+    "toast_user_deactivated": "{name} deactivated",
+    "toast_user_removed": "{name} removed",
     "kpi_section_aria": "Admin overview",
     "kpi_users_label": "Users",
     "kpi_users_unit": "{count, plural, =0 { all joined} one { pending} other { pending}}",

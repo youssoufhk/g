@@ -38,6 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
 import { Dropdown, DropdownItem, DropdownDivider } from "@/components/ui/dropdown";
+import { useToast } from "@/components/ui/toast";
 import { AdminKpis } from "@/features/admin/admin-kpis";
 import { formatDate } from "@/lib/format";
 
@@ -407,6 +408,8 @@ function UsersCard({
   activeFilter: "all" | "pending";
 }) {
   const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
+  const { show } = useToast();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editRoleUser, setEditRoleUser] = useState<AdminUser | null>(null);
   const [expanded, setExpanded] = useState(true);
@@ -415,10 +418,55 @@ function UsersCard({
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)));
   }
   function handleDeactivate(id: string) {
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status: "inactive" as UserStatus } : u)));
+    let previous: AdminUser | undefined;
+    setUsers((prev) => {
+      previous = prev.find((u) => u.id === id);
+      return prev.map((u) =>
+        u.id === id ? { ...u, status: "inactive" as UserStatus } : u,
+      );
+    });
+    if (!previous) return;
+    const snapshot = previous;
+    show({
+      tone: "info",
+      title: t("toast_user_deactivated", { name: snapshot.name }),
+      durationMs: 6000,
+      action: {
+        label: tCommon("undo"),
+        onAction: () => {
+          setUsers((prev) =>
+            prev.map((u) => (u.id === snapshot.id ? { ...u, status: snapshot.status } : u)),
+          );
+        },
+      },
+    });
   }
   function handleRemove(id: string) {
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+    let previous: { user: AdminUser; index: number } | undefined;
+    setUsers((prev) => {
+      const index = prev.findIndex((u) => u.id === id);
+      const user = index !== -1 ? prev[index] : undefined;
+      if (!user) return prev;
+      previous = { user, index };
+      return prev.filter((u) => u.id !== id);
+    });
+    if (!previous) return;
+    const snapshot = previous;
+    show({
+      tone: "info",
+      title: t("toast_user_removed", { name: snapshot.user.name }),
+      durationMs: 6000,
+      action: {
+        label: tCommon("undo"),
+        onAction: () => {
+          setUsers((prev) => {
+            const next = [...prev];
+            next.splice(snapshot.index, 0, snapshot.user);
+            return next;
+          });
+        },
+      },
+    });
   }
   function handleInvite(email: string, role: UserRole) {
     setUsers((prev) => [
