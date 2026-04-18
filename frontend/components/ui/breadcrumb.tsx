@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 /**
  * Wraps the prototype's `.breadcrumb` class. The `>` separator is added
@@ -10,8 +11,9 @@ export type BreadcrumbItem = {
 };
 
 export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
+  const t = useTranslations("a11y");
   return (
-    <nav className="breadcrumb" aria-label="Breadcrumb">
+    <nav className="breadcrumb" aria-label={t("breadcrumb")}>
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         if (item.href && !isLast) {

@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import {
   AlertCircle,
   AlertTriangle,
@@ -50,6 +51,7 @@ const TONE_ICON: Record<ToastTone, typeof Info> = {
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations("a11y");
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const show = useCallback((toast: Omit<Toast, "id">) => {
@@ -89,7 +91,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 type="button"
                 className="toast-close"
                 onClick={() => dismiss(toast.id)}
-                aria-label="Dismiss"
+                aria-label={t("dismiss")}
               >
                 <X size={14} aria-hidden />
               </button>

@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 
 /**
@@ -24,6 +25,7 @@ export function Drawer({
   children,
   width = 480,
 }: DrawerProps) {
+  const t = useTranslations("a11y");
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -55,7 +57,7 @@ export function Drawer({
               type="button"
               className="drawer-close"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t("close")}
             >
               <X size={18} aria-hidden />
             </button>

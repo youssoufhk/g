@@ -33,6 +33,7 @@ type SidebarProps = {
 export function Sidebar({ role = "admin", badges }: SidebarProps) {
   const t = useTranslations("nav");
   const appT = useTranslations("app");
+  const ta = useTranslations("a11y");
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -58,7 +59,7 @@ export function Sidebar({ role = "admin", badges }: SidebarProps) {
   return (
     <aside
       className={clsx("sidebar", collapsed && "collapsed")}
-      aria-label="Primary navigation"
+      aria-label={ta("primary_navigation")}
     >
       <div className="sidebar-logo">
         <div className="logo-icon" aria-hidden>
@@ -67,7 +68,7 @@ export function Sidebar({ role = "admin", badges }: SidebarProps) {
         <span className="logo-text">{appT("name")}</span>
       </div>
 
-      <nav className="sidebar-nav" aria-label="Main navigation">
+      <nav className="sidebar-nav" aria-label={ta("main_navigation")}>
         {visibleSections.map((section) => (
           <SidebarSection
             key={section.key}
@@ -97,11 +98,11 @@ export function Sidebar({ role = "admin", badges }: SidebarProps) {
           type="button"
           className="sidebar-collapse-btn"
           onClick={toggleCollapsed}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? ta("expand_sidebar") : ta("collapse_sidebar")}
           aria-pressed={collapsed}
         >
           <ChevronsLeft aria-hidden />
-          <span>{collapsed ? "Expand" : "Collapse"}</span>
+          <span>{collapsed ? ta("expand") : ta("collapse")}</span>
         </button>
       </div>
     </aside>

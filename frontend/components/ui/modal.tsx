@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 
 /**
@@ -57,6 +58,7 @@ export function Modal({
   className,
   labelledBy,
 }: ModalProps) {
+  const t = useTranslations("a11y");
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
 
@@ -168,7 +170,7 @@ export function Modal({
             type="button"
             className="modal-close"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("close")}
           >
             <X size={16} aria-hidden />
           </button>

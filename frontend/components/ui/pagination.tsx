@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
@@ -31,19 +32,20 @@ export function Pagination({
   onChange,
   className,
 }: PaginationProps) {
+  const t = useTranslations("a11y");
   if (pageCount <= 1) return null;
   const pages = windowed(page, pageCount);
 
   return (
     <nav
       className={clsx("pagination-buttons", className)}
-      aria-label="Pagination"
+      aria-label={t("pagination")}
     >
       <button
         type="button"
         onClick={() => onChange(Math.max(1, page - 1))}
         disabled={page <= 1}
-        aria-label="Previous page"
+        aria-label={t("previous_page")}
       >
         <ChevronLeft size={14} aria-hidden />
       </button>
@@ -81,7 +83,7 @@ export function Pagination({
         type="button"
         onClick={() => onChange(Math.min(pageCount, page + 1))}
         disabled={page >= pageCount}
-        aria-label="Next page"
+        aria-label={t("next_page")}
       >
         <ChevronRight size={14} aria-hidden />
       </button>

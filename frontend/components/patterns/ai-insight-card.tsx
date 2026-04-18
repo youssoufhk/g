@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { Sparkles, X, HelpCircle } from "lucide-react";
 
 export type AIInsightCardProps = {
@@ -43,6 +44,7 @@ export function AIInsightCard({
   onDismiss,
   whyExplanation,
 }: AIInsightCardProps) {
+  const t = useTranslations("a11y");
   const [whyOpen, setWhyOpen] = useState(false);
 
   return (
@@ -55,7 +57,7 @@ export function AIInsightCard({
             type="button"
             className="ai-dismiss"
             onClick={onDismiss}
-            aria-label="Dismiss insight"
+            aria-label={t("dismiss_insight")}
           >
             <X size={14} aria-hidden />
           </button>
@@ -80,7 +82,7 @@ export function AIInsightCard({
               onClick={() => setWhyOpen((open) => !open)}
             >
               <HelpCircle size={12} aria-hidden />
-              {whyOpen ? "Hide explanation" : "Why this insight?"}
+              {whyOpen ? t("hide_explanation") : t("why_this_insight")}
             </button>
             {whyOpen && (
               <div id="ai-why-panel" className="ai-why-panel" role="region">

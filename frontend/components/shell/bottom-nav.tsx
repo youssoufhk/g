@@ -13,10 +13,11 @@ import { bottomNav } from "./nav-items";
  */
 export function BottomNav() {
   const t = useTranslations("nav");
+  const ta = useTranslations("a11y");
   const pathname = usePathname();
 
   return (
-    <nav className="bottom-nav" aria-label="Primary navigation">
+    <nav className="bottom-nav" aria-label={ta("primary_navigation")}>
       {bottomNav.map((item) => {
         const Icon = item.icon;
         const active = isActive(pathname, item.href);
